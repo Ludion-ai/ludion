@@ -214,11 +214,14 @@ describe("a fix on its own branch", () => {
     symlinkSync(join(outside, "tree"), join(fifth.root, ".git", "objects", "ab", "c".repeat(38)));
     expect(() => fixBranch(fifthBase, "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow(`objects/ab/${"c".repeat(38)}`);
     // A fan-out entry that is not a folder does not end the check: the link after it is still found.
-    // The commit's id starts with 00, so objects/00 is already a folder, as it is for 1 run in 256 without a fixed date.
+    // The file takes a fan-out name the repository does not use yet. Here the commit's id starts with 00, so objects/00
+    // is already a folder, as it is for 1 run in 256 without a fixed date.
     const sixth = project(COMMIT_ID_00), sixthBase = gitBase(sixth.root, sixth.copy);
     expect(git(sixth.root, "rev-parse", "HEAD")).toMatch(/^00/);
-    writeFileSync(join(sixth.root, ".git", "objects", "00"), "");
-    expect(() => fixBranch(sixthBase, "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow("objects/00 (not a folder)");
+    const unused = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0")).find(name => !existsSync(join(sixth.root, ".git", "objects", name)))!;
+    expect(unused).not.toBe("00");
+    writeFileSync(join(sixth.root, ".git", "objects", unused), "");
+    expect(() => fixBranch(sixthBase, "ludion/npm/x-1.0.1", files, "ludion: x")).toThrow(`objects/${unused} (not a folder)`);
     // A reflog file already there, which Git would append to.
     const third = project();
     mkdirSync(join(third.root, ".git", "logs", "refs", "heads", "ludion", "npm"), { recursive: true });

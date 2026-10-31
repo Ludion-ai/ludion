@@ -184,12 +184,32 @@ const TREE_FLAGS = ["dev", "optional", "devOptional", "peer", "bundled"];
  * where its own requirements are looked up from, and `needs` are those requirements as [name, spec]; `peers` names the
  * ones that are peers.
  */
-type ViewEntry = { path: string; key: string; name: string; version: string; link: boolean; dir: string; needs: [string, string][]; peers?: Set<string> };
+type ViewEntry = { path: string; key: string; name: string; version: string; link: boolean; dir: string; needs: [string, string][]; peers?: Set<string>; optional?: Set<string> };
 
 /** `peerDependencies` that `peerDependenciesMeta` does not mark optional, which npm 7 and later install. */
 function requiredPeers(item: Record<string, any>): [string, string][] {
   const meta = isPlain(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {};
   return requirementList(item.peerDependencies).filter(([name]) => !(isPlain(meta[name]) && meta[name].optional === true));
+}
+
+/**
+ * The optional peers (`peerDependenciesMeta` marks them optional) that no other of the entry's groups names (npm's
+ * other edges replace a peer's, node.js `_loadDeps`). npm installs none, and one Node's lookup finds must still be the
+ * package its spec names, in range, as `npm ls` and npm 12.2.1's ERESOLVE hold it (audit 6541743253, item 1;
+ * docs/decisions/2026-10-31-lock-flags-from-graph.md, section 1).
+ */
+function optionalPeers(item: Record<string, any>, others: [string, string][]): [string, string][] {
+  const meta = isPlain(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {}, named = new Set(others.map(([name]) => name));
+  return requirementList(item.peerDependencies).filter(([name]) => isPlain(meta[name]) && meta[name].optional === true && !named.has(name));
+}
+
+/**
+ * The names an installed lock entry requires, which npm installs for it: `dependencies`, `optionalDependencies` and the
+ * peers that are not optional. An optional peer is not one: npm 12.2.1 leaves a package that only optional peers reach
+ * extraneous, and prunes it (arborist's calc-dep-flags.js), so a fix never adds one for it (audit 6541743253, item 1).
+ */
+export function requiredNames(item: Record<string, any>): string[] {
+  return [...new Set([...requirementList(item.dependencies, item.optionalDependencies), ...requiredPeers(item)].map(([name]) => name))];
 }
 
 /** Requirement groups as one list of [name, spec], sorted by name. A Map, not an object: a "__proto__" key stays a key. */
@@ -203,7 +223,7 @@ const field = (value: unknown) => typeof value === "string" ? value : value === 
  * `packages` as a view: every install path. A tree entry's `requires` is the entry's `dependencies` and
  * `optionalDependencies` (a link's: its folder's, `devDependencies` included, as npm writes it); npm 7 and later also
  * install an entry's peers, so the requirements it must find include its `peerDependencies` that `peerDependenciesMeta`
- * does not mark optional. npm writes no flags on a link.
+ * does not mark optional, and an optional one wherever the lookup finds a copy (`optional`). npm writes no flags on a link.
  */
 function viewOfPackages(packages: Record<string, any>): Map<string, ViewEntry> {
   const view = new Map<string, ViewEntry>();
@@ -215,14 +235,15 @@ function viewOfPackages(packages: Record<string, any>): Map<string, ViewEntry> {
     const version = item.link ? `file:${field(item.resolved)}` : alias ? `npm:${item.name}@${field(item.version)}` : field(item.version);
     const flags = item.link ? "" : TREE_FLAGS.filter(flag => (flag === "bundled" ? item.inBundle : item[flag]) === true).join(",");
     const requires = item.link ? requirementList(folder?.dependencies, folder?.optionalDependencies, folder?.devDependencies) : requirementList(item.dependencies, item.optionalDependencies);
-    const peers = item.link ? [] : requiredPeers(item);
+    const peers = item.link ? [] : requiredPeers(item), optional = item.link ? [] : optionalPeers(item, requires);
     view.set(path, {
       // The requirements by name: a v2 lock's npm 6 tree writes the spec an override gives (`requires`), `packages` the
       // package's own; whether each copy is what its spec asks is requirementsMet's question, per view.
       path, key: [version, item.link ? "" : field(item.resolved), item.link ? "" : field(item.integrity), flags, JSON.stringify(requires.map(([name]) => name))].join("\0"),
       name: item.link ? (typeof folder?.name === "string" ? folder.name : requireName(path)) : alias ? item.name : requireName(path),
       version: item.link ? field(folder?.version) : field(item.version), link: item.link === true,
-      dir: item.link ? `${field(item.resolved)}/` : `${path}/`, needs: [...requires, ...peers], peers: new Set(peers.map(([name]) => name)),
+      dir: item.link ? `${field(item.resolved)}/` : `${path}/`, needs: [...requires, ...peers, ...optional],
+      peers: new Set([...peers, ...optional].map(([name]) => name)), optional: new Set(optional.map(([name]) => name)),
     });
   }
   return view;
@@ -234,8 +255,8 @@ function viewOfPackages(packages: Record<string, any>): Map<string, ViewEntry> {
  */
 function projects(packages: Record<string, any>): ViewEntry[] {
   return Object.entries(packages).filter(([path, item]) => isPlain(item) && (lockKey(path, item) === "root" || lockKey(path, item) === "folder")).map(([path, item]) => {
-    const peers = requiredPeers(item);
-    return { path, key: "", name: "", version: "", link: false, dir: path ? `${path}/` : "", needs: [...requirementList(item.dependencies, item.optionalDependencies, item.devDependencies), ...peers], peers: new Set(peers.map(([name]) => name)) };
+    const peers = requiredPeers(item), requires = requirementList(item.dependencies, item.optionalDependencies, item.devDependencies), optional = optionalPeers(item, requires);
+    return { path, key: "", name: "", version: "", link: false, dir: path ? `${path}/` : "", needs: [...requires, ...peers, ...optional], peers: new Set([...peers, ...optional].map(([name]) => name)), optional: new Set(optional.map(([name]) => name)) };
   });
 }
 
@@ -331,6 +352,8 @@ function requirementsMet(view: Map<string, ViewEntry>, consumers: ViewEntry[], l
   };
   for (const consumer of [...view.values(), ...consumers]) for (const [name, spec] of consumer.needs) {
     const found = resolveFrom(view, consumer.dir, name);
+    // An optional peer that the lookup finds nothing for is met; one it finds is checked as any requirement.
+    if (!found && consumer.optional?.has(name)) continue;
     // Where an override applies, npm checks the copy against the override's spec only, not the requirement's own
     // (review 6533374683, B2).
     const overridden = overrideSpecs(overrides, project, view, consumer.path, name, spec);
@@ -419,6 +442,92 @@ export function resolveFrom<T>(entries: Map<string, T>, dir: string, name: strin
     // A workspace folder has no node_modules segment to climb; the project root is next.
     at = up === at ? "" : up;
   }
+}
+
+/** The flags npm writes on a `packages` entry, in this order. */
+const ENTRY_FLAGS = ["dev", "devOptional", "extraneous", "optional", "peer"];
+/** An entry's flags as one text ("dev,peer"; "" for none), or null when one of them is there with a value other than `true`. */
+export function writtenFlags(item: Record<string, unknown>): string | null {
+  if (ENTRY_FLAGS.some(flag => Object.hasOwn(item, flag) && item[flag] !== true)) return null;
+  return ENTRY_FLAGS.filter(flag => item[flag] === true).join(",");
+}
+
+type FlagNode = { path: string; item: Record<string, any>; top: boolean; link: boolean; dev: boolean; optional: boolean; devOptional: boolean; peer: boolean; extraneous: boolean };
+type FlagEdge = { name: string; dev: boolean; optional: boolean; peer: boolean };
+/** A glob of a root's `workspaces` ("packages/*") as a test of a folder key. */
+const workspaceTest = (pattern: string) => new RegExp(`^${pattern.replace(/^\.\//, "").replace(/\/+$/, "").split("/").map(part => part === "**" ? ".*" : part.split("*").map(s => s.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join("[^/]*")).join("/")}$`);
+/** The node a `packages` key is installed under, as arborist's resolveParent: the path above its last node_modules, else the root. */
+const parentOf = (path: string) => { const at = path.lastIndexOf("/node_modules/"); return at >= 0 ? path.slice(0, at) : ""; };
+
+/**
+ * The flags npm 12.2.1 writes on each entry of a lock's `packages` that is not the root or a link, computed from the
+ * lock's graph as writtenFlags writes them (docs/decisions/2026-10-31-lock-flags-from-graph.md, section 2; arborist's
+ * calc-dep-flags.js, node.js `_loadDeps`, edge.js and shrinkwrap.js). Every node but the root starts with every flag;
+ * walking out from the root, an edge takes off its target what neither it nor its source has, and an optional peer
+ * leaves its target extraneous. A link passes its flags to its target. npm writes `extraneous` alone, and
+ * `devOptional` only without `dev` and `optional`.
+ */
+export function computedFlags(lockText: string): Map<string, string> {
+  const packages = readLock(lockText);
+  const nodes = new Map<string, FlagNode>();
+  const node = (path: string, item: Record<string, any>, top: boolean, link: boolean): FlagNode => ({ path, item, top, link, dev: path !== "", optional: path !== "", devOptional: path !== "", peer: path !== "", extraneous: path !== "" });
+  for (const [path, item] of Object.entries(packages)) {
+    if (!isPlain(item)) continue;
+    const kind = lockKey(path, item);
+    if (kind === "extraneous") continue;
+    nodes.set(path, node(path, item, kind !== "install", kind === "install" && item.link === true));
+  }
+  if (!nodes.has("")) nodes.set("", node("", {}, true, false));
+  // The edges out of a node, by name: peers, then dependencies, optional ones and (the root's and folders') dev ones,
+  // each later group replacing an earlier one; the root's workspaces last, which nothing replaces.
+  const edgesOut = (from: FlagNode): FlagEdge[] => {
+    const out = new Map<string, FlagEdge>(), item = from.item;
+    const group = (value: unknown, kind: (name: string) => Omit<FlagEdge, "name">) => { if (isPlain(value)) for (const name of Object.keys(value)) out.set(name, { name, ...kind(name) }); };
+    const meta = isPlain(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {};
+    group(item.peerDependencies, name => ({ dev: false, optional: !!(meta[name] !== null && typeof meta[name] === "object" && meta[name].optional), peer: true }));
+    group(item.dependencies, () => ({ dev: false, optional: false, peer: false }));
+    group(item.optionalDependencies, () => ({ dev: false, optional: true, peer: false }));
+    if (from.top) group(item.devDependencies, () => ({ dev: true, optional: false, peer: false }));
+    const patterns = Array.isArray(item.workspaces) ? item.workspaces : isPlain(item.workspaces) && Array.isArray(item.workspaces.packages) ? item.workspaces.packages : [];
+    if (from.path === "" && patterns.length) {
+      const tests = patterns.filter((p: unknown): p is string => typeof p === "string").map(workspaceTest);
+      for (const [path, target] of nodes) {
+        if (!target.link || !/^node_modules\/(?:@[^/]+\/)?[^/]+$/.test(path) || typeof target.item.resolved !== "string" || !tests.some((t: RegExp) => t.test(target.item.resolved))) continue;
+        out.set(requireName(path), { name: requireName(path), dev: false, optional: false, peer: false });
+      }
+    }
+    return [...out.values()];
+  };
+  const seen = new Set<FlagNode>(), queue = [nodes.get("")!];
+  for (let at = queue.pop(); at; at = queue.pop()) {
+    seen.add(at);
+    if (!at.extraneous) for (let up = at.path === "" ? undefined : nodes.get(parentOf(at.path)); up?.extraneous; up = up.path === "" ? undefined : nodes.get(parentOf(up.path))) up.extraneous = false;
+    if (at.link) {
+      const target = typeof at.item.resolved === "string" ? nodes.get(at.item.resolved) : undefined;
+      if (!target) continue;
+      let changed = false;
+      for (const flag of ["dev", "optional", "devOptional", "peer", "extraneous"] as const) if (target[flag] && !at[flag]) { target[flag] = false; changed = true; }
+      if (changed || !seen.has(target)) queue.push(target);
+      continue;
+    }
+    for (const edge of edgesOut(at)) {
+      const to = resolveFrom(nodes, at.path ? `${at.path}/` : "", edge.name);
+      if (!to) continue;
+      let changed = false;
+      if (to.extraneous && !at.extraneous && !(edge.peer && edge.optional)) { to.extraneous = false; changed = true; }
+      if (to.dev && !at.dev && !edge.dev) { to.dev = false; changed = true; }
+      if (to.optional && !at.optional && !edge.optional) { to.optional = false; changed = true; }
+      if (to.devOptional && !at.devOptional && !at.dev && !at.optional && !edge.dev && !edge.optional) { to.devOptional = false; changed = true; }
+      if (to.peer && !at.peer && !edge.peer) { to.peer = false; changed = true; }
+      if (changed) queue.push(to);
+    }
+  }
+  const out = new Map<string, string>();
+  for (const [path, n] of nodes) {
+    if (path === "" || n.link) continue;
+    out.set(path, n.extraneous ? "extraneous" : ENTRY_FLAGS.filter(flag => flag === "devOptional" ? n.devOptional && !n.dev && !n.optional : flag !== "extraneous" && n[flag as "dev" | "optional" | "peer"]).join(","));
+  }
+  return out;
 }
 
 /**

@@ -28,7 +28,7 @@ describe("the CWE table", () => {
       single++;
       expect([id, classify(record([`CWE-${id}`])).class]).toEqual([id, classes[0]]);
     }
-    expect(single).toBe(55);
+    expect(single).toBe(34);
   });
 
   it("leaves a CWE whose set has two or more classes unclassified with no vector, and gives it the strongest when the vector allows all", () => {
@@ -41,16 +41,21 @@ describe("the CWE table", () => {
         expect([id, classify(withVectors([`CWE-${id}`], v3("C:H/I:H/A:H"))).class]).toEqual([id, classes[0]]);
       }
     }
-    expect(open).toBe(75);
+    expect(open).toBe(96);
   });
 
-  it("keeps the sets the decisions name", () => {
-    const code = ["takeover", "steal", "alter", "disrupt"], login = ["impersonate", "steal", "alter"], act = ["impersonate", "alter"], file = ["steal", "alter"];
+  it("keeps the sets the decisions name, with every class a CWE's mechanism can give", () => {
+    const all = ["takeover", "impersonate", "steal", "alter", "disrupt"], code = ["takeover", "steal", "alter", "disrupt"], login = ["impersonate", "steal", "alter", "disrupt"];
     const examples: Record<string, readonly string[]> = {
-      77: code, 78: code, 94: code, 434: code, 502: code, 829: code, 912: code, 1336: code,
-      79: login, 80: login, 87: login, 287: login, 306: login, 384: login, 613: login, 620: login, 640: login, 798: login, 1390: login, 862: login, 863: login, 284: login,
-      352: act, 601: act, 22: file, 89: file, 59: file, 73: file, 276: file, 732: file, 552: file, 943: file,
-      918: ["steal"], 611: ["steal"], 200: ["steal"], 1321: ["alter"], 91: ["alter"], 400: ["disrupt"], 1333: ["disrupt"],
+      // The chat's answers (comment 6540818608, point 2).
+      434: all, 494: code, 502: code, 829: code, 918: ["steal", "alter", "disrupt"], 611: ["steal", "alter", "disrupt"],
+      15: all, 89: all, 912: all, 943: all, 1321: all,
+      77: code, 78: code, 94: code, 98: code, 1336: code, 22: code, 59: code, 73: code, 276: code, 552: code, 732: code,
+      79: login, 80: login, 87: login, 287: login, 306: login, 384: login, 613: login, 620: login, 640: login, 798: login, 1390: login, 862: login, 863: login, 284: login, 266: login,
+      352: ["impersonate", "alter", "disrupt"], 601: ["impersonate", "steal", "alter"], 90: ["impersonate", "steal", "alter"], 91: ["impersonate", "steal", "alter"],
+      319: ["impersonate", "steal", "alter"], 642: ["impersonate", "steal", "alter"], 643: ["impersonate", "steal"], 256: ["impersonate", "steal"], 522: ["impersonate", "steal"],
+      471: ["impersonate", "alter"], 915: ["impersonate", "alter"], 125: ["steal", "disrupt"],
+      200: ["steal"], 532: ["steal"], 598: ["steal"], 400: ["disrupt"], 1333: ["disrupt"],
     };
     for (const [id, classes] of Object.entries(examples)) expect([id, SETS.get(Number(id))]).toEqual([id, classes]);
     for (const id of [20, 74, 707, 693, ...TRAP_CWES]) expect([id, SETS.has(id)]).toEqual([id, false]);
@@ -88,7 +93,7 @@ describe("the strength order", () => {
     expect([classify(withVectors(["CWE-78"], v3("C:L/I:N/A:N")), ONE_EACH).class, classify(withVectors(["CWE-78"], v3("C:L/I:N/A:N"))).class]).toEqual(["unclassified", "steal"]);
     expect([classify(record(["CWE-78"]), ONE_EACH).class, classify(record(["CWE-78"])).class]).toEqual(["takeover", "unclassified"]);
     expect(classify(record(["CWE-400", "CWE-20"])).class).toBe("disrupt");
-    expect(classify(withVectors(["CWE-918", "CWE-79"], v3("C:L/I:L/A:N"))).reason).toBe("GHSA-xxxx-xxxx-xxxx: impersonate (CWE-79), the strongest class its CWEs allow (impersonate, steal, alter) that its CVSS vector does not rule out.");
+    expect(classify(withVectors(["CWE-918", "CWE-79"], v3("C:L/I:L/A:N"))).reason).toBe("GHSA-xxxx-xxxx-xxxx: impersonate (CWE-79), the strongest class its CWEs allow (impersonate, steal, alter, disrupt) that its CVSS vector does not rule out.");
   });
 });
 
@@ -112,7 +117,7 @@ describe("the design rule (comment 6540209072, item 1)", () => {
     expect([sets, pairs]).toEqual([31, 80]);
   });
 
-  it("holds through classify() with real CWEs for each of the 13 sets and 33 pairs the shipped table's rows can form", () => {
+  it("holds through classify() with real CWEs for each of the 12 sets and 33 pairs the shipped table's rows can form", () => {
     // Every union of the table's rows, with one real CWE from each row in it.
     const formed = new Map<string, { set: TableClass[]; cwes: string[] }>();
     for (let mask = 1; mask < 1 << CWE_CLASSES.length; mask++) {
@@ -129,7 +134,7 @@ describe("the design rule (comment 6540209072, item 1)", () => {
         }
       }
     }
-    expect([formed.size, pairs]).toEqual([13, 33]);
+    expect([formed.size, pairs]).toEqual([12, 33]);
   });
 
   it("gives at the step that chooses what classify() gives, with no vector, an unreadable one, or one that rules every class out", () => {
@@ -150,12 +155,16 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
       // takeover: C:H and I:H; impersonate: C and I not N; steal: C not N; alter: I not N; disrupt: A not N.
       ["CWE-78", "C:H/I:H/A:N", "takeover"], ["CWE-78", "C:H/I:L/A:H", "steal"], ["CWE-78", "C:L/I:L/A:L", "steal"], ["CWE-78", "C:N/I:H/A:H", "alter"],
       ["CWE-78", "C:N/I:N/A:L", "disrupt"], ["CWE-78", "C:N/I:N/A:N", "unclassified"],
-      ["CWE-862", "C:L/I:L/A:N", "impersonate"], ["CWE-862", "C:L/I:N/A:N", "steal"], ["CWE-862", "C:N/I:L/A:N", "alter"], ["CWE-862", "C:N/I:N/A:H", "unclassified"],
-      ["CWE-79", "C:L/I:L/A:N", "impersonate"], ["CWE-79", "C:H/I:N/A:N", "steal"], ["CWE-79", "C:N/I:H/A:N", "alter"], ["CWE-79", "C:N/I:N/A:H", "unclassified"],
-      ["CWE-352", "C:L/I:L/A:N", "impersonate"], ["CWE-352", "C:N/I:H/A:N", "alter"], ["CWE-352", "C:H/I:N/A:N", "unclassified"],
-      ["CWE-22", "C:H/I:N/A:N", "steal"], ["CWE-22", "C:L/I:H/A:N", "steal"], ["CWE-22", "C:N/I:L/A:N", "alter"], ["CWE-22", "C:N/I:N/A:H", "unclassified"],
-      ["CWE-918", "C:L/I:N/A:N", "steal"], ["CWE-918", "C:N/I:H/A:H", "unclassified"],
-      ["CWE-1321", "C:N/I:L/A:N", "alter"], ["CWE-1321", "C:H/I:N/A:H", "unclassified"],
+      ["CWE-89", "C:H/I:H/A:N", "takeover"], ["CWE-89", "C:L/I:L/A:N", "impersonate"], ["CWE-89", "C:H/I:N/A:N", "steal"], ["CWE-89", "C:N/I:H/A:N", "alter"], ["CWE-89", "C:N/I:N/A:H", "disrupt"],
+      ["CWE-862", "C:L/I:L/A:N", "impersonate"], ["CWE-862", "C:L/I:N/A:N", "steal"], ["CWE-862", "C:N/I:L/A:N", "alter"], ["CWE-862", "C:N/I:N/A:H", "disrupt"], ["CWE-862", "C:N/I:N/A:N", "unclassified"],
+      ["CWE-79", "C:L/I:L/A:N", "impersonate"], ["CWE-79", "C:H/I:N/A:N", "steal"], ["CWE-79", "C:N/I:H/A:N", "alter"], ["CWE-79", "C:N/I:N/A:H", "disrupt"],
+      ["CWE-352", "C:L/I:L/A:N", "impersonate"], ["CWE-352", "C:N/I:H/A:N", "alter"], ["CWE-352", "C:N/I:N/A:L", "disrupt"], ["CWE-352", "C:H/I:N/A:N", "unclassified"],
+      ["CWE-643", "C:L/I:L/A:N", "impersonate"], ["CWE-643", "C:H/I:N/A:H", "steal"], ["CWE-643", "C:N/I:H/A:H", "unclassified"],
+      ["CWE-471", "C:L/I:L/A:N", "impersonate"], ["CWE-471", "C:N/I:H/A:N", "alter"], ["CWE-471", "C:H/I:N/A:H", "unclassified"],
+      ["CWE-22", "C:H/I:N/A:N", "steal"], ["CWE-22", "C:L/I:H/A:N", "steal"], ["CWE-22", "C:N/I:L/A:N", "alter"], ["CWE-22", "C:N/I:N/A:H", "disrupt"],
+      ["CWE-918", "C:L/I:N/A:N", "steal"], ["CWE-918", "C:N/I:H/A:H", "alter"], ["CWE-918", "C:N/I:N/A:L", "disrupt"], ["CWE-918", "C:N/I:N/A:N", "unclassified"],
+      ["CWE-125", "C:H/I:H/A:N", "steal"], ["CWE-125", "C:N/I:N/A:H", "disrupt"], ["CWE-125", "C:N/I:H/A:N", "unclassified"],
+      ["CWE-200", "C:L/I:L/A:L", "steal"], ["CWE-200", "C:N/I:H/A:H", "unclassified"],
       ["CWE-400", "C:N/I:N/A:L", "disrupt"], ["CWE-400", "C:H/I:H/A:N", "unclassified"],
       // Several CWEs: the strongest kept among all their classes, in either order.
       ["CWE-400,CWE-22", "C:N/I:N/A:H", "disrupt"], ["CWE-22,CWE-400", "C:N/I:H/A:H", "alter"], ["CWE-78,CWE-22", "C:H/I:N/A:N", "steal"], ["CWE-22,CWE-78", "C:H/I:H/A:N", "takeover"],
@@ -169,8 +178,9 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
     const cases: [string, string, ImpactClass][] = [
       ["CWE-78", "VC:H/VI:H/VA:N/SC:N/SI:N/SA:N", "takeover"], ["CWE-78", "VC:N/VI:N/VA:N/SC:H/SI:H/SA:N", "takeover"], ["CWE-78", "VC:H/VI:N/VA:N/SC:N/SI:H/SA:N", "steal"],
       ["CWE-78", "VC:N/VI:N/VA:N/SC:N/SI:N/SA:L", "disrupt"], ["CWE-78", "VC:N/VI:N/VA:N/SC:N/SI:N/SA:N", "unclassified"],
-      ["CWE-862", "VC:L/VI:N/VA:N/SC:N/SI:L/SA:N", "impersonate"], ["CWE-862", "VC:N/VI:N/VA:N/SC:N/SI:H/SA:N", "alter"], ["CWE-862", "VC:N/VI:N/VA:H/SC:N/SI:N/SA:H", "unclassified"],
-      ["CWE-22", "VC:N/VI:N/VA:N/SC:H/SI:N/SA:N", "steal"], ["CWE-22", "VC:N/VI:N/VA:N/SC:N/SI:L/SA:N", "alter"], ["CWE-22", "VC:N/VI:N/VA:H/SC:N/SI:N/SA:H", "unclassified"],
+      ["CWE-862", "VC:L/VI:N/VA:N/SC:N/SI:L/SA:N", "impersonate"], ["CWE-862", "VC:N/VI:N/VA:N/SC:N/SI:H/SA:N", "alter"], ["CWE-862", "VC:N/VI:N/VA:H/SC:N/SI:N/SA:H", "disrupt"],
+      ["CWE-22", "VC:N/VI:N/VA:N/SC:H/SI:N/SA:N", "steal"], ["CWE-22", "VC:N/VI:N/VA:N/SC:N/SI:L/SA:N", "alter"], ["CWE-22", "VC:N/VI:N/VA:H/SC:N/SI:N/SA:H", "disrupt"],
+      ["CWE-643", "VC:N/VI:N/VA:H/SC:N/SI:N/SA:H", "unclassified"], ["CWE-643", "VC:N/VI:N/VA:N/SC:L/SI:N/SA:N", "steal"],
       ["CWE-400", "VC:N/VI:N/VA:N/SC:N/SI:N/SA:L", "disrupt"], ["CWE-400", "VC:H/VI:H/VA:N/SC:H/SI:H/SA:N", "unclassified"],
       ["CWE-22", "SA:N/SI:N/SC:H/VA:N/VI:N/VC:N/E:A/U:Red/MVC:H", "steal"], ["CWE-78", "SA:N/SI:H/SC:H/VA:N/VI:N/VC:N", "takeover"],
     ];
@@ -185,18 +195,18 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
     expect(classify(withVectors(["CWE-862"], steal, alter)).class).toBe("unclassified");
     expect(classify(withVectors(["CWE-862"], both, v4("VC:L/VI:L/VA:N/SC:N/SI:N/SA:N"))).class).toBe("impersonate");
     expect(classify(withVectors(["CWE-78"], both, v4("VC:H/VI:L/VA:N/SC:N/SI:N/SA:N"))).class).toBe("steal");
-    expect(classify(withVectors(["CWE-22"], steal, alter)).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CVSS vectors rule out every class its CWEs allow (steal, alter).");
+    expect(classify(withVectors(["CWE-22"], steal, alter)).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CVSS vectors rule out every class its CWEs allow (takeover, steal, alter, disrupt).");
   });
 
   it("say which CWE gave the class and what the vector ruled out", () => {
     expect(classify(withVectors(["CWE-22"], v3("C:H/I:N/A:N")))).toEqual({
-      class: "steal", severity: "unknown", cwes: ["CWE-22"], reason: "GHSA-xxxx-xxxx-xxxx: steal (CWE-22), the strongest class its CWEs allow (steal, alter) that its CVSS vector does not rule out.",
+      class: "steal", severity: "unknown", cwes: ["CWE-22"], reason: "GHSA-xxxx-xxxx-xxxx: steal (CWE-22), the strongest class its CWEs allow (takeover, steal, alter, disrupt) that its CVSS vector does not rule out.",
     });
     expect(classify(withVectors(["CWE-400", "CWE-22"], v3("C:N/I:H/A:H"), v4("VC:N/VI:H/VA:H/SC:N/SI:N/SA:N"))).reason).toBe(
-      "GHSA-xxxx-xxxx-xxxx: alter (CWE-22), the strongest class its CWEs allow (steal, alter, disrupt) that its CVSS vectors do not rule out.",
+      "GHSA-xxxx-xxxx-xxxx: alter (CWE-22), the strongest class its CWEs allow (takeover, steal, alter, disrupt) that its CVSS vectors do not rule out.",
     );
-    expect(classify(withVectors(["CWE-22", "CWE-400"], v3("C:N/I:N/A:H"))).reason).toBe(
-      "GHSA-xxxx-xxxx-xxxx: disrupt (CWE-400), the strongest class its CWEs allow (steal, alter, disrupt) that its CVSS vector does not rule out.",
+    expect(classify(withVectors(["CWE-200", "CWE-400"], v3("C:N/I:N/A:H"))).reason).toBe(
+      "GHSA-xxxx-xxxx-xxxx: disrupt (CWE-400), the strongest class its CWEs allow (steal, disrupt) that its CVSS vector does not rule out.",
     );
     expect(classify(withVectors(["CWE-400"], v3("C:H/I:H/A:N"))).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CVSS vector rules out every class its CWEs allow (disrupt).");
   });
@@ -205,13 +215,14 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
     const cases: [string[], ImpactClass][] = [
       [["CWE-22"], "unclassified"], [["CWE-89"], "unclassified"], [["CWE-862"], "unclassified"], [["CWE-78"], "unclassified"], [["CWE-79"], "unclassified"], [["CWE-352"], "unclassified"],
       [["CWE-22", "CWE-89"], "unclassified"], [["CWE-20", "CWE-22"], "unclassified"], [["CWE-78", "CWE-22"], "unclassified"], [["CWE-79", "CWE-862"], "unclassified"], [["CWE-22", "CWE-918"], "unclassified"],
-      [["CWE-918", "CWE-200"], "steal"], [["CWE-400", "CWE-1333"], "disrupt"], [["CWE-400", "CWE-20"], "disrupt"], [["CWE-1321"], "alter"],
+      [["CWE-918", "CWE-200"], "unclassified"], [["CWE-1321"], "unclassified"], [["CWE-125"], "unclassified"],
+      [["CWE-200", "CWE-532"], "steal"], [["CWE-400", "CWE-1333"], "disrupt"], [["CWE-400", "CWE-20"], "disrupt"],
     ];
     for (const [cwes, want] of cases) expect([cwes, classify(record(cwes)).class]).toEqual([cwes, want]);
-    expect(classify(record(["CWE-22"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow steal or alter, and the record has no CVSS vector to choose.");
-    expect(classify(record(["CWE-862"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow impersonate, steal or alter, and the record has no CVSS vector to choose.");
-    expect(classify(record(["CWE-400", "CWE-22"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow steal, alter or disrupt, and the record has no CVSS vector to choose.");
-    expect(classify(record(["CWE-918", "CWE-200"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: CWE-200, CWE-918 are steal.");
+    expect(classify(record(["CWE-22"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow takeover, steal, alter or disrupt, and the record has no CVSS vector to choose.");
+    expect(classify(record(["CWE-862"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow impersonate, steal, alter or disrupt, and the record has no CVSS vector to choose.");
+    expect(classify(record(["CWE-200", "CWE-918"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow steal, alter or disrupt, and the record has no CVSS vector to choose.");
+    expect(classify(record(["CWE-532", "CWE-200"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: CWE-200, CWE-532 are steal.");
     expect(classify(record(["CWE-400", "CWE-20"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: CWE-400 is disrupt.");
   });
 
@@ -239,7 +250,7 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
 
   it("read no other severity type, nor entries or lists of another shape", () => {
     for (const severity of [[{ type: "CVSS_V2", score: "AV:N/AC:L/Au:N/C:N/I:N/A:P" }], [{ type: "Ubuntu", score: "high" }], [null, 5, "CVSS:3.1/C:N/I:N/A:N"], "CVSS:3.1/AV:N/C:N/I:N/A:N", { type: "CVSS_V3", score: "x" }, [{ type: "cvss_v3", score: "x" }], [{ type: "toString", score: "x" }]]) {
-      expect([severity, classify({ ...record(["CWE-918"]), severity }).class]).toEqual([severity, "steal"]);
+      expect([severity, classify({ ...record(["CWE-200"]), severity }).class]).toEqual([severity, "steal"]);
       expect([severity, classify({ ...record(["CWE-22"]), severity }).class]).toEqual([severity, "unclassified"]);
     }
   });
@@ -300,7 +311,7 @@ describe("trap", () => {
   it("is not CWE-912 (hidden functionality), which is in the takeover set, nor CWE-505, 513 or a trap CWE not of the form CWE-<number>", () => {
     for (const cwes of [["CWE-912"], ["CWE-505"], ["CWE-513"], ["CWE-5060"], ["CWE-50"], ["NVD-CWE-506"], [506]]) expect([cwes, classify(record(cwes)).class]).toEqual([cwes, "unclassified"]);
     expect(classify(withVectors(["CWE-912", "CWE-829"], v3("C:H/I:H/A:H"))).class).toBe("takeover");
-    expect(classify(withVectors(["CWE-912"], v3("C:L/I:L/A:L"))).class).toBe("steal");
+    expect(classify(withVectors(["CWE-912"], v3("C:L/I:L/A:L"))).class).toBe("impersonate");
   });
 });
 
@@ -314,7 +325,7 @@ describe("records without a CWE", () => {
     const c = classify(record(["NVD-CWE-Other", 79, "CWE-", "CWE-0", "CWE-79x"]));
     expect(c).toMatchObject({ class: "unclassified", cwes: [] });
     expect(c.reason).toBe('GHSA-xxxx-xxxx-xxxx lists no CWE in database_specific.cwe_ids. Ignored cwe_ids entries not of the form CWE-<number>: "NVD-CWE-Other", 79, "CWE-", "CWE-0", "CWE-79x".');
-    expect(classify(record(["NVD-CWE-noinfo", "CWE-918"]))).toMatchObject({ class: "steal", cwes: ["CWE-918"] });
+    expect(classify(record(["NVD-CWE-noinfo", "CWE-200"]))).toMatchObject({ class: "steal", cwes: ["CWE-200"] });
   });
 
   it("never throw on input that is not a record", () => {
@@ -347,7 +358,7 @@ describe("the same input", () => {
     expect(classify({ ...record(["CWE-22", "CWE-918", "CWE-79"], { severity: "HIGH" }), severity: [vector] })).toEqual(first);
     expect(first).toEqual({
       class: "impersonate", severity: "high", cwes: ["CWE-22", "CWE-79", "CWE-918"],
-      reason: "GHSA-xxxx-xxxx-xxxx: impersonate (CWE-79), the strongest class its CWEs allow (impersonate, steal, alter) that its CVSS vector does not rule out.",
+      reason: "GHSA-xxxx-xxxx-xxxx: impersonate (CWE-79), the strongest class its CWEs allow (takeover, impersonate, steal, alter, disrupt) that its CVSS vector does not rule out.",
     });
   });
 });
@@ -359,18 +370,21 @@ describe("real OSV records (packages/cli/test/fixtures/impact/records.json)", ()
   // both its CVSS 3 and 4 vectors say integrity is not affected, so it is unclassified since LMR1c. Since LMR1d, impersonate
   // needs both C and I affected: GHSA-223g-f5mq-gw33 (CWE-287, VC:N/VI:L) is alter, GHSA-225x-3jhx-wh4q and
   // GHSA-2497-6pwj-pwg7 (CWE-862, C:L/I:N) are steal; and GHSA-22gj-8qj2-fj46 (CWE-73 now {steal, alter}, C:N/I:L) is alter.
+  // Since LMR1e-2 every CWE has every class its mechanism can give: GHSA-22h7-7wwg-qmgg (CWE-1321, now all five, no vector)
+  // is unclassified; GHSA-2444-8gj8-6fmx (CWE-91 {impersonate, steal, alter}, C:H/I:N) is steal; GHSA-265m-7826-wjqm
+  // (CWE-915 {impersonate, alter}, VC:H/VI:H) is impersonate.
   const expected: Record<string, [ImpactClass, string]> = {
     "GHSA-2234-fmw7-43wr": ["impersonate", "moderate"], "GHSA-2238-xc5r-v9hj": ["steal", "moderate"], "GHSA-223g-f5mq-gw33": ["alter", "moderate"],
     "GHSA-223j-4rm8-mrmf": ["steal", "low"], "GHSA-224p-v68g-5g8f": ["disrupt", "moderate"], "GHSA-226w-6hhj-69hp": ["trap", "critical"],
-    "GHSA-2275-rpf5-xv8h": ["takeover", "high"], "GHSA-2299-ghjr-6vjp": ["unclassified", "low"], "GHSA-22h7-7wwg-qmgg": ["alter", "low"],
+    "GHSA-2275-rpf5-xv8h": ["takeover", "high"], "GHSA-2299-ghjr-6vjp": ["unclassified", "low"], "GHSA-22h7-7wwg-qmgg": ["unclassified", "low"],
     "GHSA-22p9-wv53-3rq4": ["disrupt", "high"], "GHSA-22rr-f3p8-5gf8": ["unclassified", "high"], "GHSA-236c-vhj4-gfxg": ["takeover", "high"],
     "GHSA-238x-w2j9-gwwr": ["impersonate", "high"], "GHSA-23vw-mhv5-grv5": ["unclassified", "high"], "GHSA-23wx-cgxq-vpwx": ["alter", "moderate"],
     "GHSA-279x-mwfv-vcqv": ["takeover", "critical"], "MAL-2021-1": ["trap", "unknown"], "MAL-2021-2": ["trap", "unknown"],
     "GHSA-2223-f22x-24cq": ["steal", "moderate"], "GHSA-222v-cx2c-q2f5": ["impersonate", "moderate"], "GHSA-2237-5r9w-vm8j": ["steal", "high"],
     "GHSA-225x-3jhx-wh4q": ["steal", "moderate"], "GHSA-22gj-8qj2-fj46": ["alter", "moderate"], "GHSA-237r-r8m4-4q88": ["unclassified", "moderate"],
-    "GHSA-23gj-x27g-r34f": ["takeover", "high"], "GHSA-243q-g9j3-qf6r": ["unclassified", "moderate"], "GHSA-2444-8gj8-6fmx": ["unclassified", "high"],
+    "GHSA-23gj-x27g-r34f": ["takeover", "high"], "GHSA-243q-g9j3-qf6r": ["unclassified", "moderate"], "GHSA-2444-8gj8-6fmx": ["steal", "high"],
     "GHSA-2497-6pwj-pwg7": ["steal", "moderate"], "GHSA-24cf-848g-762c": ["impersonate", "moderate"], "GHSA-24wv-6c99-f843": ["takeover", "critical"],
-    "GHSA-2528-jw5q-ww88": ["disrupt", "high"], "GHSA-265m-7826-wjqm": ["alter", "high"], "GHSA-267j-cwvg-j28c": ["unclassified", "moderate"],
+    "GHSA-2528-jw5q-ww88": ["disrupt", "high"], "GHSA-265m-7826-wjqm": ["impersonate", "high"], "GHSA-267j-cwvg-j28c": ["unclassified", "moderate"],
     "GHSA-273w-7fxj-pcp6": ["disrupt", "high"], "MAL-2026-3637": ["trap", "unknown"],
   };
 

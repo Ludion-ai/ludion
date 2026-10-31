@@ -77,6 +77,13 @@ T takeover, I impersonate, S steal, A alter, D disrupt. A set lists every class 
 
 No CWE enters or leaves the table, the decided-unclassified list or the trap list.
 
+*Found by the tests after this record was committed.* With these sets, the unions of the table's rows (the second check of the conditions record's point 1) form **12 sets and 33 pairs**, where LMR1d's table formed 13 and 33:
+- 4 within {steal, alter, disrupt};
+- 6 with impersonate but no takeover;
+- 2 with takeover.
+
+Every pair has a vector that gives it.
+
 ## Measured with it (defined before counting)
 
 On the same two zips (sha256 checked), in Docker with no network, every record is classified by the impact.ts of f25d51b (before) and by the new one (after):

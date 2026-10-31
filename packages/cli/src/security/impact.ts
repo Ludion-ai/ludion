@@ -21,37 +21,43 @@ export type CweTable = readonly (readonly [readonly TableClass[], readonly numbe
 
 /**
  * Each CWE in the table with every class an attacker can gain through its mechanism, strongest first; the record's
- * CVSS vector says which (docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md). A set has one class only
- * when the mechanism truly gives only one. A CWE not listed is unclassified. trap is a published record that says the
- * version is malicious: a MAL- id or alias, or one of TRAP_CWES.
+ * CVSS vector says which (docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md, one line of reason per CWE).
+ * When in doubt the set is the wider one. A set has one class only when the mechanism can give only that. A CWE not
+ * listed is unclassified. trap is a published record that says the version is malicious: a MAL- id or alias, or one
+ * of TRAP_CWES.
  */
 export const CWE_CLASSES: CweTable = [
-  // Runs their own code or commands where the application runs, or, as a vector with lower impact says, only reads,
-  // changes or stops it: OS command (78) and command (77) injection, code (94), eval (95) and static code (96) injection,
-  // PHP file inclusion (98), dangerous file upload processed in the application's environment (434), code downloaded
-  // without an integrity check (494), deserialization (502), functionality included from an untrusted sphere (829),
-  // hidden functionality (912), expression language (917) and template (1336) injection.
-  [["takeover", "steal", "alter", "disrupt"], [77, 78, 94, 95, 96, 98, 434, 494, 502, 829, 912, 917, 1336]],
-  // Gets past login or permissions to act as someone, read or change: privileges (266, 269), access control (284),
-  // authorization (285, 425, 639, 862, 863), XSS and its variants (79, 80, 83 to 87), authentication and its bypasses
-  // (287 to 290, 294, 302, 303, 305 to 307), session fixation and expiry (384, 613), password change and recovery (620,
-  // 640), hard-coded credentials (798), weak and default credentials (1390 to 1393).
-  [["impersonate", "steal", "alter"], [79, 80, 83, 84, 85, 86, 87, 266, 269, 284, 285, 287, 288, 289, 290, 294, 302, 303, 305, 306, 307, 384, 425, 613, 620, 639, 640, 798, 862, 863, 1390, 1391, 1392, 1393]],
-  // Makes the user act, without reading the answer: CSRF (352), open redirect (601).
-  [["impersonate", "alter"], [352, 601]],
-  // Reads or writes data or files: path traversal and its variants (22, 23 to 40), link following (59), external control
-  // of a file name (73), SQL injection (89), default and assigned permissions (276, 732), files or directories accessible
-  // to external parties (552), data query logic (943).
-  [["steal", "alter"], [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 59, 73, 89, 276, 552, 732, 943]],
-  // Reads data, files or secrets they must not see: LDAP (90), XPath (643) and XQuery (652) injection, out-of-bounds reads
-  // (125 to 127), SSRF (918), XXE (611), exposure of sensitive information (200 to 204, 208, 209, 212 to 215, 226, 359,
-  // 497, 524 to 526, 532, 538, 548, 598), unprotected passwords and credentials (256, 257, 522), missing or cleartext
-  // encryption (311, 312, 319).
-  [["steal"], [90, 125, 126, 127, 200, 201, 202, 203, 204, 208, 209, 212, 213, 214, 215, 226, 256, 257, 311, 312, 319, 359, 497, 522, 524, 525, 526, 532, 538, 548, 598, 611, 643, 652, 918]],
-  // Changes data, files or how the application behaves: external control of settings (15), XML injection (91),
-  // assumed-immutable data and parameters (471, 472), critical state data (642), object attributes (915), prototype
-  // pollution (1321).
-  [["alter"], [15, 91, 471, 472, 642, 915, 1321]],
+  // External control of a setting (15), SQL injection (89), dangerous upload (434), hidden functionality (912), data
+  // query logic (943), prototype pollution (1321): any of the five.
+  [["takeover", "impersonate", "steal", "alter", "disrupt"], [15, 89, 434, 912, 943, 1321]],
+  // Runs code or commands, or only reads, writes or stops: command (77, 78), code (94, 95, 96) and PHP include (98)
+  // injection, code downloaded without an integrity check (494), deserialization (502), untrusted functionality (829),
+  // expression language (917) and template (1336) injection; files reached outside their place, which a written file
+  // the application runs turns into code: path traversal and its variants (22 to 40), link following (59), external
+  // control of a file name (73), default and assigned permissions (276, 732), files accessible to external parties (552).
+  [["takeover", "steal", "alter", "disrupt"], [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 59, 73, 77, 78, 94, 95, 96, 98, 276, 494, 502, 552, 732, 829, 917, 1336]],
+  // Gets past login or permissions, then acts as someone, reads, changes or removes: XSS and its variants (79, 80, 83 to
+  // 87), privileges (266, 269), access control and authorization (284, 285, 425, 639, 862, 863), authentication and its
+  // bypasses (287 to 290, 294, 302, 303, 305 to 307), sessions (384, 613), passwords (620, 640), credentials (798, 1390 to
+  // 1393).
+  [["impersonate", "steal", "alter", "disrupt"], [79, 80, 83, 84, 85, 86, 87, 266, 269, 284, 285, 287, 288, 289, 290, 294, 302, 303, 305, 306, 307, 384, 425, 613, 620, 639, 640, 798, 862, 863, 1390, 1391, 1392, 1393]],
+  // CSRF (352): the user is made to change or remove something; the answer cannot be read.
+  [["impersonate", "alter", "disrupt"], [352]],
+  // Open redirect (601), LDAP injection (90), XML injection (91), missing or cleartext encryption (311, 319), critical
+  // state data (642): acts as the site or the user, reads, changes.
+  [["impersonate", "steal", "alter"], [90, 91, 311, 319, 601, 642]],
+  // XPath (643) and XQuery (652) "used to retrieve data", unprotected passwords and credentials (256, 257, 522),
+  // cleartext storage (312): reads, and logs in with what it read.
+  [["impersonate", "steal"], [256, 257, 312, 522, 643, 652]],
+  // Assumed-immutable data (471) and web parameters (472), object attributes (915): changes, a role or identity among them.
+  [["impersonate", "alter"], [471, 472, 915]],
+  // XXE (611), SSRF (918): reads, sends requests that change or stop.
+  [["steal", "alter", "disrupt"], [611, 918]],
+  // Out-of-bounds reads (125 to 127): reads memory, or crashes.
+  [["steal", "disrupt"], [125, 126, 127]],
+  // Exposure of information through a response, a timing, an error, a cache, a log, a listing or a query string: read
+  // only (200 to 204, 208, 209, 212 to 215, 226, 359, 497, 524 to 526, 532, 538, 548, 598).
+  [["steal"], [200, 201, 202, 203, 204, 208, 209, 212, 213, 214, 215, 226, 359, 497, 524, 525, 526, 532, 538, 548, 598]],
   // Slows or stops the application: resource consumption and its forms (400, 401, 405, 407, 409, 770, 789, 834, 1050),
   // uncontrolled recursion (674) and XML entity expansion, its form in a DTD (776), infinite loop (835), ReDoS (1333).
   [["disrupt"], [400, 401, 405, 407, 409, 674, 770, 776, 789, 834, 835, 1050, 1333]],

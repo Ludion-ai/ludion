@@ -1,4 +1,4 @@
-# started 2026-10-31T07:51:52Z, node v24.22.1
+# started 2026-10-31T08:55:54Z, node v24.22.1
 without mutations: passed
 caught: MAL- is not trap
 caught: MAL- anywhere in the id is trap
@@ -31,10 +31,13 @@ caught: any metric value accepted
 caught: N read as affected
 caught: an unreadable metric read as affected
 caught: the reason names the first CWE
-caught: CWE-22's set loses alter
-caught: the login and authorization set loses steal and alter
-caught: CSRF and redirects can steal
-caught: code injection loses disrupt
+caught: path traversal and code injection lose alter
+caught: path traversal and code injection lose disrupt
+caught: the login and authorization set loses steal, alter and disrupt
+caught: CSRF can steal
+caught: the five-class row loses impersonate
+caught: SSRF and XXE lose disrupt
+caught: out-of-bounds reads lose disrupt
 caught: CWE-912 leaves the table
 caught: a MAL- alias is not trap
 caught: an alias containing MAL- anywhere is trap
@@ -78,5 +81,5 @@ caught: the severity list not checked
 caught: Composer names with capitals accepted
 caught: a trap's record id not checked
 after restoring: passed
-77 of 77 mutations caught
-# finished 2026-10-31T07:52:56Z
+80 of 80 mutations caught
+# finished 2026-10-31T08:56:59Z

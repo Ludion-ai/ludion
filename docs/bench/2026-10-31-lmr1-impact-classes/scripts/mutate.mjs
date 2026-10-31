@@ -11,7 +11,7 @@ const mutations = [
   // LMR1's three on the table, as the code reads since LMR1d: the record's union of classes, strongest first.
   ["the weakest class wins", "[...new Set(classes)].sort((a, b) => rank(a) - rank(b))", "[...new Set(classes)].sort((a, b) => rank(b) - rank(a))"],
   ["the first CWE's classes come first", "[...new Set(classes)].sort((a, b) => rank(a) - rank(b))", "[...new Set(classes)]"],
-  ["CWE-78 leaves the table", "[77, 78, 94, 95,", "[77, 94, 95,"],
+  ["CWE-78 leaves the table", "73, 77, 78, 94, 95,", "73, 77, 94, 95,"],
   // LMR1c: each CWE's set of classes, and the CVSS vectors that choose among them.
   ["the vectors are not read", "const read = vectors(record as Record<string, unknown>);", "const read = { affects: [] } as { affects: Affects[] };"],
   ["the weakest consistent class wins", "return allowed.find(cls => affects.every(CONSISTENT[cls]));", "return allowed.findLast(cls => affects.every(CONSISTENT[cls]));"],
@@ -41,11 +41,15 @@ const mutations = [
   ["N read as affected", 'any ||= seen[0] !== "N";', "any ||= true;"],
   ["an unreadable metric read as affected", "if (typeof result === \"string\") return { unreadable:", "if (typeof result === \"string\") continue; if (false) return { unreadable:"],
   ["the reason names the first CWE", "inTable.find(l => l.classes.includes(best))!.cwe", "inTable[0]!.cwe"],
-  ["CWE-22's set loses alter", '[["steal", "alter"], [22,', '[["steal"], [22,'],
-  ["the login and authorization set loses steal and alter", '[["impersonate", "steal", "alter"], [79,', '[["impersonate"], [79,'],
-  ["CSRF and redirects can steal", '[["impersonate", "alter"], [352, 601]]', '[["impersonate", "steal", "alter"], [352, 601]]'],
-  ["code injection loses disrupt", '[["takeover", "steal", "alter", "disrupt"], [77,', '[["takeover", "steal", "alter"], [77,'],
-  ["CWE-912 leaves the table", "829, 912, 917,", "829, 917,"],
+  // LMR1e-2: every CWE with every class its mechanism can give.
+  ["path traversal and code injection lose alter", '[["takeover", "steal", "alter", "disrupt"], [22,', '[["takeover", "steal", "disrupt"], [22,'],
+  ["path traversal and code injection lose disrupt", '[["takeover", "steal", "alter", "disrupt"], [22,', '[["takeover", "steal", "alter"], [22,'],
+  ["the login and authorization set loses steal, alter and disrupt", '[["impersonate", "steal", "alter", "disrupt"], [79,', '[["impersonate"], [79,'],
+  ["CSRF can steal", '[["impersonate", "alter", "disrupt"], [352]]', '[["impersonate", "steal", "alter", "disrupt"], [352]]'],
+  ["the five-class row loses impersonate", '[["takeover", "impersonate", "steal", "alter", "disrupt"], [15,', '[["takeover", "steal", "alter", "disrupt"], [15,'],
+  ["SSRF and XXE lose disrupt", '[["steal", "alter", "disrupt"], [611, 918]]', '[["steal", "alter"], [611, 918]]'],
+  ["out-of-bounds reads lose disrupt", '[["steal", "disrupt"], [125,', '[["steal"], [125,'],
+  ["CWE-912 leaves the table", "434, 912, 943,", "434, 943,"],
   // LMR1b: trap as a published record, and stops with their reasons; LMR1d: CWE-506 to 512.
   ["a MAL- alias is not trap", "if (malAlias) return", "if (false && malAlias) return"],
   ["an alias containing MAL- anywhere is trap", 'alias.startsWith("MAL-")', 'alias.includes("MAL-")'],

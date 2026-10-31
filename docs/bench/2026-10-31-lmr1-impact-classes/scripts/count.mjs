@@ -1,13 +1,12 @@
-// node count.mjs <osv dir> <impact.ts> <impact.ts before LMR1d> [--stronger]: classify every record of OSV's npm and
-// Packagist exports three times and print the counts as JSON (LMR1d, docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md):
-//   before  the impact.ts before LMR1d (0129ba8, LMR1c);
-//   narrow  the new classify() with the sets before widening (comment 6539943852 (a) alone, NARROW below);
-//   wide    the new classify() with the table it ships (comment 6540209072, item 4).
+// node count.mjs <osv dir> <impact.ts> <impact.ts before> [--stronger]: classify every record of OSV's npm and
+// Packagist exports twice and print the counts as JSON (LMR1e-2, docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md):
+//   before  the impact.ts before LMR1e-2 (f25d51b, LMR1d's sets);
+//   after   the worktree's impact.ts (every CWE with every class its mechanism can give).
 // With --stronger it prints instead, one per line (tab-separated), every record whose class moved to a stronger one.
 // Runs in Docker only, with --network none. Every record of the exports is counted, so the shares have no interval.
 // Each trap's basis (MAL- id, MAL- alias, CWE-506 to 512) is read from the record's own fields, apart from classify(),
 // and the run fails if the two disagree on any record. It also fails if a zip's sha256 is not the one fetch.json recorded.
-// The earlier count.mjs (LMR1c) is in git history at 0129ba8.
+// The earlier count.mjs (LMR1d, three ways with the sets before widening) is in git history at f25d51b, LMR1c's at 0129ba8.
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -15,30 +14,19 @@ import { entries } from "./zip.mjs";
 
 const [dir, impactPath, beforePath] = process.argv.slice(2);
 const { classify, IMPACT_ORDER, CWE_CLASSES, TRAP_CWES } = await import(impactPath);
-const { classify: classifyBefore } = await import(beforePath);
+const { classify: classifyBefore, CWE_CLASSES: BEFORE_CLASSES } = await import(beforePath);
 const fetched = JSON.parse(readFileSync(join(dir, "fetch.json"), "utf8"));
-
-// The sets before widening, as the decision record writes them: LMR1c's sets with 912 → {takeover}, 79 →
-// {impersonate, steal, alter}, and 59, 73, 276, 732 → {steal, alter}.
-const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
-const NARROW = [
-  [["takeover"], [77, 78, 94, 95, 96, 98, 434, 494, 502, 829, 912, 917, 1336]],
-  [["impersonate", "steal", "alter"], [79, 266, 269, 284, 285, 425, 639, 862, 863]],
-  [["impersonate"], [80, ...range(83, 87), ...range(287, 290), 294, 302, 303, ...range(305, 307), 352, 384, 601, 613, 620, 640, 798, ...range(1390, 1393)]],
-  [["steal", "alter"], [...range(22, 40), 59, 73, 89, 276, 552, 732, 943]],
-  ...CWE_CLASSES.filter(([classes]) => classes.length === 1),
-];
-// Every CWE of the shipped table is in NARROW and the other way round.
-{
-  const ids = t => t.flatMap(([, i]) => i).sort((a, b) => a - b).join(",");
-  if (ids(NARROW) !== ids(CWE_CLASSES)) throw new Error("NARROW and CWE_CLASSES do not list the same CWEs");
-}
 
 const pct = (k, n) => (n ? Math.round((k / n) * 1000) / 10 : null);
 const bump = (m, k) => m.set(k, (m.get(k) ?? 0) + 1);
 const rank = c => IMPACT_ORDER.indexOf(c);
 const setOf = table => new Map(table.flatMap(([classes, ids]) => ids.map(id => [`CWE-${id}`, classes])));
-const SETS = { narrow: setOf(NARROW), wide: setOf(CWE_CLASSES) };
+const SETS = { before: setOf(BEFORE_CLASSES), after: setOf(CWE_CLASSES) };
+// The two tables list the same CWEs.
+{
+  const ids = t => t.flatMap(([, i]) => i).sort((a, b) => a - b).join(",");
+  if (ids(BEFORE_CLASSES) !== ids(CWE_CLASSES)) throw new Error("the tables before and after do not list the same CWEs");
+}
 
 /** Why a record is unclassified, from the reason classify() gives. */
 function why(reason) {
@@ -51,7 +39,7 @@ function why(reason) {
   throw new Error(`unknown reason: ${reason}`);
 }
 
-/** Counts for one way of classifying (key: "narrow" or "wide"), over the records given. */
+/** Counts for one way of classifying (key: "before" or "after"), over the records given. */
 function tally(records, key) {
   const n = records.length;
   const byClass = new Map(IMPACT_ORDER.map(c => [c, 0])), reasons = new Map(), ruledOutSingle = new Map();
@@ -72,49 +60,44 @@ function tally(records, key) {
     records: n,
     classified: { count: classified, pct: pct(classified, n) },
     by_class: Object.fromEntries([...byClass].map(([c, k]) => [c, { count: k, pct: pct(k, n) }])),
-    unclassified_by_reason: Object.fromEntries([...reasons].sort((a, b) => b[1] - a[1])),
+    unclassified_by_reason: Object.fromEntries(["vector_rules_out_every_class", "no_vector_several_classes", "no_cwe_in_table", "no_cwe", "vector_unreadable", "no_id"].map(k => [k, reasons.get(k) ?? 0])),
     ruled_out_by_vector_with_one_class: Object.fromEntries(["takeover", "impersonate", "steal", "alter", "disrupt"].map(c => [c, ruledOutSingle.get(c) ?? 0])),
   };
 }
 
-/** From → to counts between two ways of classifying, with how many went to a stronger and to a weaker class. */
-function changes(records, from, to) {
+/** From → to counts, with how many went to a stronger and to a weaker class. */
+function changes(records) {
   const matrix = new Map();
-  let changed = 0, stronger = 0, weaker = 0, newlyClassified = 0, newlyUnclassified = 0;
+  let changed = 0, stronger = 0, weaker = 0, fromUnclassified = 0, toUnclassified = 0;
   for (const r of records) {
-    const a = r[from].class, b = r[to].class;
+    const a = r.before.class, b = r.after.class;
     if (a === b) continue;
     changed++;
     if (rank(b) < rank(a)) stronger++; else weaker++;
-    if (a === "unclassified") newlyClassified++;
-    if (b === "unclassified") newlyUnclassified++;
+    if (a === "unclassified") fromUnclassified++;
+    if (b === "unclassified") toUnclassified++;
     bump(matrix, `${a} -> ${b}`);
   }
   return {
-    changed, to_stronger: stronger, to_weaker: weaker, from_unclassified: newlyClassified, to_unclassified: newlyUnclassified,
+    changed, to_stronger: stronger, to_weaker: weaker, from_unclassified: fromUnclassified, to_unclassified: toUnclassified,
     by_class: Object.fromEntries([...matrix].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))),
   };
-}
-
-function vectorShare(records) {
-  const none = records.filter(r => !r.vectors).length;
-  return { records: records.length, with_no_cvss_3_or_4_vector: { count: none, pct: pct(none, records.length) } };
 }
 
 const all = [], stronger = [];
 const out = {
   fetched,
   zips_checked: {},
-  tables: { narrow: NARROW.map(([classes, ids]) => ({ classes, cwes: ids.length })), wide: CWE_CLASSES.map(([classes, ids]) => ({ classes, cwes: ids.length })) },
+  tables: { before: BEFORE_CLASSES.map(([classes, ids]) => ({ classes, cwes: ids.length })), after: CWE_CLASSES.map(([classes, ids]) => ({ classes, cwes: ids.length })) },
   ecosystems: {},
 };
 const summarise = records => {
   const notMal = records.filter(r => !r.mal);
+  const none = notMal.filter(r => !r.vectors).length;
   return {
-    not_mal: { before_lmr1d: { classified: { count: notMal.filter(r => r.before.class !== "unclassified").length, pct: pct(notMal.filter(r => r.before.class !== "unclassified").length, notMal.length) } }, narrow: tally(notMal, "narrow"), wide: tally(notMal, "wide") },
-    changes_not_mal: { before_to_narrow: changes(notMal, "before", "narrow"), before_to_wide: changes(notMal, "before", "wide"), narrow_to_wide: changes(notMal, "narrow", "wide") },
-    vectors_not_mal: vectorShare(notMal),
-    trap_not_mal: { before_lmr1d: notMal.filter(r => r.before.class === "trap").length, now: notMal.filter(r => r.wide.class === "trap").length, by_basis: Object.fromEntries(["alias", "cwe_506", "cwe_507_512"].map(b => [b, notMal.filter(r => r.basis === b).length])) },
+    not_mal: { before: tally(notMal, "before"), after: tally(notMal, "after") },
+    changes_not_mal: changes(notMal),
+    vectors_not_mal: { records: notMal.length, with_no_cvss_3_or_4_vector: { count: none, pct: pct(none, notMal.length) } },
   };
 };
 for (const ecosystem of ["npm", "Packagist"]) {
@@ -126,24 +109,19 @@ for (const ecosystem of ["npm", "Packagist"]) {
   for (const [name, text] of entries(zip)) {
     let record;
     try { record = JSON.parse(text); } catch { throw new Error(`${ecosystem}.zip ${name}: not JSON`); }
-    const wide = classify(record), narrow = classify(record, NARROW), before = classifyBefore(record);
+    const after = classify(record), before = classifyBefore(record);
     const id = typeof record.id === "string" ? record.id : "";
     const cweIds = Array.isArray(record.database_specific?.cwe_ids) ? record.database_specific.cwe_ids : [];
     const listsCwe = n => cweIds.some(e => typeof e === "string" && new RegExp(`^CWE-${n}$`, "i").test(e.trim()));
     const basis = !id ? null
       : id.startsWith("MAL-") ? "id"
       : Array.isArray(record.aliases) && record.aliases.some(a => typeof a === "string" && a.startsWith("MAL-")) ? "alias"
-      : listsCwe(506) ? "cwe_506"
-      : TRAP_CWES.some(n => n !== 506 && listsCwe(n)) ? "cwe_507_512"
+      : TRAP_CWES.some(listsCwe) ? "cwe_506_512"
       : null;
-    for (const c of [wide, narrow]) if ((basis !== null) !== (c.class === "trap")) throw new Error(`${ecosystem}.zip ${name}: classify() says ${c.class}, the record's fields say ${basis ?? "not trap"}`);
-    // Trap changes only by CWE-507 to 512.
-    if ((before.class === "trap") !== (wide.class === "trap") && basis !== "cwe_507_512") throw new Error(`${ecosystem}.zip ${name}: trap changed (${before.class} -> ${wide.class}) not by CWE-507 to 512`);
+    for (const c of [after, before]) if ((basis !== null) !== (c.class === "trap")) throw new Error(`${ecosystem}.zip ${name}: classify() says ${c.class}, the record's fields say ${basis ?? "not trap"}`);
     const vectors = (Array.isArray(record.severity) ? record.severity : []).filter(s => s?.type === "CVSS_V3" || s?.type === "CVSS_V4").map(s => String(s.score));
-    const r = { id, ecosystem, before, narrow, wide, basis, mal: id.startsWith("MAL-"), vectors: vectors.length ? vectors : null };
-    for (const [from, to] of [["before", "narrow"], ["before", "wide"], ["narrow", "wide"]]) {
-      if (!r.mal && rank(r[to].class) < rank(r[from].class)) stronger.push([`${from}->${to}`, id, ecosystem, r[from].class, r[to].class, wide.cwes.join(",") || "-", vectors.join(" ; ") || "-"]);
-    }
+    const r = { id, ecosystem, before, after, mal: id.startsWith("MAL-"), vectors: vectors.length ? vectors : null };
+    if (!r.mal && rank(after.class) < rank(before.class)) stronger.push([id, ecosystem, before.class, after.class, after.cwes.join(",") || "-", vectors.join(" ; ") || "-"]);
     records.push(r);
   }
   for (const r of records) all.push(r);
@@ -151,10 +129,10 @@ for (const ecosystem of ["npm", "Packagist"]) {
 }
 out.ecosystems.both = summarise(all);
 if (process.argv.includes("--stronger")) {
-  console.log(["between", "id", "ecosystem", "from", "to", "cwes", "cvss"].join("\t"));
-  for (const row of stronger.sort((a, b) => (a[0] + a[1] < b[0] + b[1] ? -1 : 1))) console.log(row.join("\t"));
+  console.log(["id", "ecosystem", "before", "after", "cwes", "cvss"].join("\t"));
+  for (const row of stronger.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))) console.log(row.join("\t"));
 } else {
-  out.stronger = Object.fromEntries(["before->narrow", "before->wide", "narrow->wide"].map(k => [k, stronger.filter(s => s[0] === k).length]));
+  out.stronger = stronger.length;
   out.stronger_records = "stronger.tsv (count.sh --stronger)";
   console.log(JSON.stringify(out, null, 2));
 }

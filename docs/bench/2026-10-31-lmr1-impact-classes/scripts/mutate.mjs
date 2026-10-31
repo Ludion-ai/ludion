@@ -11,7 +11,7 @@ const mutations = [
   // LMR1's three on the table, as the code reads since LMR1d: the record's union of classes, strongest first.
   ["the weakest class wins", "[...new Set(classes)].sort((a, b) => rank(a) - rank(b))", "[...new Set(classes)].sort((a, b) => rank(b) - rank(a))"],
   ["the first CWE's classes come first", "[...new Set(classes)].sort((a, b) => rank(a) - rank(b))", "[...new Set(classes)]"],
-  ["CWE-78 leaves the table", "73, 77, 78, 94, 95,", "73, 77, 94, 95,"],
+  ["CWE-78 leaves the table", "[77, 78, 94, 95,", "[77, 94, 95,"],
   // LMR1c: each CWE's set of classes, and the CVSS vectors that choose among them.
   ["the vectors are not read", "const read = vectors(record as Record<string, unknown>);", "const read = { affects: [] } as { affects: Affects[] };"],
   ["the weakest consistent class wins", "return allowed.find(cls => affects.every(CONSISTENT[cls]));", "return allowed.findLast(cls => affects.every(CONSISTENT[cls]));"],
@@ -42,14 +42,20 @@ const mutations = [
   ["an unreadable metric read as affected", "if (typeof result === \"string\") return { unreadable:", "if (typeof result === \"string\") continue; if (false) return { unreadable:"],
   ["the reason names the first CWE", "inTable.find(l => l.classes.includes(best))!.cwe", "inTable[0]!.cwe"],
   // LMR1e-2: every CWE with every class its mechanism can give.
-  ["path traversal and code injection lose alter", '[["takeover", "steal", "alter", "disrupt"], [22,', '[["takeover", "steal", "disrupt"], [22,'],
-  ["path traversal and code injection lose disrupt", '[["takeover", "steal", "alter", "disrupt"], [22,', '[["takeover", "steal", "alter"], [22,'],
-  ["the login and authorization set loses steal, alter and disrupt", '[["impersonate", "steal", "alter", "disrupt"], [79,', '[["impersonate"], [79,'],
+  // LMR1f moved rows: their first CWE changed, so the texts below name the rows as they now start.
+  ["code injection loses alter", '[["takeover", "steal", "alter", "disrupt"], [77,', '[["takeover", "steal", "disrupt"], [77,'],
+  ["code injection loses disrupt", '[["takeover", "steal", "alter", "disrupt"], [77,', '[["takeover", "steal", "alter"], [77,'],
+  ["the login and authorization set loses steal, alter and disrupt", '[["impersonate", "steal", "alter", "disrupt"], [15,', '[["impersonate"], [15,'],
   ["CSRF can steal", '[["impersonate", "alter", "disrupt"], [352]]', '[["impersonate", "steal", "alter", "disrupt"], [352]]'],
-  ["the five-class row loses impersonate", '[["takeover", "impersonate", "steal", "alter", "disrupt"], [15,', '[["takeover", "steal", "alter", "disrupt"], [15,'],
-  ["SSRF and XXE lose disrupt", '[["steal", "alter", "disrupt"], [611, 918]]', '[["steal", "alter"], [611, 918]]'],
+  ["the five-class row loses impersonate", '[["takeover", "impersonate", "steal", "alter", "disrupt"], [434,', '[["takeover", "steal", "alter", "disrupt"], [434,'],
+  ["the file, SSRF and XXE row loses disrupt", '[["steal", "alter", "disrupt"], [22,', '[["steal", "alter"], [22,'],
   ["out-of-bounds reads lose disrupt", '[["steal", "disrupt"], [125,', '[["steal"], [125,'],
-  ["CWE-912 leaves the table", "434, 912, 943,", "434, 943,"],
+  ["CWE-912 leaves the table", "[434, 912]]", "[434]]"],
+  // LMR1f: takeover only where code running is the direct result of the mechanism (comment 6541666295, (1)).
+  ["path traversal and the file CWEs get takeover back", '[["steal", "alter", "disrupt"], [22,', '[["takeover", "steal", "alter", "disrupt"], [22,'],
+  ["SQL injection, 15, 943 and 1321 get takeover back (with the login set)", '[["impersonate", "steal", "alter", "disrupt"], [15,', '[["takeover", "impersonate", "steal", "alter", "disrupt"], [15,'],
+  ["434 and 912 lose takeover", '[["takeover", "impersonate", "steal", "alter", "disrupt"], [434, 912]]', '[["impersonate", "steal", "alter", "disrupt"], [434, 912]]'],
+  ["code injection loses takeover", '[["takeover", "steal", "alter", "disrupt"], [77,', '[["steal", "alter", "disrupt"], [77,'],
   // LMR1b: trap as a published record, and stops with their reasons; LMR1d: CWE-506 to 512.
   ["a MAL- alias is not trap", "if (malAlias) return", "if (false && malAlias) return"],
   ["an alias containing MAL- anywhere is trap", 'alias.startsWith("MAL-")', 'alias.includes("MAL-")'],
@@ -97,6 +103,13 @@ const mutations = [
   ["the severity list not checked", '(row.severity !== "unknown" && !SEVERITIES.includes(row.severity))', "false"],
   ["Composer names with capitals accepted", "(?:(?:[_.]|-{1,2})[a-z0-9]+)*$/,", "(?:(?:[_.]|-{1,2})[a-z0-9]+)*$/i,"],
   ["a trap's record id not checked", 'return !(isObject(record) && typeof record.id === "string" && !RECORD_ID.test(record.id));', "return true;"],
+  // LMR1f, R236's review of 42e30b6 (comment 6541677765): points 1, 2 and 3.
+  ["the class trap shown on any row", 'if (row.class === "trap" && stop?.reason !== "trap") throw', "if (false) throw"],
+  ["the class trap shown on any stopped row", 'if (row.class === "trap" && stop?.reason !== "trap") throw', 'if (row.class === "trap" && row.action !== "stopped") throw'],
+  ["the class trap shown on any row with a stop", 'if (row.class === "trap" && stop?.reason !== "trap") throw', 'if (row.class === "trap" && stop == null) throw'],
+  ["a vector part with a second : read as its first two", "if (fields.length !== 2) return", "if (fields.length < 2) return"],
+  ["a vector part with no : skipped", "if (fields.length !== 2) return", "if (fields.length > 2) return"],
+  ["a language found through the prototype", "!Object.hasOwn(LABELS, lang)", "!(lang in LABELS)"],
 ];
 const run = () => {
   try {

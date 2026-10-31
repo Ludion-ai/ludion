@@ -1,7 +1,8 @@
 // Impact Classes: Ludion's own classification of a vulnerability record by what the attacker gains, not by how the
 // hole works (CWE), and the protection record's Markdown table (docs/decisions/2026-10-31-impact-classes.md,
-// docs/decisions/2026-10-31-impact-classes-trap-published-record.md, docs/decisions/2026-10-31-impact-classes-cvss-vector.md
-// and docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md).
+// docs/decisions/2026-10-31-impact-classes-trap-published-record.md, docs/decisions/2026-10-31-impact-classes-cvss-vector.md,
+// docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md, docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md
+// and docs/decisions/2026-10-31-impact-classes-takeover-direct.md).
 // The CWE table is fixed in this file and reviewed with it; nothing is inferred. Not wired into a PR body or a job
 // summary yet.
 
@@ -22,25 +23,27 @@ export type CweTable = readonly (readonly [readonly TableClass[], readonly numbe
 /**
  * Each CWE in the table with every class an attacker can gain through its mechanism, strongest first; the record's
  * CVSS vector says which (docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md, one line of reason per CWE).
- * When in doubt the set is the wider one. A set has one class only when the mechanism can give only that. A CWE not
+ * When in doubt the set is the wider one, except that takeover is in a set only when the attacker's code running is the
+ * direct result of the mechanism (docs/decisions/2026-10-31-impact-classes-takeover-direct.md): a vector's C:H and I:H
+ * do not say whether a further step ran code. A set has one class only when the mechanism can give only that. A CWE not
  * listed is unclassified. trap is a published record that says the version is malicious: a MAL- id or alias, or one
  * of TRAP_CWES.
  */
 export const CWE_CLASSES: CweTable = [
-  // External control of a setting (15), SQL injection (89), dangerous upload (434), hidden functionality (912), data
-  // query logic (943), prototype pollution (1321): any of the five.
-  [["takeover", "impersonate", "steal", "alter", "disrupt"], [15, 89, 434, 912, 943, 1321]],
+  // takeover only where the attacker's code or commands running is the direct result of the mechanism, not one more
+  // step away (docs/decisions/2026-10-31-impact-classes-takeover-direct.md).
+  // Dangerous upload (434), hidden functionality (912): any of the five.
+  [["takeover", "impersonate", "steal", "alter", "disrupt"], [434, 912]],
   // Runs code or commands, or only reads, writes or stops: command (77, 78), code (94, 95, 96) and PHP include (98)
   // injection, code downloaded without an integrity check (494), deserialization (502), untrusted functionality (829),
-  // expression language (917) and template (1336) injection; files reached outside their place, which a written file
-  // the application runs turns into code: path traversal and its variants (22 to 40), link following (59), external
-  // control of a file name (73), default and assigned permissions (276, 732), files accessible to external parties (552).
-  [["takeover", "steal", "alter", "disrupt"], [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 59, 73, 77, 78, 94, 95, 96, 98, 276, 494, 502, 552, 732, 829, 917, 1336]],
+  // expression language (917) and template (1336) injection.
+  [["takeover", "steal", "alter", "disrupt"], [77, 78, 94, 95, 96, 98, 494, 502, 829, 917, 1336]],
   // Gets past login or permissions, then acts as someone, reads, changes or removes: XSS and its variants (79, 80, 83 to
   // 87), privileges (266, 269), access control and authorization (284, 285, 425, 639, 862, 863), authentication and its
   // bypasses (287 to 290, 294, 302, 303, 305 to 307), sessions (384, 613), passwords (620, 640), credentials (798, 1390 to
-  // 1393).
-  [["impersonate", "steal", "alter", "disrupt"], [79, 80, 83, 84, 85, 86, 87, 266, 269, 284, 285, 287, 288, 289, 290, 294, 302, 303, 305, 306, 307, 384, 425, 613, 620, 639, 640, 798, 862, 863, 1390, 1391, 1392, 1393]],
+  // 1393); external control of a setting (15), SQL injection (89), data query logic (943), prototype pollution (1321),
+  // whose code runs only through a further step (a command a setting names, a database feature, a chain of gadgets).
+  [["impersonate", "steal", "alter", "disrupt"], [15, 79, 80, 83, 84, 85, 86, 87, 89, 266, 269, 284, 285, 287, 288, 289, 290, 294, 302, 303, 305, 306, 307, 384, 425, 613, 620, 639, 640, 798, 862, 863, 943, 1321, 1390, 1391, 1392, 1393]],
   // CSRF (352): the user is made to change or remove something; the answer cannot be read.
   [["impersonate", "alter", "disrupt"], [352]],
   // Open redirect (601), LDAP injection (90), XML injection (91), missing or cleartext encryption (311, 319), critical
@@ -51,8 +54,11 @@ export const CWE_CLASSES: CweTable = [
   [["impersonate", "steal"], [256, 257, 312, 522, 643, 652]],
   // Assumed-immutable data (471) and web parameters (472), object attributes (915): changes, a role or identity among them.
   [["impersonate", "alter"], [471, 472, 915]],
-  // XXE (611), SSRF (918): reads, sends requests that change or stop.
-  [["steal", "alter", "disrupt"], [611, 918]],
+  // XXE (611), SSRF (918): reads, sends requests that change or stop. Files reached outside their place, read, written
+  // or removed; a written file runs only if something later runs it: path traversal and its variants (22 to 40), link
+  // following (59), external control of a file name (73), default and assigned permissions (276, 732), files accessible
+  // to external parties (552).
+  [["steal", "alter", "disrupt"], [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 59, 73, 276, 552, 611, 732, 918]],
   // Out-of-bounds reads (125 to 127): reads memory, or crashes.
   [["steal", "disrupt"], [125, 126, 127]],
   // Exposure of information through a response, a timing, an error, a cache, a log, a listing or a query string: read
@@ -126,7 +132,10 @@ function vectors(record: Record<string, unknown>): { affects: Affects[] } | { un
     if (typeof score !== "string" || !spec.prefix.test(score)) return { unreadable: `its ${type} score is not a CVSS ${type.slice(6)} vector` };
     const values = new Map<string, string[]>();
     for (const part of score.split("/").slice(1)) {
-      const [key = "", value = ""] = part.split(":");
+      // One metric and its value: a part with no ":" or with two (C:H:junk) makes the vector unreadable.
+      const fields = part.split(":");
+      if (fields.length !== 2) return { unreadable: `its ${type} vector cannot be read: ${JSON.stringify(part)} is not one metric and its value` };
+      const [key, value] = fields as [string, string];
       values.set(key, [...(values.get(key) ?? []), value]);
     }
     const affected = (keys: readonly string[]): boolean | string => {
@@ -355,13 +364,14 @@ export function codeSpan(text: string): string {
 /**
  * The protection record: a summary line, then one table row per input row, in the input's order. Every number is a
  * count of the input rows or a time between two of its timestamps. A stop is written as a trap only with a published
- * record that classifies as trap; any other stop is "stopped as unverified" with its reason. A row whose shown values
- * do not all have their strict form is not shown: a line says how many there were. Throws on a row it cannot render
- * truthfully.
+ * record that classifies as trap; any other stop is "stopped as unverified" with its reason. The class column says trap
+ * only on such a row. A row whose shown values do not all have their strict form is not shown: a line says how many
+ * there were. Throws on a row it cannot render truthfully.
  */
 export function renderRecord(rows: readonly RecordRow[], lang: Lang): string {
+  // Own keys only: "constructor" or "__proto__" is not a language.
+  if (typeof lang !== "string" || !Object.hasOwn(LABELS, lang)) throw new Error(`Unknown language: ${JSON.stringify(lang)}`);
   const l = LABELS[lang];
-  if (!l) throw new Error(`Unknown language: ${JSON.stringify(lang)}`);
   if (!rows.length) return `${l.none}\n`;
   const counts = new Map<Exclude<Action, "stopped">, number>(), unverified = new Map<StopReason, number>();
   let traps = 0, unreadable = 0;
@@ -391,6 +401,11 @@ export function renderRecord(rows: readonly RecordRow[], lang: Lang): string {
     } else {
       throw new Error(`Row ${i}: unknown stop reason ${JSON.stringify((stop as { reason: unknown }).reason)}`);
     }
+    // The class column says trap only where the stop above is a trap that a published record backs, as the stop cell
+    // and the summary do (docs/decisions/2026-10-31-impact-classes-trap-published-record.md, point 2): the row's class
+    // comes from a receipt, so it is not trusted to have come from classify().
+    // Only a stopped row has a stop (checked above), so a trap stop means a stopped row.
+    if (row.class === "trap" && stop?.reason !== "trap") throw new Error(`Row ${i}: the class is trap, but the row is not stopped as a trap with a published record that says the version is malicious`);
     const acted = instant(row.actedAt, `Row ${i} actedAt`);
     let elapsed: string = l.unknown;
     if (row.fixPublishedAt !== null) {

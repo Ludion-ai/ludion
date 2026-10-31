@@ -1,5 +1,6 @@
 // Impact Classes (docs/decisions/2026-10-31-impact-classes.md, docs/decisions/2026-10-31-impact-classes-trap-published-record.md,
-// docs/decisions/2026-10-31-impact-classes-cvss-vector.md, docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md):
+// docs/decisions/2026-10-31-impact-classes-cvss-vector.md, docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md,
+// docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md, docs/decisions/2026-10-31-impact-classes-takeover-direct.md):
 // the fixed CWE table and each CWE's set of classes, the CVSS vectors that choose among them, the design rule that a
 // vector can give every class of every set, the strength order, trap as a published record (MAL- id or alias, CWE-506
 // to 512), GHSA severity only, and the protection record's table in English and Japanese, with traps apart from stops
@@ -45,12 +46,14 @@ describe("the CWE table", () => {
   });
 
   it("keeps the sets the decisions name, with every class a CWE's mechanism can give", () => {
-    const all = ["takeover", "impersonate", "steal", "alter", "disrupt"], code = ["takeover", "steal", "alter", "disrupt"], login = ["impersonate", "steal", "alter", "disrupt"];
+    const all = ["takeover", "impersonate", "steal", "alter", "disrupt"], code = ["takeover", "steal", "alter", "disrupt"], login = ["impersonate", "steal", "alter", "disrupt"], files = ["steal", "alter", "disrupt"];
     const examples: Record<string, readonly string[]> = {
       // The chat's answers (comment 6540818608, point 2).
-      434: all, 494: code, 502: code, 829: code, 918: ["steal", "alter", "disrupt"], 611: ["steal", "alter", "disrupt"],
-      15: all, 89: all, 912: all, 943: all, 1321: all,
-      77: code, 78: code, 94: code, 98: code, 1336: code, 22: code, 59: code, 73: code, 276: code, 552: code, 732: code,
+      434: all, 494: code, 502: code, 829: code, 918: files, 611: files, 912: all,
+      77: code, 78: code, 94: code, 95: code, 96: code, 98: code, 917: code, 1336: code,
+      // takeover only where code running is the direct result of the mechanism (comment 6541666295, (1)).
+      15: login, 89: login, 943: login, 1321: login,
+      22: files, 23: files, 40: files, 59: files, 73: files, 276: files, 552: files, 732: files,
       79: login, 80: login, 87: login, 287: login, 306: login, 384: login, 613: login, 620: login, 640: login, 798: login, 1390: login, 862: login, 863: login, 284: login, 266: login,
       352: ["impersonate", "alter", "disrupt"], 601: ["impersonate", "steal", "alter"], 90: ["impersonate", "steal", "alter"], 91: ["impersonate", "steal", "alter"],
       319: ["impersonate", "steal", "alter"], 642: ["impersonate", "steal", "alter"], 643: ["impersonate", "steal"], 256: ["impersonate", "steal"], 522: ["impersonate", "steal"],
@@ -155,12 +158,16 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
       // takeover: C:H and I:H; impersonate: C and I not N; steal: C not N; alter: I not N; disrupt: A not N.
       ["CWE-78", "C:H/I:H/A:N", "takeover"], ["CWE-78", "C:H/I:L/A:H", "steal"], ["CWE-78", "C:L/I:L/A:L", "steal"], ["CWE-78", "C:N/I:H/A:H", "alter"],
       ["CWE-78", "C:N/I:N/A:L", "disrupt"], ["CWE-78", "C:N/I:N/A:N", "unclassified"],
-      ["CWE-89", "C:H/I:H/A:N", "takeover"], ["CWE-89", "C:L/I:L/A:N", "impersonate"], ["CWE-89", "C:H/I:N/A:N", "steal"], ["CWE-89", "C:N/I:H/A:N", "alter"], ["CWE-89", "C:N/I:N/A:H", "disrupt"],
+      ["CWE-89", "C:H/I:H/A:N", "impersonate"], ["CWE-89", "C:L/I:L/A:N", "impersonate"], ["CWE-89", "C:H/I:N/A:N", "steal"], ["CWE-89", "C:N/I:H/A:N", "alter"], ["CWE-89", "C:N/I:N/A:H", "disrupt"],
       ["CWE-862", "C:L/I:L/A:N", "impersonate"], ["CWE-862", "C:L/I:N/A:N", "steal"], ["CWE-862", "C:N/I:L/A:N", "alter"], ["CWE-862", "C:N/I:N/A:H", "disrupt"], ["CWE-862", "C:N/I:N/A:N", "unclassified"],
       ["CWE-79", "C:L/I:L/A:N", "impersonate"], ["CWE-79", "C:H/I:N/A:N", "steal"], ["CWE-79", "C:N/I:H/A:N", "alter"], ["CWE-79", "C:N/I:N/A:H", "disrupt"],
       ["CWE-352", "C:L/I:L/A:N", "impersonate"], ["CWE-352", "C:N/I:H/A:N", "alter"], ["CWE-352", "C:N/I:N/A:L", "disrupt"], ["CWE-352", "C:H/I:N/A:N", "unclassified"],
       ["CWE-643", "C:L/I:L/A:N", "impersonate"], ["CWE-643", "C:H/I:N/A:H", "steal"], ["CWE-643", "C:N/I:H/A:H", "unclassified"],
       ["CWE-471", "C:L/I:L/A:N", "impersonate"], ["CWE-471", "C:N/I:H/A:N", "alter"], ["CWE-471", "C:H/I:N/A:H", "unclassified"],
+      // C:H and I:H do not say a further step ran code: no takeover for files, SQL, a setting or prototype pollution.
+      ["CWE-22", "C:H/I:H/A:H", "steal"], ["CWE-276", "C:H/I:H/A:H", "steal"], ["CWE-552", "C:H/I:H/A:N", "steal"], ["CWE-732", "C:H/I:H/A:N", "steal"],
+      ["CWE-943", "C:H/I:H/A:H", "impersonate"], ["CWE-1321", "C:H/I:H/A:H", "impersonate"], ["CWE-15", "C:H/I:H/A:H", "impersonate"],
+      ["CWE-1321", "C:N/I:H/A:H", "alter"], ["CWE-434", "C:H/I:H/A:N", "takeover"], ["CWE-912", "C:H/I:H/A:N", "takeover"], ["CWE-502", "C:H/I:H/A:N", "takeover"],
       ["CWE-22", "C:H/I:N/A:N", "steal"], ["CWE-22", "C:L/I:H/A:N", "steal"], ["CWE-22", "C:N/I:L/A:N", "alter"], ["CWE-22", "C:N/I:N/A:H", "disrupt"],
       ["CWE-918", "C:L/I:N/A:N", "steal"], ["CWE-918", "C:N/I:H/A:H", "alter"], ["CWE-918", "C:N/I:N/A:L", "disrupt"], ["CWE-918", "C:N/I:N/A:N", "unclassified"],
       ["CWE-125", "C:H/I:H/A:N", "steal"], ["CWE-125", "C:N/I:N/A:H", "disrupt"], ["CWE-125", "C:N/I:H/A:N", "unclassified"],
@@ -183,6 +190,7 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
       ["CWE-643", "VC:N/VI:N/VA:H/SC:N/SI:N/SA:H", "unclassified"], ["CWE-643", "VC:N/VI:N/VA:N/SC:L/SI:N/SA:N", "steal"],
       ["CWE-400", "VC:N/VI:N/VA:N/SC:N/SI:N/SA:L", "disrupt"], ["CWE-400", "VC:H/VI:H/VA:N/SC:H/SI:H/SA:N", "unclassified"],
       ["CWE-22", "SA:N/SI:N/SC:H/VA:N/VI:N/VC:N/E:A/U:Red/MVC:H", "steal"], ["CWE-78", "SA:N/SI:H/SC:H/VA:N/VI:N/VC:N", "takeover"],
+      ["CWE-22", "VC:H/VI:H/VA:H/SC:H/SI:H/SA:H", "steal"], ["CWE-89", "VC:H/VI:H/VA:N/SC:N/SI:N/SA:N", "impersonate"],
     ];
     for (const [cwes, metrics, want] of cases) expect([cwes, metrics, classify(withVectors(cwes.split(","), v4(metrics))).class]).toEqual([cwes, metrics, want]);
   });
@@ -195,15 +203,15 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
     expect(classify(withVectors(["CWE-862"], steal, alter)).class).toBe("unclassified");
     expect(classify(withVectors(["CWE-862"], both, v4("VC:L/VI:L/VA:N/SC:N/SI:N/SA:N"))).class).toBe("impersonate");
     expect(classify(withVectors(["CWE-78"], both, v4("VC:H/VI:L/VA:N/SC:N/SI:N/SA:N"))).class).toBe("steal");
-    expect(classify(withVectors(["CWE-22"], steal, alter)).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CVSS vectors rule out every class its CWEs allow (takeover, steal, alter, disrupt).");
+    expect(classify(withVectors(["CWE-22"], steal, alter)).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CVSS vectors rule out every class its CWEs allow (steal, alter, disrupt).");
   });
 
   it("say which CWE gave the class and what the vector ruled out", () => {
     expect(classify(withVectors(["CWE-22"], v3("C:H/I:N/A:N")))).toEqual({
-      class: "steal", severity: "unknown", cwes: ["CWE-22"], reason: "GHSA-xxxx-xxxx-xxxx: steal (CWE-22), the strongest class its CWEs allow (takeover, steal, alter, disrupt) that its CVSS vector does not rule out.",
+      class: "steal", severity: "unknown", cwes: ["CWE-22"], reason: "GHSA-xxxx-xxxx-xxxx: steal (CWE-22), the strongest class its CWEs allow (steal, alter, disrupt) that its CVSS vector does not rule out.",
     });
     expect(classify(withVectors(["CWE-400", "CWE-22"], v3("C:N/I:H/A:H"), v4("VC:N/VI:H/VA:H/SC:N/SI:N/SA:N"))).reason).toBe(
-      "GHSA-xxxx-xxxx-xxxx: alter (CWE-22), the strongest class its CWEs allow (takeover, steal, alter, disrupt) that its CVSS vectors do not rule out.",
+      "GHSA-xxxx-xxxx-xxxx: alter (CWE-22), the strongest class its CWEs allow (steal, alter, disrupt) that its CVSS vectors do not rule out.",
     );
     expect(classify(withVectors(["CWE-200", "CWE-400"], v3("C:N/I:N/A:H"))).reason).toBe(
       "GHSA-xxxx-xxxx-xxxx: disrupt (CWE-400), the strongest class its CWEs allow (steal, disrupt) that its CVSS vector does not rule out.",
@@ -219,7 +227,8 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
       [["CWE-200", "CWE-532"], "steal"], [["CWE-400", "CWE-1333"], "disrupt"], [["CWE-400", "CWE-20"], "disrupt"],
     ];
     for (const [cwes, want] of cases) expect([cwes, classify(record(cwes)).class]).toEqual([cwes, want]);
-    expect(classify(record(["CWE-22"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow takeover, steal, alter or disrupt, and the record has no CVSS vector to choose.");
+    expect(classify(record(["CWE-22"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow steal, alter or disrupt, and the record has no CVSS vector to choose.");
+    expect(classify(record(["CWE-78"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow takeover, steal, alter or disrupt, and the record has no CVSS vector to choose.");
     expect(classify(record(["CWE-862"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow impersonate, steal, alter or disrupt, and the record has no CVSS vector to choose.");
     expect(classify(record(["CWE-200", "CWE-918"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: its CWEs allow steal, alter or disrupt, and the record has no CVSS vector to choose.");
     expect(classify(record(["CWE-532", "CWE-200"])).reason).toBe("GHSA-xxxx-xxxx-xxxx: CWE-200, CWE-532 are steal.");
@@ -241,6 +250,12 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
       [v3("C:H/I:N/A:"), 'its CVSS_V3 vector cannot be read: A is given 1 time (""), not once as N, L or H'],
       [v4("VC:H/VI:N/VA:N/SI:N/SA:N"), "its CVSS_V4 vector cannot be read: SC is given 0 times, not once as N, L or H"],
       [v4("VC:H/VI:N/VA:N/SC:N/SI:N/SA:S"), 'its CVSS_V4 vector cannot be read: SA is given 1 time ("S"), not once as N, L or H'],
+      // A part that is not one metric and its value (R236, point 2): a second ":", none, or an empty part.
+      [v3("C:H:junk/I:H:zzz/A:N"), 'its CVSS_V3 vector cannot be read: "C:H:junk" is not one metric and its value'],
+      [v3("C:H/I:H/A:N/E:P:x"), 'its CVSS_V3 vector cannot be read: "E:P:x" is not one metric and its value'],
+      [v3("C:H/I:H/A:N/X"), 'its CVSS_V3 vector cannot be read: "X" is not one metric and its value'],
+      [v3("C:H/I:H/A:N/"), 'its CVSS_V3 vector cannot be read: "" is not one metric and its value'],
+      [v4("VC:H/VI:H:H/VA:N/SC:N/SI:N/SA:N"), 'its CVSS_V4 vector cannot be read: "VI:H:H" is not one metric and its value'],
     ];
     for (const [vector, why] of bad) {
       expect(classify(withVectors(["CWE-78"], vector))).toEqual({ class: "unclassified", severity: "unknown", cwes: ["CWE-78"], reason: `GHSA-xxxx-xxxx-xxxx: ${why}, so no class can be ruled out.` });
@@ -358,7 +373,7 @@ describe("the same input", () => {
     expect(classify({ ...record(["CWE-22", "CWE-918", "CWE-79"], { severity: "HIGH" }), severity: [vector] })).toEqual(first);
     expect(first).toEqual({
       class: "impersonate", severity: "high", cwes: ["CWE-22", "CWE-79", "CWE-918"],
-      reason: "GHSA-xxxx-xxxx-xxxx: impersonate (CWE-79), the strongest class its CWEs allow (takeover, impersonate, steal, alter, disrupt) that its CVSS vector does not rule out.",
+      reason: "GHSA-xxxx-xxxx-xxxx: impersonate (CWE-79), the strongest class its CWEs allow (impersonate, steal, alter, disrupt) that its CVSS vector does not rule out.",
     });
   });
 });
@@ -433,8 +448,7 @@ const rows: RecordRow[] = [
   { ecosystem: "composer", package: "guzzlehttp/guzzle", from: "7.4.4", to: "7.4.5", class: "steal", severity: "moderate", action: "opened", stop: null, fixPublishedAt: "2026-10-05T10:00:00Z", actedAt: "2026-10-05T10:45:59Z" },
   { ecosystem: "npm", package: "express", from: "4.19.1", to: "4.19.2", class: "impersonate", severity: "critical", action: "waited", stop: null, fixPublishedAt: "2026-10-06T00:00:00Z", actedAt: "2026-10-06T05:00:00Z" },
   { ecosystem: "npm", package: "minimist", from: "1.2.5", to: "1.2.6", class: "unclassified", severity: "low", action: "fixed", stop: null, fixPublishedAt: "2026-10-07T00:00:00Z", actedAt: "2026-10-08T23:59:00Z" },
-  // A trap class without a published record behind the stop: written as unverified, not counted as a trap.
-  { ecosystem: "npm", package: "ua-parser-js", from: "0.7.28", to: "0.7.29", class: "trap", severity: "critical", action: "stopped", stop: { reason: "install-scripts" }, fixPublishedAt: "2026-10-09T00:00:00Z", actedAt: "2026-10-09T13:00:00Z" },
+  { ecosystem: "npm", package: "ua-parser-js", from: "0.7.28", to: "0.7.29", class: "takeover", severity: "critical", action: "stopped", stop: { reason: "install-scripts" }, fixPublishedAt: "2026-10-09T00:00:00Z", actedAt: "2026-10-09T13:00:00Z" },
   { ecosystem: "npm", package: "left-pad", from: "1.2.0", to: "1.3.0", class: "disrupt", severity: "moderate", action: "stopped", stop: { reason: "provenance-lost" }, fixPublishedAt: "2026-10-10T00:00:00Z", actedAt: "2026-10-10T00:10:00Z" },
 ];
 
@@ -450,7 +464,7 @@ describe("renderRecord", () => {
       "| 2026-10-05 | `guzzlehttp/guzzle` | `7.4.4` → `7.4.5` | Data theft | Moderate | opened a PR | 45 min |",
       "| 2026-10-06 | `express` | `4.19.1` → `4.19.2` | Impersonation | Critical | waiting | 5 h |",
       "| 2026-10-08 | `minimist` | `1.2.5` → `1.2.6` | Unclassified | Low | fixed (merged) | 47 h |",
-      "| 2026-10-09 | `ua-parser-js` | `0.7.28` → `0.7.29` | Trap | Critical | stopped as unverified: install scripts added | 13 h |",
+      "| 2026-10-09 | `ua-parser-js` | `0.7.28` → `0.7.29` | Takeover | Critical | stopped as unverified: install scripts added | 13 h |",
       "| 2026-10-10 | `left-pad` | `1.2.0` → `1.3.0` | Disruption | Moderate | stopped as unverified: provenance lost | 10 min |",
       "",
     ].join("\n"));
@@ -467,7 +481,7 @@ describe("renderRecord", () => {
       "| 2026-10-05 | `guzzlehttp/guzzle` | `7.4.4` → `7.4.5` | 抜き取り | 中 | PR を開いた | 45 分 |",
       "| 2026-10-06 | `express` | `4.19.1` → `4.19.2` | なりすまし | 重大 | 待っている | 5 時間 |",
       "| 2026-10-08 | `minimist` | `1.2.5` → `1.2.6` | 未分類 | 低 | 直した（マージ済み） | 47 時間 |",
-      "| 2026-10-09 | `ua-parser-js` | `0.7.28` → `0.7.29` | 罠 | 重大 | 確かめられなかったので止めた（install スクリプトが増えた） | 13 時間 |",
+      "| 2026-10-09 | `ua-parser-js` | `0.7.28` → `0.7.29` | 乗っ取り | 重大 | 確かめられなかったので止めた（install スクリプトが増えた） | 13 時間 |",
       "| 2026-10-10 | `left-pad` | `1.2.0` → `1.3.0` | 停止 | 中 | 確かめられなかったので止めた（来歴が切れた） | 10 分 |",
       "",
     ].join("\n"));
@@ -476,10 +490,12 @@ describe("renderRecord", () => {
   it("names every class and action in both languages", () => {
     for (const lang of ["en", "ja"] as const) {
       const out = renderRecord(IMPACT_ORDER.map((cls, i) => {
+        // The class trap is written only on a row stopped as a trap that a published record backs.
+        if (cls === "trap") return { ...rows[0]!, class: cls, action: "stopped" as const, stop: { reason: "trap" as const, record: { id: "MAL-2025-1" } } };
         const action = (["opened", "stopped", "waited", "fixed"] as const)[i % 4]!;
         return { ...rows[0]!, class: cls, action, stop: action === "stopped" ? { reason: "tests" as const } : null };
       }), lang);
-      expect(out).toContain(lang === "en" ? "Ludion: fixed 1, stopped as unverified 2 (tests fail on the new version 2), PR opened 2, waiting 2" : "Ludion：直した 1、確かめられなかったので止めた 2（新しい版でテストが通らない 2）、PR を開いた 2、待っている 2");
+      expect(out).toContain(lang === "en" ? "Ludion: fixed 1, trap stopped 1, stopped as unverified 2 (tests fail on the new version 2), PR opened 1, waiting 2" : "Ludion：直した 1、罠を止めた 1、確かめられなかったので止めた 2（新しい版でテストが通らない 2）、PR を開いた 1、待っている 2");
       for (const label of lang === "en" ? ["Trap", "Takeover", "Impersonation", "Data theft", "Tampering", "Disruption", "Unclassified"] : ["罠", "乗っ取り", "なりすまし", "抜き取り", "改ざん", "停止", "未分類"]) expect(out).toContain(`| ${label} |`);
     }
   });
@@ -505,16 +521,34 @@ describe("renderRecord", () => {
       stopped({ reason: "trap", record: { id: "MAL-2025-1" } }),
       stopped({ reason: "trap", record: { id: "GHSA-aaaa-bbbb-cccc", aliases: ["MAL-2025-2"] } }),
       stopped({ reason: "trap", record: { id: "GHSA-dddd-eeee-ffff", database_specific: { cwe_ids: ["CWE-506"] } } }),
-      stopped({ reason: "undecidable" }, "trap"),
-      stopped({ reason: "new-advisory" }, "trap"),
+      stopped({ reason: "undecidable" }, "takeover"),
+      stopped({ reason: "new-advisory" }),
     ], "en").split("\n");
     expect(out[0]).toBe("Ludion: trap stopped 3, stopped as unverified 2 (the new version has known advisories 1, could not be judged 1)");
     expect(out.slice(4, -1).map(line => line.split(" | ")[5])).toEqual([
       "trap stopped (`MAL-2025-1`)", "trap stopped (`GHSA-aaaa-bbbb-cccc`)", "trap stopped (`GHSA-dddd-eeee-ffff`)", "stopped as unverified: could not be judged", "stopped as unverified: the new version has known advisories",
     ]);
-    expect(renderRecord([stopped({ reason: "undecidable" }, "trap")], "ja").split("\n")[0]).toBe("Ludion：確かめられなかったので止めた 1（判断できなかった 1）");
+    expect(renderRecord([stopped({ reason: "undecidable" }, "takeover")], "ja").split("\n")[0]).toBe("Ludion：確かめられなかったので止めた 1（判断できなかった 1）");
     // A record id not of an id's form is not shown; the row is counted as unreadable.
     expect(renderRecord([stopped({ reason: "trap", record: { id: "MAL-a|b`c" } })], "en")).toBe("Rows that could not be read: 1. Their contents are not shown.\n");
+  });
+
+  it("writes the class trap only on a row stopped as a trap that a published record backs, and refuses any other (R236, point 1)", () => {
+    const trap: RecordRow = { ...rows[0]!, class: "trap" };
+    const others: Partial<RecordRow>[] = [
+      { action: "stopped", stop: { reason: "install-scripts" } }, { action: "stopped", stop: { reason: "undecidable" } }, { action: "stopped", stop: { reason: "new-advisory" } },
+      { action: "fixed", stop: null }, { action: "opened", stop: null }, { action: "waited", stop: null },
+    ];
+    for (const lang of ["en", "ja"] as const) for (const change of others) {
+      expect(() => renderRecord([rows[0]!, { ...trap, ...change }], lang)).toThrow("Row 1: the class is trap, but the row is not stopped as a trap with a published record that says the version is malicious");
+    }
+    // A trap stop whose record is not a trap is refused for that, whatever the class.
+    expect(() => renderRecord([{ ...trap, action: "stopped", stop: { reason: "trap", record: { id: "GHSA-1" } } }], "en")).toThrow("Row 0: the stop is given as a trap, but its record does not say the version is malicious");
+    const backed = (id: string, extra: Record<string, unknown> = {}): RecordRow => ({ ...trap, action: "stopped", stop: { reason: "trap", record: { id, ...extra } } });
+    const en = renderRecord([backed("MAL-2025-1"), backed("GHSA-aaaa-bbbb-cccc", { aliases: ["MAL-2025-2"] }), backed("GHSA-dddd-eeee-ffff", { database_specific: { cwe_ids: ["CWE-506"] } })], "en").split("\n");
+    expect(en[0]).toBe("Ludion: trap stopped 3");
+    expect(en.slice(4, -1).map(line => line.split(" | ").slice(3, 6))).toEqual([["Trap", "High", "trap stopped (`MAL-2025-1`)"], ["Trap", "High", "trap stopped (`GHSA-aaaa-bbbb-cccc`)"], ["Trap", "High", "trap stopped (`GHSA-dddd-eeee-ffff`)"]]);
+    expect(renderRecord([backed("MAL-2025-1")], "ja").split("\n")[4]).toBe("| 2026-10-03 | `lodash` | `4.17.20` → `4.17.21` | 罠 | 高 | 罠を止めた（`MAL-2025-1`） | 2 日 |");
   });
 
   it("refuses a stop given as a trap whose record does not say the version is malicious", () => {
@@ -630,6 +664,10 @@ describe("renderRecord", () => {
       [{ action: "stopped", stop: {} as unknown as RecordRow["stop"] }, "unknown stop reason undefined"],
     ];
     for (const [change, message] of bad) expect(() => renderRecord([{ ...rows[0]!, ...change }], "en")).toThrow(message);
-    expect(() => renderRecord(rows, "fr" as "en")).toThrow("Unknown language");
+    // Only the record's own languages: not a key every object inherits (R236, point 3).
+    for (const lang of ["fr", "constructor", "__proto__", "toString", "hasOwnProperty", "", null, 1]) {
+      expect(() => renderRecord(rows, lang as "en")).toThrow(`Unknown language: ${JSON.stringify(lang)}`);
+      expect(() => renderRecord([], lang as "en")).toThrow(`Unknown language: ${JSON.stringify(lang)}`);
+    }
   });
 });

@@ -1,6 +1,6 @@
 // Impact Classes: Ludion's own classification of a vulnerability record by what the attacker gains, not by how the
-// hole works (CWE), and the protection record's Markdown table (docs/decisions/2026-10-31-impact-classes.md and
-// docs/decisions/2026-10-31-impact-classes-trap-published-record.md).
+// hole works (CWE), and the protection record's Markdown table (docs/decisions/2026-10-31-impact-classes.md,
+// docs/decisions/2026-10-31-impact-classes-trap-published-record.md and docs/decisions/2026-10-31-impact-classes-cvss-vector.md).
 // The CWE table is fixed in this file and reviewed with it; nothing is inferred. Not wired into a PR body or a job
 // summary yet.
 
@@ -9,37 +9,46 @@ export type ImpactClass = "trap" | "takeover" | "impersonate" | "steal" | "alter
 export type Severity = "critical" | "high" | "moderate" | "low" | "unknown";
 export type Classification = { class: ImpactClass; severity: Severity; cwes: string[]; reason: string };
 
-/** Strongest first. A record with several CWEs takes the strongest class among them. */
+/** Strongest first. A record takes the strongest class its CWEs allow and its CVSS vectors do not rule out. */
 export const IMPACT_ORDER: readonly ImpactClass[] = ["trap", "takeover", "impersonate", "steal", "alter", "disrupt", "unclassified"];
 
+/** A class the CWE table can give: what the attacker gains through the hole. */
+export type TableClass = Exclude<ImpactClass, "trap" | "unclassified">;
+
 /**
- * Each CWE whose definition states what the attacker gains. A CWE not listed is unclassified. trap is a published record
- * that says the version is malicious: a MAL- id or alias, or TRAP_CWE.
+ * Each CWE in the table with the set of classes its definition allows (docs/decisions/2026-10-31-impact-classes-cvss-vector.md).
+ * A CWE not listed is unclassified. trap is a published record that says the version is malicious: a MAL- id or alias, or
+ * TRAP_CWE.
  */
-export const CWE_CLASSES: Readonly<Record<"takeover" | "impersonate" | "steal" | "alter" | "disrupt", readonly number[]>> = {
+export const CWE_CLASSES: readonly (readonly [readonly TableClass[], readonly number[]])[] = [
   // Runs their own code or commands where the application runs: OS command (78) and command (77) injection, code (94),
   // eval (95) and static code (96) injection, PHP file inclusion (98), dangerous file upload processed in the
   // application's environment (434), code downloaded without an integrity check (494), deserialization (502),
   // functionality included from an untrusted sphere (829), expression language (917) and template (1336) injection.
-  takeover: [77, 78, 94, 95, 96, 98, 434, 494, 502, 829, 917, 1336],
-  // Acts as a user or the owner, or goes past login or permissions: XSS and its variants (79, 80, 83 to 87), access
-  // control (284), authorization (285, 639, 862, 863, 425), privileges (266, 269), authentication and its bypasses
-  // (287 to 290, 294, 302, 303, 305 to 307), CSRF (352), session fixation and expiry (384, 613), open redirect (601),
-  // password change and recovery (620, 640), hard-coded credentials (798), weak and default credentials (1390 to 1393).
-  impersonate: [79, 80, 83, 84, 85, 86, 87, 266, 269, 284, 285, 287, 288, 289, 290, 294, 302, 303, 305, 306, 307, 352, 384, 425, 601, 613, 620, 639, 640, 798, 862, 863, 1390, 1391, 1392, 1393],
-  // Reads data, files or secrets they must not see: path traversal and its variants (22, 23 to 40), SQL (89), LDAP
-  // (90), XPath (643), XQuery (652) and data query (943) injection, out-of-bounds reads (125 to 127), SSRF (918), XXE
-  // (611), exposure of sensitive information (200 to 204, 208, 209, 212 to 215, 226, 359, 497, 524 to 526, 532, 538,
-  // 548, 552, 598), unprotected passwords and credentials (256, 257, 522), missing or cleartext encryption (311, 312, 319).
-  steal: [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 89, 90, 125, 126, 127, 200, 201, 202, 203, 204, 208, 209, 212, 213, 214, 215, 226, 256, 257, 311, 312, 319, 359, 497, 522, 524, 525, 526, 532, 538, 548, 552, 598, 611, 643, 652, 918, 943],
+  [["takeover"], [77, 78, 94, 95, 96, 98, 434, 494, 502, 829, 917, 1336]],
+  // Gets past permissions to act, read or change: privileges (266, 269), access control (284), authorization (285, 425,
+  // 639, 862, 863).
+  [["impersonate", "steal", "alter"], [266, 269, 284, 285, 425, 639, 862, 863]],
+  // Acts as a user or the owner: XSS and its variants (79, 80, 83 to 87), authentication and its bypasses (287 to 290,
+  // 294, 302, 303, 305 to 307), CSRF (352), session fixation and expiry (384, 613), open redirect (601), password change
+  // and recovery (620, 640), hard-coded credentials (798), weak and default credentials (1390 to 1393).
+  [["impersonate"], [79, 80, 83, 84, 85, 86, 87, 287, 288, 289, 290, 294, 302, 303, 305, 306, 307, 352, 384, 601, 613, 620, 640, 798, 1390, 1391, 1392, 1393]],
+  // Reads or writes data or files: path traversal and its variants (22, 23 to 40), SQL injection (89), files or
+  // directories accessible to external parties (552), data query logic (943).
+  [["steal", "alter"], [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 89, 552, 943]],
+  // Reads data, files or secrets they must not see: LDAP (90), XPath (643) and XQuery (652) injection, out-of-bounds reads
+  // (125 to 127), SSRF (918), XXE (611), exposure of sensitive information (200 to 204, 208, 209, 212 to 215, 226, 359,
+  // 497, 524 to 526, 532, 538, 548, 598), unprotected passwords and credentials (256, 257, 522), missing or cleartext
+  // encryption (311, 312, 319).
+  [["steal"], [90, 125, 126, 127, 200, 201, 202, 203, 204, 208, 209, 212, 213, 214, 215, 226, 256, 257, 311, 312, 319, 359, 497, 522, 524, 525, 526, 532, 538, 548, 598, 611, 643, 652, 918]],
   // Changes data, files or how the application behaves: external control of settings (15), XML injection (91),
   // assumed-immutable data and parameters (471, 472), critical state data (642), object attributes (915), prototype
   // pollution (1321).
-  alter: [15, 91, 471, 472, 642, 915, 1321],
+  [["alter"], [15, 91, 471, 472, 642, 915, 1321]],
   // Slows or stops the application: resource consumption and its forms (400, 401, 405, 407, 409, 770, 789, 834, 1050),
   // uncontrolled recursion (674) and XML entity expansion, its form in a DTD (776), infinite loop (835), ReDoS (1333).
-  disrupt: [400, 401, 405, 407, 409, 674, 770, 776, 789, 834, 835, 1050, 1333],
-};
+  [["disrupt"], [400, 401, 405, 407, 409, 674, 770, 776, 789, 834, 835, 1050, 1333]],
+];
 
 /** Embedded Malicious Code: a record listing it is a GitHub-reviewed malware advisory, so trap. */
 export const TRAP_CWE = 506;
@@ -54,10 +63,55 @@ export const DECIDED_UNCLASSIFIED: readonly number[] = [
   1022, 1188, 1236, 1385, 1395,
 ];
 
-const CLASS_OF = new Map<number, ImpactClass>(Object.entries(CWE_CLASSES).flatMap(([cls, ids]) => ids.map(id => [id, cls as ImpactClass] as const)));
+const CLASSES_OF = new Map<number, readonly TableClass[]>(CWE_CLASSES.flatMap(([classes, ids]) => ids.map(id => [id, classes] as const)));
 const SEVERITIES: readonly Severity[] = ["critical", "high", "moderate", "low"];
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** Whether a CVSS vector says confidentiality, integrity and availability are each affected (not N). */
+type Affects = { c: boolean; i: boolean; a: boolean };
+/** The OSV severity types read, each with its score's prefix and the base metrics for C, I and A (CVSS 4: vulnerable and subsequent systems). */
+const VECTORS: Readonly<Record<string, { prefix: RegExp; c: readonly string[]; i: readonly string[]; a: readonly string[] }>> = {
+  CVSS_V3: { prefix: /^CVSS:3\.[01]\//, c: ["C"], i: ["I"], a: ["A"] },
+  CVSS_V4: { prefix: /^CVSS:4\.0\//, c: ["VC", "SC"], i: ["VI", "SI"], a: ["VA", "SA"] },
+};
+/** When a class is consistent with a vector. */
+const CONSISTENT: Readonly<Record<TableClass, (v: Affects) => boolean>> = {
+  takeover: v => v.c || v.i || v.a,
+  impersonate: v => v.c || v.i,
+  steal: v => v.c,
+  alter: v => v.i,
+  disrupt: v => v.a,
+};
+
+/** The record's CVSS 3 and 4 vectors, or why one of them cannot be read. Other severity types are not read. */
+function vectors(record: Record<string, unknown>): { affects: Affects[] } | { unreadable: string } {
+  const affects: Affects[] = [];
+  for (const entry of Array.isArray(record.severity) ? record.severity : []) {
+    const type = isObject(entry) && typeof entry.type === "string" && Object.hasOwn(VECTORS, entry.type) ? entry.type : null;
+    if (!type) continue;
+    const spec = VECTORS[type]!, score = (entry as Record<string, unknown>).score;
+    if (typeof score !== "string" || !spec.prefix.test(score)) return { unreadable: `its ${type} score is not a CVSS ${type.slice(6)} vector` };
+    const values = new Map<string, string[]>();
+    for (const part of score.split("/").slice(1)) {
+      const [key = "", value = ""] = part.split(":");
+      values.set(key, [...(values.get(key) ?? []), value]);
+    }
+    const affected = (keys: readonly string[]): boolean | string => {
+      let any = false;
+      for (const key of keys) {
+        const seen = values.get(key) ?? [];
+        if (seen.length !== 1 || !["N", "L", "H"].includes(seen[0]!)) return `${key} is given ${seen.length} time${seen.length === 1 ? "" : "s"}${seen.length ? ` (${seen.map(v => JSON.stringify(v)).join(", ")})` : ""}, not once as N, L or H`;
+        any ||= seen[0] !== "N";
+      }
+      return any;
+    };
+    const c = affected(spec.c), i = affected(spec.i), a = affected(spec.a);
+    for (const result of [c, i, a]) if (typeof result === "string") return { unreadable: `its ${type} vector cannot be read: ${result}` };
+    affects.push({ c: c as boolean, i: i as boolean, a: a as boolean });
+  }
+  return { affects };
+}
 
 /** Classifies one OSV record (parsed JSON). Never throws; a record it cannot read is unclassified with the reason. */
 export function classify(record: unknown): Classification {
@@ -81,12 +135,34 @@ export function classify(record: unknown): Classification {
   if (malAlias) return { class: "trap", severity, cwes, reason: `${id} has the alias ${malAlias}, an OSV MAL- record: the version itself is malicious.${ignoredNote}` };
   if (numbers.has(TRAP_CWE)) return { class: "trap", severity, cwes, reason: `${id} lists CWE-${TRAP_CWE} (Embedded Malicious Code): the version itself is malicious.${ignoredNote}` };
   if (!cwes.length) return { class: "unclassified", severity, cwes, reason: `${id} lists no CWE in database_specific.cwe_ids.${ignoredNote}` };
-  let best: { cls: ImpactClass; cwe: string } | null = null;
-  for (const cwe of cwes) {
-    const cls = CLASS_OF.get(Number(cwe.slice(4)));
-    if (cls && (!best || IMPACT_ORDER.indexOf(cls) < IMPACT_ORDER.indexOf(best.cls))) best = { cls, cwe };
+  const inTable = cwes.flatMap(cwe => {
+    const classes = CLASSES_OF.get(Number(cwe.slice(4)));
+    return classes ? [{ cwe, classes }] : [];
+  });
+  if (!inTable.length) return { class: "unclassified", severity, cwes, reason: `${id}: no CWE listed (${cwes.join(", ")}) is in Ludion's table.${ignoredNote}` };
+  const rank = (cls: ImpactClass) => IMPACT_ORDER.indexOf(cls);
+  const strongest = (classes: Iterable<TableClass>) => [...classes].sort((a, b) => rank(a) - rank(b))[0];
+  const read = vectors(record as Record<string, unknown>);
+  if ("unreadable" in read) return { class: "unclassified", severity, cwes, reason: `${id}: ${read.unreadable}, so no class can be ruled out.${ignoredNote}` };
+  const unclassified = (why: string): Classification => ({ class: "unclassified", severity, cwes, reason: `${id}: ${why}.${ignoredNote}` });
+  if (read.affects.length) {
+    // The vectors keep only the classes consistent with every one of them; the record takes the strongest kept.
+    const allowed = [...new Set(inTable.flatMap(l => l.classes))].sort((a, b) => rank(a) - rank(b));
+    const best = strongest(allowed.filter(cls => read.affects.every(CONSISTENT[cls])));
+    const vector = read.affects.length > 1 ? "CVSS vectors" : "CVSS vector";
+    if (!best) return unclassified(`its ${vector} rule${read.affects.length > 1 ? "" : "s"} out every class its CWEs allow (${allowed.join(", ")})`);
+    const from = inTable.find(l => l.classes.includes(best))!.cwe;
+    return { class: best, severity, cwes, reason: `${id}: ${best} (${from}), the strongest class its CWEs allow (${allowed.join(", ")}) that its ${vector} do${read.affects.length > 1 ? "" : "es"} not rule out.${ignoredNote}` };
   }
-  if (!best) return { class: "unclassified", severity, cwes, reason: `${id}: no CWE listed (${cwes.join(", ")}) is in Ludion's table.${ignoredNote}` };
+  // No vector: a CWE with one class decides it, one with more decides nothing; the strongest decided class stands only
+  // when no undecided CWE allows a stronger one.
+  let best: { cls: TableClass; cwe: string } | null = null;
+  for (const l of inTable) if (l.classes.length === 1 && (!best || rank(l.classes[0]!) < rank(best.cls))) best = { cls: l.classes[0]!, cwe: l.cwe };
+  const open = inTable.find(l => l.classes.length > 1 && (!best || rank(strongest(l.classes)!) < rank(best.cls)));
+  if (open || !best) {
+    const o = open ?? inTable[0]!;
+    return unclassified(`${o.cwe} allows ${o.classes.slice(0, -1).join(", ")} or ${o.classes.at(-1)}${best ? `, stronger than ${best.cls} (${best.cwe}),` : ""} and the record has no CVSS vector to choose`);
+  }
   return { class: best.cls, severity, cwes, reason: `${id}: ${best.cwe} is ${best.cls}${cwes.length > 1 ? `, the strongest of ${cwes.join(", ")}` : ""}.${ignoredNote}` };
 }
 

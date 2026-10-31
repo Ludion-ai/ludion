@@ -263,6 +263,9 @@ describe("guard hook: reading a command line as the shell does", () => {
     'echo "a <<b" `id`',
     'echo "a <<b`id`"',
     "echo \"a <<'b\" `id`",
+    // ... nor take it as a heredoc whose body hides the next line (the security review of 695424c).
+    "echo \"a <<'EOF' b\"\n`id`\nEOF",
+    "echo \"x $(echo y) <<'EOF'\"\n`id`\nEOF",
     // In bash a CR is part of a word, so the # after it starts no comment.
     "echo x\r# ; node y",
   ])("blocks in bash: %j", (command) => {
@@ -277,6 +280,8 @@ describe("guard hook: reading a command line as the shell does", () => {
 
   it("still reads a quoted heredoc inside $( ) in double quotes, the way to pass text", () => {
     expect(exitFor("gh pr comment 1 --body \"$(cat <<'EOF'\nsee `x` and a <<b mention\nEOF\n)\"")).toBe(0);
+    expect(exitFor("gh pr comment 1 --body \"$(echo $(date); cat <<'EOF'\nsee `x`\nEOF\n)\"")).toBe(0);
+    expect(exitFor("gh pr comment 1 --body \"$(cat <<'EOF'\nx\nEOF\n)\" && echo '`'")).toBe(0);
   });
 
   it.each([

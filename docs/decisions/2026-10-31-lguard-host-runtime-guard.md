@@ -70,6 +70,8 @@ The same review of the fix (62d2648) found two more, also fixed with tests that 
 - **A delimiter word with `$( )`, `${ }`, `$[ ]` or a backtick cannot be read** (bash reads such a word to its own end, and `cat <<$(x)` ended at `$`): the heredoc is refused, as above.
 - **The backtick check no longer skips text after a `<<` only mentioned inside double quotes:** a word it cannot read, or one that runs past the string's closing quote, is not taken as a heredoc, and what follows is still read.
 
+Its review of that fix (695424c) found that a `<<'EOF'` mentioned inside double quotes still made the backtick check skip the next lines as a heredoc's body, which bash runs (a miss main's guard already listed). The backtick check now keeps a stack of open single quotes, double quotes and `( )`/`$( )`, and takes `<<` as a heredoc only outside quotes or inside `( )` and `$( )`, so `"$(cat <<'EOF' … EOF)"` still passes text safely.
+
 ## The tests
 
 The tests stay where the guard's tests are, `.claude/hooks/guard.test.ts`, which the root `vitest.config.ts` (project `node`, `.claude/hooks/*.test.ts`) and CI already run. They run in Docker only (`--network none`, `--memory 2g`, `--cap-drop ALL`, a non-root user), never on the host. Every refusal rule above gets at least one mutation that turns it off, applied in Docker; each must make the tests fail. The mutations and their results are in docs/bench/2026-10-31-lguard/.

@@ -163,8 +163,19 @@ M.push(
   ["H10", "a heredoc with no terminator line", R`    if (!ended) h.stage.unread = true;`, R``],
   ["H11", "an unread heredoc is refused", R`      if (stage.unread) return UNREAD;`, R``],
   ["H12", "a stage with only an unread heredoc is kept", R`stage.stdin.length || stage.unread) pipeline`, R`stage.stdin.length) pipeline`],
-  ["R1", "runsBacktick: a << word that runs past the closing double quote is not a heredoc (review of 62d2648)", R` || (quote === '"' && text.slice(i + 2, h.end).includes('"'))) i += 1;`, R`) i += 1;`],
-  ["R2", "runsBacktick: an unread << word is not a heredoc (review of 62d2648)", R`if (h.unread || (quote === '"'`, R`if ((quote === '"'`],
+  // runsBacktick's stack of open quotes and $( ) (the reviews of 62d2648 and 695424c).
+  ["R1", "runsBacktick: a $( ) opened inside double quotes", R`        else if (c === "$" && text[i + 1] === "(") {
+          open.push("(");`, R`        else if (false) {
+          open.push("(");`],
+  ["R2", "runsBacktick: a << inside double quotes is text", R`      if (top === '"') {
+        if (c === '"') open.pop();`, R`      if (top === '"' && !text.startsWith("<<", i)) {
+        if (c === '"') open.pop();`],
+  ["R3", "runsBacktick: an unread << word is not a heredoc", R`        if (!h.unread) {
+          heredocs.push(h);`, R`        if (true) {
+          heredocs.push(h);`],
+  ["R4", "runsBacktick: ( opens a context", R`if (c === '"' || c === "'" || c === "(") open.push(c);`, R`if (c === '"' || c === "'") open.push(c);`],
+  ["R5", "runsBacktick: ) closes it", R`      else if (c === ")" && top === "(") open.pop();`, R``],
+  ["R6", "runsBacktick: single quotes", R`if (c === '"' || c === "'" || c === "(") open.push(c);`, R`if (c === '"' || c === "(") open.push(c);`],
   ["H13", "runsBacktick reads the delimiter the same way", R`const h = heredocWord(text, i + 2);`, R`const h = { delim: text.slice(i + 2).replace(/^-?\s*'?(\w).*$/s, "$1"), literal: true, strip: false, end: i + 2 };`],
   // PowerShell's look-alike characters and white space (finding 3), and the comment after a CR (finding 2: L6b).
   ["W1", "PowerShell: curly double quotes", R`

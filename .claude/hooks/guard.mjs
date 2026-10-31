@@ -501,12 +501,13 @@ function check(line, depth = 0) {
  * Whether bash would run a backtick in this command line as a command: one outside single quotes and outside the body
  * of a quoted heredoc (<<'EOF'). A markdown code span in double-quoted text (a PR body, a comment, a commit message)
  * runs this way; on 2026-10-29 one ran `npx webpack serve` on a host. $( ) is not refused: "$(cat <<'EOF' ... EOF)"
- * is how text is passed safely. A heredoc operator is recognised outside single quotes, wherever it stands.
- * The heredoc's delimiter is read as bash reads it (heredocWord). A backstop, not a parser: it misses a backtick after
- * a heredoc operator merely mentioned inside double quotes, after an apostrophe in a # comment, and inside $'...'.
+ * is how text is passed safely. It keeps a stack of what is open: single quotes, double quotes, and ( or $( ), also
+ * a $( ) opened inside double quotes. A heredoc operator counts outside quotes or inside ( ) and $( ) only, so a <<
+ * mentioned in double-quoted text is text; its delimiter is read as bash reads it (heredocWord). A backstop, not a
+ * parser: it misses a backtick after an apostrophe in a # comment, and inside $'...'.
  */
 function runsBacktick(line) {
-  let quote = null;
+  const open = [];
   const heredocs = [];
   let body = null;
   for (const text of line.split("\n")) {
@@ -517,8 +518,9 @@ function runsBacktick(line) {
     }
     for (let i = 0; i < text.length; i++) {
       const c = text[i];
-      if (quote === "'") {
-        if (c === "'") quote = null;
+      const top = open.at(-1);
+      if (top === "'") {
+        if (c === "'") open.pop();
         continue;
       }
       if (c === "\\") {
@@ -526,24 +528,21 @@ function runsBacktick(line) {
         continue;
       }
       if (c === "`") return true;
-      if (c === '"') {
-        quote = quote === '"' ? null : '"';
+      if (top === '"') {
+        if (c === '"') open.pop();
+        else if (c === "$" && text[i + 1] === "(") {
+          open.push("(");
+          i++;
+        }
         continue;
       }
-      if (c === "'" && quote === null) {
-        quote = "'";
-        continue;
-      }
-      if (text.startsWith("<<<", i)) {
-        i += 2;
-        continue;
-      }
-      if (text.startsWith("<<", i)) {
+      if (c === '"' || c === "'" || c === "(") open.push(c);
+      else if (c === ")" && top === "(") open.pop();
+      else if (text.startsWith("<<<", i)) i += 2;
+      else if (text.startsWith("<<", i)) {
         const h = heredocWord(text, i + 2);
-        // A word it cannot read, or one that runs past the closing quote of a double-quoted string (a << only mentioned
-        // in the text), is not taken as a heredoc: only the << is skipped, and what follows is still read.
-        if (h.unread || (quote === '"' && text.slice(i + 2, h.end).includes('"'))) i += 1;
-        else {
+        // A word it cannot read is not taken as a heredoc; check() refuses it.
+        if (!h.unread) {
           heredocs.push(h);
           i = h.end - 1;
         }

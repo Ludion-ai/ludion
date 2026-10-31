@@ -1,6 +1,6 @@
-# LMR1 to LMR1f: how many OSV records Impact Classes classify (2026-10-31)
+# LMR1 to LMR1g: how many OSV records Impact Classes classify (2026-10-31)
 
-Started from main 0702370. The classes, the strength order, the severity rule and the CWE table's rule are in docs/decisions/2026-10-31-impact-classes.md (ludion-ops#1 comments 6538391108 and 6538576259); trap as a published record in docs/decisions/2026-10-31-impact-classes-trap-published-record.md (LMR1b, comments 6538877641 and 6538690397); each CWE's set of classes and the CVSS vectors that choose among them in docs/decisions/2026-10-31-impact-classes-cvss-vector.md (LMR1c, comment 6539200199, point 3). Later records changed parts of these: docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md (LMR1d), docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md (LMR1e-2) and docs/decisions/2026-10-31-impact-classes-takeover-direct.md (LMR1f). The code is `packages/cli/src/security/impact.ts`. Nothing here is wired into a PR body or a job summary (the next lane).
+Started from main 0702370. The classes, the strength order, the severity rule and the CWE table's rule are in docs/decisions/2026-10-31-impact-classes.md (ludion-ops#1 comments 6538391108 and 6538576259); trap as a published record in docs/decisions/2026-10-31-impact-classes-trap-published-record.md (LMR1b, comments 6538877641 and 6538690397); each CWE's set of classes and the CVSS vectors that choose among them in docs/decisions/2026-10-31-impact-classes-cvss-vector.md (LMR1c, comment 6539200199, point 3). Later records changed parts of these: docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md (LMR1d), docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md (LMR1e-2), docs/decisions/2026-10-31-impact-classes-takeover-direct.md (LMR1f) and docs/decisions/2026-10-31-impact-classes-impersonate-direct.md (LMR1g). The code is `packages/cli/src/security/impact.ts`. Nothing here is wired into a PR body or a job summary (the next lane).
 
 The sections below are newest first. Each section's numbers are from its own run; where an older section names `counts.json`, `stronger.tsv` or `logs/count.log`, read the file it says is kept for it.
 
@@ -225,11 +225,12 @@ Severity (GHSA's, not MAL-) has not changed in any of the three: moderate 6,462,
 
 `scripts/run.sh <script>` mounts the worktree read-only at /src and copies it into the volume ludion-lmr1-w (image ludion-l9-node24-git, `--rm --memory=4g --cpus=2`), as LV5's scripts do. `setup`, `fetch` and `cwe` have the network; the others run with `--network none`. `fetch`, `cwe`, `count`, `package`, `pick`, `pick-trap`, `explore`, `explore-vectors`, `fixture-vectors` and `unreadable`, which read third-party data, drop every capability.
 
-`logs/test.log`, `logs/full.log` and `logs/mutate.log` hold the latest lane's runs (LMR1f); each earlier lane's are in git history, and its numbers in its progress record:
+`logs/test.log`, `logs/full.log` and `logs/mutate.log` hold the latest lane's runs (LMR1g); each earlier lane's are in git history, and its numbers in its progress record:
 
-- `scripts/test.sh` (`logs/test.log`, 2026-10-31T10:00:10Z, tree 772a139): tsc 0; CLI tests 23 files, 983 passed, 24 skipped; impact.test.ts 48 passed.
-- `scripts/full.sh` (CI's checks except Playwright, against a stand-in repository; `logs/full.log`, 10:00:49Z, tree 772a139): typecheck 0, build 0, `npm test -- --maxWorkers=2` 39 files, 1270 passed, 24 skipped.
-- `scripts/mutate.mjs` (`logs/mutate.log`, 2026-10-31T09:56:46Z, the code of cc44cbd): **90 of 90** mutations caught; it passes without them and after restoring. The list and what LMR1f added are in docs/progress/2026-10-31-lmr1f-impact-classes-takeover-direct.md.
+- `scripts/test.sh --maxWorkers=2` (`logs/test.log`, 2026-10-31T12:57:27Z, tree 7502b8d): tsc 0; CLI tests 23 files, 984 passed, 24 skipped; impact.test.ts 49 passed.
+- `scripts/full.sh` (CI's checks except Playwright, against a stand-in repository; `logs/full.log`, 12:57:49Z, tree 7502b8d): typecheck 0, build 0, `npm test -- --maxWorkers=2` 39 files, 1271 passed, 24 skipped.
+- `scripts/mutate.mjs` (`logs/mutate.log`, 2026-10-31T12:55:12Z, the code of 3b8a327): **96 of 96** mutations caught; it passes without them and after restoring. The list and what LMR1g added are in docs/progress/2026-10-31-lmr1g-impact-classes-impersonate-direct.md.
+- LMR1f's runs (git history at 84ef289): test.sh 983 passed and full.sh 1270 passed on 772a139; 90 of 90 mutations on cc44cbd.
 
 LMR1c's runs, as first written (the logs no longer hold them; git history at c5fdfff does; LMR1b's and LMR1's numbers are in git history at 218a83a and 0e62900):
 

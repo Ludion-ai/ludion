@@ -1,8 +1,9 @@
 // A container given the host's Docker socket (/var/run/docker.sock) can start containers that bind-mount the host's files,
 // so whatever runs in it runs with the host's power. The bench scripts under docs/bench/ therefore never run an npm install
 // with its install scripts on (or npx, npm exec, pnpm, yarn) where Docker can be reached: in a container started with the
-// socket, in the scripts that container runs, or in a script that runs the docker CLI itself (which is either on the host
-// or in such a container). docs/mistakes/2026-11-01-docker-sock-npm-ci.md.
+// socket (a docker run line, or a shell function holding one), in the scripts that container runs, or in a script that uses
+// the docker CLI without starting containers (the shape of one run inside such a container, as the bench e2e.sh scripts).
+// docs/mistakes/2026-11-01-docker-sock-npm-ci.md.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -56,10 +57,17 @@ function forbidden(path: string, text: string): string[] {
   return out;
 }
 
-/** Whether a script runs the docker CLI itself. */
+/**
+ * Whether a script runs the docker CLI as a client of a Docker it was given, and starts no container itself: the shape of
+ * a script run inside a container that has the socket (e2e.sh's `$(docker --version)`). A script that starts containers is
+ * a launcher on the host; what it starts with the socket is found from its socket lines, and what it starts without the
+ * socket is not socket-side.
+ */
 function runsDocker(path: string, text: string): boolean {
-  if (isJs(path)) return /["'`]docker["'`]/.test(text);
-  return isShell(path) && lines(path, text).some(l => /(?<![\w./-])docker(?=\s|$|\))/.test(l.text));
+  if (isJs(path)) return /["'`]docker["'`]/.test(text) && !/["'`](?:run|create|compose)["'`]/.test(text);
+  if (!isShell(path)) return false;
+  const code = lines(path, text);
+  return code.some(l => /(?<![\w./-])docker(?=\s|$|\))/.test(l.text)) && !code.some(l => STARTS_CONTAINER.test(l.text));
 }
 
 const dirOf = (path: string) => path.slice(0, path.lastIndexOf("/"));
@@ -100,10 +108,20 @@ export function socketFindings(files: Map<string, string>): string[] {
 
   for (const [path, text] of files) {
     // A line that passes the socket: what it runs, and the command it starts, are socket-side.
-    for (const l of lines(path, text)) {
+    const all = lines(path, text);
+    for (const l of all) {
       if (!SOCKET.test(l.text)) continue;
       if (l.code) check(path, l);
       for (const ref of referenced(path, l.text, files, mounts(l.text))) queue.push({ path: ref, mapped: mounts(l.text) });
+      // A shell function that passes the socket (`run() { docker run -v …docker.sock… img sh -c "$1"; }`): every call of it
+      // is socket-side too.
+      const fn = isShell(path) ? /^\s*(?:function\s+)?([\w-]+)\s*\(\)\s*\{/.exec(l.text)?.[1] : undefined;
+      if (!fn) continue;
+      const call = new RegExp(`(?:^|[;&|({]|\\bthen|\\bdo|\\belse)\\s*${fn}(?=\\s|$)`);
+      for (const c of all) if (c !== l && call.test(c.text)) {
+        check(path, c);
+        for (const ref of referenced(path, c.text, files, mounts(l.text))) queue.push({ path: ref, mapped: mounts(l.text) });
+      }
     }
     // A script that runs the docker CLI can reach Docker wherever it runs.
     if (SCRIPT.test(path) && runsDocker(path, text)) queue.push({ path, mapped: new Map() });
@@ -190,5 +208,10 @@ describe("docs/bench/ and the Docker socket", () => {
       "",
     ].join("\n");
     expect(socketFindings(files({ [`${B}/run.sh`]: run, [`${B}/test.sh`]: "npm ci\n", [`${B}/e2e.sh`]: "# npm ci would run here\nnode /w/cli.js\n" }))).toEqual([]);
+    // A launcher that wraps a socket-less docker run in a function: what it passes the function runs in that container.
+    const check = "run() { docker run --rm --network none -v \"$W:/w:ro\" img sh -c \"$1\"; }\nrun \"npx vitest run tools/shadow\"\n";
+    expect(socketFindings(files({ [`${B}/check.sh`]: check }))).toEqual([]);
+    // The same launcher with the socket in the function is found.
+    expect(socketFindings(files({ [`${B}/check.sh`]: check.replace("--network none", "-v /var/run/docker.sock:/var/run/docker.sock") }))).toEqual([`${B}/check.sh:2: npx`]);
   });
 });

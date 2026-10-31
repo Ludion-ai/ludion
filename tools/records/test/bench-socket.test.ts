@@ -34,27 +34,105 @@ function lines(path: string, text: string): Line[] {
   return out;
 }
 
-const SOCKET = /docker\.sock/;
+/**
+ * Text that gives a container the host's Docker: the socket or the Windows pipe by name, DOCKER_HOST, or a bind mount of a
+ * folder the socket is in (`/`, `/var`, `/run`, `/var/run`).
+ */
+const SOCKET = /docker\.sock|docker_engine|DOCKER_HOST|(?:-v|--volume)(?:\s+|=)["']?\/{1,2}(?:var\/run|var|run)?\/?["']?:|\b(?:source|src)=["']?\/{1,2}(?:var\/run|var|run)?\/?["']?(?=[,\s"']|$)/;
 /** A line that starts a container (or builds an image): what runs in it is socket-side only when the line passes the socket. */
 const STARTS_CONTAINER = /(?<![\w./-])docker(?:\s+-{1,2}[\w-]+(?:=\S+)?)*\s+(?:run|create|build|buildx|compose)(?![\w-])/;
 
-/** The commands in a line that would run dependency code: an npm install with its scripts on, or a package runner. */
-function forbidden(path: string, text: string): string[] {
-  const out: string[] = [];
-  if (isJs(path)) {
-    for (const m of text.matchAll(/["'`](npm)["'`]\s*,\s*\[\s*["'`](ci|install|i|add|rebuild|update)["'`]/g)) if (!/ignore[-_]scripts/.test(text)) out.push(`${m[1]} ${m[2]}`);
-    for (const m of text.matchAll(/["'`](npx|pnpm|yarn|bunx|pnpx)["'`]/g)) out.push(m[1] ?? "");
-    return out;
+/** Shell assignments in a text: `NAME=value`, `NAME="value"`, `export NAME=value`. */
+function* assignments(text: string): Generator<{ name: string; value: string; exported: boolean }> {
+  for (const m of text.matchAll(/(?:^|[\s;&|(`])(export\s+)?([A-Za-z_]\w*)=("[^"]*"|'[^']*'|[^\s;&|)`]*)/gm)) yield { name: m[2] ?? "", value: (m[3] ?? "").replace(/^["']|["']$/g, ""), exported: !!m[1] };
+}
+
+/** The variables a file sets to text that gives the socket (`SOCK=/var/run/docker.sock`, `ARGS="-v …docker.sock…"`). */
+function socketVars(text: string): { all: Set<string>; exported: Set<string> } {
+  const all = new Set<string>(), exported = new Set<string>();
+  for (const a of assignments(text)) if (SOCKET.test(a.value)) { all.add(a.name); if (a.exported) exported.add(a.name); }
+  return { all, exported };
+}
+
+const usesVar = (text: string, vars: Set<string>) => [...vars].some(v => new RegExp(`\\$\\{?${v}(?!\\w)`).test(text));
+/** A line that gives the socket: by its text, or through a variable set to such text. */
+const isSocket = (text: string, vars: Set<string>) => SOCKET.test(text) || usesVar(text, vars);
+
+/** A program name, alone or with its path (`/usr/local/bin/npm`, `npm.cmd`), as a word of a command. */
+const program = (names: string) => `(?<![\\w.-])(?:[\\w.~-]*\\/)*(?:${names})(?:\\.cmd|\\.exe)?(?![\\w.-])`;
+const RUNNERS = "npx|bunx|pnpx|pnpm|yarn|npm|bun";
+/** npm's commands, with every alias and typo npm accepts, that install packages and so run their install scripts. */
+const INSTALLS = "ci|clean-install|ic|install-clean|isntall-clean|install|i|in|ins|inst|insta|instal|isnt|isnta|isntal|isntall|add|install-test|it|install-ci-test|cit|clean-install-test|sit|rebuild|rb|update|up|upgrade|udpate|dedupe|ddp";
+const INSTALL = new RegExp(`${program("npm")}(?:\\s+\\S+)*?\\s+(${INSTALLS})(?![\\w-])`);
+const RUNNER = new RegExp([
+  program("npx|bunx|pnpx|pnpm|yarn"),
+  `${program("npm")}(?:\\s+-{1,2}[\\w-]+)*\\s+(?:exec|x|create|innit|init(?=\\s+[^\\s-]))(?![\\w-])`,
+  `${program("bun")}\\s+(?:install|i|add|x|create)(?![\\w-])`,
+].join("|"));
+
+/** Whether the words of an npm command leave install scripts on: npm_config_ignore_scripts, then the last flag, decide. */
+function scriptsOn(words: string[]): boolean {
+  const falsy = (v: string) => /^(?:false|null|0*)$/i.test(v);
+  let on = true;
+  for (const w of words) { const env = /^npm_config_ignore_scripts=(.*)$/i.exec(w); if (env) on = falsy(env[1] ?? ""); }
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i] ?? "", eq = /^--ignore-scripts=(.*)$/.exec(w);
+    if (w === "--no-ignore-scripts") on = true;
+    else if (eq) on = falsy(eq[1] ?? "");
+    else if (w === "--ignore-scripts") {
+      // npm reads a following true or false as the flag's value (`--ignore-scripts false`); 0 and null are taken as false.
+      const next = words[i + 1] ?? "";
+      if (/^(?:true|false|0|null)$/i.test(next)) { on = falsy(next); i++; } else on = false;
+    }
   }
-  for (const seg of text.split(/;|&&|\|\||\||\$\(|`/)) {
-    const s = seg.trim();
+  return on;
+}
+
+/** The variables a file sets to a package manager (`NPM=npm`, `NPM=/usr/bin/npm`, `NPM=$(command -v npm)`), by name. */
+function toolVars(text: string): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const a of assignments(text)) {
+    // A path counts only in a bin/ folder: `dir=/e/npm` names a folder, not npm.
+    const m = new RegExp(`^(?:\\$\\((?:command\\s+-v|which)\\s+)?(?:(?:[\\w.~-]*/)*bin/)?(${RUNNERS})\\)?$`).exec(a.value);
+    if (m) out.set(a.name, m[1] ?? "");
+  }
+  return out;
+}
+
+/** The commands in a shell text that would run dependency code: an npm install with its scripts on, or a package runner. */
+function shellForbidden(text: string, tools: Map<string, string>): string[] {
+  const out: string[] = [];
+  // A variable's default (`${NPM:-npm}`) and a variable holding a package manager (`$NPM`) are read as the name they give.
+  let t = text.replace(/\$\{\w+:?[-=]([^}]*)\}/g, "$1");
+  for (const [name, tool] of tools) t = t.replace(new RegExp(`\\$\\{${name}\\}|\\$${name}(?!\\w)`, "g"), tool);
+  for (const seg of t.split(/;|&&|\|\||\||\$\(|`/)) {
+    // Quotes do not change a command's words (`npm "ci"`, `sh -c "npm ci"`).
+    const s = seg.replace(/["']/g, "").trim();
     if (/^(?:echo|printf|:)(?:\s|$)/.test(s)) continue;
-    const install = /(?<![\w./-])npm(?![\w-])(?:\s+\S+)*?\s+(ci|install|i|in|add|isntall|rebuild|update|up|upgrade)(?![\w-])/.exec(s);
-    if (install && !/--ignore-scripts(?!=false)|npm_config_ignore_scripts=(?:true|1)\b/i.test(s)) out.push(`npm ${install[1]} with install scripts`);
-    const runner = /(?<![\w./-])(?:npx|bunx|pnpx|pnpm|yarn)(?![\w-])|(?<![\w./-])npm(?:\s+-{1,2}[\w-]+)*\s+(?:exec|x)(?![\w-])|(?<![\w./-])bun\s+(?:install|i|add|x)(?![\w-])/.exec(s);
+    const install = INSTALL.exec(s);
+    if (install && scriptsOn(s.split(/\s+/))) out.push(`npm ${install[1]} with install scripts`);
+    const runner = RUNNER.exec(s);
     if (runner) out.push(runner[0].replace(/\s+/g, " "));
   }
   return out;
+}
+
+/** The string literals in a line of JavaScript, each with the text before it. */
+function* strings(text: string): Generator<{ value: string; before: string }> {
+  for (const m of text.matchAll(/"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g)) yield { value: (m[1] ?? m[2] ?? m[3] ?? "").replace(/\\(.)/g, "$1"), before: text.slice(0, m.index) };
+}
+
+/** The commands in a line that would run dependency code: an npm install with its scripts on, or a package runner. */
+function forbidden(path: string, text: string, tools: Map<string, string>): string[] {
+  if (!isJs(path)) return shellForbidden(text, tools);
+  const out: string[] = [];
+  // A command in a string (`execSync("npm ci")`, `spawnSync("sh", ["-c", "npx tsx"])`), except one only printed.
+  for (const s of strings(text)) if (!/(?:console\.\w+|\.write|Error|log)\(\s*$/.test(s.before)) out.push(...shellForbidden(s.value, new Map()));
+  // A program and its argument list (`execFileSync("npm", ["ci", "--no-audit"])`), read as one command.
+  for (const m of text.matchAll(new RegExp(`(["'\`])((?:[\\w.~-]*/)*(?:${RUNNERS}))\\1\\s*,\\s*\\[([^\\]]*)\\]`, "g"))) out.push(...shellForbidden([m[2] ?? "", ...[...strings(m[3] ?? "")].map(s => s.value)].join(" "), new Map()));
+  for (const m of text.matchAll(/["'`](npx|pnpm|yarn|bunx|pnpx)["'`]/g)) out.push(m[1] ?? "");
+  // npm_config_ignore_scripts set in the child's environment turns install scripts off.
+  return /npm_config_ignore_scripts["']?\s*:\s*["'`]?(?:true|1)\b/i.test(text) ? out.filter(f => !f.endsWith("with install scripts")) : out;
 }
 
 /**
@@ -64,7 +142,11 @@ function forbidden(path: string, text: string): string[] {
  * socket is not socket-side.
  */
 function runsDocker(path: string, text: string): boolean {
-  if (isJs(path)) return /["'`]docker["'`]/.test(text) && !/["'`](?:run|create|compose)["'`]/.test(text);
+  if (isJs(path)) {
+    const all = [...strings(text)].map(s => s.value);
+    const client = /["'`]docker["'`]/.test(text) || all.some(s => /^docker\s/.test(s));
+    return client && !/["'`](?:run|create|compose)["'`]/.test(text) && !all.some(s => STARTS_CONTAINER.test(s));
+  }
   if (!isShell(path)) return false;
   const code = lines(path, text);
   return code.some(l => /(?<![\w./-])docker(?=\s|$|\))/.test(l.text)) && !code.some(l => STARTS_CONTAINER.test(l.text));
@@ -79,19 +161,32 @@ function mounts(text: string): Map<string, string> {
   return out;
 }
 
-/** The script files a line names, resolved in the tree: through a mount, next to the file, or in its folder's scripts/. */
-function referenced(path: string, text: string, files: Map<string, string>, mapped: Map<string, string>): string[] {
-  const out: string[] = [];
-  for (const m of text.matchAll(/(?<![\w.-])((?:[\w.${}()-]*\/)*)([\w.-]+\.(?:sh|mjs|cjs|js|ps1))(?![\w.])/g)) {
-    const prefix = m[1] ?? "", name = m[2] ?? "";
+type Ref = { path: string; args: string[] };
+
+/**
+ * The script files a line names, resolved in the tree: by their docs/bench/ path, through a mount, next to the file, or in
+ * its folder's scripts/. A name built from a variable (`"/scripts/$script.sh"`) is tried with each argument the script
+ * was given. Each script comes with the words after it on the line, the arguments it is given.
+ */
+function referenced(path: string, text: string, files: Map<string, string>, mapped: Map<string, string>, args: string[] = []): Ref[] {
+  const out: Ref[] = [];
+  for (const m of text.matchAll(/(?<![\w.-])((?:[\w.${}()-]*\/)*)((?:[\w.-]|\$\{?\w+\}?)+\.(?:sh|mjs|cjs|js|ps1))(?![\w.])/g)) {
+    const prefix = m[1] ?? "", written = m[2] ?? "";
+    const names = written.includes("$") ? args.map(a => written.replace(/\$\{?\w+\}?/g, a)) : [written];
     const mount = /^\/([\w-]+)\//.exec(prefix)?.[1];
-    const tries = [
-      ...(mount && mapped.has(`/${mount}`) ? [`${mapped.get(`/${mount}`)}/${name}`] : []),
-      `${dirOf(path)}/${name}`,
-      `${dirOf(path)}/scripts/${name}`,
-    ];
-    const hit = tries.find(t => files.has(t));
-    if (hit && SCRIPT.test(hit)) out.push(hit);
+    const bench = prefix.indexOf("docs/bench/");
+    const rest = (text.slice((m.index ?? 0) + m[0].length).split(/[;&|)]/)[0] ?? "").replace(/["']/g, "");
+    const given = rest.split(/\s+/).filter(w => /^[\w.@/-]+$/.test(w) && !w.startsWith("-"));
+    for (const name of names) {
+      const tries = [
+        ...(bench >= 0 ? [`${prefix.slice(bench)}${name}`] : []),
+        ...(mount && mapped.has(`/${mount}`) ? [`${mapped.get(`/${mount}`)}/${name}`] : []),
+        `${dirOf(path)}/${name}`,
+        `${dirOf(path)}/scripts/${name}`,
+      ];
+      const hit = tries.find(t => files.has(t));
+      if (hit && SCRIPT.test(hit)) out.push({ path: hit, args: given });
+    }
   }
   return out;
 }
@@ -103,16 +198,26 @@ function referenced(path: string, text: string, files: Map<string, string>, mapp
 export function socketFindings(files: Map<string, string>): string[] {
   const findings = new Set<string>();
   const seen = new Set<string>();
-  const queue: { path: string; mapped: Map<string, string> }[] = [];
-  const check = (path: string, l: Line) => { for (const f of forbidden(path, l.text)) findings.add(`${path}:${l.n}: ${f}`); };
+  type Item = { path: string; mapped: Map<string, string>; vars: Set<string>; args: string[] };
+  const queue: Item[] = [];
+  const tools = new Map<string, Map<string, string>>();
+  const toolsOf = (path: string) => { if (!tools.has(path)) tools.set(path, toolVars(files.get(path) ?? "")); return tools.get(path)!; };
+  const check = (path: string, l: Line) => { for (const f of forbidden(path, l.text, toolsOf(path))) findings.add(`${path}:${l.n}: ${f}`); };
+  const follow = (path: string, text: string, mapped: Map<string, string>, vars: Set<string>, args: string[] = []) => {
+    for (const ref of referenced(path, text, files, mapped, args)) queue.push({ path: ref.path, mapped, vars, args: ref.args });
+  };
 
   for (const [path, text] of files) {
-    // A line that passes the socket: what it runs, and the command it starts, are socket-side.
+    // A line that passes the socket: what it runs, and the command it starts, are socket-side. A variable the file sets to
+    // the socket is passed on to the scripts such a line runs (`DOCKER_ARGS="-v …docker.sock…" sh run.sh full`); one it
+    // exports is passed on to every script it runs.
     const all = lines(path, text);
+    const { all: vars, exported } = socketVars(text);
     for (const l of all) {
-      if (!SOCKET.test(l.text)) continue;
+      const socket = isSocket(l.text, vars);
+      if (!socket) { if (exported.size && l.code) follow(path, l.text, new Map(), vars); continue; }
       if (l.code) check(path, l);
-      for (const ref of referenced(path, l.text, files, mounts(l.text))) queue.push({ path: ref, mapped: mounts(l.text) });
+      follow(path, l.text, mounts(l.text), vars);
       // A shell function that passes the socket (`run() { docker run -v …docker.sock… img sh -c "$1"; }`): every call of it
       // is socket-side too.
       const fn = isShell(path) ? /^\s*(?:function\s+)?([\w-]+)\s*\(\)\s*\{/.exec(l.text)?.[1] : undefined;
@@ -120,22 +225,26 @@ export function socketFindings(files: Map<string, string>): string[] {
       const call = new RegExp(`(?:^|[;&|({]|\\bthen|\\bdo|\\belse)\\s*${fn}(?=\\s|$)`);
       for (const c of all) if (c !== l && call.test(c.text)) {
         check(path, c);
-        for (const ref of referenced(path, c.text, files, mounts(l.text))) queue.push({ path: ref, mapped: mounts(l.text) });
+        follow(path, c.text, mounts(l.text), vars);
       }
     }
     // A script that runs the docker CLI can reach Docker wherever it runs.
-    if (SCRIPT.test(path) && runsDocker(path, text)) queue.push({ path, mapped: new Map() });
+    if (SCRIPT.test(path) && runsDocker(path, text)) queue.push({ path, mapped: new Map(), vars: new Set(), args: [] });
   }
 
   while (queue.length) {
-    const { path, mapped } = queue.shift()!;
-    if (seen.has(path)) continue;
-    seen.add(path);
-    for (const l of lines(path, files.get(path) ?? "")) {
+    const item = queue.shift()!;
+    // The same script reached with other mounts, variables or arguments is read again.
+    const key = JSON.stringify([item.path, [...item.mapped], [...item.vars].sort(), item.args]);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const text = files.get(item.path) ?? "";
+    const vars = new Set([...item.vars, ...socketVars(text).all]);
+    for (const l of lines(item.path, text)) {
       // What a socket-less container started from here runs is not socket-side.
-      if (STARTS_CONTAINER.test(l.text) && !SOCKET.test(l.text)) continue;
-      check(path, l);
-      for (const ref of referenced(path, l.text, files, mapped)) queue.push({ path: ref, mapped });
+      if (STARTS_CONTAINER.test(l.text) && !isSocket(l.text, vars)) continue;
+      check(item.path, l);
+      follow(item.path, l.text, item.mapped, vars, item.args);
     }
   }
   return [...findings].sort();
@@ -180,7 +289,7 @@ describe("docs/bench/ and the Docker socket", () => {
 
   it("finds an npm ci in a script that runs the docker CLI, though no file names the socket", () => {
     expect(socketFindings(files({ [`${B}/e2e.sh`]: "echo \"$(docker --version)\"\nnpm ci --no-audit --no-fund\n" }))).toEqual([`${B}/e2e.sh:2: npm ci with install scripts`]);
-    expect(socketFindings(files({ [`${B}/e2e.mjs`]: "spawnSync(\"docker\", [\"ps\"]);\nspawnSync(\"npm\", [\"ci\"]);\n" }))).toEqual([`${B}/e2e.mjs:2: npm ci`]);
+    expect(socketFindings(files({ [`${B}/e2e.mjs`]: "spawnSync(\"docker\", [\"ps\"]);\nspawnSync(\"npm\", [\"ci\"]);\n" }))).toEqual([`${B}/e2e.mjs:2: npm ci with install scripts`]);
     // Without the docker CLI and the socket, an npm ci is not this check's (a socket-less container may run it).
     expect(socketFindings(files({ [`${B}/test.sh`]: "npm ci --no-audit --no-fund\n" }))).toEqual([]);
   });
@@ -322,6 +431,7 @@ describe("bench-socket recall", () => {
     ["npm test, typecheck, --version", e2e("npm test; npm run typecheck; npm --version")],
     ["the built CLI", e2e("node \"$CLI\" patch --dir \"$dir\" --apply; echo \"patch exit $?\"")],
     ["a folder named npm", e2e("dir=/e/npm; rm -rf \"$dir\"; mkdir -p /e; cp -r /w/examples/npm-security \"$dir\"")],
+    ["a folder named npm in a variable", e2e("dir=/e/npm\ngit -C \"$dir\" init -q && git -C \"$dir\" add -A")],
     ["git init", e2e("git init -q /e/x")],
     ["a comment", e2e("# npm ci")],
     ["console.log naming npm ci", mjs("console.log(\"npm ci exit\", code);")],

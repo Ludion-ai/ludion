@@ -1,0 +1,1 @@
+{ "name": "s7", "version": "1.0.0", "workspaces": ["packages/a"], "dependencies": { "minimist": "npm:left-pad@1.3.0", "mkdirp": "0.5.1", "is-number": "7.0.0" } }

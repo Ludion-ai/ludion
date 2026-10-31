@@ -2,6 +2,7 @@
 # Runs in Docker only, in one official node image at a time (docs/decisions/2026-10-31-lock-corpus-against-npm.md):
 # writes each shape's package-lock.json with npm --package-lock-only --ignore-scripts, at lockfileVersion 2 and 3.
 # Output: /out/<npm version>/v<2|3>/<shape>/ (the project, its lock, npm's log and exit code).
+# SHAPES="a b" writes only those shapes (the alias shape was added later: docs/decisions/2026-10-31-lock-corpus-alias.md).
 set -u
 NPM=$(npm -v)
 echo "# npm $NPM, node $(node -v)"
@@ -19,7 +20,10 @@ for v in 2 3; do
   project "$base/bundled" '{ "name": "s5", "version": "1.0.0", "workspaces": ["packages/b"] }'
   project "$base/bundled/packages/b" '{ "name": "b", "version": "1.0.0", "dependencies": { "is-number": "7.0.0" }, "bundleDependencies": ["is-number"] }'
   project "$base/legacy-peer-deps" '{ "name": "s6", "version": "1.0.0", "dependencies": { "react-dom": "18.2.0" } }'
+  project "$base/alias" '{ "name": "s7", "version": "1.0.0", "workspaces": ["packages/a"], "dependencies": { "minimist": "npm:left-pad@1.3.0", "mkdirp": "0.5.1", "is-number": "7.0.0" } }'
+  project "$base/alias/packages/a" '{ "name": "a", "version": "1.0.0", "dependencies": { "is-number": "npm:left-pad@1.2.0" } }'
   for dir in "$base"/*/; do
+    case " ${SHAPES:-$(ls "$base" | tr '\n' ' ')} " in *" $(basename "$dir") "*) ;; *) continue ;; esac
     shape=$(basename "$dir"); extra=""
     [ "$shape" = legacy-peer-deps ] && extra="--legacy-peer-deps"
     (cd "$dir" && npm install --package-lock-only --ignore-scripts --no-audit --no-fund --lockfile-version="$v" $extra > npm.log 2>&1; echo $? > npm.exit)

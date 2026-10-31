@@ -2,7 +2,7 @@
 // without it. A test run that does not end within LIMIT is stopped (its whole process group) and reported apart: the
 // ReDoS mutation makes vitest spin without end (review 6516135819, N7). Usage (in /w, after npm ci): node /scripts/mutate.mjs
 import { spawn } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 const D = "packages/cli/src/security/deliver.ts", T = "packages/cli/test/deliver.test.ts", A = "packages/cli/test/action-patch.test.ts";
 const B = "packages/cli/src/security/branch.ts", BT = "packages/cli/test/branch.test.ts";
 const J = "packages/cli/src/security/judge.ts", JT = "packages/cli/test/judge.test.ts", C = "packages/cli/test/npm-corpus.test.ts";
@@ -153,6 +153,9 @@ const mutations = [
   ["requirements: a tree alias read under its path's name (M18, N4)", J, ": alias ? alias[1]! : name,", ": name,", JT],
   ["requirements: an override key counting for every name (M22, N4)", J, "if (rule.name === name && takes(rule.selector, range => semver.validRange", "if (takes(rule.selector, range => semver.validRange", JT],
   ["npm: a moved entry's peerDependenciesMeta not compared with the registry (N1)", D, "for (const key of [\"requires\", \"peers\", \"peersMeta\", \"os\", \"cpu\", \"libc\"] as const) {", "for (const key of [\"requires\", \"peers\", \"os\", \"cpu\", \"libc\"] as const) {", T],
+  // The identity rule and the alias locks npm writes (docs/decisions/2026-10-31-lock-corpus-alias.md).
+  ["requirements: another package at a location accepted, against the corpus's V3", J, "return found.name === wanted && semver.satisfies", "return semver.satisfies", C],
+  ["requirements: an alias read under its location's name, against the corpus's alias locks", J, "const [wanted, range] = alias ? [alias[1]!, alias[2]!] : [name, spec];", "const [wanted, range] = alias ? [name, alias[2]!] : [name, spec];", C],
 ];
 /** "pass", "fail", or "timeout" when the run does not end within LIMIT; then its whole process group is killed. */
 const vitest = file => new Promise(resolve => {
@@ -160,17 +163,34 @@ const vitest = file => new Promise(resolve => {
   const timer = setTimeout(() => { try { process.kill(-child.pid, "SIGKILL"); } catch {} resolve("timeout"); }, LIMIT);
   child.on("exit", code => { clearTimeout(timer); resolve(code === 0 ? "pass" : "fail"); });
 });
+// MUTATE_RESULTS names a file (on the host, through a mount) that gets one line per finished mutation, written as soon
+// as it ends: commit, result, seconds, name. Run again at the same commit (LB_HEAD), a mutation already in it is not run
+// again; its recorded result counts (a run that stopped halfway goes on where it stopped).
+const RESULTS = process.env.MUTATE_RESULTS, HEAD = process.env.LB_HEAD ?? "unknown";
+const done = new Map();
+if (RESULTS && existsSync(RESULTS)) for (const line of readFileSync(RESULTS, "utf8").split("\n")) {
+  const [head, result, seconds, name] = line.split("\t");
+  if (head === HEAD && name) done.set(name, { result, seconds });
+}
 let caught = 0, timedOut = 0;
 for (const [i, [name, file, from, to, test]] of mutations.entries()) {
   const original = readFileSync(file, "utf8");
   if (original.split(from).length !== 2) { console.log(`${i + 1}. NOT APPLIED  ${name} (the text is not found exactly once)`); continue; }
-  writeFileSync(file, original.replace(from, to));
-  const started = Date.now(), result = await vitest(test);
-  writeFileSync(file, original);
+  const earlier = done.get(name);
+  let result, seconds;
+  if (earlier) ({ result, seconds } = earlier);
+  else {
+    writeFileSync(file, original.replace(from, to));
+    const started = Date.now();
+    result = await vitest(test);
+    writeFileSync(file, original);
+    seconds = Math.round((Date.now() - started) / 1000);
+    if (RESULTS) appendFileSync(RESULTS, `${HEAD}\t${result}\t${seconds}\t${name}\n`);
+  }
   if (result !== "pass") caught++;
   if (result === "timeout") timedOut++;
   const label = { fail: "caught", timeout: `caught: no end within ${LIMIT / 1000} s`, pass: "NOT CAUGHT" }[result];
-  console.log(`${i + 1}. ${label}  ${name} — ${test} (${Math.round((Date.now() - started) / 1000)} s)`);
+  console.log(`${i + 1}. ${label}  ${name} — ${test} (${seconds} s${earlier ? ", recorded by an earlier run" : ""})`);
 }
 const clean = [];
 for (const t of new Set(mutations.map(m => m[4]))) clean.push(`${t} ${await vitest(t)}`);

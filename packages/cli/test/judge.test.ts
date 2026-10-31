@@ -870,6 +870,23 @@ describe("package-lock.json as every npm reads it (review of aa5d75b, B1)", () =
     expect(newUnmetRequirements({ lock: nested }, { lock: urlSpec }).join("\n")).toContain(`package-lock.json's npm 6 dependencies tree: node_modules/mkdirp requires minimist ${URL_SPEC}, and`);
   });
 
+  it("the identity rule: the package at a location is the one its spec names, at the top and nested, in both views", () => {
+    // docs/decisions/2026-10-31-lock-corpus-alias.md. npm 11.19.1's lock: mkdirp 0.5.1 requires minimist 0.0.8, nested
+    // under it; the project requires lodash-alias as npm:lodash@4.17.21.
+    expect(unmetRequirements(nested).size).toBe(0);
+    // An ordinary spec at a nested location: another package there is refused, in packages and in the npm 6 tree.
+    const nestedOther = edit(nested, l => { l.packages["node_modules/mkdirp/node_modules/minimist"].name = "left-pad"; l.dependencies.mkdirp.dependencies.minimist.version = "npm:left-pad@0.0.8"; });
+    expect(newUnmetRequirements({ lock: nested }, { lock: nestedOther })).toEqual([
+      "package-lock.json's npm 6 dependencies tree: node_modules/mkdirp requires minimist 0.0.8, and node_modules/mkdirp/node_modules/minimist has left-pad@0.0.8, which is not that.",
+      "package-lock.json's packages: node_modules/mkdirp requires minimist 0.0.8, and node_modules/mkdirp/node_modules/minimist has left-pad@0.0.8, which is not that.",
+    ]);
+    // An alias spec: the location must hold the package the alias names, not the package its own name says (a v3 lock:
+    // the npm 6 tree cannot say that a location holds its own name's package under an alias).
+    const v3 = (change: (l: any) => void) => edit(nested, l => { l.lockfileVersion = 3; delete l.dependencies; change(l); });
+    const aliasOwnName = v3(l => { delete l.packages["node_modules/lodash-alias"].name; });
+    expect(newUnmetRequirements({ lock: v3(() => {}) }, { lock: aliasOwnName })).toEqual(["package-lock.json's packages: the project requires lodash-alias npm:lodash@4.17.21, and node_modules/lodash-alias has lodash-alias@4.17.21, which is not that."]);
+  });
+
   it("reads a tree alias by the package it names, and an override key for its own name only (review 6533374683, N4)", () => {
     // M18: a tree entry's requirement on an alias finds the package the tree's "npm:" version names.
     const requiresAlias = (l: any) => { l.dependencies.minimist.requires = { "lodash-alias": "npm:lodash@4.17.21" }; l.packages["node_modules/minimist"].dependencies = { "lodash-alias": "npm:lodash@4.17.21" }; };

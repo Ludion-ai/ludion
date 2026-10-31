@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { lockEntries, newUnmetRequirements, readLock } from "../src/security/judge.ts";
+import { lockEntries, newUnmetRequirements, readLock, unmetRequirements } from "../src/security/judge.ts";
 
 const root = new URL("fixtures/npm-corpus/", import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), "utf8");
@@ -39,11 +39,12 @@ const npmVersions = ["10.8.2", "11.19.1", "12.2.1", "7.10.0", "8.19.4", "9.8.1"]
 describe("the npm corpus", () => {
   it("holds what the decisions asked for: npm 7 to 12, lockfileVersion 2 and 3, every shape, two reports on each lock", () => {
     expect([...new Set(corpus.map(e => e.npm))]).toEqual(npmVersions);
-    expect(written).toHaveLength(60);
+    expect(written).toHaveLength(72);
     // npm 7.10.0 writes v2 when v3 is asked; bundled entries are not written from manifests alone.
-    expect(written.filter(e => e.asked === "v3" && e.lockfileVersion === 2).map(e => e.npm)).toEqual(Array(5).fill("7.10.0"));
+    expect(written.filter(e => e.asked === "v3" && e.lockfileVersion === 2).map(e => e.npm)).toEqual(Array(6).fill("7.10.0"));
     expect(corpus.filter(e => !e.written).map(e => e.shape)).toEqual(Array(12).fill("bundled"));
-    expect(locks).toHaveLength(60 + 272);
+    expect([...new Set(written.map(e => e.shape))].sort()).toEqual(["alias", "legacy-peer-deps", "nested-overrides", "overrides", "peer-devoptional-alias", "workspaces"]);
+    expect(locks).toHaveLength(72 + 320);
     for (const lock of locks) for (const npm of ["12.2.1", "11.19.1"]) expect(() => counted(lock, npm), `${lock} ${npm}`).not.toThrow();
   });
 
@@ -57,32 +58,52 @@ describe("the npm corpus", () => {
     expect(narrowed).toEqual([]);
   });
 
-  // G2 is judged against npm 12.2.1, which writes Ludion's candidates (docs/decisions/2026-10-31-lock-corpus-npm12.md).
-  // It is not met, and this test says by how much: npm takes a copy of another package under a required name (V3,
-  // `name: "left-pad"` at a path a range requires) as meeting the range, since it checks a range's version and not the
-  // package; Ludion refuses it, and is not changed to take it (docs/bench/2026-10-31-lb2a-npm-corpus/README.md). Every
-  // other variant agrees. A new disagreement of any kind fails here.
-  it("G2 (not met for V3): a change leaves a requirement unmet exactly when npm 12.2.1 reports a new missing or invalid", () => {
-    const disagree: string[] = [];
-    let compared = 0;
-    for (const e of written) {
-      const baseText = read(`${dir(e)}package-lock.json`), manifest = JSON.parse(read(`${dir(e)}package.json`)) as unknown;
-      for (const v of e.variants ?? []) {
-        const npm = npmUnmet(e, v, "12.2.1");
-        const ours = newUnmetRequirements({ lock: baseText, manifest }, { lock: read(`${dir(e)}variants/${v}/package-lock.json`), manifest });
-        compared++;
-        if (npm !== ours.length > 0) disagree.push(`${dir(e)}variants/${v}/: npm ${npm ? "reports" : "does not report"} a new problem; Ludion ${ours.length ? `finds ${ours[0]}` : "finds none"}`);
-      }
+  /** Each variant with npm 12.2.1's answer (a new missing or invalid) and Ludion's (newUnmetRequirements). */
+  const answers = written.flatMap(e => {
+    const baseText = read(`${dir(e)}package-lock.json`), manifest = JSON.parse(read(`${dir(e)}package.json`)) as unknown;
+    return (e.variants ?? []).map(v => ({ at: `${dir(e)}variants/${v}/`, v, npm: npmUnmet(e, v, "12.2.1"), ours: newUnmetRequirements({ lock: baseText, manifest }, { lock: read(`${dir(e)}variants/${v}/package-lock.json`), manifest }) }));
+  });
+
+  // G2 is judged against npm 12.2.1, which writes Ludion's candidates (docs/decisions/2026-10-31-lock-corpus-npm12.md),
+  // on every variant but V3 (next test).
+  it("G2: apart from V3, a change leaves a requirement unmet exactly when npm 12.2.1 reports a new missing or invalid", () => {
+    expect(answers).toHaveLength(320);
+    const disagree = answers.filter(a => a.v !== "V3" && a.npm !== a.ours.length > 0).map(a => `${a.at}: npm ${a.npm ? "reports" : "does not report"} a new problem; Ludion ${a.ours.length ? `finds ${a.ours[0]}` : "finds none"}`);
+    expect(disagree).toEqual([]);
+  });
+
+  // V3 adds `name: "left-pad"` at a location a range requires. npm ls does not look at which package a location holds:
+  // it checks a range against the copy's version only. Ludion does look, and refuses: the package at a location must be
+  // the one its spec names (docs/decisions/2026-10-31-lock-corpus-alias.md). So the expected answer is fixed as
+  // "refused", whatever npm reports.
+  it("V3: npm ls does not look at a package's identity; Ludion does, and refuses every V3", () => {
+    const v3 = answers.filter(a => a.v === "V3");
+    expect(v3).toHaveLength(72);
+    expect(v3.filter(a => !a.ours.length).map(a => a.at)).toEqual([]);
+    for (const a of v3) expect(a.ours.join("\n"), a.at).toMatch(/has left-pad@\S+, which is not that\./);
+    // npm reports nothing new for 68 of them. The other four are npm 7.10.0's overrides locks, whose copy npm 12.2.1
+    // already finds outside the project's override in the base (npm 7 does not read overrides); it reports the renamed
+    // copy as a new invalid line ("minimist@npm:left-pad@1.2.8").
+    expect(v3.filter(a => a.npm).map(a => a.at)).toEqual(["7.10.0/v2/nested-overrides/variants/V3/", "7.10.0/v2/overrides/variants/V3/", "7.10.0/v3/nested-overrides/variants/V3/", "7.10.0/v3/overrides/variants/V3/"]);
+  });
+
+  // A1 and A2 (docs/decisions/2026-10-31-lock-corpus-alias.md): the locks npm writes with an alias under another real
+  // package's name, at the top (`"minimist": "npm:left-pad@1.3.0"`) and nested (a workspace's `"is-number":
+  // "npm:left-pad@1.2.0"`, beside the project's is-number 7.0.0), are read and leave no requirement unmet.
+  it("A1, A2: every alias lock npm 7 to 12 wrote is read and taken, at the top and nested", () => {
+    const alias = written.filter(e => e.shape === "alias");
+    expect(alias).toHaveLength(12);
+    for (const e of alias) {
+      const text = read(`${dir(e)}package-lock.json`), manifest = JSON.parse(read(`${dir(e)}package.json`)) as unknown;
+      expect(mainReads(text), dir(e)).toBe(true);
+      expect(prReads(text), dir(e)).toBe(true);
+      expect([...unmetRequirements(text, manifest).values()], dir(e)).toEqual([]);
+      const entries = lockEntries(text);
+      expect(entries.find(x => x.path === "node_modules/minimist"), dir(e)).toMatchObject({ name: "left-pad", version: "1.3.0" });
+      expect(entries.find(x => x.path === "node_modules/mkdirp/node_modules/minimist"), dir(e)).toMatchObject({ name: "minimist", version: "0.0.8" });
+      expect(entries.find(x => /^(?:packages\/a|node_modules\/a)\/node_modules\/is-number$/.test(x.path)), dir(e)).toMatchObject({ name: "left-pad", version: "1.2.0" });
+      expect(counted(dir(e), "12.2.1"), dir(e)).toEqual(new Set());
     }
-    expect(compared).toBe(272);
-    const substituted = /\/variants\/V3\/: npm does not report a new problem; Ludion finds package-lock\.json's [^:]+: (?:the project|\S+) requires \S+ [^,]+, and node_modules\/\S+ has left-pad@[^ ]+, which is not that\.$/;
-    expect(disagree.filter(d => !substituted.test(d))).toEqual([]);
-    // 56 of the 60 V3. The other four agree only because npm 7.10.0, which does not read `overrides`, left the copy
-    // outside the override in the base: npm 12.2.1 already reports it invalid there, and reports the renamed copy as a
-    // new invalid line ("minimist@npm:left-pad@1.2.8").
-    expect(disagree).toHaveLength(56);
-    expect(written.filter(e => e.variants?.includes("V3") && !disagree.some(d => d.startsWith(`${dir(e)}variants/V3/`))).map(dir))
-      .toEqual(["7.10.0/v2/nested-overrides/", "7.10.0/v2/overrides/", "7.10.0/v3/nested-overrides/", "7.10.0/v3/overrides/"]);
   });
 
   it("npm 11.19.1 and npm 12.2.1 say the same of every variant", () => {

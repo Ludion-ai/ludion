@@ -54,16 +54,21 @@ const mutations = [
   ["the Japanese unverified label shortened", 'unverified: "確かめられなかったので止めた",', 'unverified: "止めた",'],
   ["cwe_ids not read", "Array.isArray(specific.cwe_ids) ? specific.cwe_ids : []", "[]"],
   ["any severity string kept", "(SEVERITIES as readonly string[]).includes(raw) ? (raw as Severity) : \"unknown\"", "(raw || \"unknown\") as Severity"],
-  ["| not escaped", '.replace(/\\|/g, "\\\\|")', ""],
-  ["line breaks kept", '[\\r\\n\\u{2028}\\u{2029}]/gu, " ")', '[\\u{2028}\\u{2029}]/gu, " ")'],
-  ["fence not lengthened", "Math.max(0, ...[...flat.matchAll(/`+/g)].map(m => m[0].length)) + 1", "1"],
+  // LMR1c-3: code spans refuse \, | and line breaks instead of escaping them (ludion-ops#1 comment 6539943852 (b)), so
+  // LMR1's "| not escaped" and "line breaks kept" and LMR1c-2's two escaping mutations became one per refused character.
+  ["fence not lengthened", "Math.max(0, ...[...text.matchAll(/`+/g)].map(m => m[0].length)) + 1", "1"],
   ["minutes rounded, not floored", "Math.floor((acted - instant", "Math.round((acted - instant"],
   ["action before the fix accepted", "if (minutes < 0) throw", "if (minutes < -1e12) throw"],
   ["Feb 30 accepted", "new Date(at).toISOString().slice(0, 19) !== match[1]", "false"],
   ["summary counts every action as fixed", "`${l.count[a]} ${counts.get(a)}`", "`${l.count.fixed} ${counts.get(a)}`"],
-  // LMR1c-2: strict forms for every shown value, and \ escaped before | in the code span.
-  ["\\ not escaped", String.raw`.replace(/\\/g, "\\\\")`, ""],
-  ["\\ escaped after |", String.raw`.replace(/\\/g, "\\\\").replace(/\|/g, "\\|")`, String.raw`.replace(/\|/g, "\\|").replace(/\\/g, "\\\\")`],
+  // LMR1c-2: strict forms for every shown value. LMR1c-3: a code span refuses \, | and line breaks.
+  ["a code span accepts \\", String.raw`/[\\|\r\n\u{2028}\u{2029}]/u.test(text)`, String.raw`/[|\r\n\u{2028}\u{2029}]/u.test(text)`],
+  ["a code span accepts |", String.raw`/[\\|\r\n\u{2028}\u{2029}]/u.test(text)`, String.raw`/[\\\r\n\u{2028}\u{2029}]/u.test(text)`],
+  ["a code span accepts CR", String.raw`/[\\|\r\n\u{2028}\u{2029}]/u.test(text)`, String.raw`/[\\|\n\u{2028}\u{2029}]/u.test(text)`],
+  ["a code span accepts LF", String.raw`/[\\|\r\n\u{2028}\u{2029}]/u.test(text)`, String.raw`/[\\|\r\u{2028}\u{2029}]/u.test(text)`],
+  ["a code span accepts U+2028", String.raw`/[\\|\r\n\u{2028}\u{2029}]/u.test(text)`, String.raw`/[\\|\r\n\u{2029}]/u.test(text)`],
+  ["a code span accepts U+2029", String.raw`/[\\|\r\n\u{2028}\u{2029}]/u.test(text)`, String.raw`/[\\|\r\n\u{2028}]/u.test(text)`],
+  ["a code span escapes |", "if (/[\\\\|\\r\\n\\u{2028}\\u{2029}]/u.test(text)) throw", 'text = text.replace(/\\|/g, "\\\\|"); if (/[\\r\\n\\u{2028}\\u{2029}]/u.test(text)) throw'],
   ["the strict form not checked", "if (!readable(row)) {", "if (false) {"],
   ["unreadable rows not counted", "unreadable++;", ""],
   ["the unreadable note left out", "const note = unreadable ? [l.unreadable(unreadable)] : [];", "const note: string[] = [];"],

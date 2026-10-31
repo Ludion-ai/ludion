@@ -478,7 +478,11 @@ describe("renderRecord", () => {
     expect(renderRecord([{ ...rows[0]!, package: "a|b" }], "ja")).toBe("読めない行が 1 件あった。中身は出していない。\n");
   });
 
-  it("escapes every \\ before every | in a code span, removes line breaks, and keeps the row's columns", () => {
+  it("refuses a code span holding \\, | or a line break, escapes nothing, and keeps the row's columns", () => {
+    // ludion-ops#1 comment 6539943852 (b): a code span shows an escaping \ as written, so nothing is escaped.
+    for (const text of ["a|b", "a\\|b", "a\\", "\\\\|", "\\", "|", "a\nb", "a\rb", "a\r\nb", "a\u{2028}b", "a\u{2029}b", "a\\b"]) {
+      expect(() => codeSpan(text)).toThrow(`A code span cannot hold \\, | or a line break: ${JSON.stringify(text)}`);
+    }
     // Two readings of where a row's cells split: at each | that no \ escapes, a \ escaping the character after it (as
     // micromark reads it); and at each | with no \ right before it (as GitHub rendered `a\\|b` in one cell, 2026-10-31).
     const escaped = (line: string) => {
@@ -488,8 +492,8 @@ describe("renderRecord", () => {
     };
     const github = (line: string) => [...line].filter((c, i) => c === "|" && line[i - 1] !== "\\").length;
     const cases: [string, string][] = [
-      ["a|b", "`a\\|b`"], ["a\\|b", "`a\\\\\\|b`"], ["a\\", "`a\\\\`"], ["a\\\\|b", "`a\\\\\\\\\\|b`"], ["\\|", "`\\\\\\|`"],
-      ["a\nb", "`a b`"], ["a\r\nb|", "`a b\\|`"], ["a\u{2028}b\u{2029}c", "`a b c`"], ["a`b", "``a`b``"], ["``", "``` `` ```"], ["`lead", "`` `lead ``"], ["", "`  `"],
+      ["lodash", "`lodash`"], ["@scope/a-b.c_d~e", "`@scope/a-b.c_d~e`"], ["org.x:y", "`org.x:y`"], ["a b", "`a b`"], ["<b>x</b>", "`<b>x</b>`"],
+      ["a`b", "``a`b``"], ["``", "``` `` ```"], ["`lead", "`` `lead ``"], [" pad ", "`  pad  `"], ["", "`  `"],
     ];
     for (const [text, want] of cases) {
       expect([text, codeSpan(text)]).toEqual([text, want]);

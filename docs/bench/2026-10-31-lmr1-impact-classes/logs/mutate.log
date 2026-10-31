@@ -1,4 +1,4 @@
-# started 2026-10-31T06:16:57Z, node v24.22.1
+# started 2026-10-31T06:41:47Z, node v24.22.1
 without mutations: passed
 caught: MAL- is not trap
 caught: MAL- anywhere in the id is trap
@@ -43,15 +43,18 @@ caught: the trap cell without the record's id
 caught: the Japanese unverified label shortened
 caught: cwe_ids not read
 caught: any severity string kept
-caught: | not escaped
-caught: line breaks kept
 caught: fence not lengthened
 caught: minutes rounded, not floored
 caught: action before the fix accepted
 caught: Feb 30 accepted
 caught: summary counts every action as fixed
-caught: \ not escaped
-caught: \ escaped after |
+caught: a code span accepts \
+caught: a code span accepts |
+caught: a code span accepts CR
+caught: a code span accepts LF
+caught: a code span accepts U+2028
+caught: a code span accepts U+2029
+caught: a code span escapes |
 caught: the strict form not checked
 caught: unreadable rows not counted
 caught: the unreadable note left out
@@ -65,5 +68,5 @@ caught: the severity list not checked
 caught: Composer names with capitals accepted
 caught: a trap's record id not checked
 after restoring: passed
-64 of 64 mutations caught
-# finished 2026-10-31T06:17:52Z
+67 of 67 mutations caught
+# finished 2026-10-31T06:42:43Z

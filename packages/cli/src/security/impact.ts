@@ -283,14 +283,15 @@ function instant(value: string, field: string): number {
 }
 
 /**
- * A Markdown code span that keeps a table row whole: no line break, every \ escaped before every |, a fence longer than
- * any backtick run. The second defence: renderRecord shows only values of a strict form, which hold none of these.
+ * A Markdown code span, with a fence longer than any backtick run. Nothing is escaped: a code span shows an escaping \
+ * as written, so text holding \, | or a line break (CR, LF, U+2028, U+2029) is refused. The second defence:
+ * renderRecord shows only values of a strict form, which hold none of these.
  */
 export function codeSpan(text: string): string {
-  const flat = text.replace(/\r\n|[\r\n\u{2028}\u{2029}]/gu, " ").replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
-  const fence = "`".repeat(Math.max(0, ...[...flat.matchAll(/`+/g)].map(m => m[0].length)) + 1);
-  const pad = /^[ `]|[ `]$/.test(flat) || flat === "" ? " " : "";
-  return `${fence}${pad}${flat}${pad}${fence}`;
+  if (/[\\|\r\n\u{2028}\u{2029}]/u.test(text)) throw new Error(`A code span cannot hold \\, | or a line break: ${JSON.stringify(text)}`);
+  const fence = "`".repeat(Math.max(0, ...[...text.matchAll(/`+/g)].map(m => m[0].length)) + 1);
+  const pad = /^[ `]|[ `]$/.test(text) || text === "" ? " " : "";
+  return `${fence}${pad}${text}${pad}${fence}`;
 }
 
 /**

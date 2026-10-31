@@ -84,6 +84,9 @@ describe("the strength order", () => {
         }
       }
     }
+    // The table given is the one used: CWE-78 is {takeover} there and {takeover, steal, alter, disrupt} in the shipped one.
+    expect([classify(withVectors(["CWE-78"], v3("C:L/I:N/A:N")), ONE_EACH).class, classify(withVectors(["CWE-78"], v3("C:L/I:N/A:N"))).class]).toEqual(["unclassified", "steal"]);
+    expect([classify(record(["CWE-78"]), ONE_EACH).class, classify(record(["CWE-78"])).class]).toEqual(["takeover", "unclassified"]);
     expect(classify(record(["CWE-400", "CWE-20"])).class).toBe("disrupt");
     expect(classify(withVectors(["CWE-918", "CWE-79"], v3("C:L/I:L/A:N"))).reason).toBe("GHSA-xxxx-xxxx-xxxx: impersonate (CWE-79), the strongest class its CWEs allow (impersonate, steal, alter) that its CVSS vector does not rule out.");
   });

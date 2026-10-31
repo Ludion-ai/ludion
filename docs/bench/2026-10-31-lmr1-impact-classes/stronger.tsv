@@ -1,0 +1,867 @@
+between	id	ecosystem	from	to	cwes	cvss
+before->narrow	GHSA-22gj-8qj2-fj46	Packagist	unclassified	alter	CWE-73,CWE-610	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+before->narrow	GHSA-22r3-9w55-cj54	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:N
+before->narrow	GHSA-245j-xjvr-xvm5	Packagist	unclassified	alter	CWE-73	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:H
+before->narrow	GHSA-2cwr-f5hx-gg3w	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->narrow	GHSA-2h3h-q99f-3fhc	npm	unclassified	steal	CWE-59,CWE-61,CWE-178	CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N
+before->narrow	GHSA-2jwf-f4xq-f24h	npm	unclassified	steal	CWE-59,CWE-377	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:L/I:L/A:N
+before->narrow	GHSA-2p49-45hj-7mc9	npm	unclassified	steal	CWE-59,CWE-61	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N
+before->narrow	GHSA-2wmj-8mqg-r9q8	Packagist	unclassified	alter	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+before->narrow	GHSA-2x36-7xfm-pgm7	Packagist	unclassified	steal	CWE-276	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N
+before->narrow	GHSA-2x6f-57hp-86fx	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->narrow	GHSA-34qg-65m4-f23m	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:L ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:L/SC:N/SI:N/SA:N
+before->narrow	GHSA-3966-f6p6-2qr9	npm	unclassified	steal	CWE-732	CVSS:3.0/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-3hfp-gqgh-xc5g	npm	unclassified	trap	CWE-508,CWE-1395	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H
+before->narrow	GHSA-3jx4-q2m7-r496	npm	unclassified	steal	CWE-59,CWE-668	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-3pvj-jv98-qhjq	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L
+before->narrow	GHSA-3pw3-v88x-xj24	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-3pxq-f3cp-jmxp	npm	unclassified	steal	CWE-59,CWE-367	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+before->narrow	GHSA-3v56-q6r6-4gcw	Packagist	unclassified	alter	CWE-74,CWE-277,CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->narrow	GHSA-428f-mh7w-6w2x	npm	unclassified	trap	CWE-509	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-457r-cqc8-9vj9	npm	unclassified	takeover	CWE-912	-
+before->narrow	GHSA-4c3q-x735-j3r5	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-4gjj-r7w8-42cq	Packagist	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-4hjq-422q-4vpx	Packagist	unclassified	steal	CWE-74,CWE-732	CVSS:3.1/AV:L/AC:H/PR:H/UI:R/S:U/C:H/I:H/A:L
+before->narrow	GHSA-4jch-8qq5-hqg6	Packagist	unclassified	steal	CWE-59	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H
+before->narrow	GHSA-4jw9-5hrc-m4j6	Packagist	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:L
+before->narrow	GHSA-4mvc-qc5w-v5qr	Packagist	unclassified	steal	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->narrow	GHSA-4p55-xj37-fx7g	npm	unclassified	alter	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->narrow	GHSA-4vj3-f849-5r48	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-52f5-9888-hmc6	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N
+before->narrow	GHSA-534h-c3cw-v3h9	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-536p-4pcj-5mr9	Packagist	unclassified	steal	CWE-276,CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-569q-mpph-wgww	npm	disrupt	steal	CWE-73,CWE-770	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:P
+before->narrow	GHSA-5799-3xg7-rfrv	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->narrow	GHSA-589q-75r3-mfq4	Packagist	unclassified	steal	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->narrow	GHSA-5fc7-f62m-8983	npm	unclassified	steal	CWE-732	CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-5g9f-cwwg-4p8g	Packagist	unclassified	alter	CWE-73	CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:U/C:N/I:L/A:L
+before->narrow	GHSA-5m64-9hq5-5pf2	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-5pq3-h73f-66hr	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:L/I:L/A:N
+before->narrow	GHSA-5qj8-6xxj-hp9h	Packagist	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->narrow	GHSA-66mv-q8r2-hj8w	Packagist	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-6vfx-w7q3-42gq	Packagist	unclassified	alter	CWE-73	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H
+before->narrow	GHSA-6w4q-23cf-j9jp	npm	unclassified	alter	CWE-276,CWE-669	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+before->narrow	GHSA-745p-r637-7vvp	Packagist	unclassified	steal	CWE-665,CWE-732	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:L/I:N/A:N
+before->narrow	GHSA-75h4-c557-j89r	Packagist	unclassified	steal	CWE-59	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-7j5w-7r7x-9v27	npm	unclassified	alter	CWE-73,CWE-88	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:H/VA:H/SC:N/SI:H/SA:H
+before->narrow	GHSA-7xmq-g46g-f8pv	npm	unclassified	steal	CWE-59,CWE-367	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-82v2-mx6x-wq7q	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-8gr3-2gjw-jj7g	npm	unclassified	takeover	CWE-912	-
+before->narrow	GHSA-8jh9-wqpf-q52c	npm	unclassified	takeover	CWE-912	-
+before->narrow	GHSA-8mpm-q7mh-8fvh	npm	unclassified	steal	CWE-59,CWE-276,CWE-377	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-9722-rr68-rfpg	Packagist	unclassified	alter	CWE-73,CWE-610	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:N/I:L/A:N
+before->narrow	GHSA-98xx-8mx4-x7cm	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:L
+before->narrow	GHSA-9mph-4f7v-fmvh	npm	unclassified	steal	CWE-59	CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-9wfr-w7mm-pc7f	npm	unclassified	takeover	CWE-88,CWE-912	CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:C/C:H/I:H/A:H
+before->narrow	GHSA-9wrv-g75h-8ccc	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N
+before->narrow	GHSA-c7jj-vfmr-j9mj	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H
+before->narrow	GHSA-c8m7-r2jv-rw63	Packagist	unclassified	steal	CWE-73	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-cc8f-xg8v-72m3	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-cfcj-hqpf-hccf	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H
+before->narrow	GHSA-cfvj-7rx7-fc7c	npm	unclassified	alter	CWE-59	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:N/SI:H/SA:N
+before->narrow	GHSA-cp6g-6699-wx9c	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:H
+before->narrow	GHSA-cx45-565q-6qx8	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N
+before->narrow	GHSA-f693-58pc-2gfr	npm	unclassified	steal	CWE-732	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-f7ww-2725-qvw2	npm	unclassified	alter	CWE-59,CWE-367	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-ffr4-mrhv-vfr2	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:H/A:H ; CVSS:4.0/AV:L/AC:H/AT:N/PR:L/UI:N/VC:L/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->narrow	GHSA-fh39-c73x-5pjv	npm	unclassified	steal	CWE-732	CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-fv94-qvg8-xqpw	npm	unclassified	alter	CWE-59,CWE-61	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N
+before->narrow	GHSA-gfjr-3jmm-4g9v	npm	unclassified	alter	CWE-59	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->narrow	GHSA-ggjm-f3g4-rwmm	npm	unclassified	steal	CWE-59,CWE-61	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-gmw6-94gg-2rc2	npm	unclassified	steal	CWE-59,CWE-61	CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N
+before->narrow	GHSA-h3hj-cmcx-xc66	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->narrow	GHSA-h7f7-89mm-pqh6	npm	unclassified	steal	CWE-73	CVSS:4.0/AV:L/AC:L/AT:N/PR:H/UI:N/VC:L/VI:H/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-hr89-w7p6-pjmq	npm	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-j44m-qm6p-hp7m	npm	unclassified	alter	CWE-59	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->narrow	GHSA-j5f4-cc29-5x44	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N
+before->narrow	GHSA-jfph-3hpg-2f65	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-jpf2-9ppp-2c49	Packagist	unclassified	alter	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:U
+before->narrow	GHSA-jv6v-fvvx-4932	Packagist	unclassified	alter	CWE-73,CWE-610	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:N/I:H/A:N
+before->narrow	GHSA-jvx5-rm6q-gx7p	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->narrow	GHSA-jwp9-9v96-94mx	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:N
+before->narrow	GHSA-jxrq-8fm4-9p58	npm	unclassified	alter	CWE-59	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-m6cx-g6qm-p2cx	npm	unclassified	steal	CWE-59,CWE-61	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:H/I:H/A:N
+before->narrow	GHSA-m899-6mh4-mpc5	Packagist	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-mj4p-rc52-m843	npm	unclassified	alter	CWE-59,CWE-367	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:N/I:H/A:H
+before->narrow	GHSA-mq5v-pxpm-8jw2	Packagist	unclassified	steal	CWE-59	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-mv33-9f6j-pfmc	npm	unclassified	alter	CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:L
+before->narrow	GHSA-mwcg-wfq3-4gjc	npm	unclassified	steal	CWE-59,CWE-367	CVSS:4.0/AV:L/AC:H/AT:N/PR:L/UI:N/VC:L/VI:H/VA:H/SC:N/SI:N/SA:N
+before->narrow	GHSA-p2fh-f5fc-44hr	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-p7fg-763f-g4gf	npm	unclassified	steal	CWE-732	CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-p8q8-jfcv-g2h2	Packagist	unclassified	steal	CWE-59	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N
+before->narrow	GHSA-pg98-6v7f-2xfv	npm	unclassified	takeover	CWE-912	-
+before->narrow	GHSA-ph34-pc88-72gc	npm	unclassified	steal	CWE-732	CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-q66q-fx2p-7w4m	npm	unclassified	steal	CWE-59	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:N/VA:H/SC:H/SI:H/SA:H
+before->narrow	GHSA-qc5j-2mqx-x83q	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:L/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->narrow	GHSA-qcc4-p59m-p54m	npm	unclassified	steal	CWE-59,CWE-367	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-qfxx-c367-67f8	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+before->narrow	GHSA-qjx3-2g35-6hv8	Packagist	unclassified	steal	CWE-276,CWE-280	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:H
+before->narrow	GHSA-qp7v-gjgg-4mj6	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-qq6h-5g6j-q3cm	npm	unclassified	takeover	CWE-912	-
+before->narrow	GHSA-qqq7-4hxc-x63c	npm	unclassified	steal	CWE-73,CWE-668	CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-r54r-wmmq-mh84	npm	unclassified	alter	CWE-59,CWE-367	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-r6g8-mq9v-cgp4	Packagist	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-r95r-rj6r-c39x	npm	unclassified	steal	CWE-367,CWE-732	CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:U/C:L/I:N/A:N
+before->narrow	GHSA-rhc2-23c2-ww7c	Packagist	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H
+before->narrow	GHSA-rmqr-h98c-qg2m	Packagist	unclassified	alter	CWE-73	CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->narrow	GHSA-rwp6-7w3q-75fq	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-vcgf-vmpc-ph79	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-vg4f-8v9q-5c3x	Packagist	unclassified	alter	CWE-732	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->narrow	GHSA-vqj9-vhg4-27mg	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-vr7j-g7jv-h5mp	npm	unclassified	steal	CWE-276,CWE-732	CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-vwc7-r8mq-g2x9	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:N ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-w47m-jpv2-qfw5	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->narrow	GHSA-w4rc-p66m-x6qq	Packagist	unclassified	alter	CWE-20,CWE-73	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:P
+before->narrow	GHSA-wr23-m9m2-jjf4	Packagist	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->narrow	GHSA-wr92-6w3g-2hwc	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->narrow	GHSA-wrrr-8jcv-wjf5	npm	unclassified	alter	CWE-73	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:P
+before->narrow	GHSA-x287-wcfc-q46c	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N
+before->narrow	GHSA-x2q9-r8gm-f657	Packagist	unclassified	steal	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->narrow	GHSA-x36g-4629-xp9v	Packagist	unclassified	alter	CWE-73	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:H
+before->narrow	GHSA-x82f-27x3-q89c	npm	unclassified	alter	CWE-59,CWE-367	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+before->narrow	GHSA-xc9g-j69q-37xw	npm	unclassified	alter	CWE-73	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H
+before->narrow	GHSA-xf7w-r453-m56c	npm	unclassified	alter	CWE-59	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->narrow	GHSA-xhcr-j4j9-3gh7	npm	unclassified	steal	CWE-732	CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+before->narrow	GHSA-xmc9-4f2h-jf9c	npm	unclassified	steal	CWE-73	CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+before->narrow	GHSA-xq74-c7jx-8w5j	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:L/SC:H/SI:H/SA:L/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->narrow	GHSA-xvgh-hmx8-9xxf	npm	unclassified	steal	CWE-59,CWE-362	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:H
+before->narrow	GHSA-xwq4-2cwr-fv2q	Packagist	unclassified	steal	CWE-276	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+before->wide	GHSA-22gj-8qj2-fj46	Packagist	unclassified	alter	CWE-73,CWE-610	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+before->wide	GHSA-22r3-9w55-cj54	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:N
+before->wide	GHSA-245j-xjvr-xvm5	Packagist	unclassified	alter	CWE-73	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:H
+before->wide	GHSA-2cwr-f5hx-gg3w	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->wide	GHSA-2h3h-q99f-3fhc	npm	unclassified	steal	CWE-59,CWE-61,CWE-178	CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N
+before->wide	GHSA-2jwf-f4xq-f24h	npm	unclassified	steal	CWE-59,CWE-377	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:L/I:L/A:N
+before->wide	GHSA-2p49-45hj-7mc9	npm	unclassified	steal	CWE-59,CWE-61	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N
+before->wide	GHSA-2wmj-8mqg-r9q8	Packagist	unclassified	alter	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+before->wide	GHSA-2x36-7xfm-pgm7	Packagist	unclassified	steal	CWE-276	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N
+before->wide	GHSA-2x6f-57hp-86fx	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->wide	GHSA-34qg-65m4-f23m	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:L ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:L/SC:N/SI:N/SA:N
+before->wide	GHSA-3966-f6p6-2qr9	npm	unclassified	steal	CWE-732	CVSS:3.0/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-3hfp-gqgh-xc5g	npm	unclassified	trap	CWE-508,CWE-1395	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H
+before->wide	GHSA-3jx4-q2m7-r496	npm	unclassified	steal	CWE-59,CWE-668	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-3pvj-jv98-qhjq	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L
+before->wide	GHSA-3pw3-v88x-xj24	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-3pxq-f3cp-jmxp	npm	unclassified	steal	CWE-59,CWE-367	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+before->wide	GHSA-3v56-q6r6-4gcw	Packagist	unclassified	alter	CWE-74,CWE-277,CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->wide	GHSA-428f-mh7w-6w2x	npm	unclassified	trap	CWE-509	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-4c3q-x735-j3r5	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-4gjj-r7w8-42cq	Packagist	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-4hjq-422q-4vpx	Packagist	unclassified	steal	CWE-74,CWE-732	CVSS:3.1/AV:L/AC:H/PR:H/UI:R/S:U/C:H/I:H/A:L
+before->wide	GHSA-4jch-8qq5-hqg6	Packagist	unclassified	steal	CWE-59	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H
+before->wide	GHSA-4jw9-5hrc-m4j6	Packagist	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:L
+before->wide	GHSA-4mvc-qc5w-v5qr	Packagist	unclassified	steal	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->wide	GHSA-4p55-xj37-fx7g	npm	unclassified	alter	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->wide	GHSA-4vj3-f849-5r48	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-52f5-9888-hmc6	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N
+before->wide	GHSA-534h-c3cw-v3h9	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-536p-4pcj-5mr9	Packagist	unclassified	steal	CWE-276,CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-569q-mpph-wgww	npm	disrupt	steal	CWE-73,CWE-770	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:P
+before->wide	GHSA-5799-3xg7-rfrv	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->wide	GHSA-589q-75r3-mfq4	Packagist	unclassified	steal	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->wide	GHSA-5fc7-f62m-8983	npm	unclassified	steal	CWE-732	CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-5g9f-cwwg-4p8g	Packagist	unclassified	alter	CWE-73	CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:U/C:N/I:L/A:L
+before->wide	GHSA-5m64-9hq5-5pf2	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-5pq3-h73f-66hr	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:L/I:L/A:N
+before->wide	GHSA-5qj8-6xxj-hp9h	Packagist	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->wide	GHSA-66mv-q8r2-hj8w	Packagist	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-6vfx-w7q3-42gq	Packagist	unclassified	alter	CWE-73	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H
+before->wide	GHSA-6w4q-23cf-j9jp	npm	unclassified	alter	CWE-276,CWE-669	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+before->wide	GHSA-745p-r637-7vvp	Packagist	unclassified	steal	CWE-665,CWE-732	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:L/I:N/A:N
+before->wide	GHSA-75h4-c557-j89r	Packagist	unclassified	steal	CWE-59	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-7j5w-7r7x-9v27	npm	unclassified	alter	CWE-73,CWE-88	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:H/VA:H/SC:N/SI:H/SA:H
+before->wide	GHSA-7xmq-g46g-f8pv	npm	unclassified	steal	CWE-59,CWE-367	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-82v2-mx6x-wq7q	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-8mpm-q7mh-8fvh	npm	unclassified	steal	CWE-59,CWE-276,CWE-377	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-9722-rr68-rfpg	Packagist	unclassified	alter	CWE-73,CWE-610	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:N/I:L/A:N
+before->wide	GHSA-98xx-8mx4-x7cm	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:L
+before->wide	GHSA-9mph-4f7v-fmvh	npm	unclassified	steal	CWE-59	CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-9wfr-w7mm-pc7f	npm	unclassified	takeover	CWE-88,CWE-912	CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:C/C:H/I:H/A:H
+before->wide	GHSA-9wrv-g75h-8ccc	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N
+before->wide	GHSA-c7jj-vfmr-j9mj	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H
+before->wide	GHSA-c8m7-r2jv-rw63	Packagist	unclassified	steal	CWE-73	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-cc8f-xg8v-72m3	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-cfcj-hqpf-hccf	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H
+before->wide	GHSA-cfvj-7rx7-fc7c	npm	unclassified	alter	CWE-59	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:N/SI:H/SA:N
+before->wide	GHSA-cp6g-6699-wx9c	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:H
+before->wide	GHSA-cx45-565q-6qx8	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N
+before->wide	GHSA-f693-58pc-2gfr	npm	unclassified	steal	CWE-732	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-f7ww-2725-qvw2	npm	unclassified	alter	CWE-59,CWE-367	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-ffr4-mrhv-vfr2	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:H/A:H ; CVSS:4.0/AV:L/AC:H/AT:N/PR:L/UI:N/VC:L/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->wide	GHSA-fh39-c73x-5pjv	npm	unclassified	steal	CWE-732	CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-fv94-qvg8-xqpw	npm	unclassified	alter	CWE-59,CWE-61	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N
+before->wide	GHSA-gfjr-3jmm-4g9v	npm	unclassified	alter	CWE-59	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->wide	GHSA-ggjm-f3g4-rwmm	npm	unclassified	steal	CWE-59,CWE-61	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-gmw6-94gg-2rc2	npm	unclassified	steal	CWE-59,CWE-61	CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N
+before->wide	GHSA-h3hj-cmcx-xc66	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->wide	GHSA-h7f7-89mm-pqh6	npm	unclassified	steal	CWE-73	CVSS:4.0/AV:L/AC:L/AT:N/PR:H/UI:N/VC:L/VI:H/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-hr89-w7p6-pjmq	npm	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-j44m-qm6p-hp7m	npm	unclassified	alter	CWE-59	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->wide	GHSA-j5f4-cc29-5x44	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N
+before->wide	GHSA-j9cw-5cpj-9qj5	Packagist	unclassified	alter	CWE-912	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+before->wide	GHSA-jfph-3hpg-2f65	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-jpf2-9ppp-2c49	Packagist	unclassified	alter	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:U
+before->wide	GHSA-jv6v-fvvx-4932	Packagist	unclassified	alter	CWE-73,CWE-610	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:N/I:H/A:N
+before->wide	GHSA-jvx5-rm6q-gx7p	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->wide	GHSA-jwp9-9v96-94mx	npm	unclassified	steal	CWE-59	CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:N
+before->wide	GHSA-jxrq-8fm4-9p58	npm	unclassified	alter	CWE-59	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-m6cx-g6qm-p2cx	npm	unclassified	steal	CWE-59,CWE-61	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:H/I:H/A:N
+before->wide	GHSA-m899-6mh4-mpc5	Packagist	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-mj4p-rc52-m843	npm	unclassified	alter	CWE-59,CWE-367	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:N/I:H/A:H
+before->wide	GHSA-mq5v-pxpm-8jw2	Packagist	unclassified	steal	CWE-59	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-mv33-9f6j-pfmc	npm	unclassified	alter	CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:L
+before->wide	GHSA-mwcg-wfq3-4gjc	npm	unclassified	steal	CWE-59,CWE-367	CVSS:4.0/AV:L/AC:H/AT:N/PR:L/UI:N/VC:L/VI:H/VA:H/SC:N/SI:N/SA:N
+before->wide	GHSA-p2fh-f5fc-44hr	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-p7fg-763f-g4gf	npm	unclassified	steal	CWE-732	CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-p8q8-jfcv-g2h2	Packagist	unclassified	steal	CWE-59	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N
+before->wide	GHSA-ph34-pc88-72gc	npm	unclassified	steal	CWE-732	CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-q66q-fx2p-7w4m	npm	unclassified	steal	CWE-59	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:N/VA:H/SC:H/SI:H/SA:H
+before->wide	GHSA-qc5j-2mqx-x83q	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:L/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->wide	GHSA-qcc4-p59m-p54m	npm	unclassified	steal	CWE-59,CWE-367	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-qfxx-c367-67f8	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+before->wide	GHSA-qjx3-2g35-6hv8	Packagist	unclassified	steal	CWE-276,CWE-280	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:H
+before->wide	GHSA-qp7v-gjgg-4mj6	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-qqq7-4hxc-x63c	npm	unclassified	steal	CWE-73,CWE-668	CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-r54r-wmmq-mh84	npm	unclassified	alter	CWE-59,CWE-367	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-r6g8-mq9v-cgp4	Packagist	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-r95r-rj6r-c39x	npm	unclassified	steal	CWE-367,CWE-732	CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:U/C:L/I:N/A:N
+before->wide	GHSA-rhc2-23c2-ww7c	Packagist	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H
+before->wide	GHSA-rmqr-h98c-qg2m	Packagist	unclassified	alter	CWE-73	CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->wide	GHSA-rwp6-7w3q-75fq	npm	unclassified	steal	CWE-276	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-vcgf-vmpc-ph79	Packagist	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-vg4f-8v9q-5c3x	Packagist	unclassified	alter	CWE-732	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->wide	GHSA-vqj9-vhg4-27mg	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-vr7j-g7jv-h5mp	npm	unclassified	steal	CWE-276,CWE-732	CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-vwc7-r8mq-g2x9	npm	unclassified	alter	CWE-59	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:N ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-w47m-jpv2-qfw5	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->wide	GHSA-w4rc-p66m-x6qq	Packagist	unclassified	alter	CWE-20,CWE-73	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:P
+before->wide	GHSA-wr23-m9m2-jjf4	Packagist	unclassified	steal	CWE-732	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->wide	GHSA-wr92-6w3g-2hwc	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->wide	GHSA-wrrr-8jcv-wjf5	npm	unclassified	alter	CWE-73	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:P
+before->wide	GHSA-x287-wcfc-q46c	npm	unclassified	steal	CWE-73	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N
+before->wide	GHSA-x2q9-r8gm-f657	Packagist	unclassified	steal	CWE-276	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+before->wide	GHSA-x36g-4629-xp9v	Packagist	unclassified	alter	CWE-73	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:H
+before->wide	GHSA-x82f-27x3-q89c	npm	unclassified	alter	CWE-59,CWE-367	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+before->wide	GHSA-xc9g-j69q-37xw	npm	unclassified	alter	CWE-73	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H
+before->wide	GHSA-xf7w-r453-m56c	npm	unclassified	alter	CWE-59	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+before->wide	GHSA-xhcr-j4j9-3gh7	npm	unclassified	steal	CWE-732	CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+before->wide	GHSA-xmc9-4f2h-jf9c	npm	unclassified	steal	CWE-73	CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+before->wide	GHSA-xq74-c7jx-8w5j	npm	unclassified	steal	CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:L/SC:H/SI:H/SA:L/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+before->wide	GHSA-xvgh-hmx8-9xxf	npm	unclassified	steal	CWE-59,CWE-362	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:H
+before->wide	GHSA-xwq4-2cwr-fv2q	Packagist	unclassified	steal	CWE-276	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-223g-f5mq-gw33	npm	unclassified	alter	CWE-287,CWE-347	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-25wf-7x6c-wmpf	Packagist	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-267c-6grr-h53f	npm	unclassified	steal	CWE-288	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-26hh-7cqf-hhc6	npm	unclassified	steal	CWE-288	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-275c-xpvc-jgfw	npm	unclassified	alter	CWE-613	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-27fv-rpgj-4c6m	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-287x-6r2h-f9mw	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-28gr-86hg-r48w	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+narrow->wide	GHSA-2ccf-ffrj-m4qw	npm	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-2cf5-4w76-r9qv	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:C/C:L/I:H/A:L
+narrow->wide	GHSA-2ff2-mx52-q8wp	Packagist	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-2fw4-mgq9-39cx	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-2g7v-hghf-grg4	npm	unclassified	steal	CWE-74,CWE-77	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-2gmp-34j9-fqjm	npm	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-2hjh-495w-hmxc	Packagist	unclassified	steal	CWE-307	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-2hpc-mf4q-j885	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-2j2x-hqr9-3h42	npm	unclassified	alter	CWE-601	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-2jq7-pgqq-gqqj	Packagist	unclassified	alter	CWE-287	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-2jxg-mv2m-j4r7	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-2mc2-g238-722j	npm	unclassified	alter	CWE-78,CWE-295	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-2mfj-r695-5h9r	Packagist	unclassified	steal	CWE-98	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-2p2x-p7wj-j5h2	npm	unclassified	alter	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-2pr2-hcv6-7gwv	npm	unclassified	steal	CWE-613	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-2qrv-rc5x-2g2h	npm	unclassified	alter	CWE-829	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-2qxp-xmx6-cq4f	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-2v2v-fx7r-f2fh	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-2vg4-rrx4-qcpq	Packagist	unclassified	steal	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-2w46-vq8h-98vh	Packagist	unclassified	alter	CWE-640	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:N/I:H/A:L
+narrow->wide	GHSA-2xwq-h7r9-6w27	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-322v-p3jc-7hrg	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-32gc-64m7-hj7v	npm	unclassified	steal	CWE-307,CWE-807	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-3534-xp88-25rc	npm	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:H/VA:N/SC:N/SI:H/SA:N
+narrow->wide	GHSA-3573-4c68-g8cc	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-35g4-qx3c-vjhx	npm	unclassified	steal	CWE-306	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-35g6-rrw3-v6xc	npm	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:H
+narrow->wide	GHSA-35p2-5vrh-m3p6	Packagist	unclassified	alter	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-3644-q5cj-c5c7	npm	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:L/A:N
+narrow->wide	GHSA-37v6-fxx8-xjmx	npm	unclassified	steal	CWE-294	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-3846-mfvc-xwpf	npm	unclassified	alter	CWE-78	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-38c7-23hj-2wgq	npm	unclassified	alter	CWE-290	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:L/SA:N
+narrow->wide	GHSA-38vf-35cg-m73w	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-3cqr-58rm-57f8	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:L/A:L
+narrow->wide	GHSA-3fqr-4cg8-h96q	npm	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:L
+narrow->wide	GHSA-3g43-6gmg-66jw	npm	alter	steal	CWE-94,CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:L
+narrow->wide	GHSA-3hmr-948v-5qgq	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-3hmw-8mw3-rmpj	npm	unclassified	alter	CWE-601	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-3j6m-m5v5-9785	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-3jc6-6r48-v6qf	npm	alter	steal	CWE-94,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-3m3q-x3gj-f79x	npm	unclassified	alter	CWE-287,CWE-290,CWE-345	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N ; CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-3mcp-6rv6-c69g	Packagist	unclassified	alter	CWE-434	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-3mv2-vmwh-rwfx	Packagist	unclassified	alter	CWE-306,CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-3p42-w5ch-gg42	Packagist	unclassified	alter	CWE-601	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:N/SI:L/SA:N
+narrow->wide	GHSA-3p87-gqw8-4pf2	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-3r78-rqg8-95gg	npm	unclassified	alter	CWE-294	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-3rxx-8f33-7p6p	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-3wrg-6mg5-jg2v	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-3x3m-p2wx-g7cw	Packagist	unclassified	steal	CWE-287	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-3x3w-vcjx-7796	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-3x57-m5p4-rgh4	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-3x93-p86w-5jvh	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-3xp3-pr8x-f755	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-3xxm-3g3c-w579	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-427q-jp8v-ww95	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-4323-f82v-f6jr	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-434m-5hcj-pxf3	npm	unclassified	steal	CWE-613	CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-43fc-v873-qw85	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-4449-hg37-77v8	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L
+narrow->wide	GHSA-44jh-23m7-hpcf	npm	unclassified	steal	CWE-307,CWE-362	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-44q4-354f-c826	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-45c3-c4c3-8rqg	npm	unclassified	steal	CWE-98	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-45m2-8q7f-93wv	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-45q2-34rf-mr94	npm	unclassified	alter	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-4685-c5cp-vp95	npm	unclassified	steal	CWE-78,CWE-184	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-47vg-483w-hp3m	Packagist	unclassified	alter	CWE-384	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-47ww-mq32-g4xw	Packagist	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-484f-743f-6jx2	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-48p3-xfvw-g59c	Packagist	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-49q3-8867-5wmp	npm	unclassified	steal	CWE-78,CWE-94	CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:C/C:H/I:L/A:L
+narrow->wide	GHSA-49qv-h8pm-73pf	Packagist	unclassified	steal	CWE-287	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-4c39-hj99-5h2r	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-4c9q-64gq-xhx4	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-4cj6-f32v-6hgx	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-4gc7-qcvf-38wg	npm	unclassified	alter	CWE-78,CWE-184	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:L/AC:H/AT:P/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N
+narrow->wide	GHSA-4gm4-c4mh-4p7w	Packagist	unclassified	steal	CWE-287,CWE-288	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-4hg8-92x6-h2f3	npm	unclassified	alter	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-4j8w-p6hv-3qxc	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-4jwp-vfvf-657p	npm	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-4jwx-78vx-gm6g	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-4m3v-q747-pc6h	npm	unclassified	alter	CWE-613	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-4q27-4rrq-fx95	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-4qx8-j9vh-2628	Packagist	unclassified	alter	CWE-384	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-4r8c-pj7x-m5jx	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-4r8q-gv9j-3xx6	Packagist	unclassified	alter	CWE-601	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-4rhm-m2fp-hx7q	Packagist	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:H/PR:H/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-4rwm-c5mj-wh7x	Packagist	unclassified	alter	CWE-20,CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-4v2w-h9jm-mqjg	npm	alter	steal	CWE-78,CWE-471	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:L/A:L
+narrow->wide	GHSA-4v37-24gm-h554	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:H/A:L
+narrow->wide	GHSA-4x3x-869w-xx3m	Packagist	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-4x6g-3cmx-w76r	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-527q-4wqv-g9wj	Packagist	unclassified	steal	CWE-94,CWE-1336	CVSS:3.1/AV:N/AC:H/PR:H/UI:R/S:C/C:L/I:L/A:L
+narrow->wide	GHSA-5297-wrrp-rcj7	Packagist	unclassified	alter	CWE-613	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-533p-cp2g-99wp	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-54px-mhwv-5v8x	npm	unclassified	steal	CWE-74,CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H
+narrow->wide	GHSA-55rj-x2vc-4whq	Packagist	unclassified	alter	CWE-306,CWE-347	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-56c9-xq5g-xrf9	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-56xx-pv88-2662	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-57m2-mpc7-gwgx	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-58h4-9m7m-j9m4	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N
+narrow->wide	GHSA-592m-4533-rxq9	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-597c-mh7m-48v7	Packagist	unclassified	alter	CWE-613	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-59f3-vp2f-mp9w	Packagist	unclassified	alter	CWE-306,CWE-347	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-59h8-w5q6-mfmp	npm	unclassified	alter	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-59qg-93jg-236f	Packagist	unclassified	steal	CWE-613	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-5c6w-f4w2-2grp	Packagist	unclassified	alter	CWE-287	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-5cvp-p7p4-mcx9	npm	unclassified	steal	CWE-288,CWE-306	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-5cvx-cwpx-9rjh	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-5cx4-w4fh-fr57	Packagist	unclassified	steal	CWE-307	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-5f53-522j-j454	npm	unclassified	steal	CWE-306	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:N/SA:N
+narrow->wide	GHSA-5fw9-fq32-wv5p	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-5g3j-89fr-r2vp	npm	unclassified	alter	CWE-78,CWE-88,CWE-400,CWE-1333	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-5gj7-jf77-q2q2	npm	unclassified	alter	CWE-426,CWE-428,CWE-829	CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:L/AC:H/AT:P/PR:H/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-5gqg-mqh5-2v39	npm	unclassified	alter	CWE-78	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N
+narrow->wide	GHSA-5gwx-wf9g-r5mx	npm	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-5h2c-8v84-qpvr	npm	alter	steal	CWE-15,CWE-78	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-5h3f-885m-v22w	npm	unclassified	alter	CWE-613	CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-5hc5-fxr9-5frc	Packagist	unclassified	alter	CWE-306	CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:N/I:H/A:H ; CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-5hm8-vh6r-2cjq	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:L
+narrow->wide	GHSA-5mvm-89c9-9gm5	npm	unclassified	alter	CWE-77,CWE-88	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-5p5w-j3g7-w4wv	npm	unclassified	steal	CWE-287	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N
+narrow->wide	GHSA-5p73-qg2v-383h	Packagist	unclassified	alter	CWE-294,CWE-327	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-5pm7-cp8f-p2c2	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-5q2p-3jg8-2m98	npm	unclassified	steal	CWE-77	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-5q6m-3h65-w53x	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-5r8w-66hq-rc39	Packagist	unclassified	alter	CWE-613	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-5rp4-cwgh-gvwq	npm	unclassified	alter	CWE-78	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-5rv2-vvmf-f7w8	Packagist	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-5vjq-5jmg-39xq	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:L/I:H/A:H
+narrow->wide	GHSA-5vwr-qchf-q4pf	npm	unclassified	steal	CWE-78,CWE-88	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:L/SI:L/SA:N
+narrow->wide	GHSA-5w8r-8pgj-5jmf	npm	unclassified	alter	CWE-287,CWE-322	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-5wjw-qjhm-v43h	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-5wqj-f379-6jh4	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-5x2w-37xf-7962	Packagist	unclassified	steal	CWE-306	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6263-x97c-c4gg	npm	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-62cx-5xj4-wfm4	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-62f6-h68r-3jpw	Packagist	unclassified	alter	CWE-384	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-63gr-g7jc-v8rg	npm	unclassified	steal	CWE-306	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6423-85cc-8gf6	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-64hg-93w9-fc35	Packagist	unclassified	alter	CWE-287,CWE-306	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-652h-xwhf-q4h6	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:L/A:N
+narrow->wide	GHSA-65p8-9433-jpcp	Packagist	unclassified	alter	CWE-1336	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-65v7-wg35-2qpm	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-663r-x48j-fg8p	npm	unclassified	alter	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-66gr-xrcf-8jpq	Packagist	unclassified	alter	CWE-601	CVSS:3.0/AV:N/AC:L/PR:L/UI:R/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-66rg-92q4-6m8q	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-67hj-8239-cmf5	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-698v-4r3x-3vcv	npm	unclassified	steal	CWE-78	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-699q-wcff-g9mj	Packagist	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:L/I:H/A:H
+narrow->wide	GHSA-69r2-2fg7-7hf9	npm	alter	steal	CWE-94,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6cgh-hjpw-q3gq	npm	unclassified	alter	CWE-287,CWE-347	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-6chf-hhqf-749c	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-6f58-j323-6472	Packagist	unclassified	steal	CWE-287,CWE-620	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-6f6r-m9pv-67jw	npm	unclassified	alter	CWE-78	CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:U/C:N/I:H/A:H
+narrow->wide	GHSA-6fxm-r8p3-mx5c	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6gf6-24h2-66j4	Packagist	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-6gwx-gw56-qhf7	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-6h7h-m7p5-hjqp	Packagist	unclassified	steal	CWE-288	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6h98-cf9g-vmg2	npm	unclassified	alter	CWE-290,CWE-345	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-6j9m-rp7m-3gfg	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-6jmh-9gqm-5xrx	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-6jr7-99pf-8vgf	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:L/A:L
+narrow->wide	GHSA-6mxw-2vhf-42g5	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6p8r-6m93-557f	npm	unclassified	steal	CWE-307,CWE-799	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N ; CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6pqm-xvfc-w7p4	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-6q8m-42qq-64r7	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-6qjh-p324-694f	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6rcw-ww3x-xqwm	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6rvw-7p8v-mjfq	Packagist	unclassified	steal	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-6v4m-fw66-8r4x	npm	unclassified	steal	CWE-78,CWE-155	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6v7p-5qcq-268c	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-6vx5-cg2p-7g5v	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-6w4x-gcx3-8p7v	Packagist	unclassified	alter	CWE-352,CWE-749	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-6wp6-22x5-rr3w	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:H/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-6x64-9x62-f2gx	npm	unclassified	steal	CWE-94	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:L
+narrow->wide	GHSA-72jf-5fg5-3cw3	Packagist	unclassified	alter	CWE-601	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:N/SI:L/SA:N
+narrow->wide	GHSA-733r-8xcp-w9mr	Packagist	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-752x-23hp-jmv6	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-75hx-xj24-mqrw	npm	unclassified	steal	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:H
+narrow->wide	GHSA-75w3-gmqx-993q	npm	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-77fc-4cv5-hmfr	Packagist	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-77qv-gh6f-pgh4	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-782p-5fr5-7fj8	npm	unclassified	steal	CWE-74,CWE-94	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-786w-p5pm-cvgh	Packagist	unclassified	steal	CWE-290	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-7cvw-wrj9-q5fp	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-7ffh-cjvg-fpr4	Packagist	unclassified	alter	CWE-434	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-7gwj-7fhm-vw4w	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:C/C:L/I:H/A:N
+narrow->wide	GHSA-7gxq-5qqc-v3fc	Packagist	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-7jp2-5h22-m432	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-7m6h-rg42-m449	Packagist	unclassified	alter	CWE-306	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-7mx2-7q8p-pgmw	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-7pr3-34rg-g53m	Packagist	unclassified	alter	CWE-434	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-7r3h-m5j6-3q42	npm	unclassified	alter	CWE-74,CWE-77	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:N/I:L/A:N
+narrow->wide	GHSA-7r5q-4qgx-v545	Packagist	unclassified	alter	CWE-352,CWE-749	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-7r79-mrp6-8mhq	Packagist	unclassified	alter	CWE-640	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-7rg4-266c-jqw6	Packagist	unclassified	alter	CWE-330,CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-7rpc-9m88-cf9w	Packagist	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:L/A:L
+narrow->wide	GHSA-7rv5-mrxv-xcr9	npm	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-7rvm-xjpp-63r9	npm	unclassified	steal	CWE-94,CWE-250,CWE-693	CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-7x2h-3v2v-24p9	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-7x97-j373-85x5	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:L/I:H/A:L
+narrow->wide	GHSA-8288-jpqp-95fx	npm	unclassified	steal	CWE-307	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-82gw-wqw6-r2cf	npm	unclassified	alter	CWE-78	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-83h6-22cp-f22w	Packagist	unclassified	steal	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-83rx-c8cr-6j8q	npm	unclassified	steal	CWE-829	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-842m-vp3r-qwwr	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-84fx-pwf3-7777	npm	unclassified	steal	CWE-74,CWE-77	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-84g9-w2xq-vcv6	npm	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-8535-hvm8-2hmv	Packagist	unclassified	steal	CWE-1336	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-866c-wwm5-4rj7	npm	unclassified	alter	CWE-294	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-8689-gm9g-jgr6	npm	unclassified	alter	CWE-294	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-86hp-qxqp-w9wv	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-8783-3wgf-jggf	npm	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:H
+narrow->wide	GHSA-87f9-hvmw-gh4p	npm	unclassified	steal	CWE-94	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:L
+narrow->wide	GHSA-88m2-j94x-v4fx	Packagist	unclassified	steal	CWE-20,CWE-502	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-88xj-97gf-7wpq	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-89gv-h8wf-cg8r	npm	unclassified	alter	CWE-601	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-89hr-6x2p-8xjv	npm	unclassified	steal	CWE-613	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-89r3-6x4j-v7wf	npm	unclassified	steal	CWE-294	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-8c3f-x5f9-6h62	npm	unclassified	steal	CWE-77,CWE-78	CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-8f24-v5vv-gm5j	npm	unclassified	alter	CWE-601	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-8fhh-hf9w-55p7	Packagist	unclassified	alter	CWE-287,CWE-697	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-8hc2-hvrc-x4qr	Packagist	unclassified	alter	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-8hxm-42v5-66hm	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-8j36-q8x7-pm6q	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-8jr5-6gvj-rfpf	npm	unclassified	steal	CWE-306,CWE-942	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:H/SC:N/SI:N/SA:N
+narrow->wide	GHSA-8m28-w6xg-35hw	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-8m5f-2xvp-2c8w	Packagist	unclassified	alter	CWE-640	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-8mf7-vv8w-hjr2	npm	unclassified	alter	CWE-78,CWE-693	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-8mv7-9c27-98vc	npm	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:L/SA:N
+narrow->wide	GHSA-8prq-2jr2-cm92	Packagist	unclassified	steal	CWE-307	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-8px5-2gfr-7ph6	npm	unclassified	alter	CWE-78	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:H/A:L ; CVSS:4.0/AV:L/AC:H/AT:N/PR:L/UI:N/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-8qm8-g55h-xmqr	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-8w7q-29mw-gf5c	npm	unclassified	steal	CWE-94,CWE-1336	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:L/A:L
+narrow->wide	GHSA-8wf2-3ggj-78q9	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-8whr-v3gm-w8h9	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:L/A:L
+narrow->wide	GHSA-8xv4-jj4h-qww6	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-928r-fm4v-mvrw	npm	unclassified	steal	CWE-74,CWE-434	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:L/A:L
+narrow->wide	GHSA-92ph-xm9v-cg3j	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-92xh-6x7v-4rmq	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:A/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-938f-5r4f-h65v	Packagist	unclassified	disrupt	CWE-502,CWE-915	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-93rg-2xm5-2p9v	npm	unclassified	steal	CWE-287	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-944x-pm95-3jpr	npm	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-94jp-7776-qj6q	npm	unclassified	steal	CWE-613	CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-94wq-87g6-8h77	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-96c6-m98x-hxjx	Packagist	unclassified	alter	CWE-384	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-96hh-8hx5-cpw7	Packagist	unclassified	steal	CWE-434	CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:P/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N/E:U
+narrow->wide	GHSA-96qm-hwhp-2rm8	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-97jw-gr4m-c5v8	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-984p-xq9m-4rjw	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-98qf-jvwj-2r5f	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-99w8-c5f6-96pp	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-99wg-vmvq-2cp5	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-9ff2-p842-45wq	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-9g95-48c6-r778	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-9hq9-cr36-4wpj	Packagist	unclassified	alter	CWE-351,CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-9jcx-v3wj-wh4m	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-9m65-766c-r333	npm	unclassified	alter	CWE-502,CWE-843	CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-9prm-jqwx-45x9	npm	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N
+narrow->wide	GHSA-9pw5-wx67-q964	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-9qvw-fhj2-xqmv	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-9r75-g2cr-3h76	npm	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-9v5m-39wh-5chq	Packagist	unclassified	alter	CWE-290	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-9v78-h226-2rmq	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-9wmw-9wph-2vwp	npm	unclassified	steal	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-9wwp-q7wq-jx35	npm	unclassified	steal	CWE-613	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:N/A:N
+narrow->wide	GHSA-9wxg-vf3r-56hc	npm	unclassified	alter	CWE-94,CWE-116	CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-9x76-mp7r-2xc5	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-9xx5-cv6j-x533	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-c2px-jcgw-9x57	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-c37p-4qqg-3p76	npm	unclassified	alter	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-c3x7-gjmx-r2ff	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-c4wx-3x5q-hf4w	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:H
+narrow->wide	GHSA-c4xj-x7p8-3x7q	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-c54w-7j5f-xg98	npm	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N
+narrow->wide	GHSA-c7vg-w8q8-c3wf	Packagist	unclassified	steal	CWE-384	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-c7x2-7h8r-jq4m	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-c94v-8fff-73ph	npm	unclassified	steal	CWE-829	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-cg23-qf8f-62rr	Packagist	unclassified	steal	CWE-287,CWE-289	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-cg57-p69r-3m7p	npm	unclassified	steal	CWE-74,CWE-434	CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-cg6c-q2hx-69h7	npm	unclassified	alter	CWE-294	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-cg8w-5jrc-675g	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-cj7v-w2c7-cp7c	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-cjfr-9f5r-3q93	Packagist	unclassified	alter	CWE-352,CWE-749	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-cjp8-vv38-p3g2	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-cm8v-2vh9-cxf3	npm	unclassified	steal	CWE-78,CWE-184	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:H/A:N ; CVSS:4.0/AV:L/AC:H/AT:N/PR:L/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-cpqc-g4r8-6hxg	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-cq77-8jpx-892g	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-cvrm-5hp6-h523	Packagist	unclassified	alter	CWE-601	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N
+narrow->wide	GHSA-cwpp-5962-q4f6	npm	unclassified	alter	CWE-78,CWE-184	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-cxv7-6jgf-7gwf	Packagist	unclassified	steal	CWE-798	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-f339-246p-wwjp	Packagist	unclassified	steal	CWE-306	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-f55r-8rcv-mqcf	Packagist	unclassified	steal	CWE-613	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-f6gv-hh8j-q8vq	npm	unclassified	alter	CWE-94	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-f6ww-vqw2-xp3v	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-f794-r6xc-hf3v	npm	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-f8ff-652m-j5rx	Packagist	unclassified	steal	CWE-98	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-f9wg-5f46-cjmw	npm	unclassified	steal	CWE-290,CWE-601	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:H/I:N/A:N
+narrow->wide	GHSA-ff98-w8hj-qrxf	npm	unclassified	alter	CWE-78	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-ffpg-gm3h-4p5p	Packagist	unclassified	alter	CWE-601,CWE-644	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:H/VA:N/SC:N/SI:H/SA:N/E:P
+narrow->wide	GHSA-ffw8-fwxp-h64w	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:L
+narrow->wide	GHSA-fg3m-vhrr-8gj6	npm	unclassified	alter	CWE-78	CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-fh7r-58q4-6387	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N
+narrow->wide	GHSA-fhvv-p968-6vvj	Packagist	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-fj4g-2p96-q6m3	npm	unclassified	alter	CWE-306	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-fj59-f6c3-3vw4	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:N/A:N
+narrow->wide	GHSA-fmqq-hw9m-448q	Packagist	unclassified	alter	CWE-502	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-fmr2-m7gc-577w	Packagist	unclassified	alter	CWE-640	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-fpr8-4wvx-j9q3	npm	unclassified	steal	CWE-77,CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-fq4p-86hh-42v9	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N
+narrow->wide	GHSA-fq4x-789w-jg5h	npm	unclassified	alter	CWE-306	CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-frqg-7g38-6gcf	Packagist	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:L/A:N
+narrow->wide	GHSA-g2mg-cgr6-vmv7	Packagist	unclassified	steal	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-g3h8-cg9x-47qw	Packagist	unclassified	alter	CWE-434	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-g3mx-8jm6-rc85	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-g3xf-85wc-45gq	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-g4c9-f287-64xg	npm	unclassified	steal	CWE-74,CWE-94	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-g4gm-pxh3-29fq	Packagist	unclassified	alter	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-g6vq-wc8w-4g69	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-g72g-r7m4-9x4g	npm	unclassified	alter	CWE-613	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-g777-crp9-m27g	npm	unclassified	steal	CWE-798	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-g7cr-9h7q-4qxq	npm	unclassified	alter	CWE-289	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-g7r3-jwhw-2wfv	Packagist	unclassified	steal	CWE-613	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-g8mr-fgfg-5qpc	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N
+narrow->wide	GHSA-g8pg-33v4-9r96	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-g9g6-gvq9-j4vp	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-gc8w-x73w-p4rh	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-gcxp-xg77-798j	Packagist	unclassified	steal	CWE-20,CWE-502	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:P/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-gf2c-93hm-r9j5	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-gfvf-2f25-f34r	Packagist	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:L/A:N
+narrow->wide	GHSA-ggm6-h3mx-cmmp	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:N ; CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-ghcm-xqfw-q4vr	npm	unclassified	steal	CWE-94	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:L
+narrow->wide	GHSA-ghcv-22jf-vfxm	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-gjvc-55fw-v6vq	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-gvvx-fc6p-2h9x	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-gwfr-jfjf-92vv	Packagist	unclassified	steal	CWE-20,CWE-502	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-gxrg-x694-283w	Packagist	unclassified	steal	CWE-1336	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-gxwx-c7m8-f95h	Packagist	unclassified	alter	CWE-601	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-h36m-2vh5-x699	npm	unclassified	alter	CWE-78	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:L/AC:H/AT:N/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-h4xc-577p-hgj9	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-h5cw-625j-3rxh	npm	unclassified	alter	CWE-346,CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-h5gm-x9wr-vhcm	Packagist	unclassified	steal	CWE-307	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-h698-r4hm-w94p	npm	unclassified	steal	CWE-287	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-h6jh-cf83-qcq5	Packagist	unclassified	steal	CWE-94	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:H/A:N
+narrow->wide	GHSA-h8gr-qwr6-m9gx	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-hff7-ccv5-52f8	npm	unclassified	alter	CWE-290	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-hfrv-h3q8-9jpr	npm	unclassified	disrupt	CWE-502	CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+narrow->wide	GHSA-hhpq-7wg4-36jm	Packagist	unclassified	alter	CWE-601	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-hjfh-5jmm-xr24	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-hjhp-hwfj-hwf3	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-hm42-q32m-vj4f	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:N/I:H/A:L
+narrow->wide	GHSA-hm92-vgmw-qfmx	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-hp8h-7x69-4wmv	npm	unclassified	steal	CWE-613	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-hqgj-4396-hmxv	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-hqxf-mhfw-rc44	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-hv79-p62r-wg3p	Packagist	unclassified	steal	CWE-74,CWE-94	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:L/A:L
+narrow->wide	GHSA-hvp3-26wx-g2w4	npm	unclassified	alter	CWE-613	CVSS:4.0/AV:N/AC:H/AT:N/PR:H/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-hxg2-5c8p-ppwm	Packagist	unclassified	alter	CWE-20,CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-j27g-r58q-624w	Packagist	unclassified	alter	CWE-640	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-j32x-j8pj-pg2h	npm	alter	steal	CWE-94,CWE-400,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H
+narrow->wide	GHSA-j3f9-p6hm-5w6q	Packagist	unclassified	steal	CWE-98	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-j586-cj67-vg4p	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-j59f-6m4q-62h6	npm	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-j5jh-hpr4-h332	Packagist	unclassified	steal	CWE-384	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-j5rc-cr5w-vfg6	Packagist	unclassified	alter	CWE-287,CWE-384	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-j665-rvj7-2jv9	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L
+narrow->wide	GHSA-j6c7-3h5x-99g9	npm	unclassified	alter	CWE-78	CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-j837-vm6w-6qcv	Packagist	unclassified	alter	CWE-434	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-j8g6-5gqc-mq36	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:H/A:N
+narrow->wide	GHSA-j8g8-j7fc-43v6	npm	unclassified	alter	CWE-434	CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-j8gj-9rm5-4xhx	Packagist	unclassified	alter	CWE-290	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-j9cw-5cpj-9qj5	Packagist	unclassified	alter	CWE-912	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-j9f8-8h89-j69x	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-j9wj-m24m-7jj6	npm	unclassified	alter	CWE-77	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-jf6p-4hgv-v6qh	Packagist	unclassified	alter	CWE-80	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-jff2-qjw8-5476	npm	unclassified	steal	CWE-77,CWE-78	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:L/A:H
+narrow->wide	GHSA-jg2j-2w24-54cg	Packagist	unclassified	steal	CWE-1336	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:N/A:N
+narrow->wide	GHSA-jgmv-j7ww-jx2x	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-jh5r-qr3c-85q8	Packagist	unclassified	alter	CWE-80	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-jh66-rjx8-8qqc	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-jhm7-29pj-4xvf	npm	unclassified	steal	CWE-307,CWE-1289	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-jmmg-jqc7-5qf4	npm	unclassified	alter	CWE-287,CWE-307,CWE-346	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:L/AC:H/AT:P/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-jmmp-vh96-78rm	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-jqmq-fpwv-p925	Packagist	unclassified	steal	CWE-288	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-jqxr-vjvv-899m	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:A/AC:L/PR:L/UI:R/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-jrvm-mcxc-mf6m	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-jv6r-mj9p-9xff	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-jw8g-5j46-44rp	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-jwvf-28fg-g4xg	Packagist	unclassified	steal	CWE-94,CWE-116	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-jxgr-3v7q-3w9v	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-m2cq-xjgm-f668	npm	unclassified	steal	CWE-306	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:H/SI:N/SA:N
+narrow->wide	GHSA-m2m6-cff5-3w7c	npm	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-m2wj-r6g3-fxfx	Packagist	unclassified	alter	CWE-384	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-m39p-34qh-rh3w	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-m492-gv72-xvxj	Packagist	unclassified	alter	CWE-640	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-m57p-p67h-mq74	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-m5q3-mvcr-gc5m	Packagist	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-m8fm-mv5w-33pv	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-m958-864j-xq5w	npm	unclassified	steal	CWE-294	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-m97f-x4mr-4x3q	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-m9hv-qmqh-33qh	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-mcxq-54f4-mmx5	Packagist	unclassified	steal	CWE-20,CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-mfr9-pcm3-6mwc	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-mfwh-5m23-j46w	npm	unclassified	steal	CWE-20,CWE-77	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:L/I:N/A:N
+narrow->wide	GHSA-mg2g-8pwj-r2j2	Packagist	unclassified	alter	CWE-287,CWE-288	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-mhvf-j94g-3qp7	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-mm4f-47ch-f7hx	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-mpq2-mv8p-9wm6	Packagist	unclassified	alter	CWE-352,CWE-1275	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-mq59-m269-xvcx	npm	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-mqh4-2mm8-g7w9	Packagist	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L
+narrow->wide	GHSA-mqpr-49jj-32rc	npm	unclassified	alter	CWE-290	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:L/SA:N
+narrow->wide	GHSA-mqqj-fx8h-437j	Packagist	unclassified	alter	CWE-305,CWE-791	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-mqxh-6gq7-558m	npm	unclassified	steal	CWE-829	CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-mr32-vwc2-5j6h	npm	unclassified	steal	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-mv9j-8jvg-j8mr	npm	unclassified	alter	CWE-294	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-mvw6-62qv-vmqf	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-mx25-j3rc-6w2w	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:N/I:H/A:L
+narrow->wide	GHSA-mxjr-xmcg-fg7w	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-p2c4-gxp4-j3xp	npm	unclassified	disrupt	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L
+narrow->wide	GHSA-p2ch-c2c3-4xm5	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:N/I:H/A:H
+narrow->wide	GHSA-p2x3-8689-cwpg	npm	unclassified	steal	CWE-306	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-p493-635q-r6gr	npm	unclassified	alter	CWE-74,CWE-94	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-p4pj-9g59-4ppv	Packagist	unclassified	alter	CWE-74,CWE-917	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-p4wh-cr8m-gm6c	npm	unclassified	alter	CWE-184,CWE-829	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L ; CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-p523-jrph-qjc6	Packagist	unclassified	steal	CWE-613	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-p5h2-vr99-xm99	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-p68j-q8j9-jwf5	npm	unclassified	alter	CWE-613	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-p68q-wchp-6fh7	npm	unclassified	steal	CWE-288	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-p696-gf58-9w97	Packagist	unclassified	alter	CWE-306	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-p6c5-mjgj-m4rm	npm	unclassified	steal	CWE-434	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-p6mr-xf3r-ghq4	npm	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-p6rm-483j-37jf	npm	unclassified	steal	CWE-77,CWE-78	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-p853-83gj-wjj3	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:L/I:H/A:H
+narrow->wide	GHSA-p8gp-899c-jvq9	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-pcw7-5633-82vv	npm	unclassified	steal	CWE-434,CWE-693	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-pf38-v6qj-j23h	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-pfj7-w373-gqch	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-pfv7-rr5m-qmv6	npm	unclassified	alter	CWE-306	CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-pgcc-vfmc-7cw5	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-pgj4-g5j4-cmfx	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:L
+narrow->wide	GHSA-ph84-r98x-2j22	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-ph86-p8f6-f9r2	Packagist	unclassified	alter	CWE-290	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-pj27-2xvp-4qxg	npm	unclassified	steal	CWE-613	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:N/A:N
+narrow->wide	GHSA-pjr6-jx7r-j4r6	npm	unclassified	alter	CWE-613	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-pm52-wwrw-c282	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N
+narrow->wide	GHSA-pmm3-68q9-57jg	npm	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-ppjq-qxhx-m25f	npm	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-pq8p-wc4f-vg7j	Packagist	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-pqr6-3j58-9w58	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-px8v-hxxx-2rgh	Packagist	unclassified	steal	CWE-74,CWE-94	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:L
+narrow->wide	GHSA-q22j-5r3g-9hmh	Packagist	unclassified	alter	CWE-94	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-q2cv-94xm-qvg4	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-q58j-g3f4-h26h	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+narrow->wide	GHSA-q6v4-xjp2-8ggv	Packagist	unclassified	steal	CWE-94	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-q745-cfqh-hcrw	Packagist	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-q75c-4gmv-mg9x	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-q765-wm9j-66qj	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-q768-x9m6-m9qp	npm	unclassified	alter	CWE-93,CWE-346,CWE-601	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-q938-ghwv-8gvc	Packagist	unclassified	alter	CWE-290	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-qchr-8m24-7v66	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N
+narrow->wide	GHSA-qcjg-hvg6-hxcp	Packagist	unclassified	steal	CWE-434	CVSS:3.0/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:L
+narrow->wide	GHSA-qf6m-6m4g-rmrc	Packagist	unclassified	alter	CWE-306	CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:N/I:H/A:H ; CVSS:4.0/AV:L/AC:H/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N
+narrow->wide	GHSA-qgp8-v765-qxx9	npm	unclassified	alter	CWE-287	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-qhc7-xhc2-7p7w	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-qhr7-v3xp-vw9m	Packagist	unclassified	alter	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-qhrx-hcm6-pmrw	Packagist	unclassified	alter	CWE-502	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-qj94-6rx6-27fr	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-qjg4-w4c6-f6c6	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-qp42-5pj7-4ccm	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-qq45-cqhg-jwx5	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-qr95-4mq5-r3fh	Packagist	unclassified	alter	CWE-502	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-qrgf-9gpc-vrxw	npm	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-qv4x-v2v4-f8p9	Packagist	unclassified	alter	CWE-80	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H
+narrow->wide	GHSA-qw36-p97w-vcqr	Packagist	unclassified	steal	CWE-384	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-qwmf-95r9-gx9x	npm	unclassified	steal	CWE-290	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-qwww-vcr4-c8h2	npm	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-qwx7-39pw-2mhr	Packagist	unclassified	alter	CWE-352,CWE-749	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-r23f-c2j5-rx2f	Packagist	unclassified	steal	CWE-98,CWE-829	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-r2vw-p77f-vc27	Packagist	unclassified	alter	CWE-384	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-r385-c5fc-x56c	npm	unclassified	steal	CWE-74,CWE-1336	CVSS:3.1/AV:P/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-r399-636x-v7f6	npm	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N
+narrow->wide	GHSA-r3c9-9j5q-pwv4	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-r3hf-q3mf-7h6w	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-r48r-j8fx-mq2c	npm	unclassified	alter	CWE-287,CWE-322	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-r557-wffq-wvrc	npm	unclassified	alter	CWE-601	CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:L/SA:N
+narrow->wide	GHSA-r657-33vp-gp22	npm	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-r657-3wqh-g2x9	Packagist	unclassified	steal	CWE-798	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:N
+narrow->wide	GHSA-r6fw-8m27-43c9	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-r6wx-627v-gh2f	npm	unclassified	steal	CWE-80	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-r87w-47m8-22w3	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-r899-h629-j84r	npm	unclassified	steal	CWE-434	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:N
+narrow->wide	GHSA-r8vr-m544-qh4h	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-r9q5-c7qc-p26w	npm	unclassified	alter	CWE-294	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-rc4q-9m69-gqp8	npm	unclassified	alter	CWE-352,CWE-565	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-rcm4-jv5g-wccm	Packagist	unclassified	alter	CWE-613	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-rf4q-m23c-7q8r	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-rgmp-4873-r683	Packagist	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-rgr9-r7mj-mf6x	npm	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-rh46-3fgc-mvrf	npm	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-rh7v-6w34-w2rr	npm	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:N
+narrow->wide	GHSA-rh9j-f5f8-rvgc	npm	unclassified	alter	CWE-287,CWE-295	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-rj44-gpjc-29r7	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-rmxw-jxxx-4cpc	npm	unclassified	steal	CWE-287,CWE-290	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-rp2c-jrgp-cvr8	npm	unclassified	steal	CWE-75,CWE-434	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-rq42-58qf-v3qx	Packagist	unclassified	steal	CWE-307,CWE-770	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-rqgv-292v-5qgr	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-rqvj-fc2x-99q6	Packagist	unclassified	alter	CWE-307	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-rv3q-xmfw-mcjv	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-rv89-wch8-c574	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-rvgm-35jw-q628	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-rw74-vc9h-534j	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-rwpg-4c4c-v3r4	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-rxc9-f2x6-qh4w	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-rxj3-rrwm-pj4r	Packagist	unclassified	alter	CWE-502	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-v45m-hxqp-fwf5	Packagist	unclassified	steal	CWE-1336	CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-v4cr-m5f8-gxw8	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-v5w9-prxf-w882	npm	unclassified	alter	CWE-287	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-v68g-62v9-39w5	Packagist	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-v6f4-jwv9-682w	Packagist	unclassified	steal	CWE-20,CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-v797-hfv8-v2xm	Packagist	unclassified	alter	CWE-384	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-v7c7-658v-hh7v	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-v8x7-r927-cc93	npm	unclassified	steal	CWE-434	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:N
+narrow->wide	GHSA-v923-w3x8-wh69	npm	unclassified	steal	CWE-384	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:L
+narrow->wide	GHSA-vc7j-h8xg-fv5x	npm	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:N/A:N
+narrow->wide	GHSA-vf3q-frmr-vrr9	Packagist	unclassified	steal	CWE-94,CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-vf7h-6246-hm43	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-vg2g-698h-v9w3	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:L
+narrow->wide	GHSA-vg3j-hpm9-8v5v	Packagist	unclassified	steal	CWE-287,CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-vh4h-fvqf-q9wv	npm	unclassified	alter	CWE-287	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:Amber
+narrow->wide	GHSA-vm67-7vmg-66vm	npm	unclassified	steal	CWE-77,CWE-78	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-vmfm-ch9h-5c7g	npm	unclassified	alter	CWE-307	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-vmqv-hx8q-j7mg	npm	unclassified	steal	CWE-94,CWE-829	CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:L/I:H/A:L
+narrow->wide	GHSA-vpwh-qmwc-2phg	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-vq9x-w82r-rhmc	Packagist	unclassified	alter	CWE-307	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-vrf4-mx87-p53w	npm	unclassified	alter	CWE-290,CWE-345	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:L
+narrow->wide	GHSA-vrm6-c878-fpq6	Packagist	unclassified	alter	CWE-94	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-vvh2-82c7-ppfg	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-vvvv-983w-r7pv	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-vxh4-x6gv-mphf	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-w267-m9c4-8555	Packagist	unclassified	steal	CWE-613	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-w2f4-hxpm-mq98	Packagist	unclassified	steal	CWE-434	CVSS:3.0/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:L/A:H
+narrow->wide	GHSA-w2fr-65vp-mxw3	Packagist	unclassified	steal	CWE-502	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:N
+narrow->wide	GHSA-w2g4-g8xr-px4x	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-w392-68rg-pgg4	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-w3mq-67mw-3p9f	Packagist	unclassified	alter	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-w4m6-x6c2-j5c9	npm	unclassified	alter	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-w6f4-3v35-qjhj	npm	unclassified	alter	CWE-77,CWE-436	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:N/I:H/A:H ; CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:A/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-w6jr-wj64-mc9x	Packagist	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:H/A:H
+narrow->wide	GHSA-w73r-8mm4-cfvf	npm	unclassified	steal	CWE-287,CWE-306	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-w7x8-q2gp-5cgg	npm	unclassified	steal	CWE-94	CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:L/VA:N/SC:H/SI:L/SA:N
+narrow->wide	GHSA-w8cj-mvf9-mpc9	Packagist	unclassified	alter	CWE-78	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-w9j9-w4cp-6wgr	npm	unclassified	alter	CWE-78	CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-wfm2-rq5g-f8v5	npm	unclassified	alter	CWE-288	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-wfv7-5x33-v22h	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-wg24-9xm9-593v	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-wh69-wc6q-7888	npm	unclassified	alter	CWE-77,CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:N
+narrow->wide	GHSA-wjg9-v8cf-f5q2	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:H/A:H
+narrow->wide	GHSA-wjqw-r9x4-j59v	npm	unclassified	alter	CWE-287	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-wjrj-jc3w-ppfw	Packagist	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-wjv8-pxr6-5f4r	Packagist	unclassified	steal	CWE-502	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-wm25-49w3-5qrg	Packagist	unclassified	alter	CWE-330,CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:H
+narrow->wide	GHSA-wm7g-rmgg-9837	Packagist	unclassified	alter	CWE-287	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H
+narrow->wide	GHSA-wmx7-pw49-88jx	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:N/I:H/A:N ; CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:P/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-wp68-xrfg-xvq4	Packagist	unclassified	alter	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:P/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-wppf-gqj5-fc4f	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N
+narrow->wide	GHSA-wpvm-wqr4-p7cw	npm	unclassified	disrupt	CWE-829	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H
+narrow->wide	GHSA-ww7h-g2qf-7xv6	Packagist	unclassified	alter	CWE-352,CWE-749	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-wwfj-h843-3hrq	npm	unclassified	steal	CWE-98	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-wwg8-6ffr-h4q2	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-wwrj-3hvj-prpm	npm	unclassified	alter	CWE-307,CWE-1188	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-wx4p-jr66-jfp9	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-wxfg-253g-m7r4	Packagist	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-wxq7-x3qp-vcr8	npm	unclassified	alter	CWE-185,CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-wxw3-q3m9-c3jr	npm	unclassified	alter	CWE-287,CWE-345,CWE-352	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-x28w-hvwc-mp75	Packagist	unclassified	steal	CWE-94,CWE-96	CVSS:3.0/AV:N/AC:H/PR:L/UI:N/S:C/C:L/I:L/A:H
+narrow->wide	GHSA-x2pw-9c38-cp2j	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-x3cf-w64x-4cp2	Packagist	unclassified	steal	CWE-434	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-x44x-r84w-8v67	npm	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+narrow->wide	GHSA-x45j-jq9q-gf3q	Packagist	unclassified	steal	CWE-287	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N
+narrow->wide	GHSA-x4rj-f7m6-42c3	Packagist	unclassified	alter	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-x4vh-j75g-268g	npm	unclassified	alter	CWE-613	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+narrow->wide	GHSA-x5gv-jw7f-j6xj	npm	unclassified	steal	CWE-78	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-x645-6pf9-xwxw	Packagist	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:L/A:L
+narrow->wide	GHSA-x6v2-xmrq-574j	Packagist	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:L/A:N
+narrow->wide	GHSA-x8rx-789c-2pxq	npm	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:H
+narrow->wide	GHSA-x9hc-rw35-f44h	npm	unclassified	steal	CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-xc68-rrqc-qgq3	npm	unclassified	steal	CWE-74,CWE-77	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+narrow->wide	GHSA-xc7w-v5x6-cc87	npm	unclassified	alter	CWE-306	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N ; CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-xcj9-5m2h-648r	npm	unclassified	steal	CWE-94	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:L
+narrow->wide	GHSA-xcq3-7pf3-5jvc	Packagist	unclassified	steal	CWE-98	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:H/A:H
+narrow->wide	GHSA-xf27-jqwv-gf3r	npm	unclassified	alter	CWE-829	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-xffp-6w68-4775	Packagist	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-xfxf-qw26-hr33	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+narrow->wide	GHSA-xg76-5qj2-2hhv	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:L
+narrow->wide	GHSA-xg8v-m2mh-45m6	npm	unclassified	alter	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-xj25-753j-wgp9	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-xj9w-cgqg-q897	Packagist	unclassified	steal	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-xjg6-5v39-v7fc	Packagist	unclassified	alter	CWE-352	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+narrow->wide	GHSA-xjp4-6w75-qrj7	Packagist	unclassified	steal	CWE-20,CWE-94	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:H/A:H
+narrow->wide	GHSA-xmgr-jff3-fcfv	Packagist	unclassified	alter	CWE-384	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-xp68-7g33-f49m	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-xph5-278p-26qx	npm	unclassified	alter	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+narrow->wide	GHSA-xpr4-8vp6-c87j	Packagist	unclassified	alter	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N
+narrow->wide	GHSA-xqv9-qr76-hfq2	npm	unclassified	steal	CWE-77	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P
+narrow->wide	GHSA-xrgv-34cc-q765	npm	unclassified	alter	CWE-78	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:H/A:L ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+narrow->wide	GHSA-xrmj-5g4g-8987	npm	unclassified	steal	CWE-1336	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N
+narrow->wide	GHSA-xvhf-x56f-2hpp	npm	unclassified	steal	CWE-78	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+narrow->wide	GHSA-xxqw-83c7-r24r	Packagist	unclassified	steal	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X

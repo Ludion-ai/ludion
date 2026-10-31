@@ -268,3 +268,4 @@
 0059cb3	fail	1	npm: a flag that is not true accepted
 0059cb3	fail	1	npm: inBundle counted as a flag
 0059cb3	fail	1	npm: an entry whose flags alone changed compared with the registry again
+ddef04c	fail	18	a parent other than the base accepted

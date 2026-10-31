@@ -20,6 +20,15 @@ export function phpFixPublished(scan: Scan): FixPublished {
   return { at: at.toISOString(), note: `php.net's release date of PHP ${first.version}, the first security release newer than the Dockerfile's version. php.net gives a day only; recorded as 00:00 UTC that day.` };
 }
 
+/** Node.js: nodejs.org's index date of the first security release of the line newer than the Dockerfile's version. */
+export function nodeFixPublished(scan: Scan): FixPublished {
+  const first = [...scan.security_releases].sort((a, b) => compare(a.version, b.version))[0];
+  if (!first) return { at: null, note: "Not found: nodejs.org lists no security release of the line newer than the Dockerfile's version." };
+  const at = /^\d{4}-\d{2}-\d{2}$/.test(first.date) ? new Date(`${first.date}T00:00:00.000Z`) : null;
+  if (!at || Number.isNaN(at.getTime()) || at.toISOString().slice(0, 10) !== first.date) return { at: null, note: `Not read: nodejs.org's date for Node.js ${first.version} is not in the form "2026-10-21".` };
+  return { at: at.toISOString(), note: `nodejs.org's release date of Node.js ${first.version}, the first security release of the line newer than the Dockerfile's version. nodejs.org gives a day only; recorded as 00:00 UTC that day.` };
+}
+
 /** npm and Composer: the registry's publish time of each planned version; the latest of them, when a fix has several. */
 export async function dependencyFixPublished(ecosystem: Ecosystem, changes: Change[], fetchFn: typeof fetch = fetch): Promise<FixPublished> {
   if (ecosystem === "maven") return { at: null, note: "Not read: Ludion does not read Maven Central's publish times yet." };

@@ -1,0 +1,149 @@
+# at commit ba04725e8c0b8b56a23501c515bed0b02cd43445, 0 files differing from it
+# started 2026-10-30T19:09:36Z, node v24.22.1, git version 2.39.5, Docker version 27.5.1, build 9f9e405
+npm ci exit 0
+build exit 0
+== case node
+base 4f961cfbb83defc9f6f17a93a36c6275703540fe
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 20f5ef08-d8df-4e9a-be38-36d05a3a3213: outcome applied, base 4f961cfbb83defc9f6f17a93a36c6275703540fe
+  digests: old node@sha256:e4bf2a82ad0a4037d28035ae71529873c069b13eb0455466ae0bc13363826e34 new node@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914; baseline_passed true candidate_passed true; security releases 22.23.4, 22.23.2, 22.23.0, 22.22.2
+  node 22.22.0 -> 22.23.4: applied ludion/node/22.23.4 ad2b763b9d65f382c6a3c24fd460a21568a58944 published=2026-03-24T00:00:00.000Z found=2026-10-30T19:09:47.496Z applied=2026-10-30T19:09:52.905Z
+Packed 1 applied fix into /e/node/artifact1.
+pack exit 0
+  775 bytes fixes.bundle
+  2491 bytes receipt.json
+  head ad2b763b9d65f382c6a3c24fd460a21568a58944 refs/heads/ludion/node/22.23.4
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 20f5ef08-d8df-4e9a-be38-36d05a3a3213 on 4f961cfbb83d: 1 applied fix.
+  node (ludion/node/22.23.4): opened #1
+open exit 0
+-- origin's branches:
+  ludion/node/22.23.4 ad2b763b9d65f382c6a3c24fd460a21568a58944
+  main 4f961cfbb83defc9f6f17a93a36c6275703540fe
+  ludion/node/22.23.4: parent 4f961cfbb83defc9f6f17a93a36c6275703540fe changes Dockerfile 
+    Dockerfile: FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 85c8f9c1-ed2d-41f6-ae64-88d9a8b0273a: outcome applied, base 4f961cfbb83defc9f6f17a93a36c6275703540fe
+  digests: old node@sha256:e4bf2a82ad0a4037d28035ae71529873c069b13eb0455466ae0bc13363826e34 new node@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914; baseline_passed true candidate_passed true; security releases 22.23.4, 22.23.2, 22.23.0, 22.22.2
+  node 22.22.0 -> 22.23.4: applied ludion/node/22.23.4 c4654360d7c718c415e05ea31d678d00c8ba2e01 published=2026-03-24T00:00:00.000Z found=2026-10-30T19:09:54.548Z applied=2026-10-30T19:10:00.085Z
+Packed 1 applied fix into /e/node/artifact2.
+pack exit 0
+  775 bytes fixes.bundle
+  2491 bytes receipt.json
+  head c4654360d7c718c415e05ea31d678d00c8ba2e01 refs/heads/ludion/node/22.23.4
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 85c8f9c1-ed2d-41f6-ae64-88d9a8b0273a on 4f961cfbb83d: 1 applied fix.
+  node (ludion/node/22.23.4): open_pr_exists #1
+open exit 0
+-- origin's branches:
+  ludion/node/22.23.4 ad2b763b9d65f382c6a3c24fd460a21568a58944
+  main 4f961cfbb83defc9f6f17a93a36c6275703540fe
+  ludion/node/22.23.4: parent 4f961cfbb83defc9f6f17a93a36c6275703540fe changes Dockerfile 
+    Dockerfile: FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
+-- PRs in the stand-in:
+  #1 open ludion/node/22.23.4 -> main: ludion: Node.js 22.22.0 -> 22.23.4 in Dockerfile
+  API calls: 6; POST: 1
+-- body of PR #1:
+  | <!-- ludion-fix -->
+  | **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
+  | 
+  | Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit `4f961cfbb83d`. This PR holds that one fix (one commit).
+  | 
+  | | | |
+  | |---|---|
+  | | Package | `node` (node) |
+  | | Change | `22.22.0` → `22.23.4` |
+  | | Advisories | nodejs.org's security release (no advisory ID read) |
+  | | Fix published | `2026-03-24T00:00:00.000Z` (nodejs.org's release day of the first newer security release of the line, at 00:00 UTC) |
+  | | Found | `2026-10-30T19:09:47.496Z` (this run's lookup; an earlier run may have seen it first) |
+  | | Branch made | `2026-10-30T19:09:52.905Z` |
+  | | Receipt | `20f5ef08-d8df-4e9a-be38-36d05a3a3213` (in this run's ludion-fixes artifact) |
+  | 
+  | The times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.
+  | 
+  | **What was checked**
+  | 
+  | - By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
+  | - This commit changes only `Dockerfile`, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag.
+  | - Node.js image updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.
+  | 
+  | **Not checked**
+  | 
+  | - Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
+  | - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
+  | - Production: nothing is deployed.
+== case php
+base 410c6fb672b5667e964bc08564bec7e2b87a983c
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt f0e46803-00f3-46e0-b052-5e99c3ab8df9: outcome applied, base 410c6fb672b5667e964bc08564bec7e2b87a983c
+  digests: old php@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1 new php@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65; baseline_passed true candidate_passed true; security releases 8.4.27
+  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 6a940776265976690242a20030529b4b703fbc3b published=2026-10-21T00:00:00.000Z found=2026-10-30T19:10:01.995Z applied=2026-10-30T19:10:07.404Z
+Packed 1 applied fix into /e/php/artifact1.
+pack exit 0
+  762 bytes fixes.bundle
+  2147 bytes receipt.json
+  head 6a940776265976690242a20030529b4b703fbc3b refs/heads/ludion/php/8.4.27
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt f0e46803-00f3-46e0-b052-5e99c3ab8df9 on 410c6fb672b5: 1 applied fix.
+  php (ludion/php/8.4.27): opened #1
+open exit 0
+-- origin's branches:
+  ludion/php/8.4.27 6a940776265976690242a20030529b4b703fbc3b
+  main 410c6fb672b5667e964bc08564bec7e2b87a983c
+  ludion/php/8.4.27: parent 410c6fb672b5667e964bc08564bec7e2b87a983c changes Dockerfile 
+    Dockerfile: FROM php:8.4.27-cli-alpine@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 6e37b213-071f-472b-9a75-519f16541cca: outcome applied, base 410c6fb672b5667e964bc08564bec7e2b87a983c
+  digests: old php@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1 new php@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65; baseline_passed true candidate_passed true; security releases 8.4.27
+  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 8ed10c4976fc67fcb0273548dbe0ab8e15c005c4 published=2026-10-21T00:00:00.000Z found=2026-10-30T19:10:09.018Z applied=2026-10-30T19:10:14.330Z
+Packed 1 applied fix into /e/php/artifact2.
+pack exit 0
+  763 bytes fixes.bundle
+  2147 bytes receipt.json
+  head 8ed10c4976fc67fcb0273548dbe0ab8e15c005c4 refs/heads/ludion/php/8.4.27
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 6e37b213-071f-472b-9a75-519f16541cca on 410c6fb672b5: 1 applied fix.
+  php (ludion/php/8.4.27): open_pr_exists #1
+open exit 0
+-- origin's branches:
+  ludion/php/8.4.27 6a940776265976690242a20030529b4b703fbc3b
+  main 410c6fb672b5667e964bc08564bec7e2b87a983c
+  ludion/php/8.4.27: parent 410c6fb672b5667e964bc08564bec7e2b87a983c changes Dockerfile 
+    Dockerfile: FROM php:8.4.27-cli-alpine@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65
+-- PRs in the stand-in:
+  #1 open ludion/php/8.4.27 -> main: ludion: PHP 8.4.26 -> 8.4.27 in Dockerfile
+  API calls: 6; POST: 1
+-- body of PR #1:
+  | <!-- ludion-fix -->
+  | **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
+  | 
+  | Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit `410c6fb672b5`. This PR holds that one fix (one commit).
+  | 
+  | | | |
+  | |---|---|
+  | | Package | `php` (php) |
+  | | Change | `8.4.26` → `8.4.27` |
+  | | Advisories | php.net's security release (no advisory ID read) |
+  | | Fix published | `2026-10-21T00:00:00.000Z` (php.net's release day of the first newer security release, at 00:00 UTC) |
+  | | Found | `2026-10-30T19:10:01.995Z` (this run's lookup; an earlier run may have seen it first) |
+  | | Branch made | `2026-10-30T19:10:07.404Z` |
+  | | Receipt | `f0e46803-00f3-46e0-b052-5e99c3ab8df9` (in this run's ludion-fixes artifact) |
+  | 
+  | The times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.
+  | 
+  | **What was checked**
+  | 
+  | - By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
+  | - This commit changes only `Dockerfile`, and its only parent is the base commit. The job that opened this PR, which runs no project code, checked again that only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag.
+  | - PHP image updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.
+  | 
+  | **Not checked**
+  | 
+  | - Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
+  | - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
+  | - Production: nothing is deployed.
+# finished 2026-10-30T19:10:14Z

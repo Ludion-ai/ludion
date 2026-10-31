@@ -1,0 +1,8 @@
+id	aliases	cwes	withdrawn	class	summary
+GHSA-236c-vhj4-gfxg	-	CWE-829,CWE-912	2026-02-17T21:40:20Z	takeover	"Duplicate Advisory: Embedded malware in ua-parser-js"
+GHSA-394c-5j6w-4xmx	CVE-2020-7793	CWE-400	-	disrupt	"ua-parser-js Regular Expression Denial of Service vulnerability"
+GHSA-662x-fhqg-9p8v	CVE-2020-7733	CWE-400	-	disrupt	"Regular Expression Denial of Service in ua-parser-js"
+GHSA-78cj-fxph-m83p	CVE-2021-27292	CWE-400	-	disrupt	"Regular Expression Denial of Service (ReDoS) in ua-parser-js"
+GHSA-9h5v-pfqq-x599	CVE-2026-48125	CWE-400,CWE-1333	-	disrupt	"UAParser.js: Unbounded `Sec-CH-UA-Model` parsing can trigger ReDoS in `withClientHints()`"
+GHSA-fhg7-m89q-25r3	CVE-2022-25927	CWE-400,CWE-1333	-	disrupt	"ReDoS Vulnerability in ua-parser-js version"
+GHSA-pjwm-rvh2-c87w	CVE-2021-4229	CWE-506,CWE-912	-	trap	"Embedded malware in ua-parser-js"

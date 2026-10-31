@@ -1,0 +1,2635 @@
+{
+  "fetched": {
+    "npm": {
+      "url": "https://osv-vulnerabilities.storage.googleapis.com/npm/all.zip",
+      "fetched_at": "2026-10-31T03:50:00.668Z",
+      "last_modified": "Sat, 31 Oct 2026 03:03:11 GMT",
+      "bytes": 219692908,
+      "sha256": "49a43c99756a84092c1b53f514a1bbccabf0e106dc76ebed73b1660423f14575"
+    },
+    "Packagist": {
+      "url": "https://osv-vulnerabilities.storage.googleapis.com/Packagist/all.zip",
+      "fetched_at": "2026-10-31T03:50:17.051Z",
+      "last_modified": "Sat, 31 Oct 2026 03:03:06 GMT",
+      "bytes": 11087332,
+      "sha256": "4effe961117ef2559d36a5f719b0397fcf048a5d30617fd36df6cd201e0d99f1"
+    }
+  },
+  "zips_checked": {
+    "npm": "49a43c99756a84092c1b53f514a1bbccabf0e106dc76ebed73b1660423f14575",
+    "Packagist": "4effe961117ef2559d36a5f719b0397fcf048a5d30617fd36df6cd201e0d99f1"
+  },
+  "table": {
+    "sets": [
+      {
+        "classes": [
+          "takeover"
+        ],
+        "cwes": 12
+      },
+      {
+        "classes": [
+          "impersonate",
+          "steal",
+          "alter"
+        ],
+        "cwes": 8
+      },
+      {
+        "classes": [
+          "impersonate"
+        ],
+        "cwes": 28
+      },
+      {
+        "classes": [
+          "steal",
+          "alter"
+        ],
+        "cwes": 22
+      },
+      {
+        "classes": [
+          "steal"
+        ],
+        "cwes": 35
+      },
+      {
+        "classes": [
+          "alter"
+        ],
+        "cwes": 7
+      },
+      {
+        "classes": [
+          "disrupt"
+        ],
+        "cwes": 13
+      }
+    ],
+    "mapped_cwes": 125,
+    "decided_unclassified": 53
+  },
+  "ecosystems": {
+    "npm": {
+      "all": {
+        "records": 230992,
+        "mal": 222919,
+        "withdrawn": 742,
+        "with_cwe": 7839,
+        "classified": {
+          "count": 229127,
+          "pct": 99.2
+        },
+        "classified_before_lmr1c": {
+          "count": 229384,
+          "pct": 99.3
+        },
+        "trap_by": {
+          "id": 222919,
+          "alias": 12,
+          "cwe_506": 393
+        },
+        "not_trap_classified_by_table": {
+          "count": 5803,
+          "of": 7668,
+          "pct": 75.7
+        },
+        "by_class": {
+          "trap": {
+            "count": 223324,
+            "pct": 96.7,
+            "before_lmr1c": 223324
+          },
+          "takeover": {
+            "count": 951,
+            "pct": 0.4,
+            "before_lmr1c": 951
+          },
+          "impersonate": {
+            "count": 2094,
+            "pct": 0.9,
+            "before_lmr1c": 2151
+          },
+          "steal": {
+            "count": 1359,
+            "pct": 0.6,
+            "before_lmr1c": 1567
+          },
+          "alter": {
+            "count": 614,
+            "pct": 0.3,
+            "before_lmr1c": 603
+          },
+          "disrupt": {
+            "count": 785,
+            "pct": 0.3,
+            "before_lmr1c": 788
+          },
+          "unclassified": {
+            "count": 1865,
+            "pct": 0.8,
+            "before_lmr1c": 1608
+          }
+        },
+        "by_severity": {
+          "unknown": 222922,
+          "high": 3188,
+          "moderate": 2886,
+          "critical": 1467,
+          "low": 529
+        },
+        "unclassified_by_reason": {
+          "no_cwe_in_table": 1374,
+          "no_cwe": 234,
+          "vector_rules_out_every_class": 161,
+          "no_vector_to_choose": 96
+        },
+        "unclassified_with_cwe": 1631,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            169
+          ],
+          [
+            "CWE-74",
+            74
+          ],
+          [
+            "CWE-1321",
+            69
+          ],
+          [
+            "CWE-347",
+            65
+          ],
+          [
+            "CWE-22",
+            64
+          ],
+          [
+            "CWE-248",
+            60
+          ],
+          [
+            "CWE-693",
+            60
+          ],
+          [
+            "CWE-367",
+            51
+          ],
+          [
+            "CWE-346",
+            44
+          ],
+          [
+            "CWE-345",
+            41
+          ],
+          [
+            "CWE-184",
+            40
+          ],
+          [
+            "CWE-59",
+            38
+          ],
+          [
+            "CWE-436",
+            38
+          ],
+          [
+            "CWE-668",
+            31
+          ],
+          [
+            "CWE-295",
+            28
+          ],
+          [
+            "CWE-918",
+            27
+          ],
+          [
+            "CWE-754",
+            26
+          ],
+          [
+            "CWE-913",
+            26
+          ],
+          [
+            "CWE-116",
+            25
+          ],
+          [
+            "CWE-88",
+            24
+          ]
+        ],
+        "unclassified_naming": {
+          "CWE-59": 38,
+          "CWE-73": 15,
+          "CWE-276": 12,
+          "CWE-732": 18
+        }
+      },
+      "not_mal": {
+        "records": 8073,
+        "mal": 0,
+        "withdrawn": 410,
+        "with_cwe": 7839,
+        "classified": {
+          "count": 6208,
+          "pct": 76.9
+        },
+        "classified_before_lmr1c": {
+          "count": 6465,
+          "pct": 80.1
+        },
+        "trap_by": {
+          "id": 0,
+          "alias": 12,
+          "cwe_506": 393
+        },
+        "not_trap_classified_by_table": {
+          "count": 5803,
+          "of": 7668,
+          "pct": 75.7
+        },
+        "by_class": {
+          "trap": {
+            "count": 405,
+            "pct": 5,
+            "before_lmr1c": 405
+          },
+          "takeover": {
+            "count": 951,
+            "pct": 11.8,
+            "before_lmr1c": 951
+          },
+          "impersonate": {
+            "count": 2094,
+            "pct": 25.9,
+            "before_lmr1c": 2151
+          },
+          "steal": {
+            "count": 1359,
+            "pct": 16.8,
+            "before_lmr1c": 1567
+          },
+          "alter": {
+            "count": 614,
+            "pct": 7.6,
+            "before_lmr1c": 603
+          },
+          "disrupt": {
+            "count": 785,
+            "pct": 9.7,
+            "before_lmr1c": 788
+          },
+          "unclassified": {
+            "count": 1865,
+            "pct": 23.1,
+            "before_lmr1c": 1608
+          }
+        },
+        "by_severity": {
+          "high": 3188,
+          "moderate": 2886,
+          "critical": 1467,
+          "low": 529,
+          "unknown": 3
+        },
+        "unclassified_by_reason": {
+          "no_cwe_in_table": 1374,
+          "no_cwe": 234,
+          "vector_rules_out_every_class": 161,
+          "no_vector_to_choose": 96
+        },
+        "unclassified_with_cwe": 1631,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            169
+          ],
+          [
+            "CWE-74",
+            74
+          ],
+          [
+            "CWE-1321",
+            69
+          ],
+          [
+            "CWE-347",
+            65
+          ],
+          [
+            "CWE-22",
+            64
+          ],
+          [
+            "CWE-248",
+            60
+          ],
+          [
+            "CWE-693",
+            60
+          ],
+          [
+            "CWE-367",
+            51
+          ],
+          [
+            "CWE-346",
+            44
+          ],
+          [
+            "CWE-345",
+            41
+          ],
+          [
+            "CWE-184",
+            40
+          ],
+          [
+            "CWE-59",
+            38
+          ],
+          [
+            "CWE-436",
+            38
+          ],
+          [
+            "CWE-668",
+            31
+          ],
+          [
+            "CWE-295",
+            28
+          ],
+          [
+            "CWE-918",
+            27
+          ],
+          [
+            "CWE-754",
+            26
+          ],
+          [
+            "CWE-913",
+            26
+          ],
+          [
+            "CWE-116",
+            25
+          ],
+          [
+            "CWE-88",
+            24
+          ]
+        ],
+        "unclassified_naming": {
+          "CWE-59": 38,
+          "CWE-73": 15,
+          "CWE-276": 12,
+          "CWE-732": 18
+        }
+      },
+      "not_mal_not_withdrawn": {
+        "records": 7663,
+        "mal": 0,
+        "withdrawn": 0,
+        "with_cwe": 7480,
+        "classified": {
+          "count": 5972,
+          "pct": 77.9
+        },
+        "classified_before_lmr1c": {
+          "count": 6224,
+          "pct": 81.2
+        },
+        "trap_by": {
+          "id": 0,
+          "alias": 11,
+          "cwe_506": 391
+        },
+        "not_trap_classified_by_table": {
+          "count": 5570,
+          "of": 7261,
+          "pct": 76.7
+        },
+        "by_class": {
+          "trap": {
+            "count": 402,
+            "pct": 5.2,
+            "before_lmr1c": 402
+          },
+          "takeover": {
+            "count": 907,
+            "pct": 11.8,
+            "before_lmr1c": 907
+          },
+          "impersonate": {
+            "count": 1978,
+            "pct": 25.8,
+            "before_lmr1c": 2034
+          },
+          "steal": {
+            "count": 1325,
+            "pct": 17.3,
+            "before_lmr1c": 1530
+          },
+          "alter": {
+            "count": 602,
+            "pct": 7.9,
+            "before_lmr1c": 590
+          },
+          "disrupt": {
+            "count": 758,
+            "pct": 9.9,
+            "before_lmr1c": 761
+          },
+          "unclassified": {
+            "count": 1691,
+            "pct": 22.1,
+            "before_lmr1c": 1439
+          }
+        },
+        "by_severity": {
+          "high": 3068,
+          "moderate": 2696,
+          "critical": 1414,
+          "low": 483,
+          "unknown": 2
+        },
+        "unclassified_by_reason": {
+          "no_cwe_in_table": 1256,
+          "no_cwe": 183,
+          "vector_rules_out_every_class": 157,
+          "no_vector_to_choose": 95
+        },
+        "unclassified_with_cwe": 1508,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            165
+          ],
+          [
+            "CWE-74",
+            72
+          ],
+          [
+            "CWE-1321",
+            67
+          ],
+          [
+            "CWE-22",
+            63
+          ],
+          [
+            "CWE-347",
+            63
+          ],
+          [
+            "CWE-248",
+            58
+          ],
+          [
+            "CWE-693",
+            51
+          ],
+          [
+            "CWE-346",
+            42
+          ],
+          [
+            "CWE-345",
+            40
+          ],
+          [
+            "CWE-367",
+            38
+          ],
+          [
+            "CWE-436",
+            36
+          ],
+          [
+            "CWE-59",
+            35
+          ],
+          [
+            "CWE-668",
+            29
+          ],
+          [
+            "CWE-184",
+            28
+          ],
+          [
+            "CWE-295",
+            27
+          ],
+          [
+            "CWE-754",
+            26
+          ],
+          [
+            "CWE-918",
+            26
+          ],
+          [
+            "CWE-116",
+            25
+          ],
+          [
+            "CWE-362",
+            24
+          ],
+          [
+            "CWE-88",
+            23
+          ]
+        ],
+        "unclassified_naming": {
+          "CWE-59": 35,
+          "CWE-73": 12,
+          "CWE-276": 11,
+          "CWE-732": 14
+        }
+      },
+      "changes_not_mal": {
+        "changed": 348,
+        "by_class": {
+          "steal -> unclassified": 122,
+          "steal -> alter": 86,
+          "alter -> unclassified": 71,
+          "impersonate -> unclassified": 56,
+          "disrupt -> unclassified": 8,
+          "alter -> disrupt": 4,
+          "impersonate -> disrupt": 1
+        },
+        "by_cwe": [
+          {
+            "cwe": "CWE-22",
+            "changed": 139,
+            "steal -> alter": 75,
+            "steal -> unclassified": 63,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-1321",
+            "changed": 73,
+            "alter -> unclassified": 69,
+            "alter -> disrupt": 4
+          },
+          {
+            "cwe": "CWE-918",
+            "changed": 27,
+            "steal -> unclassified": 26,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-89",
+            "changed": 20,
+            "steal -> unclassified": 16,
+            "steal -> alter": 4
+          },
+          {
+            "cwe": "CWE-73",
+            "changed": 18,
+            "steal -> alter": 16,
+            "steal -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-400",
+            "changed": 12,
+            "disrupt -> unclassified": 7,
+            "alter -> disrupt": 4,
+            "impersonate -> disrupt": 1
+          },
+          {
+            "cwe": "CWE-269",
+            "changed": 11,
+            "impersonate -> unclassified": 11
+          },
+          {
+            "cwe": "CWE-311",
+            "changed": 9,
+            "impersonate -> unclassified": 9
+          },
+          {
+            "cwe": "CWE-125",
+            "changed": 7,
+            "steal -> unclassified": 7
+          },
+          {
+            "cwe": "CWE-285",
+            "changed": 7,
+            "impersonate -> unclassified": 7
+          },
+          {
+            "cwe": "CWE-23",
+            "changed": 5,
+            "steal -> alter": 4,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-59",
+            "changed": 5,
+            "steal -> alter": 5
+          },
+          {
+            "cwe": "CWE-284",
+            "changed": 5,
+            "impersonate -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-307",
+            "changed": 5,
+            "impersonate -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-639",
+            "changed": 5,
+            "impersonate -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-862",
+            "changed": 5,
+            "impersonate -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-863",
+            "changed": 5,
+            "impersonate -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-915",
+            "changed": 5,
+            "alter -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-79",
+            "changed": 4,
+            "impersonate -> unclassified": 4
+          },
+          {
+            "cwe": "CWE-287",
+            "changed": 4,
+            "impersonate -> unclassified": 4
+          },
+          {
+            "cwe": "CWE-306",
+            "changed": 4,
+            "impersonate -> unclassified": 4
+          },
+          {
+            "cwe": "CWE-20",
+            "changed": 3,
+            "steal -> unclassified": 2,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-200",
+            "changed": 3,
+            "steal -> unclassified": 3
+          },
+          {
+            "cwe": "CWE-345",
+            "changed": 3,
+            "impersonate -> unclassified": 2,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-27",
+            "changed": 2,
+            "steal -> alter": 2
+          },
+          {
+            "cwe": "CWE-126",
+            "changed": 2,
+            "steal -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-208",
+            "changed": 2,
+            "steal -> alter": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-248",
+            "changed": 2,
+            "alter -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-295",
+            "changed": 2,
+            "alter -> unclassified": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-352",
+            "changed": 2,
+            "impersonate -> disrupt": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-471",
+            "changed": 2,
+            "alter -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-524",
+            "changed": 2,
+            "steal -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-613",
+            "changed": 2,
+            "impersonate -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-943",
+            "changed": 2,
+            "steal -> alter": 2
+          },
+          {
+            "cwe": "CWE-24",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-35",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-61",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-74",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-80",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-90",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-91",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-174",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-184",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-294",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-347",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-349",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-362",
+            "changed": 1,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-367",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-426",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-525",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-532",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-552",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-611",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-625",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-645",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-693",
+            "changed": 1,
+            "alter -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-749",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-754",
+            "changed": 1,
+            "alter -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-770",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-799",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-807",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-834",
+            "changed": 1,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-835",
+            "changed": 1,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-942",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-1395",
+            "changed": 1,
+            "steal -> unclassified": 1
+          }
+        ]
+      },
+      "vectors_not_mal": {
+        "records": 8073,
+        "shapes": {
+          "none": 753,
+          "cvss3_only": 4857,
+          "cvss4_only": 1362,
+          "both": 1101
+        },
+        "cvss3_and_4_disagree_on_not_n": {
+          "c": 71,
+          "i": 58,
+          "a": 84,
+          "any": 147
+        },
+        "classified_with_no_vector_whose_whole_set_is_several_classes": 9
+      }
+    },
+    "Packagist": {
+      "all": {
+        "records": 7397,
+        "mal": 1,
+        "withdrawn": 155,
+        "with_cwe": 6254,
+        "classified": {
+          "count": 5418,
+          "pct": 73.2
+        },
+        "classified_before_lmr1c": {
+          "count": 5542,
+          "pct": 74.9
+        },
+        "trap_by": {
+          "id": 1,
+          "alias": 0,
+          "cwe_506": 1
+        },
+        "not_trap_classified_by_table": {
+          "count": 5416,
+          "of": 7395,
+          "pct": 73.2
+        },
+        "by_class": {
+          "trap": {
+            "count": 2,
+            "pct": 0,
+            "before_lmr1c": 2
+          },
+          "takeover": {
+            "count": 724,
+            "pct": 9.8,
+            "before_lmr1c": 724
+          },
+          "impersonate": {
+            "count": 3383,
+            "pct": 45.7,
+            "before_lmr1c": 3453
+          },
+          "steal": {
+            "count": 1108,
+            "pct": 15,
+            "before_lmr1c": 1195
+          },
+          "alter": {
+            "count": 70,
+            "pct": 0.9,
+            "before_lmr1c": 36
+          },
+          "disrupt": {
+            "count": 131,
+            "pct": 1.8,
+            "before_lmr1c": 132
+          },
+          "unclassified": {
+            "count": 1979,
+            "pct": 26.8,
+            "before_lmr1c": 1855
+          }
+        },
+        "by_severity": {
+          "moderate": 3576,
+          "high": 1908,
+          "unknown": 801,
+          "critical": 658,
+          "low": 454
+        },
+        "unclassified_by_reason": {
+          "no_cwe": 1142,
+          "no_cwe_in_table": 713,
+          "vector_rules_out_every_class": 73,
+          "no_vector_to_choose": 51
+        },
+        "unclassified_with_cwe": 837,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            158
+          ],
+          [
+            "CWE-74",
+            91
+          ],
+          [
+            "CWE-345",
+            22
+          ],
+          [
+            "CWE-1236",
+            21
+          ],
+          [
+            "CWE-284",
+            20
+          ],
+          [
+            "CWE-93",
+            19
+          ],
+          [
+            "CWE-347",
+            19
+          ],
+          [
+            "CWE-732",
+            18
+          ],
+          [
+            "CWE-22",
+            17
+          ],
+          [
+            "CWE-331",
+            16
+          ],
+          [
+            "CWE-352",
+            16
+          ],
+          [
+            "CWE-116",
+            15
+          ],
+          [
+            "CWE-470",
+            15
+          ],
+          [
+            "CWE-436",
+            14
+          ],
+          [
+            "CWE-693",
+            14
+          ],
+          [
+            "CWE-73",
+            13
+          ],
+          [
+            "CWE-327",
+            13
+          ],
+          [
+            "CWE-668",
+            13
+          ],
+          [
+            "CWE-346",
+            12
+          ],
+          [
+            "CWE-330",
+            11
+          ]
+        ],
+        "unclassified_naming": {
+          "CWE-59": 7,
+          "CWE-73": 13,
+          "CWE-276": 10,
+          "CWE-732": 18
+        }
+      },
+      "not_mal": {
+        "records": 7396,
+        "mal": 0,
+        "withdrawn": 155,
+        "with_cwe": 6254,
+        "classified": {
+          "count": 5417,
+          "pct": 73.2
+        },
+        "classified_before_lmr1c": {
+          "count": 5541,
+          "pct": 74.9
+        },
+        "trap_by": {
+          "id": 0,
+          "alias": 0,
+          "cwe_506": 1
+        },
+        "not_trap_classified_by_table": {
+          "count": 5416,
+          "of": 7395,
+          "pct": 73.2
+        },
+        "by_class": {
+          "trap": {
+            "count": 1,
+            "pct": 0,
+            "before_lmr1c": 1
+          },
+          "takeover": {
+            "count": 724,
+            "pct": 9.8,
+            "before_lmr1c": 724
+          },
+          "impersonate": {
+            "count": 3383,
+            "pct": 45.7,
+            "before_lmr1c": 3453
+          },
+          "steal": {
+            "count": 1108,
+            "pct": 15,
+            "before_lmr1c": 1195
+          },
+          "alter": {
+            "count": 70,
+            "pct": 0.9,
+            "before_lmr1c": 36
+          },
+          "disrupt": {
+            "count": 131,
+            "pct": 1.8,
+            "before_lmr1c": 132
+          },
+          "unclassified": {
+            "count": 1979,
+            "pct": 26.8,
+            "before_lmr1c": 1855
+          }
+        },
+        "by_severity": {
+          "moderate": 3576,
+          "high": 1908,
+          "unknown": 800,
+          "critical": 658,
+          "low": 454
+        },
+        "unclassified_by_reason": {
+          "no_cwe": 1142,
+          "no_cwe_in_table": 713,
+          "vector_rules_out_every_class": 73,
+          "no_vector_to_choose": 51
+        },
+        "unclassified_with_cwe": 837,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            158
+          ],
+          [
+            "CWE-74",
+            91
+          ],
+          [
+            "CWE-345",
+            22
+          ],
+          [
+            "CWE-1236",
+            21
+          ],
+          [
+            "CWE-284",
+            20
+          ],
+          [
+            "CWE-93",
+            19
+          ],
+          [
+            "CWE-347",
+            19
+          ],
+          [
+            "CWE-732",
+            18
+          ],
+          [
+            "CWE-22",
+            17
+          ],
+          [
+            "CWE-331",
+            16
+          ],
+          [
+            "CWE-352",
+            16
+          ],
+          [
+            "CWE-116",
+            15
+          ],
+          [
+            "CWE-470",
+            15
+          ],
+          [
+            "CWE-436",
+            14
+          ],
+          [
+            "CWE-693",
+            14
+          ],
+          [
+            "CWE-73",
+            13
+          ],
+          [
+            "CWE-327",
+            13
+          ],
+          [
+            "CWE-668",
+            13
+          ],
+          [
+            "CWE-346",
+            12
+          ],
+          [
+            "CWE-330",
+            11
+          ]
+        ],
+        "unclassified_naming": {
+          "CWE-59": 7,
+          "CWE-73": 13,
+          "CWE-276": 10,
+          "CWE-732": 18
+        }
+      },
+      "not_mal_not_withdrawn": {
+        "records": 7241,
+        "mal": 0,
+        "withdrawn": 0,
+        "with_cwe": 6125,
+        "classified": {
+          "count": 5307,
+          "pct": 73.3
+        },
+        "classified_before_lmr1c": {
+          "count": 5427,
+          "pct": 74.9
+        },
+        "trap_by": {
+          "id": 0,
+          "alias": 0,
+          "cwe_506": 1
+        },
+        "not_trap_classified_by_table": {
+          "count": 5306,
+          "of": 7240,
+          "pct": 73.3
+        },
+        "by_class": {
+          "trap": {
+            "count": 1,
+            "pct": 0,
+            "before_lmr1c": 1
+          },
+          "takeover": {
+            "count": 708,
+            "pct": 9.8,
+            "before_lmr1c": 708
+          },
+          "impersonate": {
+            "count": 3319,
+            "pct": 45.8,
+            "before_lmr1c": 3388
+          },
+          "steal": {
+            "count": 1084,
+            "pct": 15,
+            "before_lmr1c": 1169
+          },
+          "alter": {
+            "count": 69,
+            "pct": 1,
+            "before_lmr1c": 34
+          },
+          "disrupt": {
+            "count": 126,
+            "pct": 1.7,
+            "before_lmr1c": 127
+          },
+          "unclassified": {
+            "count": 1934,
+            "pct": 26.7,
+            "before_lmr1c": 1814
+          }
+        },
+        "by_severity": {
+          "moderate": 3509,
+          "high": 1857,
+          "unknown": 781,
+          "critical": 644,
+          "low": 450
+        },
+        "unclassified_by_reason": {
+          "no_cwe": 1116,
+          "no_cwe_in_table": 698,
+          "vector_rules_out_every_class": 69,
+          "no_vector_to_choose": 51
+        },
+        "unclassified_with_cwe": 818,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            155
+          ],
+          [
+            "CWE-74",
+            88
+          ],
+          [
+            "CWE-345",
+            22
+          ],
+          [
+            "CWE-284",
+            20
+          ],
+          [
+            "CWE-1236",
+            20
+          ],
+          [
+            "CWE-93",
+            19
+          ],
+          [
+            "CWE-347",
+            19
+          ],
+          [
+            "CWE-732",
+            18
+          ],
+          [
+            "CWE-22",
+            16
+          ],
+          [
+            "CWE-331",
+            16
+          ],
+          [
+            "CWE-352",
+            16
+          ],
+          [
+            "CWE-116",
+            15
+          ],
+          [
+            "CWE-436",
+            14
+          ],
+          [
+            "CWE-470",
+            14
+          ],
+          [
+            "CWE-327",
+            13
+          ],
+          [
+            "CWE-693",
+            13
+          ],
+          [
+            "CWE-73",
+            12
+          ],
+          [
+            "CWE-668",
+            12
+          ],
+          [
+            "CWE-330",
+            11
+          ],
+          [
+            "CWE-88",
+            10
+          ]
+        ],
+        "unclassified_naming": {
+          "CWE-59": 7,
+          "CWE-73": 12,
+          "CWE-276": 10,
+          "CWE-732": 18
+        }
+      },
+      "changes_not_mal": {
+        "changed": 165,
+        "by_class": {
+          "impersonate -> unclassified": 70,
+          "steal -> unclassified": 46,
+          "steal -> alter": 40,
+          "alter -> unclassified": 6,
+          "disrupt -> unclassified": 2,
+          "steal -> disrupt": 1
+        },
+        "by_cwe": [
+          {
+            "cwe": "CWE-22",
+            "changed": 50,
+            "steal -> alter": 33,
+            "steal -> unclassified": 17
+          },
+          {
+            "cwe": "CWE-284",
+            "changed": 20,
+            "impersonate -> unclassified": 20
+          },
+          {
+            "cwe": "CWE-89",
+            "changed": 17,
+            "steal -> unclassified": 10,
+            "steal -> alter": 7
+          },
+          {
+            "cwe": "CWE-352",
+            "changed": 16,
+            "impersonate -> unclassified": 16
+          },
+          {
+            "cwe": "CWE-863",
+            "changed": 9,
+            "impersonate -> unclassified": 9
+          },
+          {
+            "cwe": "CWE-91",
+            "changed": 5,
+            "alter -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-285",
+            "changed": 5,
+            "impersonate -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-611",
+            "changed": 5,
+            "steal -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-639",
+            "changed": 5,
+            "impersonate -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-862",
+            "changed": 5,
+            "impersonate -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-918",
+            "changed": 5,
+            "steal -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-20",
+            "changed": 4,
+            "steal -> unclassified": 2,
+            "impersonate -> unclassified": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-79",
+            "changed": 4,
+            "impersonate -> unclassified": 4
+          },
+          {
+            "cwe": "CWE-200",
+            "changed": 3,
+            "impersonate -> unclassified": 2,
+            "steal -> disrupt": 1
+          },
+          {
+            "cwe": "CWE-203",
+            "changed": 3,
+            "steal -> unclassified": 3
+          },
+          {
+            "cwe": "CWE-208",
+            "changed": 3,
+            "steal -> unclassified": 3
+          },
+          {
+            "cwe": "CWE-693",
+            "changed": 3,
+            "impersonate -> unclassified": 3
+          },
+          {
+            "cwe": "CWE-23",
+            "changed": 2,
+            "steal -> alter": 2
+          },
+          {
+            "cwe": "CWE-307",
+            "changed": 2,
+            "impersonate -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-347",
+            "changed": 2,
+            "steal -> disrupt": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-59",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-204",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-269",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-287",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-306",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-400",
+            "changed": 1,
+            "steal -> disrupt": 1
+          },
+          {
+            "cwe": "CWE-472",
+            "changed": 1,
+            "alter -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-524",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-552",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-601",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-613",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-640",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-749",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-770",
+            "changed": 1,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-1333",
+            "changed": 1,
+            "disrupt -> unclassified": 1
+          }
+        ]
+      },
+      "vectors_not_mal": {
+        "records": 7396,
+        "shapes": {
+          "none": 1375,
+          "cvss3_only": 4743,
+          "cvss4_only": 722,
+          "both": 556
+        },
+        "cvss3_and_4_disagree_on_not_n": {
+          "c": 16,
+          "i": 14,
+          "a": 30,
+          "any": 46
+        },
+        "classified_with_no_vector_whose_whole_set_is_several_classes": 3
+      }
+    },
+    "both": {
+      "all": {
+        "records": 238389,
+        "mal": 222920,
+        "withdrawn": 897,
+        "with_cwe": 14093,
+        "classified": {
+          "count": 234545,
+          "pct": 98.4
+        },
+        "classified_before_lmr1c": {
+          "count": 234926,
+          "pct": 98.5
+        },
+        "trap_by": {
+          "id": 222920,
+          "alias": 12,
+          "cwe_506": 394
+        },
+        "not_trap_classified_by_table": {
+          "count": 11219,
+          "of": 15063,
+          "pct": 74.5
+        },
+        "by_class": {
+          "trap": {
+            "count": 223326,
+            "pct": 93.7,
+            "before_lmr1c": 223326
+          },
+          "takeover": {
+            "count": 1675,
+            "pct": 0.7,
+            "before_lmr1c": 1675
+          },
+          "impersonate": {
+            "count": 5477,
+            "pct": 2.3,
+            "before_lmr1c": 5604
+          },
+          "steal": {
+            "count": 2467,
+            "pct": 1,
+            "before_lmr1c": 2762
+          },
+          "alter": {
+            "count": 684,
+            "pct": 0.3,
+            "before_lmr1c": 639
+          },
+          "disrupt": {
+            "count": 916,
+            "pct": 0.4,
+            "before_lmr1c": 920
+          },
+          "unclassified": {
+            "count": 3844,
+            "pct": 1.6,
+            "before_lmr1c": 3463
+          }
+        },
+        "by_severity": {
+          "unknown": 223723,
+          "moderate": 6462,
+          "high": 5096,
+          "critical": 2125,
+          "low": 983
+        },
+        "unclassified_by_reason": {
+          "no_cwe_in_table": 2087,
+          "no_cwe": 1376,
+          "vector_rules_out_every_class": 234,
+          "no_vector_to_choose": 147
+        },
+        "unclassified_with_cwe": 2468,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            327
+          ],
+          [
+            "CWE-74",
+            165
+          ],
+          [
+            "CWE-347",
+            84
+          ],
+          [
+            "CWE-22",
+            81
+          ],
+          [
+            "CWE-693",
+            74
+          ],
+          [
+            "CWE-1321",
+            69
+          ],
+          [
+            "CWE-248",
+            66
+          ],
+          [
+            "CWE-345",
+            63
+          ],
+          [
+            "CWE-367",
+            59
+          ],
+          [
+            "CWE-346",
+            56
+          ],
+          [
+            "CWE-436",
+            52
+          ],
+          [
+            "CWE-184",
+            48
+          ],
+          [
+            "CWE-59",
+            45
+          ],
+          [
+            "CWE-668",
+            44
+          ],
+          [
+            "CWE-116",
+            40
+          ],
+          [
+            "CWE-93",
+            39
+          ],
+          [
+            "CWE-732",
+            36
+          ],
+          [
+            "CWE-295",
+            35
+          ],
+          [
+            "CWE-88",
+            34
+          ],
+          [
+            "CWE-362",
+            34
+          ]
+        ],
+        "unclassified_naming": {
+          "CWE-59": 45,
+          "CWE-73": 28,
+          "CWE-276": 22,
+          "CWE-732": 36
+        }
+      },
+      "not_mal": {
+        "records": 15469,
+        "mal": 0,
+        "withdrawn": 565,
+        "with_cwe": 14093,
+        "classified": {
+          "count": 11625,
+          "pct": 75.2
+        },
+        "classified_before_lmr1c": {
+          "count": 12006,
+          "pct": 77.6
+        },
+        "trap_by": {
+          "id": 0,
+          "alias": 12,
+          "cwe_506": 394
+        },
+        "not_trap_classified_by_table": {
+          "count": 11219,
+          "of": 15063,
+          "pct": 74.5
+        },
+        "by_class": {
+          "trap": {
+            "count": 406,
+            "pct": 2.6,
+            "before_lmr1c": 406
+          },
+          "takeover": {
+            "count": 1675,
+            "pct": 10.8,
+            "before_lmr1c": 1675
+          },
+          "impersonate": {
+            "count": 5477,
+            "pct": 35.4,
+            "before_lmr1c": 5604
+          },
+          "steal": {
+            "count": 2467,
+            "pct": 15.9,
+            "before_lmr1c": 2762
+          },
+          "alter": {
+            "count": 684,
+            "pct": 4.4,
+            "before_lmr1c": 639
+          },
+          "disrupt": {
+            "count": 916,
+            "pct": 5.9,
+            "before_lmr1c": 920
+          },
+          "unclassified": {
+            "count": 3844,
+            "pct": 24.8,
+            "before_lmr1c": 3463
+          }
+        },
+        "by_severity": {
+          "moderate": 6462,
+          "high": 5096,
+          "critical": 2125,
+          "low": 983,
+          "unknown": 803
+        },
+        "unclassified_by_reason": {
+          "no_cwe_in_table": 2087,
+          "no_cwe": 1376,
+          "vector_rules_out_every_class": 234,
+          "no_vector_to_choose": 147
+        },
+        "unclassified_with_cwe": 2468,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            327
+          ],
+          [
+            "CWE-74",
+            165
+          ],
+          [
+            "CWE-347",
+            84
+          ],
+          [
+            "CWE-22",
+            81
+          ],
+          [
+            "CWE-693",
+            74
+          ],
+          [
+            "CWE-1321",
+            69
+          ],
+          [
+            "CWE-248",
+            66
+          ],
+          [
+            "CWE-345",
+            63
+          ],
+          [
+            "CWE-367",
+            59
+          ],
+          [
+            "CWE-346",
+            56
+          ],
+          [
+            "CWE-436",
+            52
+          ],
+          [
+            "CWE-184",
+            48
+          ],
+          [
+            "CWE-59",
+            45
+          ],
+          [
+            "CWE-668",
+            44
+          ],
+          [
+            "CWE-116",
+            40
+          ],
+          [
+            "CWE-93",
+            39
+          ],
+          [
+            "CWE-732",
+            36
+          ],
+          [
+            "CWE-295",
+            35
+          ],
+          [
+            "CWE-88",
+            34
+          ],
+          [
+            "CWE-362",
+            34
+          ]
+        ],
+        "unclassified_naming": {
+          "CWE-59": 45,
+          "CWE-73": 28,
+          "CWE-276": 22,
+          "CWE-732": 36
+        }
+      },
+      "not_mal_not_withdrawn": {
+        "records": 14904,
+        "mal": 0,
+        "withdrawn": 0,
+        "with_cwe": 13605,
+        "classified": {
+          "count": 11279,
+          "pct": 75.7
+        },
+        "classified_before_lmr1c": {
+          "count": 11651,
+          "pct": 78.2
+        },
+        "trap_by": {
+          "id": 0,
+          "alias": 11,
+          "cwe_506": 392
+        },
+        "not_trap_classified_by_table": {
+          "count": 10876,
+          "of": 14501,
+          "pct": 75
+        },
+        "by_class": {
+          "trap": {
+            "count": 403,
+            "pct": 2.7,
+            "before_lmr1c": 403
+          },
+          "takeover": {
+            "count": 1615,
+            "pct": 10.8,
+            "before_lmr1c": 1615
+          },
+          "impersonate": {
+            "count": 5297,
+            "pct": 35.5,
+            "before_lmr1c": 5422
+          },
+          "steal": {
+            "count": 2409,
+            "pct": 16.2,
+            "before_lmr1c": 2699
+          },
+          "alter": {
+            "count": 671,
+            "pct": 4.5,
+            "before_lmr1c": 624
+          },
+          "disrupt": {
+            "count": 884,
+            "pct": 5.9,
+            "before_lmr1c": 888
+          },
+          "unclassified": {
+            "count": 3625,
+            "pct": 24.3,
+            "before_lmr1c": 3253
+          }
+        },
+        "by_severity": {
+          "moderate": 6205,
+          "high": 4925,
+          "critical": 2058,
+          "low": 933,
+          "unknown": 783
+        },
+        "unclassified_by_reason": {
+          "no_cwe_in_table": 1954,
+          "no_cwe": 1299,
+          "vector_rules_out_every_class": 226,
+          "no_vector_to_choose": 146
+        },
+        "unclassified_with_cwe": 2326,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            320
+          ],
+          [
+            "CWE-74",
+            160
+          ],
+          [
+            "CWE-347",
+            82
+          ],
+          [
+            "CWE-22",
+            79
+          ],
+          [
+            "CWE-1321",
+            67
+          ],
+          [
+            "CWE-248",
+            64
+          ],
+          [
+            "CWE-693",
+            64
+          ],
+          [
+            "CWE-345",
+            62
+          ],
+          [
+            "CWE-346",
+            52
+          ],
+          [
+            "CWE-436",
+            50
+          ],
+          [
+            "CWE-367",
+            46
+          ],
+          [
+            "CWE-59",
+            42
+          ],
+          [
+            "CWE-668",
+            41
+          ],
+          [
+            "CWE-116",
+            40
+          ],
+          [
+            "CWE-93",
+            39
+          ],
+          [
+            "CWE-184",
+            35
+          ],
+          [
+            "CWE-295",
+            34
+          ],
+          [
+            "CWE-362",
+            34
+          ],
+          [
+            "CWE-88",
+            33
+          ],
+          [
+            "CWE-327",
+            33
+          ]
+        ],
+        "unclassified_naming": {
+          "CWE-59": 42,
+          "CWE-73": 24,
+          "CWE-276": 21,
+          "CWE-732": 32
+        }
+      },
+      "changes_not_mal": {
+        "changed": 513,
+        "by_class": {
+          "steal -> unclassified": 168,
+          "impersonate -> unclassified": 126,
+          "steal -> alter": 126,
+          "alter -> unclassified": 77,
+          "disrupt -> unclassified": 10,
+          "alter -> disrupt": 4,
+          "impersonate -> disrupt": 1,
+          "steal -> disrupt": 1
+        },
+        "by_cwe": [
+          {
+            "cwe": "CWE-22",
+            "changed": 189,
+            "steal -> alter": 108,
+            "steal -> unclassified": 80,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-1321",
+            "changed": 73,
+            "alter -> unclassified": 69,
+            "alter -> disrupt": 4
+          },
+          {
+            "cwe": "CWE-89",
+            "changed": 37,
+            "steal -> unclassified": 26,
+            "steal -> alter": 11
+          },
+          {
+            "cwe": "CWE-918",
+            "changed": 32,
+            "steal -> unclassified": 31,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-284",
+            "changed": 25,
+            "impersonate -> unclassified": 25
+          },
+          {
+            "cwe": "CWE-73",
+            "changed": 18,
+            "steal -> alter": 16,
+            "steal -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-352",
+            "changed": 18,
+            "impersonate -> unclassified": 17,
+            "impersonate -> disrupt": 1
+          },
+          {
+            "cwe": "CWE-863",
+            "changed": 14,
+            "impersonate -> unclassified": 14
+          },
+          {
+            "cwe": "CWE-400",
+            "changed": 13,
+            "disrupt -> unclassified": 7,
+            "alter -> disrupt": 4,
+            "impersonate -> disrupt": 1,
+            "steal -> disrupt": 1
+          },
+          {
+            "cwe": "CWE-269",
+            "changed": 12,
+            "impersonate -> unclassified": 12
+          },
+          {
+            "cwe": "CWE-285",
+            "changed": 12,
+            "impersonate -> unclassified": 12
+          },
+          {
+            "cwe": "CWE-639",
+            "changed": 10,
+            "impersonate -> unclassified": 10
+          },
+          {
+            "cwe": "CWE-862",
+            "changed": 10,
+            "impersonate -> unclassified": 10
+          },
+          {
+            "cwe": "CWE-311",
+            "changed": 9,
+            "impersonate -> unclassified": 9
+          },
+          {
+            "cwe": "CWE-79",
+            "changed": 8,
+            "impersonate -> unclassified": 8
+          },
+          {
+            "cwe": "CWE-20",
+            "changed": 7,
+            "steal -> unclassified": 4,
+            "steal -> alter": 2,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-23",
+            "changed": 7,
+            "steal -> alter": 6,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-125",
+            "changed": 7,
+            "steal -> unclassified": 7
+          },
+          {
+            "cwe": "CWE-307",
+            "changed": 7,
+            "impersonate -> unclassified": 7
+          },
+          {
+            "cwe": "CWE-59",
+            "changed": 6,
+            "steal -> alter": 6
+          },
+          {
+            "cwe": "CWE-91",
+            "changed": 6,
+            "alter -> unclassified": 5,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-200",
+            "changed": 6,
+            "steal -> unclassified": 3,
+            "impersonate -> unclassified": 2,
+            "steal -> disrupt": 1
+          },
+          {
+            "cwe": "CWE-611",
+            "changed": 6,
+            "steal -> unclassified": 5,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-208",
+            "changed": 5,
+            "steal -> unclassified": 4,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-287",
+            "changed": 5,
+            "impersonate -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-306",
+            "changed": 5,
+            "impersonate -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-915",
+            "changed": 5,
+            "alter -> unclassified": 5
+          },
+          {
+            "cwe": "CWE-693",
+            "changed": 4,
+            "impersonate -> unclassified": 3,
+            "alter -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-203",
+            "changed": 3,
+            "steal -> unclassified": 3
+          },
+          {
+            "cwe": "CWE-345",
+            "changed": 3,
+            "impersonate -> unclassified": 2,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-347",
+            "changed": 3,
+            "impersonate -> unclassified": 1,
+            "steal -> disrupt": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-524",
+            "changed": 3,
+            "steal -> unclassified": 3
+          },
+          {
+            "cwe": "CWE-613",
+            "changed": 3,
+            "impersonate -> unclassified": 3
+          },
+          {
+            "cwe": "CWE-27",
+            "changed": 2,
+            "steal -> alter": 2
+          },
+          {
+            "cwe": "CWE-126",
+            "changed": 2,
+            "steal -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-248",
+            "changed": 2,
+            "alter -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-295",
+            "changed": 2,
+            "alter -> unclassified": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-471",
+            "changed": 2,
+            "alter -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-552",
+            "changed": 2,
+            "steal -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-749",
+            "changed": 2,
+            "impersonate -> unclassified": 2
+          },
+          {
+            "cwe": "CWE-770",
+            "changed": 2,
+            "impersonate -> unclassified": 1,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-943",
+            "changed": 2,
+            "steal -> alter": 2
+          },
+          {
+            "cwe": "CWE-24",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-35",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-61",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-74",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-80",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-90",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-174",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-184",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-204",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-294",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-349",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-362",
+            "changed": 1,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-367",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-426",
+            "changed": 1,
+            "steal -> alter": 1
+          },
+          {
+            "cwe": "CWE-472",
+            "changed": 1,
+            "alter -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-525",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-532",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-601",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-625",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-640",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-645",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-754",
+            "changed": 1,
+            "alter -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-799",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-807",
+            "changed": 1,
+            "impersonate -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-834",
+            "changed": 1,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-835",
+            "changed": 1,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-942",
+            "changed": 1,
+            "steal -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-1333",
+            "changed": 1,
+            "disrupt -> unclassified": 1
+          },
+          {
+            "cwe": "CWE-1395",
+            "changed": 1,
+            "steal -> unclassified": 1
+          }
+        ]
+      },
+      "vectors_not_mal": {
+        "records": 15469,
+        "shapes": {
+          "none": 2128,
+          "cvss3_only": 9600,
+          "cvss4_only": 2084,
+          "both": 1657
+        },
+        "cvss3_and_4_disagree_on_not_n": {
+          "c": 87,
+          "i": 72,
+          "a": 114,
+          "any": 193
+        },
+        "classified_with_no_vector_whose_whole_set_is_several_classes": 12
+      }
+    }
+  },
+  "malware_or_malicious": {
+    "search": "summary or details contains \"malware\" or \"malicious\", case ignored (fixed strings)",
+    "matched": 225743,
+    "matched_trap": 223326,
+    "not_trap": 2417,
+    "not_trap_by_class": {
+      "takeover": 350,
+      "impersonate": 901,
+      "steal": 438,
+      "alter": 109,
+      "disrupt": 135,
+      "unclassified": 484
+    },
+    "not_trap_by_word": {
+      "malware_only": 20,
+      "malicious_only": 2365,
+      "both": 32
+    },
+    "not_trap_with_malware": {
+      "count": 52,
+      "by_class": {
+        "takeover": 12,
+        "impersonate": 29,
+        "steal": 3,
+        "alter": 0,
+        "disrupt": 0,
+        "unclassified": 8
+      },
+      "ids": [
+        "GHSA-236c-vhj4-gfxg",
+        "GHSA-26xq-m8xw-6373",
+        "GHSA-2f24-mg4x-534q",
+        "GHSA-2m69-jmvh-6chr",
+        "GHSA-3735-5339-xfwx",
+        "GHSA-393c-p46r-7c95",
+        "GHSA-428f-mh7w-6w2x",
+        "GHSA-44wr-rmwq-3phw",
+        "GHSA-5h77-88j3-r659",
+        "GHSA-77x8-3v3h-hrhv",
+        "GHSA-7944-7c6r-55vv",
+        "GHSA-7c4c-749j-pfp2",
+        "GHSA-7g78-5g5g-mvfj",
+        "GHSA-7mvr-c777-76hp",
+        "GHSA-8366-xmgf-334f",
+        "GHSA-86rg-8hc8-v82p",
+        "GHSA-8wp2-vxpg-xcvp",
+        "GHSA-93jc-vqqc-vvvh",
+        "GHSA-97v6-998m-fp4g",
+        "GHSA-9hq9-cr36-4wpj",
+        "GHSA-9x9c-ghc5-jhw9",
+        "GHSA-c4xj-x7p8-3x7q",
+        "GHSA-c9rj-pgxv-84jc",
+        "GHSA-cq8c-xv66-36gw",
+        "GHSA-cqcc-mm6x-vmvw",
+        "GHSA-cv2g-8cj8-vgc7",
+        "GHSA-f2fc-vc88-6w7q",
+        "GHSA-f3cw-hg6r-chfv",
+        "GHSA-fjpj-6qcq-6pw2",
+        "GHSA-g3j5-mpp2-2fqm",
+        "GHSA-g74q-6g2f-874x",
+        "GHSA-gqxx-248x-g29f",
+        "GHSA-gxxh-8vcj-w2mh",
+        "GHSA-hjpm-7mrm-26w8",
+        "GHSA-j5w5-568x-rq53",
+        "GHSA-jcxm-7wvp-g6p5",
+        "GHSA-mghp-5cq4-v6mg",
+        "GHSA-mpjj-4688-3fxg",
+        "GHSA-mv33-9f6j-pfmc",
+        "GHSA-q4p8-8j9m-8hxj",
+        "GHSA-qpgq-5g92-j5q8",
+        "GHSA-qx2v-qp2m-jg93",
+        "GHSA-rmw5-f87r-w988",
+        "GHSA-v5ff-xmfp-p245",
+        "GHSA-vcrw-4xvv-jh49",
+        "GHSA-vmf3-w455-68vh",
+        "GHSA-vqxf-r9ph-cc9c",
+        "GHSA-wc29-h54q-q8qx",
+        "GHSA-wf43-fpp3-cf65",
+        "GHSA-wppf-gqj5-fc4f",
+        "GHSA-wrrr-8jcv-wjf5",
+        "GHSA-xpv2-hrfc-hw62"
+      ]
+    },
+    "not_trap_listing_cwe_912": [
+      "GHSA-236c-vhj4-gfxg"
+    ],
+    "all_not_trap_listing_cwe_912": [
+      "GHSA-236c-vhj4-gfxg",
+      "GHSA-457r-cqc8-9vj9",
+      "GHSA-8gr3-2gjw-jj7g",
+      "GHSA-8jh9-wqpf-q52c",
+      "GHSA-9wfr-w7mm-pc7f",
+      "GHSA-j9cw-5cpj-9qj5",
+      "GHSA-pg98-6v7f-2xfv",
+      "GHSA-qq6h-5g6j-q3cm"
+    ],
+    "not_trap_records": "malware-or-malicious.tsv (count.sh --words)"
+  }
+}

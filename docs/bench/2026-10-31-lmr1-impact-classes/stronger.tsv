@@ -1,0 +1,394 @@
+comparison	id	ecosystem	before	after	cwes	cvss
+lmr1d_to_after	GHSA-2444-8gj8-6fmx	Packagist	unclassified	steal	CWE-91	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-2488-w585-72ch	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:L
+lmr1d_to_after	GHSA-265m-7826-wjqm	Packagist	alter	impersonate	CWE-915	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-28mc-g557-92m7	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-2944-57xv-2682	npm	unclassified	disrupt	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-29qv-4j9f-fjw5	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-2g4c-8fpm-c46v	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-2g98-f9jv-w8c5	Packagist	unclassified	steal	CWE-91	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+lmr1d_to_after	GHSA-2gg9-6p7w-6cpj	npm	alter	impersonate	CWE-693,CWE-915	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:L
+lmr1d_to_after	GHSA-2ghc-6v89-pw9j	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:H
+lmr1d_to_after	GHSA-2hpj-g53m-9gj6	npm	steal	impersonate	CWE-311	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-2m53-83f3-562j	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-2qph-q8xw-gv7q	Packagist	alter	impersonate	CWE-913,CWE-915	CVSS:4.0/AV:N/AC:H/AT:N/PR:H/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N/E:U
+lmr1d_to_after	GHSA-2r6j-862c-m2v2	Packagist	steal	impersonate	CWE-434,CWE-552	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:H/A:L/E:F/RL:O/RC:C
+lmr1d_to_after	GHSA-2rcp-jvr4-r259	npm	steal	impersonate	CWE-200,CWE-522	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N
+lmr1d_to_after	GHSA-33q9-f52j-gc75	npm	unclassified	disrupt	CWE-306	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-356r-77q8-f64f	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-35c5-67fm-cpcp	Packagist	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:N/VI:L/VA:L/SC:N/SI:L/SA:L
+lmr1d_to_after	GHSA-35cq-wv6v-88xf	npm	unclassified	alter	CWE-918	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:L/SI:L/SA:L/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+lmr1d_to_after	GHSA-35g6-rrw3-v6xc	npm	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:H
+lmr1d_to_after	GHSA-3627-w2qr-5fxr	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-363v-5rh8-23wg	Packagist	steal	impersonate	CWE-312	CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-36rg-gfq2-3h56	npm	unclassified	steal	CWE-601	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:P/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+lmr1d_to_after	GHSA-38hq-7x33-php4	npm	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:N/A:N
+lmr1d_to_after	GHSA-38vf-35cg-m73w	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+lmr1d_to_after	GHSA-39pp-xp36-q6mg	npm	alter	steal	CWE-15,CWE-693	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-39qv-prmh-x37f	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-3c3p-xh4f-pfh7	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:L
+lmr1d_to_after	GHSA-3c9c-2p65-qvwv	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N
+lmr1d_to_after	GHSA-3cpp-fv95-mpr5	Packagist	unclassified	alter	CWE-918	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:N
+lmr1d_to_after	GHSA-3fjq-93xj-3f3f	npm	unclassified	disrupt	CWE-79	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-3hvj-2783-34x2	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-3m9x-2qfj-xvq4	Packagist	unclassified	alter	CWE-611	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-3mpr-hq3p-49h9	npm	alter	impersonate	CWE-20,CWE-471	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-3r56-7hhr-vfg9	npm	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:N/VA:N/SC:H/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+lmr1d_to_after	GHSA-3vg7-jw9m-pc3f	Packagist	steal	impersonate	CWE-20,CWE-22,CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:H/E:H/RL:O/RC:C
+lmr1d_to_after	GHSA-3w6x-2g7m-8v23	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:H/A:N
+lmr1d_to_after	GHSA-3wrg-6mg5-jg2v	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+lmr1d_to_after	GHSA-3x3f-jcp3-g22j	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-4233-7q5q-m7p6	npm	unclassified	alter	CWE-918	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N
+lmr1d_to_after	GHSA-4233-jc72-56c5	npm	unclassified	disrupt	CWE-625,CWE-918	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-4263-jgmp-7pf4	npm	unclassified	disrupt	CWE-1321	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-432j-4fw9-2g6f	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-43f3-h63w-p6f6	npm	unclassified	disrupt	CWE-22	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-43fc-jf86-j433	npm	unclassified	disrupt	CWE-754,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-45c6-75p6-83cc	npm	alter	impersonate	CWE-91	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+lmr1d_to_after	GHSA-472v-j2g4-g9h2	Packagist	unclassified	disrupt	CWE-22	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-47pj-q2vm-46xc	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-4fr2-j4g9-mppf	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-4gxf-g5gf-22h4	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-4gxm-v5v7-fqc4	npm	unclassified	disrupt	CWE-22,CWE-73	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-4h7p-4vq8-g2gh	Packagist	unclassified	disrupt	CWE-284	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-4jcg-jxpf-5vq3	Packagist	unclassified	disrupt	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-4mvj-rq4v-2fxw	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L
+lmr1d_to_after	GHSA-4pc9-x2fx-p7vj	npm	unclassified	steal	CWE-601	CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:P/VC:H/VI:N/VA:N/SC:L/SI:N/SA:N
+lmr1d_to_after	GHSA-4q69-q4q7-x82c	npm	unclassified	disrupt	CWE-284	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-4rmj-w58m-fvch	Packagist	unclassified	alter	CWE-918	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+lmr1d_to_after	GHSA-4v2w-h9jm-mqjg	npm	steal	impersonate	CWE-78,CWE-471	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:L/A:L
+lmr1d_to_after	GHSA-4w2w-36vm-c8hf	Packagist	unclassified	disrupt	CWE-22	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-4xcx-cwrq-w792	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-529q-4j3p-7c5r	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-5448-v74m-7mv7	Packagist	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-558p-m34m-vpmq	npm	steal	impersonate	CWE-522	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N
+lmr1d_to_after	GHSA-5846-7qm3-r52j	npm	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-59m2-j944-839w	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-5cph-wvm9-45gj	npm	alter	steal	CWE-15	CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-5fr8-xhqq-4p3q	Packagist	unclassified	disrupt	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-5fw2-mwhh-9947	npm	unclassified	disrupt	CWE-639	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H ; CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-5fxx-jwjm-x9hj	Packagist	unclassified	disrupt	CWE-284	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-5h3x-9wvq-w4m2	npm	unclassified	disrupt	CWE-862	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-5h9v-837x-m97r	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-5m9c-634g-47vq	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-5m9r-p9g7-679c	npm	unclassified	disrupt	CWE-307	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-5pg7-v24c-9rp9	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-5pjj-7fq8-9gpf	Packagist	alter	impersonate	CWE-91	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-5rc6-2r3r-fv79	npm	steal	impersonate	CWE-311	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-5xjx-4xcm-hpcm	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-6339-gv7w-g5f4	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-65q2-x652-xx84	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-6648-6g96-mg35	Packagist	unclassified	disrupt	CWE-284	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-679f-58pq-4v2c	npm	unclassified	disrupt	CWE-1321	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-67mx-6wf2-92xp	Packagist	unclassified	disrupt	CWE-862	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-68hw-vfh7-xvg8	npm	unclassified	disrupt	CWE-287,CWE-345	CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-68x5-xx89-w9mm	npm	unclassified	disrupt	CWE-613	CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-6cf6-8hvr-r68w	npm	steal	impersonate	CWE-300,CWE-319,CWE-598	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:H/A:N
+lmr1d_to_after	GHSA-6fw4-hr69-g3rv	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-6mgf-v5j7-45cr	npm	steal	impersonate	CWE-116,CWE-184,CWE-522	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:L/VA:N/SC:L/SI:L/SA:N
+lmr1d_to_after	GHSA-6q8q-rvf4-m4pg	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-6rmx-gvvg-vh6j	npm	unclassified	disrupt	CWE-307,CWE-799	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-6v7p-j23v-4xmw	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-6vfq-jmxg-g58r	Packagist	steal	impersonate	CWE-200,CWE-312	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N
+lmr1d_to_after	GHSA-6vx5-cg2p-7g5v	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:L/I:L/A:N
+lmr1d_to_after	GHSA-6xc4-7fmm-65q2	Packagist	steal	impersonate	CWE-74,CWE-319	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:C/C:H/I:H/A:H
+lmr1d_to_after	GHSA-6xp4-cf37-ppjh	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:L
+lmr1d_to_after	GHSA-728h-4mwj-f2p4	npm	alter	impersonate	CWE-915	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-72f3-6w86-7rv3	npm	unclassified	disrupt	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-72q2-5rxx-xfff	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-73wf-gq98-2v4g	npm	unclassified	disrupt	CWE-248,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-747p-jfqv-f43r	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-76g8-235f-gj6p	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-77xq-cpvg-7xm2	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-7899-w6c4-vqc4	npm	unclassified	steal	CWE-601,CWE-665,CWE-669,CWE-693	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:L/SI:N/SA:N/E:P
+lmr1d_to_after	GHSA-78pr-c5x5-jggc	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-792q-q67h-w579	npm	unclassified	disrupt	CWE-22,CWE-23	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-79h2-v6hh-wq23	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-7cp4-jw97-3rc2	npm	unclassified	steal	CWE-601	CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:P/VC:H/VI:N/VA:N/SC:L/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:Amber
+lmr1d_to_after	GHSA-7gwj-7fhm-vw4w	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:C/C:L/I:H/A:N
+lmr1d_to_after	GHSA-7j59-v9qr-6fq9	npm	unclassified	steal	CWE-601	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:N/VA:N/SC:H/SI:N/SA:N
+lmr1d_to_after	GHSA-7j65-65cr-6644	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-7jp2-5h22-m432	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:N
+lmr1d_to_after	GHSA-7m6r-fhh7-r47c	npm	unclassified	alter	CWE-90	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-7mc2-6phr-23xc	npm	steal	impersonate	CWE-522	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N/E:P
+lmr1d_to_after	GHSA-7mqx-wwh4-f9fw	npm	unclassified	disrupt	CWE-307	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-7mx3-vvmw-hjmv	npm	unclassified	disrupt	CWE-1321	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-7p6h-3fmw-539q	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-7pvx-4585-hqww	npm	unclassified	disrupt	CWE-1321	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-7q22-x757-cmgc	Packagist	unclassified	disrupt	CWE-287,CWE-863	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:U
+lmr1d_to_after	GHSA-7q9c-hpx7-9cwm	npm	unclassified	disrupt	CWE-306	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-7qm6-9v49-38m9	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-7r2x-3qcm-8vfw	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-7vx2-5349-qj99	Packagist	unclassified	steal	CWE-91	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+lmr1d_to_after	GHSA-7w3c-jgh7-cwjw	Packagist	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-7wpw-2hjm-89gp	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-866w-xmhq-wj7x	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-87qp-7cw8-8q9c	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-8882-frvv-92w4	npm	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-8889-9g3f-73rj	Packagist	unclassified	disrupt	CWE-307	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-88gm-j2wx-58h6	npm	unclassified	disrupt	CWE-918	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-896r-f27r-55mw	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-89fp-f5mx-748x	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-8cc8-8vvx-fhgw	npm	steal	impersonate	CWE-311	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-8cp7-rp8r-mg77	npm	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-8f34-f56x-9xph	npm	unclassified	disrupt	CWE-125	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-8gf4-pcj6-54rp	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-8jjf-w7j6-323c	npm	alter	impersonate	CWE-91,CWE-347	CVSS:3.0/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-8mv3-37rc-pvxj	Packagist	unclassified	disrupt	CWE-352,CWE-749	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-8p5c-f836-m4h7	Packagist	alter	impersonate	CWE-91	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-8qwh-4vwv-7c5m	Packagist	unclassified	disrupt	CWE-79	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-8r98-rqg5-4vm3	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-8v63-cqqc-6r2c	npm	unclassified	disrupt	CWE-915,CWE-1321	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-8vv3-jxm8-f4vf	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-8xv4-jj4h-qww6	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N
+lmr1d_to_after	GHSA-928r-fm4v-mvrw	npm	steal	impersonate	CWE-74,CWE-434	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:L/A:L
+lmr1d_to_after	GHSA-92v9-xh2q-fq9f	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L
+lmr1d_to_after	GHSA-92xj-mqp7-vmcj	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H/E:P/RL:O/RC:C
+lmr1d_to_after	GHSA-93p6-9cxv-5rpq	Packagist	unclassified	disrupt	CWE-863	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-944x-pm95-3jpr	npm	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N
+lmr1d_to_after	GHSA-9534-h433-2rjf	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-954j-f27r-cj52	Packagist	steal	impersonate	CWE-312	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-955m-rr6m-2f9v	npm	steal	impersonate	CWE-522	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:H/A:H
+lmr1d_to_after	GHSA-95ff-46g6-6gw9	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-96hh-8hx5-cpw7	Packagist	steal	impersonate	CWE-434	CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:P/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N/E:U
+lmr1d_to_after	GHSA-96r7-mrqf-jhcc	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-97rm-xj73-33jh	npm	alter	steal	CWE-15,CWE-74	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:H
+lmr1d_to_after	GHSA-9c2p-jw8p-f84v	npm	unclassified	disrupt	CWE-89	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-9chw-xrwx-f86j	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-9f2h-7v79-mxw3	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:N/A:L
+lmr1d_to_after	GHSA-9g8m-v378-pcg3	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-9g9w-hmvj-5h57	npm	alter	impersonate	CWE-471	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-9jf3-f2pg-7868	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-9m93-w8w6-76hh	npm	unclassified	disrupt	CWE-1321	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:H
+lmr1d_to_after	GHSA-9mh6-g99m-ppcw	Packagist	steal	impersonate	CWE-22,CWE-434	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:N
+lmr1d_to_after	GHSA-9mx2-prfp-8hqp	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-9p47-w5xp-f4xr	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-9qh2-6fxg-9m4g	npm	unclassified	disrupt	CWE-125	CVSS:3.0/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-9r8p-h6cc-6qhm	npm	steal	impersonate	CWE-312	CVSS:4.0/AV:N/AC:L/AT:P/PR:H/UI:N/VC:L/VI:N/VA:N/SC:H/SI:L/SA:L
+lmr1d_to_after	GHSA-9rhg-254w-fh9x	npm	unclassified	disrupt	CWE-1321	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:P
+lmr1d_to_after	GHSA-9vx6-7xxf-x967	npm	unclassified	disrupt	CWE-125	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:H
+lmr1d_to_after	GHSA-9wcg-jrwf-8gg7	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-9wjf-94h3-r4rh	Packagist	unclassified	disrupt	CWE-284	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-9xgp-3mxp-rv7x	Packagist	unclassified	disrupt	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-c36v-fmgq-m8hx	npm	unclassified	disrupt	CWE-915,CWE-1321	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-c4qp-h3m6-785f	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-c4v8-2hg8-jv77	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:H/UI:R/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-c4w7-xm78-47vh	npm	alter	impersonate	CWE-20,CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-c53v-qmrx-93hg	Packagist	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:N/A:N
+lmr1d_to_after	GHSA-c636-cg5r-2498	Packagist	unclassified	disrupt	CWE-611	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-c676-mcw3-qg55	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-c7m7-4257-h698	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-c96f-x56v-gq3h	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-cfw5-2vxh-hr84	npm	unclassified	disrupt	CWE-1321	CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-cg57-p69r-3m7p	npm	steal	impersonate	CWE-74,CWE-434	CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-ch52-px8q-f22j	npm	unclassified	alter	CWE-367,CWE-918	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:L/A:N
+lmr1d_to_after	GHSA-cj7w-pm77-hvg6	Packagist	alter	impersonate	CWE-91	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H
+lmr1d_to_after	GHSA-cj9f-h6r6-4cx2	npm	unclassified	alter	CWE-918	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L
+lmr1d_to_after	GHSA-cqp5-m4pq-gfgp	npm	alter	impersonate	CWE-471	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-cqqh-49mx-fq63	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-cr8h-x88h-jwj2	npm	steal	impersonate	CWE-311	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-crpf-4hrx-3jrp	npm	alter	impersonate	CWE-915	CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:L/VI:L/VA:N/SC:H/SI:H/SA:N
+lmr1d_to_after	GHSA-cw6x-mw64-q6pv	npm	unclassified	disrupt	CWE-285,CWE-307,CWE-639,CWE-862	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:L
+lmr1d_to_after	GHSA-cwx2-736x-mf6w	npm	alter	impersonate	CWE-20,CWE-471	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:H/A:H
+lmr1d_to_after	GHSA-f4jp-rw7w-ccwg	npm	unclassified	disrupt	CWE-1321	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-f5vj-f2hx-8m93	npm	unclassified	disrupt	CWE-352,CWE-749	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:N/A:L
+lmr1d_to_after	GHSA-f65p-4m7j-42xc	npm	unclassified	alter	CWE-20,CWE-918	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+lmr1d_to_after	GHSA-f6x8-65q6-j9m9	npm	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:L/VI:N/VA:N/SC:L/SI:N/SA:N
+lmr1d_to_after	GHSA-f757-9c4x-chff	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-f98m-q3hr-p5wq	npm	alter	impersonate	CWE-20,CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-f9cv-665r-275h	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-fhgh-fjh9-vq62	Packagist	unclassified	disrupt	CWE-89	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:U
+lmr1d_to_after	GHSA-fhv8-fx5f-7fxf	npm	unclassified	disrupt	CWE-915,CWE-1321	CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-fm93-fhh2-cg2c	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-fph4-wmhf-6fwf	npm	unclassified	alter	CWE-174,CWE-918	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+lmr1d_to_after	GHSA-fqrj-m88p-qf3v	npm	unclassified	disrupt	CWE-287	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-fqx8-v33p-4qcc	Packagist	unclassified	disrupt	CWE-79	CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-fx46-whrj-73v5	npm	alter	impersonate	CWE-547,CWE-642	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+lmr1d_to_after	GHSA-fxwf-45c7-4ppr	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-g3qj-j598-cxmq	npm	unclassified	disrupt	CWE-125,CWE-126,CWE-1395	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-g92x-8m54-p89v	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-g93h-75m9-3qq4	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-g95j-p8f6-pwh4	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-g974-hxvm-x689	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-g99v-8hwm-g76g	npm	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-gcgf-fh7c-8gf2	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N
+lmr1d_to_after	GHSA-gcj7-r3hg-m7w6	npm	unclassified	disrupt	CWE-294,CWE-345	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-gf8v-vxf9-7c66	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-ggv3-vmgw-xv2q	npm	unclassified	disrupt	CWE-732	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-gh4j-gqv2-49f6	npm	alter	impersonate	CWE-91	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+lmr1d_to_after	GHSA-ghr5-ch3p-vcr6	npm	unclassified	disrupt	CWE-693,CWE-1321	CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-ghww-cv4v-hmxx	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-gmjw-49p4-pcfm	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:L/I:H/A:H
+lmr1d_to_after	GHSA-gp6w-ccqv-p7qr	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-gp8f-8m3g-qvj9	npm	unclassified	disrupt	CWE-349,CWE-639	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-gpvc-mx6g-cchv	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-gr58-j5wh-m333	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-h437-qjj9-vmq4	Packagist	alter	impersonate	CWE-91	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H
+lmr1d_to_after	GHSA-h4mc-r4f4-hcf4	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-h68q-55jf-x68w	npm	unclassified	disrupt	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-h6pr-c536-6rjg	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-h9fm-xcv2-qfw3	npm	unclassified	disrupt	CWE-306	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+lmr1d_to_after	GHSA-hc94-2wfr-4pwf	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-hfj7-542q-8fvv	npm	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:N/A:N
+lmr1d_to_after	GHSA-hhph-8536-gfq5	npm	steal	impersonate	CWE-200,CWE-522	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-hjfh-5jmm-xr24	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:N
+lmr1d_to_after	GHSA-hjgp-8ffr-hwwr	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-hm82-qr45-h7mw	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-hr2q-hp5q-x767	npm	unclassified	alter	CWE-918	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L
+lmr1d_to_after	GHSA-hrpp-h998-j3pp	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-hv96-xxx2-5v7w	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-hxhm-3vj9-6cqh	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-j452-xhg8-qg39	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:L
+lmr1d_to_after	GHSA-j5qp-p44g-2m49	npm	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-j65r-g7q2-f8v3	Packagist	steal	impersonate	CWE-257,CWE-522	CVSS:3.0/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:L/A:H
+lmr1d_to_after	GHSA-j7cg-h9v9-6vqp	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-j7j5-752x-wr4v	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-j9q7-3rhf-4ppv	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-jg62-h7pv-hxgv	Packagist	unclassified	disrupt	CWE-284	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-jg8v-48h5-wgxg	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-jh5w-6964-x5cf	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-jh7p-qr78-84p7	npm	steal	impersonate	CWE-522	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-jj78-5fmv-mv28	npm	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:L/SI:N/SA:N/E:P
+lmr1d_to_after	GHSA-jppx-hw2f-8gx4	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-jq2f-59pj-p3m3	Packagist	unclassified	disrupt	CWE-862	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-jqv5-7xpx-qj74	npm	alter	impersonate	CWE-913,CWE-915	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-jv35-xqg7-f92r	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-jvf5-q4h5-2jmj	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-jvff-x2qm-6286	npm	alter	impersonate	CWE-915	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-jvwf-75h9-cwgg	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-m4hj-wg2r-qpcr	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-m58f-9pvv-8mp2	Packagist	unclassified	disrupt	CWE-307	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-m79w-4mqv-r39f	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-m8gw-hjpr-rjv7	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-m8pw-h8qj-rgj9	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-mh82-55cm-6gfh	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-mhvh-gwhr-76pw	npm	steal	impersonate	CWE-312	CVSS:4.0/AV:N/AC:L/AT:P/PR:H/UI:N/VC:L/VI:N/VA:N/SC:H/SI:L/SA:L/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+lmr1d_to_after	GHSA-mjjj-6p43-vhhv	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-mq4r-h2gh-qv7x	npm	alter	impersonate	CWE-915	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:L
+lmr1d_to_after	GHSA-mq53-pc65-wjc4	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-mq76-m7gv-xhfm	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-mrqx-rp3w-jpjp	Packagist	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-mw95-gmw4-883p	Packagist	alter	impersonate	CWE-91	CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H
+lmr1d_to_after	GHSA-p2fh-2h23-6grg	npm	unclassified	disrupt	CWE-1321	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:L
+lmr1d_to_after	GHSA-p33m-7w7f-gmj8	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-p4hc-9pjh-55c8	npm	unclassified	alter	CWE-918	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N/E:P
+lmr1d_to_after	GHSA-p4xx-m758-3hpx	Packagist	unclassified	alter	CWE-918	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:N/I:L/A:L
+lmr1d_to_after	GHSA-p52w-7rhw-9m67	Packagist	unclassified	disrupt	CWE-862	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-p5w8-m249-4r4v	npm	unclassified	disrupt	CWE-863	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-p6c5-mjgj-m4rm	npm	steal	impersonate	CWE-434	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+lmr1d_to_after	GHSA-p9pc-299p-vxgp	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-pc47-g7gv-4gpw	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-pc58-wgmc-hfjr	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-pcw7-5633-82vv	npm	steal	impersonate	CWE-434,CWE-693	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-pf2j-9qmp-jqr2	npm	alter	impersonate	CWE-471,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-pf56-329r-95rw	npm	steal	impersonate	CWE-522	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H
+lmr1d_to_after	GHSA-pf6p-25r2-fx45	Packagist	unclassified	alter	CWE-918	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+lmr1d_to_after	GHSA-pg8g-f2hf-x82m	npm	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+lmr1d_to_after	GHSA-ph6g-6v8w-8p6m	Packagist	unclassified	disrupt	CWE-640	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-php6-83fg-gw3g	npm	steal	impersonate	CWE-522	CVSS:3.0/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-pj2c-h76w-vv6f	npm	steal	impersonate	CWE-319	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N
+lmr1d_to_after	GHSA-pjjf-hc4q-g298	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-pmm3-68q9-57jg	npm	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-pp75-xfpw-37g9	npm	unclassified	disrupt	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-pqr6-3j58-9w58	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+lmr1d_to_after	GHSA-pr34-8jfr-xhv8	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-q42p-pg8m-cqh6	npm	alter	impersonate	CWE-471	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-q5j8-9m9g-x2jh	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-q9mq-245r-4g93	npm	unclassified	disrupt	CWE-22,CWE-73	CVSS:4.0/AV:L/AC:H/AT:P/PR:H/UI:A/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-q9qr-h33g-fw3j	Packagist	steal	impersonate	CWE-522	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-qcjg-hvg6-hxcp	Packagist	steal	impersonate	CWE-434	CVSS:3.0/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:L
+lmr1d_to_after	GHSA-qf8x-vqjv-92gr	npm	unclassified	disrupt	CWE-287,CWE-295	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-qhh4-458h-xwh2	npm	steal	impersonate	CWE-346,CWE-522	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:L/SA:N
+lmr1d_to_after	GHSA-qp4c-xg64-7c6x	npm	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:U
+lmr1d_to_after	GHSA-qv78-6gpp-hm68	Packagist	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:L/I:N/A:N
+lmr1d_to_after	GHSA-qvwf-w35m-6r95	Packagist	unclassified	disrupt	CWE-611	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-qxch-whhj-8956	npm	unclassified	disrupt	CWE-248,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-r27j-894h-3w3p	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-r2rq-3h56-fqm4	Packagist	unclassified	disrupt	CWE-613	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-r36x-p5pv-9mfx	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-r659-8xfp-j327	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-r899-h629-j84r	npm	steal	impersonate	CWE-434	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:N
+lmr1d_to_after	GHSA-r9w3-g83q-m6hq	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-rc4v-99cr-pjcm	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:H
+lmr1d_to_after	GHSA-rf6f-7fwh-wjgh	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:P
+lmr1d_to_after	GHSA-rgvg-3wpc-h44p	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:N
+lmr1d_to_after	GHSA-rh7p-9c79-gpp8	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-rh7v-6w34-w2rr	npm	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:N
+lmr1d_to_after	GHSA-rjf2-j2r6-q8gr	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-rjpm-qmq7-q85w	Packagist	unclassified	disrupt	CWE-611	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-rmhg-2cvv-q7vx	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-rp2c-jrgp-cvr8	npm	steal	impersonate	CWE-75,CWE-434	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N
+lmr1d_to_after	GHSA-rpg7-q4cv-p466	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-rpv2-g4pc-wp72	Packagist	unclassified	steal	CWE-91	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+lmr1d_to_after	GHSA-rqgp-ccph-5w65	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-rrqm-p222-8ph2	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:N
+lmr1d_to_after	GHSA-rvp5-9p55-f5rp	npm	unclassified	steal	CWE-601	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-rvqr-hrcc-j9vv	npm	alter	impersonate	CWE-345,CWE-642	CVSS:3.1/AV:A/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N ; CVSS:4.0/AV:A/AC:L/AT:N/PR:N/UI:P/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-rxrv-835q-v5mh	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H
+lmr1d_to_after	GHSA-v26w-gcxh-v4r7	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-v2vf-jv88-3fp5	Packagist	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:L/I:N/A:L
+lmr1d_to_after	GHSA-v427-c49j-8w6x	Packagist	steal	impersonate	CWE-312	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:L/A:N
+lmr1d_to_after	GHSA-v5gf-vpjc-pc7w	npm	unclassified	disrupt	CWE-307,CWE-645	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-v6f4-jwv9-682w	Packagist	steal	impersonate	CWE-20,CWE-434	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N
+lmr1d_to_after	GHSA-v6wh-96g9-6wx3	npm	steal	impersonate	CWE-73,CWE-522	CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:H/SI:H/SA:H
+lmr1d_to_after	GHSA-v88g-cgmw-v5xw	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-v8x7-r927-cc93	npm	steal	impersonate	CWE-434	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:N
+lmr1d_to_after	GHSA-vf3q-frmr-vrr9	Packagist	steal	impersonate	CWE-94,CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-vhw5-3g5m-8ggf	npm	unclassified	steal	CWE-601	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-vj72-mwrj-m2xq	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-vjq3-x3f2-fvxq	Packagist	steal	impersonate	CWE-522,CWE-1125	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-vmjq-hvgq-2wv4	npm	alter	impersonate	CWE-915	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-vp8p-c6xj-xpj7	Packagist	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:N
+lmr1d_to_after	GHSA-vp8w-wj4m-3r7j	npm	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:P
+lmr1d_to_after	GHSA-vpf5-82c8-9v36	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-vr8x-74pm-6vj7	npm	unclassified	disrupt	CWE-22	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-vrr3-5r3v-7xfw	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-vvv8-xw5f-3f88	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-vx8m-6fhw-pccw	npm	unclassified	disrupt	CWE-347,CWE-613	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-w2f4-hxpm-mq98	Packagist	steal	impersonate	CWE-434	CVSS:3.0/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:L/A:H
+lmr1d_to_after	GHSA-w36c-qxrq-v7fw	Packagist	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+lmr1d_to_after	GHSA-w43h-r5m5-p832	npm	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-w45g-5746-x9fp	npm	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:N/SI:L/SA:L
+lmr1d_to_after	GHSA-w76h-8m22-hpgh	npm	unclassified	alter	CWE-918	CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-w789-49fc-v8hr	npm	unclassified	alter	CWE-20,CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-w83q-mcmx-mh42	npm	steal	impersonate	CWE-90	CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N ; CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:L/SI:N/SA:N
+lmr1d_to_after	GHSA-wh42-8r2w-873x	Packagist	unclassified	steal	CWE-91	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U
+lmr1d_to_after	GHSA-wh94-p5m6-mr7j	npm	unclassified	disrupt	CWE-862	CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-wppf-gqj5-fc4f	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N
+lmr1d_to_after	GHSA-wppr-j57c-8jpm	Packagist	unclassified	disrupt	CWE-285,CWE-639	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-wq7q-7vfh-2x3h	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-wqfc-cr59-h64p	npm	steal	impersonate	CWE-311,CWE-319	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-wr5g-q49g-548w	npm	steal	impersonate	CWE-522	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H
+lmr1d_to_after	GHSA-wv67-9jq7-8r69	npm	unclassified	disrupt	CWE-125,CWE-126	CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-wvp2-4qqp-4h3r	npm	unclassified	alter	CWE-184,CWE-918	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:L/A:N
+lmr1d_to_after	GHSA-wwg2-2crq-6grr	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-wwgq-9jhf-qgw6	Packagist	unclassified	disrupt	CWE-352	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L
+lmr1d_to_after	GHSA-wx3q-6x7x-jjw4	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-wxfj-84xf-7gxv	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-wxrr-jp8m-qq7f	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-x268-6jhm-2mx8	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-x2fc-mxcx-w4mf	npm	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-x3c7-22c8-prg7	Packagist	alter	impersonate	CWE-915	CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:L
+lmr1d_to_after	GHSA-x3mg-q38v-m562	npm	unclassified	disrupt	CWE-862	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-x3r2-fj3r-g5mv	npm	steal	impersonate	CWE-200,CWE-522	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N
+lmr1d_to_after	GHSA-x3wr-v4wx-5qpc	npm	alter	impersonate	CWE-915,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-x4cf-6jr3-3qvp	npm	unclassified	disrupt	CWE-125	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-x4qj-2f4q-r4rx	npm	unclassified	disrupt	CWE-918	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-x56p-c8cg-q435	npm	unclassified	steal	CWE-601	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:N/A:N
+lmr1d_to_after	GHSA-x56r-5r34-qg74	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-x5w6-38gp-mrqh	npm	steal	impersonate	CWE-319	CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:H ; CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:A/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-x6g4-fwcc-jj8w	Packagist	unclassified	alter	CWE-611	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:U
+lmr1d_to_after	GHSA-xcrg-29h7-h4cj	Packagist	alter	impersonate	CWE-91	CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-xcvv-84j5-jw9h	npm	alter	impersonate	CWE-471,CWE-1321	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-xj6f-x7jm-85ff	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-xmjc-63pr-2mpg	Packagist	alter	impersonate	CWE-915	CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-xp5q-77mh-6hm2	Packagist	unclassified	disrupt	CWE-352	CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-xp68-7g33-f49m	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X
+lmr1d_to_after	GHSA-xq4f-3jxp-qv6m	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-xq8r-r72r-pqwm	npm	steal	impersonate	CWE-311	CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H
+lmr1d_to_after	GHSA-xw57-23p8-9wc5	npm	unclassified	alter	CWE-918	CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-xw7v-qrhc-jjg2	Packagist	unclassified	disrupt	CWE-863	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-xwx6-jjhv-84p8	npm	unclassified	disrupt	CWE-1321	CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N
+lmr1d_to_after	GHSA-xx4g-r65p-3qf2	npm	unclassified	disrupt	CWE-1321	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-xxc2-j7jj-6g5m	npm	unclassified	disrupt	CWE-287	CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H
+lmr1d_to_after	GHSA-xxqw-83c7-r24r	Packagist	steal	impersonate	CWE-434	CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L ; CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X

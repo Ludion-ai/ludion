@@ -3,13 +3,13 @@ import { join } from "node:path";
 import { detectEcosystems, inventory, textFile, type Ecosystem } from "./inventory.ts";
 import { resolvedMavenInventory } from "./dependency-patch.ts";
 import { OsvClient, type DependencyScan, type ReadOnlyScan } from "./osv.ts";
-import { scanPhp, type Scan } from "./php.ts";
+import { MissingImageTag, scanPhp, type Release, type Scan } from "./php.ts";
 import { namesNodeImage, scanNode } from "./node.ts";
 import { CONFIG, readConfig } from "./project.ts";
 import { isReadOnlyCliName, READONLY_CLI_NAMES, READONLY_READERS, type ReadOnlyReader } from "./readonly/index.ts";
 import type { ReadOnlyEcosystem } from "./readonly/types.ts";
 
-export type ProjectScan = { schema: 1; checked_at: string; status: "attention_required" | "no_known_updates"; checks: ({ ecosystem: "php" | "node"; result: Scan } | { ecosystem: Ecosystem; result: DependencyScan } | { ecosystem: ReadOnlyEcosystem; result: ReadOnlyScan } | { ecosystem: string; error: string })[]; unsupported: string[] };
+export type ProjectScan = { schema: 1; checked_at: string; status: "attention_required" | "no_known_updates"; checks: ({ ecosystem: "php" | "node"; result: Scan } | { ecosystem: Ecosystem; result: DependencyScan } | { ecosystem: ReadOnlyEcosystem; result: ReadOnlyScan } | { ecosystem: string; error: string; security_releases?: Release[] })[]; unsupported: string[] };
 /** Inventories scan does not read. A file a registered read-only reader handled is left out. */
 const UNSUPPORTED = ["requirements.txt", "pyproject.toml", "go.mod", "Cargo.lock", "build.gradle", "build.gradle.kts"];
 const message = (error: unknown) => error instanceof Error ? error.message : String(error);
@@ -20,6 +20,16 @@ export const vulnerable = (result: DependencyScan | ReadOnlyScan): boolean => "f
  * line's newest release with none, waiting or not, is shown but not counted (docs/decisions/2026-11-01-scan-exit-non-security-move.md).
  */
 export const securityMove = (result: Scan): boolean => result.candidate !== null && result.security_releases.length > 0;
+/**
+ * What scan exits 1 for: a known vulnerability, a counted image move, or an image check stopped because Docker Hub has no
+ * tag for the move (php.ts, MissingImageTag) while a newer security release lies between, which the check keeps.
+ */
+export const found = (check: ProjectScan["checks"][number]): boolean => "result" in check
+  ? "findings" in check.result ? vulnerable(check.result) : securityMove(check.result)
+  : (check.security_releases?.length ?? 0) > 0;
+/** A failed image check; a stop for a missing tag keeps the newer security releases it found. */
+const imageError = (ecosystem: "php" | "node", error: unknown): ProjectScan["checks"][number] =>
+  error instanceof MissingImageTag && error.security_releases.length ? { ecosystem, error: error.message, security_releases: error.security_releases } : { ecosystem, error: message(error) };
 
 /** `readers` and `client` exist for tests; callers use the registered readers and OSV. */
 export async function scanProject(root: string, selected?: string, deps: { readers?: readonly ReadOnlyReader[]; client?: OsvClient } = {}): Promise<ProjectScan> {
@@ -77,13 +87,13 @@ export async function scanProject(root: string, selected?: string, deps: { reade
   if (selected === "php" || (auto && existsSync(join(root, imageFile)) && /\bphp:/.test(textFile(root, imageFile)))) {
     try {
       checks.push({ ecosystem: "php", result: await scanPhp(textFile(root, imageFile)) });
-    } catch (error) { checks.push({ ecosystem: "php", error: message(error) }); }
+    } catch (error) { checks.push(imageError("php", error)); }
   }
   // The official Node.js image (node.ts): when the policy or --ecosystem says node, or, unselected, a FROM line names it.
   if (selected === "node" || (auto && saved && "dockerfile" in saved && saved.ecosystem === "node") || (auto && existsSync(join(root, imageFile)) && namesNodeImage(textFile(root, imageFile)))) {
     try {
       checks.push({ ecosystem: "node", result: await scanNode(textFile(root, imageFile)) });
-    } catch (error) { checks.push({ ecosystem: "node", error: message(error) }); }
+    } catch (error) { checks.push(imageError("node", error)); }
   }
   const unsupported = !auto ? [] : UNSUPPORTED.filter(f => existsSync(join(root, f)) && !handled.has(f));
   if (!checks.length && !unsupported.length) throw new Error(`No supported project inventory found. Expected PHP or Node.js Dockerfile, npm lockfile, composer.lock or pom.xml${readers.length ? `, or for a read-only scan ${readers.flatMap(r => r.files).join(", ")}` : ""}.`);

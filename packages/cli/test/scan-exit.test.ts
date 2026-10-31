@@ -28,11 +28,33 @@ function project(dockerfile: string, extra: Record<string, string> = {}): string
   for (const [name, text] of Object.entries(extra)) writeFileSync(join(root, name), text);
   return root;
 }
-/** The scan's exit code and what it printed, at `now`. Docker Hub answers 404 for the tags in `missing`; `args` are added. */
-async function scan(root: string, now: string, missing: string[] = [], args: string[] = []): Promise<{ exit: number; out: string[]; err: string[] }> {
+// Docker Hub failing other than with a 404 for the tag (php.ts, dockerHubTag): the pull token or the tag's HEAD answers an
+// error, no token or no digest, or the request fails or times out (a redirect fails as a request does: redirect "error").
+// `reason` is the failure's own text, which a scan with no newer security release prints as before; `stated` is how a
+// stop that keeps a newer security release gives it.
+const TOKEN = "https://auth.docker.io/", REGISTRY = "https://registry-1.docker.io/";
+type Failure = { at: string; answer: () => Response; reason: (ref: string) => string; stated: (ref: string) => string };
+const FAILURES: Record<string, Failure> = {
+  "HTTP 503 for the tag": { at: REGISTRY, answer: () => new Response(null, { status: 503 }), reason: ref => `Docker Hub gave no digest for ${ref} (HTTP 503).`, stated: ref => `Docker Hub gave no digest for ${ref} (HTTP 503).` },
+  "HTTP 429 for the tag": { at: REGISTRY, answer: () => new Response(null, { status: 429 }), reason: ref => `Docker Hub gave no digest for ${ref} (HTTP 429).`, stated: ref => `Docker Hub gave no digest for ${ref} (HTTP 429).` },
+  "no digest for the tag": { at: REGISTRY, answer: () => new Response(null, { status: 200 }), reason: ref => `Docker Hub gave no digest for ${ref} (HTTP 200).`, stated: ref => `Docker Hub gave no digest for ${ref} (HTTP 200).` },
+  "a failed request for the tag": { at: REGISTRY, answer: () => { throw new TypeError("fetch failed"); }, reason: () => "fetch failed", stated: () => "fetch failed." },
+  "a timeout for the tag": { at: REGISTRY, answer: () => { throw new DOMException("The operation was aborted due to timeout", "TimeoutError"); }, reason: () => "The operation was aborted due to timeout", stated: () => "The operation was aborted due to timeout." },
+  "HTTP 503 for the token": { at: TOKEN, answer: () => new Response(null, { status: 503 }), reason: () => "Official Docker Hub token lookup failed (HTTP 503). No update decision was made.", stated: () => "Official Docker Hub token lookup failed (HTTP 503)." },
+  "no token": { at: TOKEN, answer: () => new Response("{}"), reason: () => "Docker Hub gave no pull token.", stated: () => "Docker Hub gave no pull token." },
+  "a failed request for the token": { at: TOKEN, answer: () => { throw new TypeError("fetch failed"); }, reason: () => "fetch failed", stated: () => "fetch failed." },
+};
+const failing = (failure: Failure, fetchFn: typeof fetch): typeof fetch => (async (input: string | URL | Request, init?: RequestInit) =>
+  String(input).startsWith(failure.at) ? failure.answer() : fetchFn(input, init)) as typeof fetch;
+/**
+ * The scan's exit code and what it printed, at `now`. Docker Hub answers 404 for the tags in `missing`, or fails as `down`
+ * says; `args` are added.
+ */
+async function scan(root: string, now: string, missing: string[] = [], args: string[] = [], down?: Failure): Promise<{ exit: number; out: string[]; err: string[] }> {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(new Date(now));
-  vi.stubGlobal("fetch", withHub(lists, { missing }));
+  const hub = withHub(lists, { missing });
+  vi.stubGlobal("fetch", down ? failing(down, hub) : hub);
   const out: string[] = [], err: string[] = [];
   const log = vi.spyOn(console, "log").mockImplementation((line: unknown) => { out.push(String(line)); });
   const error = vi.spyOn(console, "error").mockImplementation((line: unknown) => { err.push(String(line)); });
@@ -124,6 +146,39 @@ describe.each(Object.entries(CASES))("scan of the official %s image", (ecosystem
   });
   it("exits 0 for a move with no newer security release while it waits, without asking Docker Hub for the tag, as before", async () => {
     const { exit } = await scan(project(c.none), before(c.until), [c.tag]);
+    expect(exit).toBe(0);
+  });
+  // Any other failure of Docker Hub's check after the newer security releases are counted keeps them, as a 404 does
+  // (php.ts, ImageMoveStopped): whether a security release is newer is read from the official list alone.
+  const unchecked = (c: (typeof CASES)[keyof typeof CASES], ecosystem: string, failure: Failure) => `${c.label} ${c.current} is a security release newer than ${c.before}; Docker Hub could not be checked for ${ecosystem}:${c.tag}, the newest release of ${c.line} in the Dockerfile's variant: ${failure.stated(`${ecosystem}:${c.tag}`)} Ludion does not move the image without that check. No update decision was made.`;
+  it.each(Object.entries(FAILURES))("exits 1 when Docker Hub fails with %s but a newer security release lies between, and names it", async (_name, failure) => {
+    const root = project(c.between);
+    const { exit, out, err } = await scan(root, c.until, [], [], failure);
+    expect(exit).toBe(1);
+    expect(out).toContain(`${ecosystem}: ${unchecked(c, ecosystem, failure)}`);
+    expect(err.join("\n")).not.toContain("unavailable");
+    const report = await scanProject(root);
+    expect(report.status).toBe("attention_required");
+    expect(report.checks).toEqual([{ ecosystem, error: unchecked(c, ecosystem, failure), security_releases: [expect.objectContaining({ version: c.current, security: true })] }]);
+  });
+  it("gives the kept security release in scan --json when Docker Hub fails", async () => {
+    const root = project(c.between), failure = FAILURES["HTTP 503 for the tag"]!;
+    const json = await scan(root, c.until, [], ["--json"], failure);
+    expect(json.exit).toBe(1);
+    expect(JSON.parse(json.out.join("\n"))).toMatchObject({ status: "attention_required", checks: [{ ecosystem, error: unchecked(c, ecosystem, failure), security_releases: [{ version: c.current }] }] });
+  });
+  it.each(Object.entries(FAILURES))("exits 2 when Docker Hub fails with %s for a move with no newer security release once its wait has ended, as before", async (_name, failure) => {
+    const root = project(c.none);
+    const { exit, out, err } = await scan(root, c.until, [], [], failure);
+    expect(exit).toBe(2);
+    expect(err).toContain(`${ecosystem}: unavailable — ${failure.reason(`${ecosystem}:${c.tag}`)}`);
+    expect(out.join("\n")).not.toContain("security release newer than");
+    const report = await scanProject(root);
+    expect(report.status).toBe("attention_required");
+    expect(report.checks).toEqual([{ ecosystem, error: failure.reason(`${ecosystem}:${c.tag}`) }]);
+  });
+  it("exits 0 for a move with no newer security release while it waits, without asking a failing Docker Hub, as before", async () => {
+    const { exit } = await scan(project(c.none), before(c.until), [], [], FAILURES["HTTP 503 for the token"]);
     expect(exit).toBe(0);
   });
 });

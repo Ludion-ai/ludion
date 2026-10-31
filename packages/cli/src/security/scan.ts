@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { detectEcosystems, inventory, textFile, type Ecosystem } from "./inventory.ts";
 import { resolvedMavenInventory } from "./dependency-patch.ts";
 import { OsvClient, type DependencyScan, type ReadOnlyScan } from "./osv.ts";
-import { MissingImageTag, scanPhp, type Release, type Scan } from "./php.ts";
+import { ImageMoveStopped, scanPhp, type Release, type Scan } from "./php.ts";
 import { namesNodeImage, scanNode } from "./node.ts";
 import { CONFIG, readConfig } from "./project.ts";
 import { isReadOnlyCliName, READONLY_CLI_NAMES, READONLY_READERS, type ReadOnlyReader } from "./readonly/index.ts";
@@ -21,15 +21,16 @@ export const vulnerable = (result: DependencyScan | ReadOnlyScan): boolean => "f
  */
 export const securityMove = (result: Scan): boolean => result.candidate !== null && result.security_releases.length > 0;
 /**
- * What scan exits 1 for: a known vulnerability, a counted image move, or an image check stopped because Docker Hub has no
- * tag for the move (php.ts, MissingImageTag) while a newer security release lies between, which the check keeps.
+ * What scan exits 1 for: a known vulnerability, a counted image move, or an image check stopped at Docker Hub (no tag for
+ * the move, or Docker Hub could not be checked; php.ts, ImageMoveStopped) while a newer security release lies between,
+ * which the check keeps.
  */
 export const found = (check: ProjectScan["checks"][number]): boolean => "result" in check
   ? "findings" in check.result ? vulnerable(check.result) : securityMove(check.result)
   : (check.security_releases?.length ?? 0) > 0;
-/** A failed image check; a stop for a missing tag keeps the newer security releases it found. */
+/** A failed image check; a stop at Docker Hub keeps the newer security releases it found. */
 const imageError = (ecosystem: "php" | "node", error: unknown): ProjectScan["checks"][number] =>
-  error instanceof MissingImageTag && error.security_releases.length ? { ecosystem, error: error.message, security_releases: error.security_releases } : { ecosystem, error: message(error) };
+  error instanceof ImageMoveStopped && error.security_releases.length ? { ecosystem, error: error.message, security_releases: error.security_releases } : { ecosystem, error: message(error) };
 
 /** `readers` and `client` exist for tests; callers use the registered readers and OSV. */
 export async function scanProject(root: string, selected?: string, deps: { readers?: readonly ReadOnlyReader[]; client?: OsvClient } = {}): Promise<ProjectScan> {

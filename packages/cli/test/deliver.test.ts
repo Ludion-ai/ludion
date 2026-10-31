@@ -679,6 +679,30 @@ describe("the PR job checks what a fix pins against the official registry", { ti
       }
     }
   });
+  // docs/decisions/2026-10-31-limgv-image-newest-built-release.md: a move with no newer security release goes through the
+  // PR job (openFixes) to a pushed branch and an opened PR, whose title and body do not say "security".
+  it.each([
+    ["PHP", { schema: 1, dockerfile: "./Dockerfile", test: ["php", "t.php"], timeout_seconds: 60 }, "php", "8.4.27", "8.4.28", "-cli-alpine", {}],
+    ["Node.js", NODE_POLICY, "node", "22.23.4", "22.23.5", "-alpine", { runtime: "node" }],
+  ] as const)("%s: a move to the line's newest release with no newer security release is pushed and opened", async (label, policy, runtime, from, to, flavor, scanExtra) => {
+    const r = repository({ "ludion.security.json": `${JSON.stringify(policy)}\n`, Dockerfile: `FROM ${runtime}:${from}${flavor}\nWORKDIR /app\n` });
+    const after = `FROM ${runtime}:${to}${flavor}@sha256:${"1".repeat(64)}\nWORKDIR /app\n`, branch = `ludion/${runtime}/${to}`;
+    const made = fixBranch(r.gitBase, branch, [{ path: "Dockerfile", content: after }], `ludion: ${label} ${from} -> ${to} in ./Dockerfile\n\n${label} ${to}, the newest release of the line (no newer security release); Docker rebuilds only the newest tag of a line.\n\nLudion receipt ${ID}: the project's test passed on ${r.base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`);
+    const receipt = {
+      schema: 1, id: ID, scope: "dockerfile_only_not_deployed", outcome: "applied", baseline_passed: true, candidate_passed: true, base_commit: r.base,
+      scan: { current: { version: from }, candidate: { version: to }, security_releases: [], wait_until: "2026-11-02T00:00:00.000Z", ...scanExtra }, dockerfile_after: sha256(after),
+      branch, commit: made, fix_published_at: null, found_at: "2026-11-02T01:00:00.000Z", applied_at: "2026-11-02T01:05:00.000Z",
+    };
+    const tags: string[] = [], gh = github(r.origin), digest = async (tag: string) => { tags.push(tag); return `sha256:${"1".repeat(64)}`; };
+    const result = await open(checkout(r.origin), artifact(r.work, receipt, [`refs/heads/${branch}`], r.base), r.base, r.origin, gh, "refs/heads/main", runtime === "node" ? { nodeDigest: digest } : { phpDigest: digest });
+    expect(tags).toEqual([`${to}${flavor}`]);
+    expect(result.deliveries).toMatchObject([{ outcome: "opened", branch }]);
+    expect(branchAt(r.origin, branch)).toBe(made);
+    expect(gh.opened).toHaveLength(1);
+    expect(gh.opened[0]).toMatchObject({ title: `ludion: ${label} ${from} -> ${to} in ./Dockerfile`, head: branch });
+    expect(`${String(gh.opened[0]!.title)}\n${String(gh.opened[0]!.body)}`.toLowerCase()).not.toContain("security");
+    expect(String(gh.opened[0]!.body)).toContain(`moved the image to \`${to}\`, the newest release of its line`);
+  });
   it("Docker Hub is asked for library/node's tag, with a pull token for library/node only", async () => {
     const urls: string[] = [];
     const fetchFn = (async (url: string | URL | Request) => {
@@ -688,6 +712,9 @@ describe("the PR job checks what a fix pins against the official registry", { ti
     expect(await dockerHubDigest("22.23.4-alpine", fetchFn, "node")).toBe(`sha256:${"3".repeat(64)}`);
     expect(urls).toEqual(["https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/node:pull", "https://registry-1.docker.io/v2/library/node/manifests/22.23.4-alpine"]);
     await expect(dockerHubDigest("22.23.4-alpine", fetchFn, "evil" as "node")).rejects.toThrow("Not an official image");
+    // A tag Docker Hub does not have: the PR job pushes nothing for it (the scan's own stop is in security.test.ts).
+    const missing = (async (url: string | URL | Request) => String(url).startsWith("https://auth.docker.io/") ? new Response(JSON.stringify({ token: "t" })) : new Response(null, { status: 404 })) as typeof fetch;
+    await expect(dockerHubDigest("22.23.9-alpine", missing, "node")).rejects.toThrow("Docker Hub gave no digest for node:22.23.9-alpine (HTTP 404).");
   });
   /** A Composer project whose fix moves symfony/http-foundation 5.4.0 -> 5.4.54 and adds symfony/polyfill-php83, which 5.4.54 requires. */
   function composerFix() {
@@ -807,7 +834,54 @@ describe("the policy at the base decides what a fix may change, and what it may 
     expect(() => checkArtifact(work, artifact(work, { ...nodeReceipt(base, made, after), branch: "ludion/php/22.23.4" }, ["refs/heads/ludion/node/22.23.4"], base), base)).toThrow();
     expect(() => checkArtifact(work, artifact(work, nodeReceipt(base, made, after, { security_releases: [{ version: "22.23.4" }] }), ["refs/heads/ludion/node/22.23.4"], base), base)).toThrow();
   });
-  const fixOf = (pkg: string, from: string, to: string, files: string[]): CheckedFix => ({
+  // docs/decisions/2026-10-31-limgv-image-newest-built-release.md, items 6 to 8: a move to the line's newest release with
+  // no newer security release. Its receipt lists no security release, has waited, and has no exposure-time start.
+  it.each([
+    ["PHP", { schema: 1, dockerfile: "./Dockerfile", test: ["php", "t.php"], timeout_seconds: 60 }, "php", "8.4.27", "8.4.28", "-cli-alpine", {}],
+    ["Node.js", NODE_POLICY, "node", "22.23.4", "22.23.5", "-alpine", { runtime: "node" }],
+  ] as const)("%s: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts", (label, policy, runtime, from, to, flavor, scanExtra) => {
+    const work = mkdtempSync(join(tmpdir(), "ludion-deliver-newest-"));
+    writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify(policy)}\n`);
+    writeFileSync(join(work, "Dockerfile"), `FROM ${runtime}:${from}${flavor}\nWORKDIR /app\n`);
+    const base = commit(work), copy = mkdtempSync(join(tmpdir(), "ludion-deliver-copy-"));
+    snapshot(work, copy);
+    const after = `FROM ${runtime}:${to}${flavor}@sha256:${"1".repeat(64)}\nWORKDIR /app\n`, branch = `ludion/${runtime}/${to}`, ref = [`refs/heads/${branch}`];
+    const message = (why: string) => `ludion: ${label} ${from} -> ${to} in ./Dockerfile\n\n${why}\n\nLudion receipt ${ID}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+    const fact = message(`${label} ${to}, the newest release of the line (no newer security release); Docker rebuilds only the newest tag of a line.`);
+    const receipt = (made: string, extra: Record<string, unknown> = {}, scan: Record<string, unknown> = {}) => ({
+      schema: 1, id: ID, scope: "dockerfile_only_not_deployed", outcome: "applied", baseline_passed: true, candidate_passed: true, base_commit: base,
+      scan: { current: { version: from }, candidate: { version: to }, security_releases: [], wait_until: "2026-11-02T00:00:00.000Z", ...scanExtra, ...scan }, dockerfile_after: sha256(after),
+      branch, commit: made, fix_published_at: null, found_at: "2026-11-02T01:00:00.000Z", applied_at: "2026-11-02T01:05:00.000Z", ...extra,
+    });
+    const made = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], fact);
+    const checked = checkArtifact(work, artifact(work, receipt(made), ref, base), base);
+    expect(checked.fixes).toMatchObject([{ package: runtime, branch, commit: made, message: fact, waited_until: "2026-11-02T00:00:00.000Z", fix_published_at: null }]);
+    const fix = checked.fixes[0]!, body = pullRequestBody(checked, fix);
+    expect(body).toContain(`Ludion's validation job moved the image to \`${to}\`, the newest release of its line: Docker rebuilds only the newest tag of a line, with its OS packages. No advisory names this move. By its receipt, it waited until \`2026-11-02T00:00:00.000Z\` (72 hours after the end of the release's day)`);
+    expect(body).toContain("| Advisories | none (a move to the line's newest release) |");
+    expect(body).toContain("| Fix published | none (no advisory; this move is not counted in exposure time) |");
+    expect(body).toContain(`${label} image updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check. This move's 72-hour wait is the validation job's, by its receipt.`);
+    // The PR's title (the commit's subject) and body never call the move a security release or fix.
+    expect(`${fix.subject}\n${body}`.toLowerCase()).not.toContain("security");
+    // Refused: applied before its wait ends, no wait_until, a fix_published_at, a commit that claims a security release.
+    expect(() => checkArtifact(work, artifact(work, receipt(made, { applied_at: "2026-11-01T23:59:59.999Z" }), ref, base), base)).toThrow("before its wait ends at 2026-11-02T00:00:00.000Z");
+    expect(() => checkArtifact(work, artifact(work, receipt(made, {}, { wait_until: undefined }), ref, base), base)).toThrow("scan.wait_until is missing");
+    expect(() => checkArtifact(work, artifact(work, receipt(made, { fix_published_at: "2026-10-27T00:00:00.000Z" }), ref, base), base)).toThrow("it has no advisory");
+    git(work, "branch", "-D", branch);
+    const claims = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], message(`Official ${label} security releases: ${to}.`));
+    expect(() => checkArtifact(work, artifact(work, receipt(claims), ref, base), base)).toThrow();
+    // The same commit with a receipt that lists a security release: the commit then carries the wrong paragraph.
+    git(work, "branch", "-D", branch);
+    const again = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], fact);
+    expect(() => checkArtifact(work, artifact(work, receipt(again, {}, { security_releases: [{ version: to }] }), ref, base), base)).toThrow();
+    // A fix with a security release keeps its texts, and needs no wait.
+    git(work, "branch", "-D", branch);
+    const security = fixBranch(gitBase(work, copy), branch, [{ path: "Dockerfile", content: after }], message(`Official ${label} security releases: ${to}.`));
+    const found = checkArtifact(work, artifact(work, receipt(security, { fix_published_at: "2026-10-27T00:00:00.000Z", applied_at: "2026-10-27T01:05:00.000Z" }, { security_releases: [{ version: to }], wait_until: undefined }), ref, base), base);
+    expect(found.fixes[0]!.waited_until).toBeUndefined();
+    expect(pullRequestBody(found, found.fixes[0]!)).toContain("found a published security fix");
+  });
+  const fixOf =(pkg: string, from: string, to: string, files: string[]): CheckedFix => ({
     package: pkg, changes: [{ name: pkg, from, to, advisories: [] }], branch: "ludion/x", commit: "a".repeat(40), subject: "", message: "", tree: "",
     files: files.map(path => ({ path, after_hash: "" })), fix_published_at: null, found_at: "", applied_at: "", verdict: null,
   });
@@ -993,9 +1067,53 @@ describe("the policy at the base decides what a fix may change, and what it may 
       ["a flag as a string", (e: Record<string, unknown>) => { e.optional = "true"; }],
       ["inBundle", (e: Record<string, unknown>) => { e.inBundle = true; }],
       ["a flag change with another key", (e: Record<string, unknown>) => { e.peer = true; e.hasInstallScript = true; }],
+      // Review 6541119866, N2: a changed `name`, here the entry's own (another package's is the identity rule's, below).
+      ["its name", (e: Record<string, unknown>) => { e.name = "tr46"; }],
     ] as const) expect(tr46(change), what).toContain("package-lock.json changes node_modules/tr46 (0.0.3 -> 0.0.3), which this fix does not plan.");
-    // Flags npm would not write there pass: whether they are the ones npm computes is not checked (the hole docs/status.md lists).
+    expect(tr46(e => { e.name = "evil"; })).toContain("node_modules/whatwg-url requires tr46 ~0.0.3, and node_modules/tr46 has evil@0.0.3, which is not that.");
+    // Flags npm would not write there pass: whether they are the ones npm computes is not checked (the hole docs/status.md
+    // lists; the graph-computed flags are a separate lane, docs/decisions/2026-10-31-lock-flags-from-graph.md, section 2).
     expect(tr46(e => { e.dev = true; e.devOptional = true; })).toBeNull();
+  });
+  // Review 6541119866, N1: `optional` and `peer` change alone as npm 12.2.1 writes it (X1 and X2 of
+  // docs/decisions/2026-10-31-lock-flags-from-graph.md): node-fetch 2.6.7 makes the project's optional (X1) or peer (X2)
+  // whatwg-url, and what it requires, production dependencies. X5: an optional peer that finds its package, in range.
+  it("npm: npm 12.2.1's fixes whose flags alone change (optional, peer) are taken, and an optional peer in range (N1)", () => {
+    const fix = fixOf("node-fetch", "2.6.1", "2.6.7", ["package.json", "package-lock.json"]);
+    const at = (dir: string, v: string, s: "base" | "fix", file: string) => readFileSync(new URL(`fixtures/npm-corpus/extra/${dir}/${v}/${s}/${file}`, import.meta.url), "utf8");
+    for (const [dir, flag] of [["optional", "optional"], ["peer", "peer"], ["optional-peer-in-range", null]] as const) for (const v of ["v2", "v3"]) {
+      const [was, is] = [JSON.parse(at(dir, v, "base", "package-lock.json")).packages, JSON.parse(at(dir, v, "fix", "package-lock.json")).packages];
+      if (flag) for (const path of ["node_modules/whatwg-url", "node_modules/tr46", "node_modules/webidl-conversions"]) {
+        expect(was[path][flag], `${dir} ${v} ${path}`).toBe(true);
+        expect({ ...is[path], [flag]: true }, `${dir} ${v} ${path}`).toEqual(was[path]);
+      }
+      const side = (s: "base" | "fix") => files({ "package.json": at(dir, v, s, "package.json"), "package-lock.json": at(dir, v, s, "package-lock.json") });
+      expect(contentProblem("npm", fix, side("base"), side("fix")), `${dir} ${v}`).toBeNull();
+    }
+  });
+  // Audit 6541743253, item 1 (docs/decisions/2026-10-31-lock-flags-from-graph.md, section 1): node-fetch 2.6.7's optional
+  // peer `encoding ^0.1.0`. The forged variants of npm 12.2.1's node-fetch fix (fixtures/npm-corpus/extra/optional-peer-forged).
+  it("npm: an optional peer adds nothing, and where the lock has one it is the package its spec names, in range (audit 6541743253, item 1)", () => {
+    const fix = fixOf("node-fetch", "2.6.1", "2.6.7", ["package.json", "package-lock.json"]);
+    const read = (path: string) => readFileSync(new URL(`fixtures/npm-corpus/extra/${path}`, import.meta.url), "utf8");
+    for (const v of ["v2", "v3"]) {
+      const base = files({ "package.json": read(`node-fetch/${v}/base/package.json`), "package-lock.json": read(`node-fetch/${v}/base/package-lock.json`) });
+      const variant = (name: string) => contentProblem("npm", fix, base, files({ "package.json": read(`optional-peer-forged/${name}/${v}/package.json`), "package-lock.json": read(`optional-peer-forged/${name}/${v}/package-lock.json`) }));
+      // B, C, E and P: rule 2, the requirement check (npm ls reports C and E; it does not look at B's nested peer or P's identity).
+      expect(variant("B"), `B ${v}`).toContain("node_modules/node-fetch requires encoding ^0.1.0, and node_modules/node-fetch/node_modules/encoding has evil-pkg@1.0.0, which is not that.");
+      expect(variant("C"), `C ${v}`).toContain("node_modules/node-fetch requires encoding ^0.1.0, and node_modules/encoding has evil-pkg@1.0.0, which is not that.");
+      expect(variant("E"), `E ${v}`).toContain("node_modules/node-fetch requires encoding ^0.1.0, and node_modules/encoding has encoding@9.9.9, which is not that.");
+      expect(variant("P"), `P ${v}`).toContain("node_modules/node-fetch requires encoding ^0.1.0, and node_modules/encoding has left-pad@0.1.13, which is not that.");
+      // R: the real encoding, in range, nested under node-fetch: rule 1, the walk (npm 12.2.1 leaves it extraneous).
+      expect(variant("R"), `R ${v}`).toBe("package-lock.json adds node_modules/node-fetch/node_modules/encoding, node_modules/node-fetch/node_modules/iconv-lite, node_modules/node-fetch/node_modules/safer-buffer, which no package the fix moves or adds requires.");
+    }
+    // Rule 2 where nothing is added: X4's project requires `"encoding": "npm:left-pad@1.3.0"`, so node-fetch 2.6.7's
+    // optional peer finds left-pad. npm 12.2.1 refuses to write that fix (ERESOLVE); forged here from its base.
+    const x4 = JSON.parse(read("optional-peer-other/v3/base/package-lock.json")), nf = JSON.parse(read("node-fetch/v3/fix/package-lock.json")).packages;
+    x4.packages[""].dependencies["node-fetch"] = "2.6.7";
+    for (const path of ["node_modules/node-fetch", "node_modules/whatwg-url", "node_modules/tr46", "node_modules/webidl-conversions"]) x4.packages[path] = nf[path];
+    expect(contentProblem("npm", fix, files({ "package.json": read("optional-peer-other/v3/base/package.json"), "package-lock.json": read("optional-peer-other/v3/base/package-lock.json") }), files({ "package.json": read("optional-peer-other/v3/fix/package.json"), "package-lock.json": JSON.stringify(x4, null, 2) })))
+      .toBe("package-lock.json's packages: node_modules/node-fetch requires encoding ^0.1.0, and node_modules/encoding has left-pad@1.3.0, which is not that.");
   });
   it("advisory IDs: only the forms a receipt can hold (OSV's for npm, Packagist and Maven, and Packagist's own)", () => {
     for (const id of ["GHSA-35jh-r3h4-6jhm", "CVE-2021-23337", "CVE-2024-1234567", "MAL-2024-12345", "PKSA-n8pg-4n3p-wcn3"]) expect(ADVISORY.test(id), id).toBe(true);

@@ -1,0 +1,21 @@
+# started 2026-10-31T13:51:27Z, node v24.22.1, git version 2.39.5
+== npm run build
+build exit 0
+13:51:29 [build] ✓ Completed in 423ms.
+13:51:29 [build] 5 page(s) built in 614ms
+13:51:29 [build] Complete!
+== npm run typecheck
+
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+typecheck exit 0
+== npm test -- --maxWorkers=2
+test exit 0
+ ✓ |node| packages/cli/test/security.test.ts (69 tests) 1041ms
+ ✓ |node| packages/cli/test/node-image.test.ts (66 tests) 431ms
+ ✓ |node| packages/cli/test/deliver.test.ts (62 tests) 13847ms
+ ✓ |node| tools/records/test/records.test.ts (14 tests) 23ms
+ Test Files  40 passed (40)
+      Tests  1380 passed | 25 skipped (1405)
+# finished 2026-10-31T13:51:48Z

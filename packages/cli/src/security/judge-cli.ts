@@ -5,7 +5,7 @@ import { join } from "node:path";
 import semver from "semver";
 import { fromPnpmLock } from "../lockfile.ts";
 import { parseArgs } from "node:util";
-import { allChanges, declaredByProject, judge, lockEntries, lockEntryChanges, lockExtraneous, lockLinks, newUnmetRequirements, renderJudgement, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
+import { allChanges, declaredByProject, judge, lockEntries, lockEntryChanges, lockExtraneous, lockFlagChanges, lockLinks, newUnmetRequirements, renderJudgement, type Change, type FixedAdvisory, type VersionFacts } from "./judge.ts";
 import { gatherFacts } from "./npm-facts.ts";
 import { regularFile, rootPath } from "./project.ts";
 import { workspaceDir, workspaceManifestChanges } from "./workspace-manifests.ts";
@@ -36,7 +36,7 @@ export async function judgeCli(args: string[]): Promise<number> {
   // devDependency (docs/decisions/2026-10-29-every-change-counts-as-production.md).
   const changes = lock.changes.map(c => ({ ...c, dev: false }));
   let facts = new Map<string, VersionFacts>(), fixes: FixedAdvisory[] = [], created = new Map<string, string | null>(), errors: string[] = [];
-  try { ({ facts, fixes, created } = await gatherFacts(changes, fetch, lock.entries.map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
+  try { ({ facts, fixes, created } = await gatherFacts(changes, fetch, [...lock.entries, ...lock.flagged].map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
   const workspaces = workspaceManifests(before, after, files, { before: JSON.parse(beforeManifest), after: JSON.parse(afterManifest) }, { before: beforeLock, after: afterLock });
   const result = judge({ ...lock, changes, facts, fixes, files, now, errors, created, workspaces });
   console.log(values.json ? JSON.stringify(result, null, 2) : renderJudgement(result));
@@ -61,6 +61,8 @@ export function packageLockInputs(lock: { before: string; after: string }, manif
   return {
     changes: allChanges(lock.before, lock.after),
     entries: lockEntryChanges(beforeEntries, afterEntries),
+    // Entries whose flags alone changed: gate 2 checks their versions too (docs/decisions/2026-10-31-flag-only-entries-gate2.md).
+    flagged: lockFlagChanges(lock.before, lock.after),
     links: lockLinks(lock.after).filter(link => !hadLinks.has(link)),
     extraneous: [...extraneousAfter.filter(e => !extraneousBefore.includes(e)), ...extraneousBefore.filter(e => !extraneousAfter.includes(e)).map(e => `(removed) ${e}`)],
     manifest: manifest.before === manifest.after ? undefined : { before: JSON.parse(manifest.before) as unknown, after: JSON.parse(manifest.after) as unknown },

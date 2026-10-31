@@ -1,0 +1,14 @@
+# at commit 44da769fb3975d653c0ef3908da8954f8172fd76, 3 files differing from it
+# started 2026-10-31T11:30:20Z, node v24.22.1, git version 2.39.5
+1. caught  rule 1: the walk follows optional peers — packages/cli/test/deliver.test.ts packages/cli/test/npm-corpus.test.ts (20 s)
+2. caught  rule 2: an entry's optional peer not checked where it is there — packages/cli/test/deliver.test.ts packages/cli/test/npm-corpus.test.ts (19 s)
+3. caught  rule 2: the project's optional peer not checked where it is there — packages/cli/test/deliver.test.ts packages/cli/test/npm-corpus.test.ts (19 s)
+4. caught  rule 2: a missing optional peer counted unmet — packages/cli/test/deliver.test.ts packages/cli/test/npm-corpus.test.ts (19 s)
+5. caught  rule 2: an optional peer that another group names checked as a peer too — packages/cli/test/deliver.test.ts packages/cli/test/npm-corpus.test.ts (19 s)
+6. caught  gate 2: flag-only entries not passed to the judge — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+7. caught  gate 2: patch's judge does not ask for their facts — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+8. NOT CAUGHT  gate 2: ludion judge does not ask for their facts — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+9. caught  gate 2: an entry whose flags did not change counted — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+10. caught  gate 2: an entry whose integrity changed counted as flag-only — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+9 of 10 applied mutations caught (10 run, 18 in all), 0 of them by the time limit; without mutations: packages/cli/test/deliver.test.ts packages/cli/test/npm-corpus.test.ts: pass, packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts: pass
+# finished 2026-10-31T11:32:22Z

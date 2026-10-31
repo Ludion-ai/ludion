@@ -1,0 +1,167 @@
+# started 2026-10-31T13:54:28Z, node v24.22.1, git version 2.39.5, Docker version 27.5.1, build 9f9e405
+npm ci exit 0
+build exit 0
+== case node
+  FROM node:22.22.0-alpine
+base 55e0aca3465cc5cea4714fde8fa71d9469c9f8fa
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 7d82524a-f3c1-4ddc-9f67-a565cefbc63d: outcome applied, base 55e0aca3465cc5cea4714fde8fa71d9469c9f8fa
+  digests: old node@sha256:e4bf2a82ad0a4037d28035ae71529873c069b13eb0455466ae0bc13363826e34 new node@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914; baseline_passed true candidate_passed true; security releases 22.23.4, 22.23.2, 22.23.0, 22.22.2
+  node 22.22.0 -> 22.23.4: applied ludion/node/22.23.4 746ea3568a21715c4aa65f21b12989e857b2634d published=2026-03-24T00:00:00.000Z found=2026-10-31T13:54:42.250Z applied=2026-10-31T13:54:49.139Z
+  scan: update_available, candidate 22.23.4, wait_until undefined
+Packed 1 applied fix into /e/node/artifact1.
+pack exit 0
+  head 746ea3568a21715c4aa65f21b12989e857b2634d refs/heads/ludion/node/22.23.4
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 7d82524a-f3c1-4ddc-9f67-a565cefbc63d on 55e0aca3465c: 1 applied fix.
+  node (ludion/node/22.23.4): opened #1
+open exit 0
+  ludion/node/22.23.4: FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
+    | ludion: Node.js 22.22.0 -> 22.23.4 in Dockerfile
+    | 
+    | Official Node.js security releases: 22.23.4, 22.23.2, 22.23.0, 22.22.2.
+    | 
+    | Ludion receipt 7d82524a-f3c1-4ddc-9f67-a565cefbc63d: the project's test passed on 55e0aca3465c and on this change, offline in Docker.
+    | Source Dockerfile only; production was not changed.
+    | 
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 860c093c-74ac-427c-981b-2ae88251f437: outcome applied, base 55e0aca3465cc5cea4714fde8fa71d9469c9f8fa
+  digests: old node@sha256:e4bf2a82ad0a4037d28035ae71529873c069b13eb0455466ae0bc13363826e34 new node@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914; baseline_passed true candidate_passed true; security releases 22.23.4, 22.23.2, 22.23.0, 22.22.2
+  node 22.22.0 -> 22.23.4: applied ludion/node/22.23.4 9b2d90559a9c0f44cc9888f47d3e7cacdbbf0f9d published=2026-03-24T00:00:00.000Z found=2026-10-31T13:54:51.306Z applied=2026-10-31T13:54:57.641Z
+  scan: update_available, candidate 22.23.4, wait_until undefined
+Packed 1 applied fix into /e/node/artifact2.
+pack exit 0
+  head 9b2d90559a9c0f44cc9888f47d3e7cacdbbf0f9d refs/heads/ludion/node/22.23.4
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 860c093c-74ac-427c-981b-2ae88251f437 on 55e0aca3465c: 1 applied fix.
+  node (ludion/node/22.23.4): open_pr_exists #1
+open exit 0
+  ludion/node/22.23.4: FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
+    | ludion: Node.js 22.22.0 -> 22.23.4 in Dockerfile
+    | 
+    | Official Node.js security releases: 22.23.4, 22.23.2, 22.23.0, 22.22.2.
+    | 
+    | Ludion receipt 7d82524a-f3c1-4ddc-9f67-a565cefbc63d: the project's test passed on 55e0aca3465c and on this change, offline in Docker.
+    | Source Dockerfile only; production was not changed.
+    | 
+-- PRs in the stand-in:
+  #1 open ludion/node/22.23.4: ludion: Node.js 22.22.0 -> 22.23.4 in Dockerfile; "security" in title or body: true
+== case php
+  FROM php:8.4.26-cli-alpine
+base e927bb9674db6851cd05c3bb9c73abf2cab0b6c3
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt f616456c-a27f-4fdf-bcdc-c3bc3349cf73: outcome applied, base e927bb9674db6851cd05c3bb9c73abf2cab0b6c3
+  digests: old php@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1 new php@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65; baseline_passed true candidate_passed true; security releases 8.4.27
+  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 54936ab9f4e2e22e50e6e97f987ac203985d154b published=2026-10-21T00:00:00.000Z found=2026-10-31T13:54:59.521Z applied=2026-10-31T13:55:06.054Z
+  scan: update_available, candidate 8.4.27, wait_until undefined
+Packed 1 applied fix into /e/php/artifact1.
+pack exit 0
+  head 54936ab9f4e2e22e50e6e97f987ac203985d154b refs/heads/ludion/php/8.4.27
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt f616456c-a27f-4fdf-bcdc-c3bc3349cf73 on e927bb9674db: 1 applied fix.
+  php (ludion/php/8.4.27): opened #1
+open exit 0
+  ludion/php/8.4.27: FROM php:8.4.27-cli-alpine@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65
+    | ludion: PHP 8.4.26 -> 8.4.27 in Dockerfile
+    | 
+    | Official PHP security releases: 8.4.27.
+    | 
+    | Ludion receipt f616456c-a27f-4fdf-bcdc-c3bc3349cf73: the project's test passed on e927bb9674db and on this change, offline in Docker.
+    | Source Dockerfile only; production was not changed.
+    | 
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 7daf523e-b085-47e2-9f95-50481e3abeba: outcome applied, base e927bb9674db6851cd05c3bb9c73abf2cab0b6c3
+  digests: old php@sha256:37c8c64177612b72e7f9d2c00481739c166a3708bea27c1cfd27fea1291d82d1 new php@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65; baseline_passed true candidate_passed true; security releases 8.4.27
+  php 8.4.26 -> 8.4.27: applied ludion/php/8.4.27 d051941881904b6a39e3491d2371dbad9d30772f published=2026-10-21T00:00:00.000Z found=2026-10-31T13:55:07.719Z applied=2026-10-31T13:55:14.504Z
+  scan: update_available, candidate 8.4.27, wait_until undefined
+Packed 1 applied fix into /e/php/artifact2.
+pack exit 0
+  head d051941881904b6a39e3491d2371dbad9d30772f refs/heads/ludion/php/8.4.27
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 7daf523e-b085-47e2-9f95-50481e3abeba on e927bb9674db: 1 applied fix.
+  php (ludion/php/8.4.27): open_pr_exists #1
+open exit 0
+  ludion/php/8.4.27: FROM php:8.4.27-cli-alpine@sha256:d8784155c4d37986be9ddd7a8950df7e78998cc48e35472cd69e2b9371424a65
+    | ludion: PHP 8.4.26 -> 8.4.27 in Dockerfile
+    | 
+    | Official PHP security releases: 8.4.27.
+    | 
+    | Ludion receipt f616456c-a27f-4fdf-bcdc-c3bc3349cf73: the project's test passed on e927bb9674db and on this change, offline in Docker.
+    | Source Dockerfile only; production was not changed.
+    | 
+-- PRs in the stand-in:
+  #1 open ludion/php/8.4.27: ludion: PHP 8.4.26 -> 8.4.27 in Dockerfile; "security" in title or body: true
+== case node-newest
+  FROM node:24.22.1-alpine
+base 888fbe4fabd98565bd09734b06ceb7f629d30188
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 869413b8-a89a-4f56-a7c9-880824fad606: outcome applied, base 888fbe4fabd98565bd09734b06ceb7f629d30188
+  digests: old node@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53 new node@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85; baseline_passed true candidate_passed true; security releases 
+  node 24.22.1 -> 24.22.2: applied ludion/node/24.22.2 c40a3d73fe479bd59487c60005da838b88e34a96 published=null found=2026-10-31T13:55:16.306Z applied=2026-10-31T13:55:47.543Z
+  scan: update_available, candidate 24.22.2, wait_until 2026-10-31T00:00:00.000Z
+Packed 1 applied fix into /e/node-newest/artifact1.
+pack exit 0
+  head c40a3d73fe479bd59487c60005da838b88e34a96 refs/heads/ludion/node/24.22.2
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 869413b8-a89a-4f56-a7c9-880824fad606 on 888fbe4fabd9: 1 applied fix.
+  node (ludion/node/24.22.2): opened #1
+open exit 0
+  ludion/node/24.22.2: FROM node:24.22.2-alpine@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85
+    | ludion: Node.js 24.22.1 -> 24.22.2 in Dockerfile
+    | 
+    | Node.js 24.22.2, the newest release of the line (no newer security release); Docker rebuilds only the newest tag of a line.
+    | 
+    | Ludion receipt 869413b8-a89a-4f56-a7c9-880824fad606: the project's test passed on 888fbe4fabd9 and on this change, offline in Docker.
+    | Source Dockerfile only; production was not changed.
+    | 
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 0
+receipt 70116701-e837-4124-afc3-9293340605dd: outcome applied, base 888fbe4fabd98565bd09734b06ceb7f629d30188
+  digests: old node@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53 new node@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85; baseline_passed true candidate_passed true; security releases 
+  node 24.22.1 -> 24.22.2: applied ludion/node/24.22.2 1b59b0ba19202c5d46fcc06c99b4643a5127f7be published=null found=2026-10-31T13:55:49.258Z applied=2026-10-31T13:55:55.499Z
+  scan: update_available, candidate 24.22.2, wait_until 2026-10-31T00:00:00.000Z
+Packed 1 applied fix into /e/node-newest/artifact2.
+pack exit 0
+  head 1b59b0ba19202c5d46fcc06c99b4643a5127f7be refs/heads/ludion/node/24.22.2
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+Receipt 70116701-e837-4124-afc3-9293340605dd on 888fbe4fabd9: 1 applied fix.
+  node (ludion/node/24.22.2): open_pr_exists #1
+open exit 0
+  ludion/node/24.22.2: FROM node:24.22.2-alpine@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85
+    | ludion: Node.js 24.22.1 -> 24.22.2 in Dockerfile
+    | 
+    | Node.js 24.22.2, the newest release of the line (no newer security release); Docker rebuilds only the newest tag of a line.
+    | 
+    | Ludion receipt 869413b8-a89a-4f56-a7c9-880824fad606: the project's test passed on 888fbe4fabd9 and on this change, offline in Docker.
+    | Source Dockerfile only; production was not changed.
+    | 
+-- PRs in the stand-in:
+  #1 open ludion/node/24.22.2: ludion: Node.js 24.22.1 -> 24.22.2 in Dockerfile; "security" in title or body: false
+== case node-missing
+  FROM node:22.22.0-alpine3.22
+base ace456d4d17c2945a86cbe76e960295af57d6155
+-- run 1, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 2
+  stderr: ludion: Docker Hub has no node:22.23.4-alpine3.22, the newest release of Node.js 22 in the Dockerfile's variant: Docker has not published it yet, or no longer builds this variant. Ludion does not move the variant or its OS release. No update decision was made.
+(no JSON: Unexpected end of JSON input)
+ludion: Unexpected end of JSON input
+pack exit 2
+-- run 1, PR job (contents and pull-requests: write): fresh clone, deliver open
+ludion: The artifact was refused, and nothing was pushed or opened: it has no receipt.json.
+open exit 2
+-- run 2, validation job (contents: read): fresh clone, patch --apply, deliver pack
+patch exit 2
+  stderr: ludion: Docker Hub has no node:22.23.4-alpine3.22, the newest release of Node.js 22 in the Dockerfile's variant: Docker has not published it yet, or no longer builds this variant. Ludion does not move the variant or its OS release. No update decision was made.
+(no JSON: Unexpected end of JSON input)
+ludion: Unexpected end of JSON input
+pack exit 2
+-- run 2, PR job (contents and pull-requests: write): fresh clone, deliver open
+ludion: The artifact was refused, and nothing was pushed or opened: it has no receipt.json.
+open exit 2
+-- PRs in the stand-in:
+# finished 2026-10-31T13:55:59Z

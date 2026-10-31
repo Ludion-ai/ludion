@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "name": "s9",
+  "dependencies": {
+    "node-fetch": {
+      "version": "2.6.7",
+      "resolved": "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.7.tgz",
+      "overridden": false,
+      "dependencies": {
+        "encoding": {
+          "version": "1.0.0",
+          "resolved": "https://registry.npmjs.org/evil-pkg/-/evil-pkg-1.0.0.tgz",
+          "overridden": false
+        },
+        "whatwg-url": {
+          "version": "5.0.0"
+        }
+      }
+    },
+    "whatwg-url": {
+      "version": "5.0.0",
+      "resolved": "https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz",
+      "overridden": false,
+      "dependencies": {
+        "tr46": {
+          "version": "0.0.3",
+          "resolved": "https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz",
+          "overridden": false
+        },
+        "webidl-conversions": {
+          "version": "3.0.1",
+          "resolved": "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz",
+          "overridden": false
+        }
+      }
+    }
+  }
+}

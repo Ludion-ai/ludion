@@ -1,0 +1,5 @@
+# at commit 39ee847a63daacfc5c7b5457798e4365e3dbe177, 1 files differing from it
+# started 2026-10-31T10:23:30Z, node v24.22.1, git version 2.39.5
+5. caught  rule 2: an optional peer that another group names checked as a peer too — packages/cli/test/deliver.test.ts packages/cli/test/npm-corpus.test.ts (20 s)
+1 of 1 applied mutations caught (1 run, 25 in all), 0 of them by the time limit; without mutations: packages/cli/test/deliver.test.ts packages/cli/test/npm-corpus.test.ts: pass
+# finished 2026-10-31T10:24:09Z

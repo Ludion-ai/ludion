@@ -1,7 +1,8 @@
-import { compare, officialImage, releaseJson, withoutBom, type Release, type RuntimeImage, type Scan } from "./php.ts";
+import { compare, imageMove, officialImage, releaseJson, withoutBom, type Release, type RuntimeImage, type Scan } from "./php.ts";
 
 /**
- * The official Node.js image, moved to a security release of its own line (docs/decisions/2026-10-31-lnode-node-image.md).
+ * The official Node.js image, moved to the newest release of its line that Docker still builds in its variant
+ * (docs/decisions/2026-10-31-lnode-node-image.md; its item 5 replaced by docs/decisions/2026-10-31-limgv-image-newest-built-release.md).
  * The same path as PHP's image (php.ts): nodejs.org's release index marks each release `security: true` or `false`.
  */
 export const NODE_INDEX_URL = "https://nodejs.org/dist/index.json";
@@ -22,9 +23,10 @@ export function nodeImage(dockerfile: string): RuntimeImage {
 }
 
 const DAY = /^(\d{4})-(\d{2})-(\d{2})$/;
-const realDay = (date: string) => {
+/** nodejs.org's release day ("2026-10-21") as 00:00 UTC that day; null when it is not in that form or not a real day. */
+export const nodeDay = (date: string): Date | null => {
   const match = DAY.exec(date), at = match ? new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))) : null;
-  return at !== null && at.toISOString().slice(0, 10) === date;
+  return at !== null && at.toISOString().slice(0, 10) === date ? at : null;
 };
 
 /** The releases of one line (the major) from nodejs.org's index, newest first. Any entry of the line that is incomplete fails the lookup. */
@@ -38,7 +40,7 @@ export function parseNodeReleases(input: unknown, line: string): Release[] {
     const match = /^v(\d+)\.(\d+)\.(\d+)$/.exec(item.version);
     // Prereleases and other lines are left out.
     if (!match || match[1] !== line) continue;
-    if (typeof item.date !== "string" || !realDay(item.date) || typeof item.security !== "boolean") {
+    if (typeof item.date !== "string" || !nodeDay(item.date) || typeof item.security !== "boolean") {
       throw new Error("Incomplete Node.js release metadata. No update decision was made.");
     }
     const version = item.version.slice(1);
@@ -52,13 +54,10 @@ export function parseNodeReleases(input: unknown, line: string): Release[] {
 export async function scanNode(dockerfile: string, fetchFn: typeof fetch = fetch): Promise<Scan> {
   const current = nodeImage(dockerfile);
   const releases = parseNodeReleases(await releaseJson(NODE_INDEX_URL, "Node.js release", 4, 30_000, fetchFn), current.branch);
-  const fixes = releases.filter(r => r.security && compare(r.version, current.version) > 0);
-  // Releases of a line are cumulative: the newest security release is the smallest version holding every published fix.
-  const fixed = fixes[0];
-  const candidate = fixed ? { version: fixed.version, reference: `node:${fixed.version}${current.flavor}` } : null;
+  const now = new Date(), move = await imageMove("node", releases, current, `Node.js ${current.branch}`, nodeDay, now, fetchFn);
   return {
-    schema: 1, checked_at: new Date().toISOString(), status: candidate ? "update_available" : "no_newer_security_release",
-    scope: "dockerfile_base_image", runtime: "node", current, candidate, security_releases: fixes, source: NODE_INDEX_URL,
-    note: "Checks nodejs.org's security-release marks against the Dockerfile, not live deployment inventory or every CVE. No match is not a security guarantee. No major upgrades, end-of-life certification, same-tag image rebuilds, or automatic production deployment.",
+    schema: 1, checked_at: now.toISOString(), status: move.status,
+    scope: "dockerfile_base_image", runtime: "node", current, candidate: move.candidate, security_releases: move.security_releases, ...(move.wait_until ? { wait_until: move.wait_until } : {}), source: NODE_INDEX_URL,
+    note: "Checks nodejs.org's release index (the line's newest release and its security marks), and Docker Hub's tag for a move, against the Dockerfile, not live deployment inventory or every CVE. No match is not a security guarantee. No major upgrades, end-of-life certification, same-tag image rebuilds, or automatic production deployment.",
   };
 }

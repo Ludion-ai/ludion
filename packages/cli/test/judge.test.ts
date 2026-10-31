@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { allChanges, installScripts, judge, lockDiff, lockEntries, newUnmetRequirements, unmetRequirements, lockEntryChanges, lockExtraneous, lockLinks, manifestChanges, ownFixes, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
+import { allChanges, installScripts, judge, lockDiff, lockEntries, newUnmetRequirements, unmetRequirements, lockEntryChanges, lockExtraneous, lockFlagChanges, lockLinks, manifestChanges, ownFixes, registryTarball, renderJudgement, urgencyOf, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { gatherFacts, osvIds, provenanceFrom, sharedPublisher } from "../src/security/npm-facts.ts";
-import { pnpmChanges } from "../src/security/judge-cli.ts";
+import { packageLockInputs, pnpmChanges } from "../src/security/judge-cli.ts";
 import { OsvClient } from "../src/security/osv.ts";
 import { firstPublish, renderTimeCap, timeCap } from "../src/security/time-cap.ts";
 
@@ -932,5 +932,54 @@ describe("package-lock.json as every npm reads it (review of aa5d75b, B1)", () =
     const v3 = edit(nested, l => { l.lockfileVersion = 3; delete l.dependencies; });
     expect(lockEntries(v3)).toHaveLength(lockEntries(nested).length);
     expect(() => lockEntries(edit(nested, l => { l.lockfileVersion = 3; l.dependencies.nan.version = "2.29.0"; }))).toThrow("disagree at node_modules/nan");
+  });
+});
+
+// Gate 2 on every entry whose flags alone changed (docs/decisions/2026-10-31-flag-only-entries-gate2.md): "Check every
+// package in the lockfile diff". tr46's flags changed beside the move of lib.
+describe("gate 2 on an entry whose flags alone changed", () => {
+  const tr46 = { path: "node_modules/tr46", name: "tr46", version: "0.0.3", dev: false, resolved: url("tr46", "0.0.3"), integrity: INTEGRITY };
+  const judged = (f: VersionFacts | null, flagged = [tr46]) => judge({
+    changes: [change()], fixes: [fixHigh], files: ["package-lock.json"], now: new Date("2026-10-10T00:00:00Z"), flagged,
+    facts: new Map([["lib@1.0.0", fact({ published_at: "2026-09-01T00:00:00Z" })], ["lib@1.0.1", fact()], ...(f ? [["tr46@0.0.3", f] as [string, VersionFacts]] : [])]),
+  });
+  const at = "tr46@0.0.3 at node_modules/tr46 (its flags alone changed)";
+  it("stops on a MAL- record, a withdrawn or a deprecated version, and cannot decide without facts", () => {
+    const plain = judged(fact(), []);
+    expect(plain.verdict).toBe("ready_except_build");
+    expect(judged(fact()).verdict).toBe("ready_except_build");
+    for (const [over, message] of [
+      [{ malicious: ["MAL-2026-1"] } as Partial<VersionFacts>, `${at} is in OSV's malicious-package records (MAL-2026-1).`],
+      [{ present: false }, `${at} is no longer listed by the registry (unpublished or withdrawn).`],
+      [{ deprecated: "use something else" }, `${at} is deprecated: use something else`],
+    ] as const) {
+      const j = judged(fact(over as Partial<VersionFacts>));
+      expect(j.verdict, message).toBe("stop");
+      expect(j.findings, message).toContainEqual({ gate: 2, package: "tr46", effect: "stop", message });
+    }
+    const none = judged(null);
+    expect(none.verdict).toBe("undecidable");
+    expect(none.findings).toContainEqual({ gate: 2, package: "tr46", effect: "stop", message: `No registry facts for ${at}; undecidable.` });
+  });
+  it("reports its advisories, and sets no wait: it is its own predecessor", () => {
+    const plain = judged(fact(), []);
+    const j = judged(fact({ advisories: ["GHSA-xxxx-yyyy-zzzz"], published_at: "2026-10-09T23:00:00Z", publisher: "mallory", install_scripts: ["postinstall"] }));
+    expect(j.verdict).toBe("ready_except_build");
+    expect(j.findings).toContainEqual({ gate: 1, package: "tr46", effect: "info", message: `${at} has known advisories, as before: GHSA-xxxx-yyyy-zzzz.` });
+    expect([j.wait_hours, j.newest_publish, j.wait_until]).toEqual([plain.wait_hours, plain.newest_publish, plain.wait_until]);
+  });
+  it("packageLockInputs finds B1's three entries in npm 12.2.1's locks, and none where nothing but flags is the same", () => {
+    const read = (path: string) => readFileSync(new URL(`fixtures/npm-corpus/extra/${path}`, import.meta.url), "utf8");
+    for (const x of ["node-fetch", "optional", "peer"]) for (const v of ["v2", "v3"]) {
+      const lock = { before: read(`${x}/${v}/base/package-lock.json`), after: read(`${x}/${v}/fix/package-lock.json`) };
+      const inputs = packageLockInputs(lock, { before: read(`${x}/${v}/base/package.json`), after: read(`${x}/${v}/fix/package.json`) });
+      expect(inputs.flagged.map(e => `${e.path}@${e.version}`), `${x} ${v}`).toEqual(["node_modules/tr46@0.0.3", "node_modules/webidl-conversions@3.0.1", "node_modules/whatwg-url@5.0.0"]);
+      expect(inputs.entries.map(e => e.path), `${x} ${v}`).toEqual(["node_modules/node-fetch"]);
+      expect(lockFlagChanges(lock.before, lock.before), `${x} ${v}`).toEqual([]);
+    }
+    // An entry whose integrity changed as well is a changed entry (lockEntryChanges), not a flag-only one.
+    const before = read("node-fetch/v3/base/package-lock.json"), after = JSON.parse(read("node-fetch/v3/fix/package-lock.json"));
+    after.packages["node_modules/tr46"].integrity = INTEGRITY;
+    expect(lockFlagChanges(before, JSON.stringify(after)).map(e => e.path)).toEqual(["node_modules/webidl-conversions", "node_modules/whatwg-url"]);
   });
 });

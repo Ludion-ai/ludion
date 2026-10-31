@@ -10,10 +10,10 @@ import { describe, expect, it } from "vitest";
 const root = new URL("../../../", import.meta.url);
 
 /** Script files a container can be told to run, and the files a socket mount can be written in. */
-const SCRIPT = /\.(?:sh|mjs|cjs|js|ps1)$/;
-const SCANNED = /(?:\.(?:sh|mjs|cjs|js|ts|ps1|md|yml|yaml)|Dockerfile)$/;
-const isShell = (path: string) => /\.(?:sh|ps1)$/.test(path);
-const isJs = (path: string) => /\.(?:mjs|cjs|js|ts)$/.test(path);
+const SCRIPT = /\.(?:sh|bash|mjs|cjs|js|ts|mts|cts|ps1)$/;
+const SCANNED = /(?:\.(?:sh|bash|mjs|cjs|js|ts|mts|cts|ps1|md|yml|yaml)|Dockerfile)$/;
+const isShell = (path: string) => /\.(?:sh|bash|ps1)$/.test(path);
+const isJs = (path: string) => /\.(?:mjs|cjs|js|ts|mts|cts)$/.test(path);
 
 type Line = { n: number; text: string; code: boolean };
 
@@ -40,17 +40,24 @@ function lines(path: string, text: string): Line[] {
  */
 const SOCKET = /docker\.sock|docker_engine|DOCKER_HOST|(?:-v|--volume)(?:\s+|=)["']?\/{1,2}(?:var\/run|var|run)?\/?["']?:|\b(?:source|src)=["']?\/{1,2}(?:var\/run|var|run)?\/?["']?(?=[,\s"']|$)/;
 /** A line that starts a container (or builds an image): what runs in it is socket-side only when the line passes the socket. */
-const STARTS_CONTAINER = /(?<![\w./-])docker(?:\s+-{1,2}[\w-]+(?:=\S+)?)*\s+(?:run|create|build|buildx|compose)(?![\w-])/;
+// An option is `-[\w-]+` (which takes `--x` too), so each option matches only one way.
+const STARTS_CONTAINER = /(?<![\w./-])docker(?:\s+-[\w-]+(?:=\S+)?)*\s+(?:run|create|build|buildx|compose)(?![\w-])/;
 
-/** Shell assignments in a text: `NAME=value`, `NAME="value"`, `export NAME=value`. */
+/** Shell assignments in a text: `NAME=value`, `NAME="value"`, `NAME=(a bash array)`, `export NAME=value`. */
 function* assignments(text: string): Generator<{ name: string; value: string; exported: boolean }> {
-  for (const m of text.matchAll(/(?:^|[\s;&|(`])(export\s+)?([A-Za-z_]\w*)=("[^"]*"|'[^']*'|[^\s;&|)`]*)/gm)) yield { name: m[2] ?? "", value: (m[3] ?? "").replace(/^["']|["']$/g, ""), exported: !!m[1] };
+  for (const m of text.matchAll(/(?:^|[\s;&|(`])(export\s+)?([A-Za-z_]\w*)=("[^"]*"|'[^']*'|\([^)]*\)|[^\s;&|)`]*)/gm)) yield { name: m[2] ?? "", value: (m[3] ?? "").replace(/^["'(]|["')]$/g, ""), exported: !!m[1] };
 }
 
-/** The variables a file sets to text that gives the socket (`SOCK=/var/run/docker.sock`, `ARGS="-v …docker.sock…"`). */
+/** A folder the socket is in, as a variable's whole value (`SOCK_DIR=/var/run`). */
+const SOCKET_FOLDER = /^\/{1,2}(?:var\/run|var|run)?\/?$/;
+
+/**
+ * The variables a file sets to text that gives the socket (`SOCK=/var/run/docker.sock`, `ARGS="-v …docker.sock…"`,
+ * `args=(-v …docker.sock…)`), or to a folder the socket is in (`SOCK_DIR=/var/run`).
+ */
 function socketVars(text: string): { all: Set<string>; exported: Set<string> } {
   const all = new Set<string>(), exported = new Set<string>();
-  for (const a of assignments(text)) if (SOCKET.test(a.value)) { all.add(a.name); if (a.exported) exported.add(a.name); }
+  for (const a of assignments(text)) if (SOCKET.test(a.value) || SOCKET_FOLDER.test(a.value)) { all.add(a.name); if (a.exported) exported.add(a.name); }
   return { all, exported };
 }
 
@@ -61,12 +68,16 @@ const isSocket = (text: string, vars: Set<string>) => SOCKET.test(text) || usesV
 /** A program name, alone or with its path (`/usr/local/bin/npm`, `npm.cmd`), as a word of a command. */
 const program = (names: string) => `(?<![\\w.-])(?:[\\w.~-]*\\/)*(?:${names})(?:\\.cmd|\\.exe)?(?![\\w.-])`;
 const RUNNERS = "npx|bunx|pnpx|pnpm|yarn|npm|bun";
-/** npm's commands, with every alias and typo npm accepts, that install packages and so run their install scripts. */
-const INSTALLS = "ci|clean-install|ic|install-clean|isntall-clean|install|i|in|ins|inst|insta|instal|isnt|isnta|isntal|isntall|add|install-test|it|install-ci-test|cit|clean-install-test|sit|rebuild|rb|update|up|upgrade|udpate|dedupe|ddp";
-const INSTALL = new RegExp(`${program("npm")}(?:\\s+\\S+)*?\\s+(${INSTALLS})(?![\\w-])`);
+/**
+ * npm's commands that install packages and so run their install scripts, with every alias and typo npm accepts: in npm
+ * 11.19.1, the commands whose options include ignore-scripts, except those that run only the project's own scripts (run,
+ * test, start, stop, restart, pack, publish, version) and find-dupes, a dry run. `npm audit fix` is matched apart.
+ */
+const INSTALLS = "ci|clean-install|ic|install-clean|isntall-clean|install|i|in|ins|inst|insta|instal|isnt|isnta|isntal|isntall|add|install-test|it|install-ci-test|cit|clean-install-test|sit|rebuild|rb|update|u|up|upgrade|udpate|dedupe|ddp|link|ln|prune";
+const INSTALL = new RegExp(`${program("npm")}(?:\\s+\\S+)*?\\s+(${INSTALLS}|audit(?:\\s+\\S+)*?\\s+fix)(?![\\w-])`);
 const RUNNER = new RegExp([
   program("npx|bunx|pnpx|pnpm|yarn"),
-  `${program("npm")}(?:\\s+-{1,2}[\\w-]+)*\\s+(?:exec|x|create|innit|init(?=\\s+[^\\s-]))(?![\\w-])`,
+  `${program("npm")}(?:\\s+-[\\w-]+)*\\s+(?:exec|x|create|innit|init(?=\\s+[^\\s-]))(?![\\w-])`,
   `${program("bun")}\\s+(?:install|i|add|x|create)(?![\\w-])`,
 ].join("|"));
 
@@ -119,7 +130,7 @@ function shellForbidden(text: string, tools: Map<string, string>): string[] {
 
 /** The string literals in a line of JavaScript, each with the text before it. */
 function* strings(text: string): Generator<{ value: string; before: string }> {
-  for (const m of text.matchAll(/"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g)) yield { value: (m[1] ?? m[2] ?? m[3] ?? "").replace(/\\(.)/g, "$1"), before: text.slice(0, m.index) };
+  for (const m of text.matchAll(/"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g)) yield { value: (m[1] ?? m[2] ?? m[3] ?? "").replace(/\\(.)/g, (_, c: string) => c === "n" ? "\n" : c === "t" ? "\t" : c), before: text.slice(0, m.index) };
 }
 
 /** The commands in a line that would run dependency code: an npm install with its scripts on, or a package runner. */
@@ -127,7 +138,9 @@ function forbidden(path: string, text: string, tools: Map<string, string>): stri
   if (!isJs(path)) return shellForbidden(text, tools);
   const out: string[] = [];
   // A command in a string (`execSync("npm ci")`, `spawnSync("sh", ["-c", "npx tsx"])`), except one only printed.
-  for (const s of strings(text)) if (!/(?:console\.\w+|\.write|Error|log)\(\s*$/.test(s.before)) out.push(...shellForbidden(s.value, new Map()));
+  // Only console output, the process's own stdout and stderr, and an Error's message count as printed: a shell's stdin
+  // (`sh.stdin.write("npm ci\n")`) or a helper whose name ends in log (`runAndlog("npm ci")`) can run it.
+  for (const s of strings(text)) if (!/(?:\bconsole\.\w+|\bprocess\.std(?:out|err)\.write|\bError)\(\s*$/.test(s.before)) out.push(...shellForbidden(s.value, new Map()));
   // A program and its argument list (`execFileSync("npm", ["ci", "--no-audit"])`), read as one command.
   for (const m of text.matchAll(new RegExp(`(["'\`])((?:[\\w.~-]*/)*(?:${RUNNERS}))\\1\\s*,\\s*\\[([^\\]]*)\\]`, "g"))) out.push(...shellForbidden([m[2] ?? "", ...[...strings(m[3] ?? "")].map(s => s.value)].join(" "), new Map()));
   for (const m of text.matchAll(/["'`](npx|pnpm|yarn|bunx|pnpx)["'`]/g)) out.push(m[1] ?? "");
@@ -171,7 +184,7 @@ type Ref = { path: string; args: string[] };
 function referenced(path: string, text: string, files: Map<string, string>, mapped: Map<string, string>, args: string[] = []): Ref[] {
   const out: Ref[] = [];
   // A variable in a name is `${name}` or a whole `$name`, so each part of the name matches only one way (no backtracking).
-  for (const m of text.matchAll(/(?<![\w.-])((?:[\w.${}()-]*\/)*)((?:[\w.-]|\$\{\w+\}|\$\w+(?!\w))+\.(?:sh|mjs|cjs|js|ps1))(?![\w.])/g)) {
+  for (const m of text.matchAll(/(?<![\w.-])((?:[\w.${}()-]*\/)*)((?:[\w.-]|\$\{\w+\}|\$\w+(?!\w))+\.(?:sh|bash|mjs|cjs|js|ts|mts|cts|ps1))(?![\w.])/g)) {
     const prefix = m[1] ?? "", written = m[2] ?? "";
     const names = written.includes("$") ? args.map(a => written.replace(/\$\{?\w+\}?/g, a)) : [written];
     const mount = /^\/([\w-]+)\//.exec(prefix)?.[1];
@@ -327,9 +340,10 @@ describe("docs/bench/ and the Docker socket", () => {
 });
 
 // The forms the check must find and the forms it must pass, as small trees. The must-find table holds the review's probes
-// of PR #248 (P1-P17 for the command, Q0-Q6 for the ways of giving the socket, R2-R3 its mutations) and every npm alias
-// of an install that runs scripts. A form this check cannot see is in the known-miss table, asserted not found, so that the
-// recall in docs/progress/2026-11-01-lsock2-watch-recall.md counts it and a later fix shows up here.
+// of PR #248 (P1-P17 for the command, Q0-Q6 for the ways of giving the socket, R2-R3 its mutations), every alias of the
+// npm commands in INSTALLS, and the forms the review of PR #249 named. A form this check cannot see is in the known-miss
+// table, asserted not found, so that the recall in docs/progress/2026-11-01-lsock2-watch-recall.md counts it and a later
+// fix shows up here. A form in none of the tables has not been measured.
 describe("bench-socket recall", () => {
   const D = "docs/bench/x/scripts";
   const SOCK = "-v /var/run/docker.sock:/var/run/docker.sock";

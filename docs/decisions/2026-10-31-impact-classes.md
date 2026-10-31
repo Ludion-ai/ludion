@@ -6,6 +6,13 @@
 
 **Changed in part again** by docs/decisions/2026-10-31-impact-classes-cvss-vector.md (comment 6539200199, point 3): each CWE allows a set of classes and the record's CVSS vector chooses among them. Points 2 and 5 below are kept as first written.
 
+**Changed in part three more times**, each record pointing to the next:
+- docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md (LMR1d): the conditions; CWE-507 to 512 are trap with 506; CWE-912 and CWE-59, 73, 276 and 732 enter the table.
+- docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md (LMR1e-2): every CWE's set holds every class its mechanism can give.
+- docs/decisions/2026-10-31-impact-classes-takeover-direct.md (LMR1f): takeover only when code running is the direct result of the mechanism.
+
+So the unclassified list below no longer holds for 506, 912, 59, 73, 276 and 732. The list is kept as first written; `DECIDED_UNCLASSIFIED` and `TRAP_CWES` in impact.ts are the current lists. Pointed out by the review of 42e30b6 (PR #236 comment 6541677765, point 7).
+
 ## The owner's words (Claude chat, 2026-10-31)
 
 - 12:25 JST: 「表を作って、どれだけの危険性から守ったのかってのを」

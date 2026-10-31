@@ -1,6 +1,8 @@
-# LMR1, LMR1b and LMR1c: how many OSV records Impact Classes classify (2026-10-31)
+# LMR1 to LMR1f: how many OSV records Impact Classes classify (2026-10-31)
 
-Started from main 0702370. The classes, the strength order, the severity rule and the CWE table's rule are in docs/decisions/2026-10-31-impact-classes.md (ludion-ops#1 comments 6538391108 and 6538576259); trap as a published record in docs/decisions/2026-10-31-impact-classes-trap-published-record.md (LMR1b, comments 6538877641 and 6538690397); each CWE's set of classes and the CVSS vectors that choose among them in docs/decisions/2026-10-31-impact-classes-cvss-vector.md (LMR1c, comment 6539200199, point 3). The code is `packages/cli/src/security/impact.ts`. Nothing here is wired into a PR body or a job summary (the next lane).
+Started from main 0702370. The classes, the strength order, the severity rule and the CWE table's rule are in docs/decisions/2026-10-31-impact-classes.md (ludion-ops#1 comments 6538391108 and 6538576259); trap as a published record in docs/decisions/2026-10-31-impact-classes-trap-published-record.md (LMR1b, comments 6538877641 and 6538690397); each CWE's set of classes and the CVSS vectors that choose among them in docs/decisions/2026-10-31-impact-classes-cvss-vector.md (LMR1c, comment 6539200199, point 3). Later records changed parts of these: docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md (LMR1d), docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md (LMR1e-2) and docs/decisions/2026-10-31-impact-classes-takeover-direct.md (LMR1f). The code is `packages/cli/src/security/impact.ts`. Nothing here is wired into a PR body or a job summary (the next lane).
+
+The sections below are newest first. Each section's numbers are from its own run; where an older section names `counts.json`, `stronger.tsv` or `logs/count.log`, read the file it says is kept for it.
 
 ## Data
 
@@ -15,7 +17,23 @@ The CWE definitions in `logs/cwe-definitions.log` are MITRE's CWE 5.0 (2026-10-2
 
 These are every record of the two exports, not a sample, so the shares below are plain percentages with no interval.
 
+## Results (LMR1f: takeover only when code running is the direct result of the mechanism)
+
+docs/decisions/2026-10-31-impact-classes-takeover-direct.md (committed and pushed in 05dde3b before the code and the count). `scripts/count.sh` (`logs/count.log`, 2026-10-31T09:56:04Z, impact.ts 9538e75e…, the code of cc44cbd) classified every record three times: with the impact.ts of f25d51b (LMR1d, `osv/impact-before-lmr1e2.ts`, sha256 ffefa53e…), of 42e30b6 (LMR1e-2, `osv/impact-before-lmr1f.ts`, written from `git show`, sha256 d121e485…) and the new one. `counts.json` and `stronger.tsv` (`count.sh --stronger`, `logs/count-stronger.log`) are this run. LMR1e-2's are kept as `counts-before-lmr1f.json`, `stronger-before-lmr1f.tsv`, `logs/count-before-lmr1f.log` and `logs/count-stronger-before-lmr1f.log`. Among records that are not MAL-:
+
+| | LMR1d | LMR1e-2 | After |
+|---|---|---|---|
+| npm + Packagist (15,469) | 11,288 (73.0%) | 11,340 (73.3%) | **11,340 (73.3%)** |
+| npm (8,073) | 6,067 (75.2%) | 6,077 (75.3%) | **6,077 (75.3%)** |
+| Packagist (7,396) | 5,221 (70.6%) | 5,263 (71.2%) | **5,263 (71.2%)** |
+
+takeover: 1,249 → 1,964 → **1,249**. No record moved to takeover, from LMR1e-2 or from LMR1d. LMR1e-2 → after: 715 changed, all weaker (takeover → impersonate 563, takeover → steal 152). LMR1d → after: 1,228 changed, 1,076 to a stronger class (listed one by one in stronger.tsv). The rest is in docs/progress/2026-10-31-lmr1f-impact-classes-takeover-direct.md.
+
+`scripts/unreadable.sh` lists every record whose vector cannot be read. With the code of 02c6337 (`logs/unreadable-02c6337.log`), where a part with no ":" also made the vector unreadable, two records were: GHSA-g357-x5c3-c72p and GHSA-9p7c-v5x3-rfx8, whose CVSS 4 vectors end with "/". cc44cbd reads such a part as before; `logs/unreadable.log` (cc44cbd) lists none.
+
 ## Results (LMR1e-2: every CWE with every class its mechanism can give)
+
+Where this section names `counts.json`, `stronger.tsv`, `logs/count.log` or `logs/count-stronger.log`, read `counts-before-lmr1f.json`, `stronger-before-lmr1f.tsv`, `logs/count-before-lmr1f.log` and `logs/count-stronger-before-lmr1f.log`. The count.mjs of 42e30b6 (git history) has its two ways.
 
 docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md (committed in fdf2e10 before the code and the count). `scripts/count.sh` (`logs/count.log`, 2026-10-31T08:57:14Z, impact.ts d121e485…) classified every record with the impact.ts of f25d51b (`osv/impact-before-lmr1e2.ts`, sha256 ffefa53e…) and with the new one. `counts.json` and `stronger.tsv` are this run. LMR1d's are kept as `counts-before-lmr1e2.json`, `stronger-before-lmr1e2.tsv` and `logs/count-before-lmr1e2.log`. Among records that are not MAL-:
 
@@ -179,9 +197,15 @@ Severity (GHSA's, not MAL-) has not changed in any of the three: moderate 6,462,
 
 ## Checks (all in Docker; nothing ran on the host)
 
-`scripts/run.sh <script>` mounts the worktree read-only at /src and copies it into the volume ludion-lmr1-w (image ludion-l9-node24-git, `--rm --memory=4g --cpus=2`), as LV5's scripts do. `setup`, `fetch` and `cwe` have the network; the others run with `--network none`. `fetch`, `cwe`, `count`, `package`, `pick`, `pick-trap`, `explore`, `explore-vectors` and `fixture-vectors`, which read third-party data, drop every capability.
+`scripts/run.sh <script>` mounts the worktree read-only at /src and copies it into the volume ludion-lmr1-w (image ludion-l9-node24-git, `--rm --memory=4g --cpus=2`), as LV5's scripts do. `setup`, `fetch` and `cwe` have the network; the others run with `--network none`. `fetch`, `cwe`, `count`, `package`, `pick`, `pick-trap`, `explore`, `explore-vectors`, `fixture-vectors` and `unreadable`, which read third-party data, drop every capability.
 
-LMR1c's runs (the logs hold only these; LMR1b's and LMR1's numbers are in git history at 218a83a and 0e62900):
+`logs/test.log`, `logs/full.log` and `logs/mutate.log` hold the latest lane's runs (LMR1f); each earlier lane's are in git history, and its numbers in its progress record:
+
+- `scripts/test.sh` (`logs/test.log`): LMR1F_TEST.
+- `scripts/full.sh` (`logs/full.log`): LMR1F_FULL.
+- `scripts/mutate.mjs` (`logs/mutate.log`, 2026-10-31T09:56:46Z, the code of cc44cbd): **90 of 90** mutations caught; it passes without them and after restoring. The list and what LMR1f added are in docs/progress/2026-10-31-lmr1f-impact-classes-takeover-direct.md.
+
+LMR1c's runs, as first written (the logs no longer hold them; git history at c5fdfff does; LMR1b's and LMR1's numbers are in git history at 218a83a and 0e62900):
 
 - `scripts/test.sh` (`logs/test.log`, 2026-10-31T05:28:47Z, tree 6bc011c): tsc 0; `vitest run --project node packages/cli/test`: 23 files, 977 passed, 24 skipped; impact.test.ts 42 passed.
 - `scripts/full.sh` (CI's checks except Playwright, against a stand-in repository; `logs/full.log`): typecheck 0, build 0, `npm test -- --maxWorkers=2` 39 files, 1264 passed, 24 skipped, at 05:29Z on tree 6bc011c (before these docs) and at 05:31:50Z on c5fdfff, with them (the log's run).

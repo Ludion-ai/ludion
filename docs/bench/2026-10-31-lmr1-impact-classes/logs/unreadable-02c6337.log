@@ -1,0 +1,5 @@
+# started 2026-10-31T09:58:31Z, node v24.22.1, impact.ts of 02c6337 sha256 d0a7e96549f63f20dda7ad616a4d9c8d2ef0eedb2777d32f7b8e4b9bb3c55ee6
+zip	id	class	reason	cvss
+npm.zip	GHSA-g357-x5c3-c72p	unclassified	GHSA-g357-x5c3-c72p: its CVSS_V4 vector cannot be read: "" is not one metric and its value, so no class can be ruled out.	CVSS_V4 "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/"
+Packagist.zip	GHSA-9p7c-v5x3-rfx8	unclassified	GHSA-9p7c-v5x3-rfx8: its CVSS_V4 vector cannot be read: "" is not one metric and its value, so no class can be ruled out.	CVSS_V3 "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N" ; CVSS_V4 "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/"
+# finished 2026-10-31T09:58:33Z

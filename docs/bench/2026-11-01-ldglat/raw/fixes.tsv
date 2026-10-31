@@ -1,0 +1,471 @@
+source	version	binary	start	start_kind	first_seen_debian	why
+acl	2.3.1-3	libacl1			2023-01-18T15:38:20Z	not-in-debian-security
+adduser	3.134	adduser			2023-05-25T20:49:37Z	not-in-debian-security
+aom	3.6.0-1+deb12u1	libaom3	2024-08-21T08:46:30Z	bin	2024-08-22T02:40:39Z	
+aom	3.6.0-1+deb12u2	libaom3			2025-06-20T02:45:46Z	not-in-debian-security
+aom	3.6.0-1+deb12u3	libaom3	2026-09-06T12:03:06Z	bin		
+apache2	2.4.59-1~deb12u1	apache2	2024-04-16T18:30:47Z	bin	2024-05-05T20:59:10Z	
+apache2	2.4.61-1~deb12u1	apache2	2024-07-11T19:36:35Z	bin	2024-07-12T20:37:46Z	
+apache2	2.4.62-1~deb12u1	apache2			2024-08-17T02:39:24Z	not-in-debian-security
+apache2	2.4.62-1~deb12u2	apache2	2024-10-08T20:18:43Z	bin	2024-10-10T20:46:54Z	
+apache2	2.4.65-1~deb12u1	apache2			2025-08-29T02:54:55Z	not-in-debian-security
+apache2	2.4.66-1~deb12u1	apache2			2026-01-01T14:57:18Z	not-in-debian-security
+apache2	2.4.66-1~deb12u2	apache2			2026-05-03T03:32:40Z	not-in-debian-security
+apache2	2.4.67-1~deb12u1	apache2			2026-05-06T02:34:05Z	not-in-debian-security
+apache2	2.4.67-1~deb12u2	apache2	2026-05-06T15:01:04Z	bin	2026-05-06T20:50:57Z	
+apache2	2.4.67-1~deb12u3	apache2	2026-06-06T14:30:08Z	bin	2026-06-08T21:40:28Z	
+apache2	2.4.68-1~deb12u1	apache2			2026-06-17T02:34:28Z	not-in-debian-security
+apr	1.7.2-3+deb12u1	libapr1			2024-11-03T02:59:04Z	not-in-debian-security
+apr-util	1.6.3-1	libaprutil1			2023-02-04T03:14:01Z	not-in-debian-security
+apr-util	1.6.3-1+deb12u1	libaprutil1	2026-08-16T17:53:35Z	bin		
+apt	2.6.1	apt			2023-05-25T20:49:37Z	not-in-debian-security
+argon2	0~20171227-0.3+deb12u1	libargon2-1			2023-04-26T21:06:01Z	not-in-debian-security
+attr	1:2.5.1-4	libattr1			2023-01-18T15:38:20Z	not-in-debian-security
+audit	1:3.0.9-1	libaudit-common			2023-02-11T15:16:57Z	not-in-debian-security
+autoconf	2.71-3	autoconf			2023-01-14T20:55:00Z	not-in-debian-security
+automake-1.16	1:1.16.5-1.3	automake			2022-03-18T22:10:07Z	not-in-debian-security
+autotools-dev	20220109.1	autotools-dev			2022-02-06T03:11:38Z	not-in-debian-security
+base-files	12.4+deb12u1	base-files			2023-07-16T03:03:30Z	not-in-debian-security
+base-files	12.4+deb12u10	base-files			2025-03-10T10:18:57Z	not-in-debian-security
+base-files	12.4+deb12u11	base-files			2025-05-12T02:35:23Z	not-in-debian-security
+base-files	12.4+deb12u12	base-files			2025-08-31T20:35:04Z	not-in-debian-security
+base-files	12.4+deb12u13	base-files			2026-01-05T02:35:02Z	not-in-debian-security
+base-files	12.4+deb12u14	base-files			2026-05-11T02:40:57Z	not-in-debian-security
+base-files	12.4+deb12u15	base-files			2026-07-05T08:36:37Z	not-in-debian-security
+base-files	12.4+deb12u2	base-files			2023-10-02T02:59:20Z	not-in-debian-security
+base-files	12.4+deb12u3	base-files			2023-12-04T03:35:17Z	not-in-debian-security
+base-files	12.4+deb12u4	base-files			2023-12-10T09:31:58Z	not-in-debian-security
+base-files	12.4+deb12u5	base-files			2024-02-06T16:33:51Z	not-in-debian-security
+base-files	12.4+deb12u6	base-files			2024-06-23T20:47:40Z	not-in-debian-security
+base-files	12.4+deb12u7	base-files			2024-08-25T20:55:44Z	not-in-debian-security
+base-files	12.4+deb12u8	base-files			2024-11-04T03:29:56Z	not-in-debian-security
+base-files	12.4+deb12u9	base-files			2025-01-06T03:31:11Z	not-in-debian-security
+base-passwd	3.6.1	base-passwd			2022-09-20T17:45:10Z	not-in-debian-security
+bash	5.2.15-2	bash			2023-01-02T15:34:46Z	not-in-debian-security
+binutils	2.40-2	binutils			2023-01-15T21:19:34Z	not-in-debian-security
+brotli	1.0.9-2	libbrotli1			2020-09-08T14:48:48Z	not-in-debian-security
+brotli	1.0.9-2+deb12u1	libbrotli1	2026-10-23T20:23:35Z	bin		
+bzip2	1.0.8-5	libbz2-1.0			2021-12-03T15:25:36Z	not-in-debian-security
+ca-certificates	20230311+deb12u1	ca-certificates			2025-06-13T14:40:14Z	not-in-debian-security
+ca-certificates	20230311+deb12u1~deb11u1	ca-certificates	2026-02-20T21:43:29Z	bin		
+ca-certificates	20250419~deb12u1	ca-certificates	2026-08-09T21:22:55Z	bin		
+ca-certificates	20250419~deb12u1~deb11u1	ca-certificates	2026-08-09T21:22:55Z	bin		
+ca-certificates	20250419~deb12u2	ca-certificates	2026-10-20T21:32:55Z	bin		
+cairo	1.16.0-7	libcairo-gobject2			2022-12-10T03:46:54Z	not-in-debian-security
+cdebconf	0.270	libdebconfclient0			2023-05-23T14:57:55Z	not-in-debian-security
+coreutils	9.1-1	coreutils			2022-09-21T06:48:19Z	not-in-debian-security
+curl	7.88.1-10+deb12u1	curl	2023-07-26T19:33:24Z	bin	2023-07-31T03:04:04Z	
+curl	7.88.1-10+deb12u11	curl			2025-03-08T22:05:02Z	no-binary-and-not-in-debian-security
+curl	7.88.1-10+deb12u12	curl			2025-03-09T22:19:33Z	not-in-debian-security
+curl	7.88.1-10+deb12u13	curl			2025-06-20T02:45:46Z	not-in-debian-security
+curl	7.88.1-10+deb12u14	curl			2025-07-29T20:34:48Z	not-in-debian-security
+curl	7.88.1-10+deb12u15	curl			2026-06-30T21:09:56Z	not-in-debian-security
+curl	7.88.1-10+deb12u1~bpo11+1	curl			2023-08-30T21:39:37Z	not-in-debian-security
+curl	7.88.1-10+deb12u2	curl			2023-08-06T09:19:12Z	not-in-debian-security
+curl	7.88.1-10+deb12u3	curl			2023-09-30T15:13:40Z	not-in-debian-security
+curl	7.88.1-10+deb12u3~bpo11+1	curl			2023-10-12T21:11:49Z	not-in-debian-security
+curl	7.88.1-10+deb12u4	curl	2023-10-11T06:58:56Z	bin	2023-10-12T08:56:04Z	
+curl	7.88.1-10+deb12u5	curl	2023-12-23T19:10:56Z	bin	2023-12-25T03:15:52Z	
+curl	7.88.1-10+deb12u5~bpo11+1	curl			2024-01-03T21:14:36Z	not-in-debian-security
+curl	7.88.1-10+deb12u6	curl			2024-04-09T20:44:32Z	not-in-debian-security
+curl	7.88.1-10+deb12u6~bpo11+1	curl			2024-05-16T08:50:26Z	not-in-debian-security
+curl	7.88.1-10+deb12u7	curl			2024-08-23T14:43:12Z	not-in-debian-security
+curl	7.88.1-10+deb12u8	curl			2024-11-03T21:17:23Z	not-in-debian-security
+curl	7.88.1-10+deb12u9	curl			2025-01-25T20:55:03Z	not-in-debian-security
+cyrus-sasl2	2.1.28+dfsg-10	libsasl2-2			2022-11-23T03:14:41Z	not-in-debian-security
+cyrus-sasl2	2.1.28+dfsg-10+deb12u1	libsasl2-2	2026-10-30T16:14:47Z	bin		
+dash	0.5.12-2	dash			2023-01-05T21:32:33Z	not-in-debian-security
+dav1d	1.0.0-2+deb12u1	libdav1d6	2024-05-09T14:39:36Z	bin	2024-05-12T14:53:13Z	
+db-defaults	5.3.2	libdb-dev			2022-11-07T21:15:24Z	not-in-debian-security
+db5.3	5.3.28+dfsg2-1	libdb5.3			2023-01-18T15:38:20Z	not-in-debian-security
+debconf	1.5.82	debconf			2023-01-09T09:18:52Z	not-in-debian-security
+debian-archive-keyring	2023.3+deb12u1	debian-archive-keyring			2023-08-27T08:51:58Z	not-in-debian-security
+debian-archive-keyring	2023.3+deb12u2	debian-archive-keyring			2025-04-16T02:44:50Z	not-in-debian-security
+debianutils	5.7-0.5~deb12u1	debianutils			2023-07-31T21:20:34Z	not-in-debian-security
+diffutils	1:3.8-4	diffutils			2023-02-04T03:14:01Z	not-in-debian-security
+djvulibre	3.5.28-2.1~deb12u1	libdjvulibre-dev	2025-07-07T19:47:13Z	bin	2025-07-08T08:41:35Z	
+djvulibre	3.5.28-2.2~deb12u1	libdjvulibre-dev			2025-07-28T14:37:03Z	not-in-debian-security
+dpkg	1.21.22	dpkg			2023-05-17T03:05:21Z	not-in-debian-security
+dpkg	1.21.23	dpkg			2026-05-04T02:59:22Z	not-in-debian-security
+e2fsprogs	1.47.0-2	e2fsprogs			2023-03-05T08:36:56Z	not-in-debian-security
+elfutils	0.188-2.1	libelf1			2023-01-15T03:12:29Z	not-in-debian-security
+expat	2.5.0-1+deb12u1	libexpat1	2024-09-17T20:39:47Z	bin	2024-09-18T20:44:50Z	
+expat	2.5.0-1+deb12u2	libexpat1			2025-06-01T02:51:58Z	not-in-debian-security
+expat	2.5.0-1+deb12u3	libexpat1	2026-08-31T21:13:27Z	bin		
+expat	2.5.0-1+deb12u4	libexpat1	2026-10-01T05:22:50Z	bin		
+expat	2.5.0-1+deb12u5	libexpat1	2026-10-22T08:24:45Z	bin		
+fftw3	3.3.10-1	libfftw3-double3			2022-11-30T21:28:15Z	not-in-debian-security
+file	1:5.44-3	file			2023-01-29T21:41:28Z	not-in-debian-security
+findutils	4.9.0-4	findutils			2023-01-09T09:18:52Z	not-in-debian-security
+fontconfig	2.14.1-4	fontconfig			2023-02-01T15:31:18Z	not-in-debian-security
+fonts-dejavu	2.37-6	fonts-dejavu-core			2023-03-10T15:12:28Z	not-in-debian-security
+freetype	2.12.1+dfsg-5+deb12u1	libfreetype-dev			2023-09-25T21:04:29Z	not-in-debian-security
+freetype	2.12.1+dfsg-5+deb12u2	libfreetype-dev			2023-09-30T03:16:47Z	not-in-debian-security
+freetype	2.12.1+dfsg-5+deb12u3	libfreetype-dev			2024-03-25T09:13:29Z	not-in-debian-security
+freetype	2.12.1+dfsg-5+deb12u4	libfreetype-dev	2025-03-17T17:51:48Z	bin	2025-03-19T21:06:21Z	
+fribidi	1.0.8-2.1	libfribidi0			2022-04-06T02:56:11Z	not-in-debian-security
+gcc-12	12.2.0-14+deb12u1	gcc-12-base	2025-08-21T17:54:18Z	src	2025-04-15T08:43:22Z	
+gcc-defaults	1.203	cpp			2023-01-08T15:51:09Z	not-in-debian-security
+gdbm	1.23-3	libgdbm-compat4			2022-10-09T21:09:10Z	not-in-debian-security
+gdk-pixbuf	2.42.10+dfsg-1+deb12u1	gir1.2-gdkpixbuf-2.0			2024-06-22T14:43:33Z	not-in-debian-security
+gdk-pixbuf	2.42.10+dfsg-1+deb12u2	gir1.2-gdkpixbuf-2.0	2025-06-22T18:11:50Z	bin	2025-06-24T02:39:34Z	
+gdk-pixbuf	2.42.10+dfsg-1+deb12u3	gir1.2-gdkpixbuf-2.0			2025-12-07T20:41:32Z	not-in-debian-security
+gdk-pixbuf	2.42.10+dfsg-1+deb12u4	gir1.2-gdkpixbuf-2.0	2026-04-11T18:53:31Z	bin	2026-04-18T20:34:06Z	
+git	1:2.39.5-0+deb12u1	git	2024-09-13T19:45:55Z	bin	2024-09-15T20:51:56Z	
+git	1:2.39.5-0+deb12u2	git	2025-01-26T15:31:44Z	bin	2025-01-27T20:50:14Z	
+git	1:2.39.5-0+deb12u3	git			2025-10-19T20:38:02Z	not-in-debian-security
+glib2.0	2.74.6-2+deb12u1	libglib2.0-0	2024-05-07T20:04:08Z	bin	2024-05-08T21:37:38Z	
+glib2.0	2.74.6-2+deb12u2	libglib2.0-0	2024-05-09T05:02:07Z	bin	2024-05-15T04:09:22Z	
+glib2.0	2.74.6-2+deb12u3	libglib2.0-0			2024-05-26T03:11:47Z	not-in-debian-security
+glib2.0	2.74.6-2+deb12u4	libglib2.0-0			2024-10-30T15:03:11Z	not-in-debian-security
+glib2.0	2.74.6-2+deb12u5	libglib2.0-0			2024-11-17T14:46:34Z	not-in-debian-security
+glib2.0	2.74.6-2+deb12u6	libglib2.0-0	2025-08-21T17:54:18Z	src	2025-04-15T08:43:22Z	
+glib2.0	2.74.6-2+deb12u7	libglib2.0-0			2025-08-31T02:44:03Z	not-in-debian-security
+glib2.0	2.74.6-2+deb12u8	libglib2.0-0			2025-12-26T20:56:09Z	not-in-debian-security
+glib2.0	2.74.6-2+deb12u9	libglib2.0-0			2026-04-08T20:39:14Z	not-in-debian-security
+glibc	2.36-9+deb12u1	libc-bin			2023-07-14T15:11:32Z	not-in-debian-security
+glibc	2.36-9+deb12u10	libc-bin	2025-08-21T17:54:18Z	src	2025-03-08T02:55:45Z	
+glibc	2.36-9+deb12u11	libc-bin			2025-06-01T02:51:58Z	not-in-debian-security
+glibc	2.36-9+deb12u12	libc-bin			2025-06-03T20:54:16Z	not-in-debian-security
+glibc	2.36-9+deb12u13	libc-bin			2025-08-28T02:41:21Z	not-in-debian-security
+glibc	2.36-9+deb12u14	libc-bin			2026-05-04T02:59:22Z	not-in-debian-security
+glibc	2.36-9+deb12u2	libc-bin			2023-09-30T15:13:40Z	not-in-debian-security
+glibc	2.36-9+deb12u3	libc-bin	2023-10-03T17:26:36Z	bin	2023-10-08T03:04:12Z	
+glibc	2.36-9+deb12u4	libc-bin	2024-01-30T18:34:07Z	bin	2024-01-31T15:38:25Z	
+glibc	2.36-9+deb12u5	libc-bin			2024-03-25T09:13:29Z	not-in-debian-security
+glibc	2.36-9+deb12u6	libc-bin	2024-04-23T07:09:53Z	bin	2024-04-23T21:20:25Z	
+glibc	2.36-9+deb12u7	libc-bin	2024-05-03T19:52:45Z	bin	2024-05-05T20:59:10Z	
+glibc	2.36-9+deb12u8	libc-bin			2024-08-17T02:39:24Z	not-in-debian-security
+glibc	2.36-9+deb12u9	libc-bin			2024-11-02T02:55:12Z	not-in-debian-security
+gmp	2:6.2.1+dfsg1-1.1	libgmp10			2022-10-08T02:52:42Z	not-in-debian-security
+gnupg2	2.2.40-1.1	gpgv			2023-03-26T21:21:04Z	not-in-debian-security
+gnupg2	2.2.40-1.1+deb12u1	gpgv			2025-06-21T21:54:21Z	not-in-debian-security
+gnupg2	2.2.40-1.1+deb12u2	gpgv			2026-01-03T02:37:49Z	not-in-debian-security
+gnutls28	3.7.9-2+deb12u1	libgnutls30			2023-12-04T03:35:17Z	not-in-debian-security
+gnutls28	3.7.9-2+deb12u2	libgnutls30			2024-01-31T15:38:25Z	not-in-debian-security
+gnutls28	3.7.9-2+deb12u3	libgnutls30			2024-06-17T02:36:17Z	not-in-debian-security
+gnutls28	3.7.9-2+deb12u4	libgnutls30	2025-02-17T20:10:41Z	bin	2025-02-19T03:09:25Z	
+gnutls28	3.7.9-2+deb12u5	libgnutls30	2025-07-16T15:44:06Z	bin	2025-07-27T02:37:45Z	
+gnutls28	3.7.9-2+deb12u6	libgnutls30	2026-02-18T11:58:05Z	bin	2026-02-21T20:47:12Z	
+gnutls28	3.7.9-2+deb12u7	libgnutls30	2026-05-19T20:39:50Z	bin	2026-05-23T03:19:37Z	
+gobject-introspection	1.74.0-3	gir1.2-freedesktop			2023-01-20T15:07:43Z	not-in-debian-security
+graphite2	1.3.14-1	libgraphite2-3			2020-04-01T15:44:01Z	not-in-debian-security
+graphite2	1.3.14-1+deb12u1	libgraphite2-3			2026-06-09T02:34:15Z	not-in-debian-security
+grep	3.8-5	grep			2023-01-26T14:57:07Z	not-in-debian-security
+gzip	1.12-1	gzip			2022-04-10T09:18:55Z	not-in-debian-security
+harfbuzz	6.0.0+dfsg-3	libharfbuzz0b			2023-02-02T21:21:52Z	not-in-debian-security
+hicolor-icon-theme	0.17-2	hicolor-icon-theme			2018-03-19T10:01:03Z	not-in-debian-security
+hostname	3.23+nmu1	hostname			2022-12-30T15:17:41Z	not-in-debian-security
+icu	72.1-3+deb12u1	libicu72	2025-06-26T21:05:38Z	bin	2025-06-30T20:34:27Z	
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u1	imagemagick	2024-02-22T19:01:26Z	bin	2024-02-24T09:22:35Z	
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u10	imagemagick	2026-05-29T18:24:05Z	bin	2026-05-30T02:51:23Z	
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u11	imagemagick	2026-06-23T12:11:02Z	bin	2026-06-25T02:31:20Z	
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u12	imagemagick	2026-07-13T19:18:02Z	bin		
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u13	imagemagick	2026-07-23T15:23:46Z	bin		
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u14	imagemagick	2026-10-26T02:47:04Z	bin		
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u2	imagemagick			2024-08-22T02:40:39Z	not-in-debian-security
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u3	imagemagick			2025-05-03T20:59:36Z	not-in-debian-security
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u4	imagemagick	2025-09-11T17:30:31Z	bin	2025-09-16T02:39:27Z	
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u5	imagemagick			2026-01-04T02:57:12Z	not-in-debian-security
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u6	imagemagick	2026-01-26T22:45:14Z	bin	2026-01-29T20:33:45Z	
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u7	imagemagick	2026-03-10T21:21:58Z	bin	2026-03-13T20:33:33Z	
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u8	imagemagick	2026-04-14T20:26:16Z	bin	2026-04-18T20:34:06Z	
+imagemagick	8:6.9.11.60+dfsg-1.6+deb12u9	imagemagick	2026-05-03T14:56:35Z	bin	2026-05-03T20:48:01Z	
+imath	3.1.6-1	libimath-3-1-29			2023-01-23T04:00:22Z	not-in-debian-security
+init-system-helpers	1.65.2	init-system-helpers			2022-09-18T08:56:38Z	not-in-debian-security
+init-system-helpers	1.65.2+deb12u1	init-system-helpers			2025-08-22T20:57:52Z	not-in-debian-security
+isl	0.25-1.1	libisl23			2024-01-21T03:25:14Z	not-in-debian-security
+jansson	2.14-2	libjansson4			2022-04-14T03:00:09Z	not-in-debian-security
+jbigkit	2.1-6.1	libjbig-dev			2022-12-10T03:46:54Z	not-in-debian-security
+keyutils	1.6.3-2	libkeyutils1			2022-12-20T03:57:34Z	not-in-debian-security
+krb5	1.20.1-2+deb12u1	libgssapi-krb5-2			2023-08-19T09:32:49Z	not-in-debian-security
+krb5	1.20.1-2+deb12u2	libgssapi-krb5-2	2024-07-05T21:16:20Z	bin	2024-07-08T20:42:17Z	
+krb5	1.20.1-2+deb12u3	libgssapi-krb5-2			2025-04-15T02:50:12Z	not-in-debian-security
+krb5	1.20.1-2+deb12u4	libgssapi-krb5-2			2025-06-01T02:51:58Z	not-in-debian-security
+krb5	1.20.1-2+deb12u5	libgssapi-krb5-2	2026-05-22T21:29:46Z	bin	2026-05-23T14:35:52Z	
+lcms2	2.14-2	liblcms2-2			2023-02-20T02:55:12Z	not-in-debian-security
+lcms2	2.14-2+deb12u1	liblcms2-2	2026-05-10T15:57:21Z	bin	2026-05-10T20:42:19Z	
+lerc	4.0.0+ds-2	liblerc-dev			2022-10-15T15:02:49Z	not-in-debian-security
+libassuan	2.5.5-5	libassuan0			2022-11-03T03:52:29Z	not-in-debian-security
+libbsd	0.11.7-2	libbsd0			2023-01-29T21:41:28Z	not-in-debian-security
+libcap-ng	0.8.3-1	libcap-ng0			2022-06-23T09:29:01Z	not-in-debian-security
+libcap2	1:2.66-4+deb12u1	libcap2			2025-04-15T08:43:22Z	not-in-debian-security
+libcap2	1:2.66-4+deb12u2	libcap2	2026-03-19T18:34:03Z	src	2025-06-26T20:40:07Z	
+libcap2	1:2.66-4+deb12u3	libcap2			2026-05-03T03:32:40Z	not-in-debian-security
+libcbor	0.8.0-2	libcbor0.8			2021-11-24T21:28:08Z	not-in-debian-security
+libdatrie	0.2.13-2	libdatrie1			2021-10-17T08:43:02Z	not-in-debian-security
+libde265	1.0.11-1+deb12u1	libde265-0			2023-12-04T03:35:17Z	not-in-debian-security
+libde265	1.0.11-1+deb12u2	libde265-0			2024-02-03T15:25:33Z	not-in-debian-security
+libde265	1.0.11-1+deb12u3	libde265-0	2026-09-20T12:33:12Z	bin		
+libdeflate	1.14-1	libdeflate-dev			2022-10-03T21:21:00Z	not-in-debian-security
+libedit	3.1-20221030-2	libedit2			2022-11-24T21:08:35Z	not-in-debian-security
+liberror-perl	0.17029-2	liberror-perl			2022-10-14T21:02:18Z	not-in-debian-security
+libevent	2.1.12-stable-8	libevent-2.1-7			2023-03-04T02:46:59Z	not-in-debian-security
+libevent	2.1.12-stable-8+deb12u1	libevent-2.1-7	2026-09-18T14:46:05Z	bin		
+libexif	0.6.24-1	libexif-dev			2021-12-05T08:49:53Z	not-in-debian-security
+libexif	0.6.24-1+deb12u1	libexif-dev			2026-05-09T14:41:05Z	not-in-debian-security
+libffi	3.4.4-1	libffi8			2022-10-24T14:53:33Z	not-in-debian-security
+libfido2	1.12.0-2	libfido2-1			2022-11-16T03:27:21Z	not-in-debian-security
+libgcrypt20	1.10.1-3	libgcrypt20			2022-11-19T21:40:55Z	not-in-debian-security
+libgcrypt20	1.10.1-3+deb12u1	libgcrypt20	2026-05-22T21:49:30Z	bin	2026-05-23T14:35:52Z	
+libgpg-error	1.46-1	libgpg-error0			2022-10-20T15:15:14Z	not-in-debian-security
+libheif	1.15.1-1+deb12u1	libheif1	2024-10-25T18:08:51Z	bin	2024-10-26T14:39:32Z	
+libice	2:1.0.10-1	libice-dev			2020-09-24T15:01:37Z	not-in-debian-security
+libidn2	2.3.3-1	libidn2-0			2022-07-12T03:16:42Z	not-in-debian-security
+libjpeg-turbo	1:2.1.5-2	libjpeg-dev			2023-02-04T03:14:01Z	not-in-debian-security
+libksba	1.6.3-2	libksba8			2022-12-21T03:19:39Z	not-in-debian-security
+liblqr	0.4.2-2.1	liblqr-1-0			2018-01-02T05:52:58Z	not-in-debian-security
+libmaxminddb	1.7.1-1	libmaxminddb-dev			2023-01-07T15:43:44Z	not-in-debian-security
+libmd	1.0.4-2	libmd0			2022-07-10T08:46:39Z	not-in-debian-security
+libnsl	1.3.0-2	libnsl-dev			2020-10-10T20:50:29Z	not-in-debian-security
+libonig	6.9.8-1	libonig5			2022-05-04T21:55:32Z	not-in-debian-security
+libpng1.6	1.6.39-2	libpng-dev			2022-12-01T15:49:14Z	not-in-debian-security
+libpng1.6	1.6.39-2+deb12u1	libpng-dev	2025-12-10T08:54:01Z	bin	2026-01-03T14:45:17Z	
+libpng1.6	1.6.39-2+deb12u2	libpng-dev			2026-02-21T20:47:12Z	no-binary-and-not-in-debian-security
+libpng1.6	1.6.39-2+deb12u3	libpng-dev	2026-02-17T21:37:34Z	bin	2026-02-21T20:47:12Z	
+libpng1.6	1.6.39-2+deb12u4	libpng-dev	2026-03-31T21:13:06Z	bin	2026-04-02T20:41:01Z	
+libpng1.6	1.6.39-2+deb12u5	libpng-dev	2026-05-10T16:08:38Z	bin	2026-05-10T20:42:19Z	
+libpng1.6	1.6.39-2+deb12u6	libpng-dev	2026-10-05T15:33:14Z	bin		
+libpsl	0.21.2-1	libpsl5			2023-02-14T21:22:25Z	not-in-debian-security
+libpthread-stubs	0.4-1	libpthread-stubs0-dev			2019-02-08T16:23:11Z	not-in-debian-security
+librsvg	2.54.7+dfsg-1~deb12u1	gir1.2-rsvg-2.0	2023-08-27T14:26:38Z	bin	2023-08-28T21:18:28Z	
+libseccomp	2.5.4-1+deb12u1	libseccomp2			2024-06-17T02:36:17Z	not-in-debian-security
+libselinux	3.4-1	libselinux1			2022-06-04T15:37:11Z	not-in-debian-security
+libsemanage	3.4-1	libsemanage-common			2022-06-04T21:40:28Z	not-in-debian-security
+libsepol	3.4-2.1	libsepol2			2023-05-27T08:53:34Z	not-in-debian-security
+libsm	2:1.2.3-1	libsm-dev			2019-02-09T03:20:42Z	not-in-debian-security
+libsodium	1.0.18-1	libsodium23			2019-08-19T09:53:15Z	not-in-debian-security
+libsodium	1.0.18-1+deb12u1	libsodium23	2026-01-05T19:31:05Z	bin	2026-01-10T20:29:34Z	
+libssh2	1.10.0-3	libssh2-1			2022-03-02T02:59:35Z	not-in-debian-security
+libssh2	1.10.0-3+deb12u1	libssh2-1	2026-09-05T18:34:20Z	bin		
+libtasn1-6	4.19.0-2+deb12u1	libtasn1-6	2025-02-10T21:37:47Z	bin	2025-02-16T15:03:56Z	
+libthai	0.1.29-1	libthai-data			2021-12-21T03:42:39Z	not-in-debian-security
+libtirpc	1.3.3+ds-1	libtirpc-common			2022-08-12T09:29:25Z	not-in-debian-security
+libtool	2.4.7-7~deb12u1	libltdl-dev			2024-04-22T20:50:59Z	not-in-debian-security
+libunistring	1.0-2	libunistring2			2022-10-03T21:21:00Z	not-in-debian-security
+libwebp	1.2.4-0.2+deb12u1	libwebp-dev	2023-09-13T21:06:46Z	bin	2023-09-16T21:03:34Z	
+libwmf	0.2.12-5.1	libwmf-0.2-7			2023-05-17T03:05:21Z	not-in-debian-security
+libx11	2:1.8.4-2+deb12u1	libx11-6	2023-06-21T09:28:36Z	bin	2023-06-24T21:47:05Z	
+libx11	2:1.8.4-2+deb12u2	libx11-6	2023-10-05T19:07:05Z	bin	2023-10-12T08:56:04Z	
+libxau	1:1.0.9-1	libxau-dev			2021-01-29T03:16:54Z	not-in-debian-security
+libxcb	1.15-1	libxcb-render0			2022-08-04T09:18:27Z	not-in-debian-security
+libxcrypt	1:4.4.33-2	libcrypt1			2023-01-07T03:05:52Z	not-in-debian-security
+libxdmcp	1:1.1.2-3	libxdmcp-dev			2017-03-02T21:17:17Z	not-in-debian-security
+libxext	2:1.3.4-1	libxext-dev			2021-09-16T20:55:09Z	not-in-debian-security
+libxml2	2.9.14+dfsg-1.3~deb12u1	libxml2			2023-07-12T09:13:00Z	not-in-debian-security
+libxml2	2.9.14+dfsg-1.3~deb12u2	libxml2	2025-06-25T18:54:27Z	bin	2025-06-26T20:40:07Z	
+libxml2	2.9.14+dfsg-1.3~deb12u3	libxml2			2025-07-29T02:37:17Z	not-in-debian-security
+libxml2	2.9.14+dfsg-1.3~deb12u4	libxml2	2025-08-29T07:24:01Z	bin	2025-08-29T21:19:24Z	
+libxml2	2.9.14+dfsg-1.3~deb12u5	libxml2			2025-12-07T20:41:32Z	not-in-debian-security
+libxml2	2.9.14+dfsg-1.3~deb12u6	libxml2			2026-06-09T20:39:38Z	not-in-debian-security
+libxrender	1:0.9.10-1.1	libxrender-dev			2022-06-14T21:34:29Z	not-in-debian-security
+libxslt	1.1.35-1+deb12u1	libxslt1-dev	2025-03-23T13:54:04Z	bin	2025-03-27T02:32:33Z	
+libxslt	1.1.35-1+deb12u2	libxslt1-dev	2025-08-19T07:28:24Z	bin	2025-08-21T20:48:48Z	
+libxslt	1.1.35-1+deb12u3	libxslt1-dev	2025-09-24T19:54:30Z	bin	2025-09-28T14:54:36Z	
+libxslt	1.1.35-1+deb12u4	libxslt1-dev			2026-05-04T02:59:22Z	not-in-debian-security
+libxt	1:1.2.1-1.1	libxt-dev			2023-04-03T20:53:39Z	not-in-debian-security
+libyaml	0.2.5-1	libyaml-0-2			2022-07-16T21:13:42Z	not-in-debian-security
+libzstd	1.5.4+dfsg2-5	libzstd1			2023-03-19T03:05:36Z	not-in-debian-security
+linux	6.1.147-1	linux-libc-dev	2025-08-12T19:09:59Z	bin	2025-08-17T21:28:21Z	
+linux	6.1.148-1	linux-libc-dev			2025-08-27T14:47:40Z	not-in-debian-security
+linux	6.1.153-1	linux-libc-dev	2025-09-22T21:26:03Z	bin	2025-09-28T14:54:36Z	
+linux	6.1.158-1	linux-libc-dev	2025-11-11T20:17:39Z	bin	2025-11-14T21:09:35Z	
+linux	6.1.159-1	linux-libc-dev			2026-01-02T14:43:54Z	not-in-debian-security
+linux	6.1.162-1	linux-libc-dev	2026-02-09T19:06:42Z	bin	2026-02-19T20:39:30Z	
+linux	6.1.164-1	linux-libc-dev	2026-03-12T21:18:21Z	bin	2026-03-13T20:33:33Z	
+linux	6.1.170-1	linux-libc-dev	2026-05-01T19:06:34Z	bin	2026-05-02T21:15:08Z	
+linux	6.1.172-1	linux-libc-dev	2026-05-15T17:52:55Z	bin	2026-05-17T02:41:56Z	
+linux	6.1.174-1	linux-libc-dev	2026-05-28T13:40:18Z	bin	2026-05-30T02:51:23Z	
+linux	6.1.176-1	linux-libc-dev	2026-07-03T18:37:19Z	bin	2026-07-04T21:13:17Z	
+linux	6.1.177-1	linux-libc-dev	2026-07-17T09:33:33Z	bin		
+linux	6.1.180-1	linux-libc-dev	2026-08-04T13:45:15Z	bin		
+linux	6.1.187-1	linux-libc-dev	2026-09-08T09:43:15Z	bin		
+linux	6.1.190-1	linux-libc-dev	2026-10-17T13:03:50Z	bin		
+lua5.3	5.3.6-2	liblua5.3-0			2022-12-10T21:43:06Z	not-in-debian-security
+lz4	1.9.4-1	liblz4-1			2022-08-29T03:28:59Z	not-in-debian-security
+lzo2	2.10-2	liblzo2-2			2020-01-23T03:06:19Z	not-in-debian-security
+m4	1.4.19-3	m4			2023-02-04T03:14:01Z	not-in-debian-security
+make-dfsg	4.3-4.1	make			2021-04-12T20:31:28Z	not-in-debian-security
+mariadb	1:10.11.11-0+deb12u1	libmariadb-dev			2025-03-02T10:12:15Z	not-in-debian-security
+mariadb	1:10.11.13-0+deb12u1	libmariadb-dev			2025-06-11T20:42:24Z	not-in-debian-security
+mariadb	1:10.11.14-0+deb12u1	libmariadb-dev			2025-08-29T08:57:13Z	not-in-debian-security
+mariadb	1:10.11.14-0+deb12u2	libmariadb-dev			2025-08-31T02:44:03Z	not-in-debian-security
+mariadb	1:10.11.18-0+deb12u1	libmariadb-dev			2026-07-04T14:50:40Z	not-in-debian-security
+mariadb	1:10.11.19-0+deb12u1	libmariadb-dev	2026-10-14T16:34:16Z	bin		
+mariadb	1:10.11.4-1~deb12u1	libmariadb-dev			2023-08-20T21:21:11Z	not-in-debian-security
+mariadb	1:10.11.6-0+deb12u1	libmariadb-dev			2024-01-17T15:05:34Z	not-in-debian-security
+mariadb	1:10.11.9-0+deb12u1	libmariadb-dev			2024-10-27T21:56:52Z	not-in-debian-security
+mawk	1.3.4.20200120-3.1	mawk			2022-06-17T21:37:16Z	not-in-debian-security
+media-types	10.0.0	media-types			2023-02-11T21:05:40Z	not-in-debian-security
+mercurial	6.3.2-1+deb12u1	mercurial	2025-03-22T12:44:13Z	bin	2025-03-27T02:32:33Z	
+mpclib3	1.3.1-1	libmpc3			2022-12-27T03:29:39Z	not-in-debian-security
+mpfr4	4.2.0-1	libmpfr6			2023-01-14T20:55:00Z	not-in-debian-security
+mysql-defaults	1.1.0	default-libmysqlclient-dev			2023-01-17T21:54:16Z	not-in-debian-security
+ncurses	6.4-4	libtinfo6			2023-05-07T20:53:04Z	not-in-debian-security
+netbase	6.4	netbase			2022-10-18T09:20:47Z	not-in-debian-security
+nettle	3.8.1-2	libhogweed6			2022-08-12T09:29:25Z	not-in-debian-security
+nghttp2	1.52.0-1+deb12u1	libnghttp2-14	2023-12-01T20:30:02Z	bin	2023-12-04T03:35:17Z	
+nghttp2	1.52.0-1+deb12u2	libnghttp2-14			2024-09-29T14:36:58Z	not-in-debian-security
+nghttp2	1.52.0-1+deb12u3	libnghttp2-14	2026-05-14T08:45:45Z	bin	2026-05-17T02:41:56Z	
+npth	1.6-3	libnpth0			2020-10-18T09:01:04Z	not-in-debian-security
+numactl	2.0.16-1	libnuma1	2025-08-21T17:54:18Z	src	2022-12-28T09:29:16Z	
+openexr	3.1.5-5	libopenexr-3-1-30			2023-04-24T09:08:15Z	not-in-debian-security
+openjpeg2	2.5.0-2+deb12u1	libopenjp2-7	2025-01-27T19:23:46Z	bin	2025-01-28T21:00:16Z	
+openjpeg2	2.5.0-2+deb12u2	libopenjp2-7			2025-08-22T20:57:52Z	not-in-debian-security
+openjpeg2	2.5.0-2+deb12u3	libopenjp2-7	2026-05-15T21:45:14Z	bin	2026-05-17T02:41:56Z	
+openldap	2.5.13+dfsg-5	libldap-2.5-0			2023-02-08T21:16:59Z	not-in-debian-security
+openssh	1:9.2p1-2+deb12u1	openssh-client			2023-09-25T09:01:10Z	not-in-debian-security
+openssh	1:9.2p1-2+deb12u10	openssh-client			2026-05-05T20:41:43Z	not-in-debian-security
+openssh	1:9.2p1-2+deb12u2	openssh-client	2023-12-22T08:54:54Z	bin	2023-12-23T03:28:10Z	
+openssh	1:9.2p1-2+deb12u3	openssh-client	2024-07-01T08:25:23Z	bin	2024-07-01T20:41:38Z	
+openssh	1:9.2p1-2+deb12u4	openssh-client			2024-12-08T20:44:21Z	not-in-debian-security
+openssh	1:9.2p1-2+deb12u5	openssh-client	2025-02-18T09:26:02Z	bin	2025-02-19T03:09:25Z	
+openssh	1:9.2p1-2+deb12u6	openssh-client			2025-05-09T03:04:17Z	not-in-debian-security
+openssh	1:9.2p1-2+deb12u7	openssh-client			2025-07-29T02:37:17Z	not-in-debian-security
+openssh	1:9.2p1-2+deb12u8	openssh-client			2026-02-28T20:47:45Z	not-in-debian-security
+openssh	1:9.2p1-2+deb12u9	openssh-client	2026-04-09T20:31:53Z	bin	2026-04-18T20:34:06Z	
+openssl	3.0.10-1~deb12u1	libssl3			2023-09-10T02:49:57Z	not-in-debian-security
+openssl	3.0.11-1~deb12u1	libssl3			2023-09-28T03:00:30Z	not-in-debian-security
+openssl	3.0.11-1~deb12u2	libssl3	2023-10-24T19:11:10Z	bin	2023-10-29T04:31:03Z	
+openssl	3.0.13-1~deb12u1	libssl3			2024-03-25T09:13:29Z	not-in-debian-security
+openssl	3.0.13-1~deb12u2	libssl3			2024-08-15T03:03:36Z	not-in-debian-security
+openssl	3.0.14-1~deb12u1	libssl3			2024-08-22T21:05:25Z	not-in-debian-security
+openssl	3.0.14-1~deb12u2	libssl3	2024-09-03T18:54:33Z	bin	2024-09-04T03:00:14Z	
+openssl	3.0.15-1~deb12u1	libssl3			2024-11-01T02:53:24Z	not-in-debian-security
+openssl	3.0.16-1~deb12u1	libssl3			2025-04-26T20:42:42Z	not-in-debian-security
+openssl	3.0.17-1~deb12u1	libssl3			2025-07-28T14:37:03Z	not-in-debian-security
+openssl	3.0.17-1~deb12u2	libssl3			2025-08-07T20:39:08Z	not-in-debian-security
+openssl	3.0.17-1~deb12u3	libssl3	2025-10-01T13:04:22Z	bin	2025-10-19T15:11:46Z	
+openssl	3.0.18-1~deb12u1	libssl3			2025-12-06T14:52:06Z	not-in-debian-security
+openssl	3.0.18-1~deb12u2	libssl3	2026-01-27T19:44:59Z	bin	2026-01-29T20:33:45Z	
+openssl	3.0.19-1~deb12u1	libssl3			2026-02-28T20:47:45Z	not-in-debian-security
+openssl	3.0.19-1~deb12u2	libssl3	2026-04-07T21:15:19Z	bin	2026-04-08T20:39:14Z	
+openssl	3.0.20-1~deb12u1	libssl3			2026-05-06T02:34:05Z	not-in-debian-security
+openssl	3.0.20-1~deb12u2	libssl3	2026-06-09T21:45:05Z	bin	2026-06-12T02:37:39Z	
+openssl	3.0.22-1~deb12u1	libssl3	2026-09-25T11:03:00Z	bin		
+openssl	3.0.22-1~deb12u2	libssl3	2026-10-26T04:03:29Z	bin		
+p11-kit	0.24.1-2	libp11-kit0			2022-12-28T09:29:16Z	not-in-debian-security
+pam	1.5.2-6+deb12u1	libpam-modules			2023-09-24T08:44:40Z	not-in-debian-security
+pam	1.5.2-6+deb12u2	libpam-modules			2025-10-19T20:38:02Z	not-in-debian-security
+pango1.0	1.50.12+ds-1	libpango-1.0-0			2022-12-17T03:34:12Z	not-in-debian-security
+patch	2.7.6-7	patch			2021-01-09T14:30:16Z	not-in-debian-security
+pcre2	10.42-1	libpcre2-8-0			2023-01-02T15:34:46Z	not-in-debian-security
+pcre2	10.42-1+deb12u1	libpcre2-8-0	2026-09-04T09:43:38Z	bin		
+pcre2	10.42-1+deb12u2	libpcre2-8-0	2026-10-03T21:13:04Z	bin		
+perl	5.36.0-7+deb12u1	perl-base			2023-12-01T09:23:18Z	not-in-debian-security
+perl	5.36.0-7+deb12u2	perl-base	2025-04-13T13:53:24Z	bin	2025-04-14T21:07:55Z	
+perl	5.36.0-7+deb12u3	perl-base			2025-08-30T02:51:32Z	not-in-debian-security
+perl	5.36.0-7+deb12u4	perl-base	2026-10-05T09:03:07Z	bin		
+pinentry	1.2.1-1	pinentry-curses			2022-10-19T03:16:45Z	not-in-debian-security
+pixman	0.42.2-1	libpixman-1-0			2022-11-11T15:43:42Z	not-in-debian-security
+pkgconf	1.8.1-1	libpkgconf3			2023-01-23T04:00:22Z	not-in-debian-security
+postgresql-15	15.10-0+deb12u1	libpq-dev	2024-11-21T19:18:18Z	bin	2024-11-25T14:53:47Z	
+postgresql-15	15.11-0+deb12u1	libpq-dev			2025-02-16T20:56:56Z	not-in-debian-security
+postgresql-15	15.12-0+deb12u1	libpq-dev			2025-03-01T21:13:06Z	not-in-debian-security
+postgresql-15	15.12-0+deb12u2	libpq-dev			2025-03-06T21:13:36Z	not-in-debian-security
+postgresql-15	15.13-0+deb12u1	libpq-dev			2025-05-09T20:40:45Z	not-in-debian-security
+postgresql-15	15.14-0+deb12u1	libpq-dev			2025-08-22T20:57:52Z	not-in-debian-security
+postgresql-15	15.15-0+deb12u1	libpq-dev			2026-01-01T20:24:16Z	not-in-debian-security
+postgresql-15	15.16-0+deb12u1	libpq-dev	2026-02-12T19:44:45Z	bin	2026-02-19T20:39:30Z	
+postgresql-15	15.17-0+deb12u1	libpq-dev			2026-02-28T20:47:45Z	not-in-debian-security
+postgresql-15	15.18-0+deb12u1	libpq-dev	2026-05-14T14:38:37Z	bin	2026-05-17T02:41:56Z	
+postgresql-15	15.19-0+deb12u1	libpq-dev	2026-08-13T18:23:49Z	bin		
+postgresql-15	15.3-0+deb12u1	libpq-dev			2023-05-12T03:05:01Z	not-in-debian-security
+postgresql-15	15.4-0+deb12u1	libpq-dev			2023-10-12T21:11:49Z	not-in-debian-security
+postgresql-15	15.5-0+deb12u1	libpq-dev	2023-11-13T21:08:34Z	bin	2023-12-01T09:23:18Z	
+postgresql-15	15.6-0+deb12u1	libpq-dev	2024-02-14T19:56:59Z	bin	2024-02-19T21:19:08Z	
+postgresql-15	15.7-0+deb12u1	libpq-dev			2024-05-21T03:00:22Z	not-in-debian-security
+postgresql-15	15.8-0+deb12u1	libpq-dev	2024-08-09T08:36:53Z	bin	2024-08-12T21:24:27Z	
+postgresql-15	15.9-0+deb12u1	libpq-dev	2024-11-15T21:32:13Z	bin	2024-11-25T14:53:47Z	
+procps	2:4.0.2-3	libproc2-0			2022-12-20T03:57:34Z	not-in-debian-security
+python3-defaults	3.11.2-1	libpython3-stdlib			2023-02-15T21:09:53Z	not-in-debian-security
+python3-stdlib-extensions	3.11.2-3	python3-distutils			2023-05-03T02:55:36Z	not-in-debian-security
+python3.11	3.11.2-6+deb12u1	libpython3.11-minimal			2024-03-04T03:56:51Z	not-in-debian-security
+python3.11	3.11.2-6+deb12u2	libpython3.11-minimal			2024-05-21T03:00:22Z	not-in-debian-security
+python3.11	3.11.2-6+deb12u3	libpython3.11-minimal	2024-08-27T10:40:50Z	bin	2024-09-01T02:49:50Z	
+python3.11	3.11.2-6+deb12u4	libpython3.11-minimal			2024-10-10T20:46:54Z	not-in-debian-security
+python3.11	3.11.2-6+deb12u5	libpython3.11-minimal			2024-12-08T20:44:21Z	not-in-debian-security
+python3.11	3.11.2-6+deb12u6	libpython3.11-minimal			2025-05-03T20:59:36Z	not-in-debian-security
+python3.11	3.11.2-6+deb12u7	libpython3.11-minimal			2026-05-03T08:39:40Z	not-in-debian-security
+python3.11	3.11.2-6+deb12u8	libpython3.11-minimal			2026-05-25T02:24:35Z	not-in-debian-security
+python3.11	3.11.2-6+deb12u9	libpython3.11-minimal	2026-10-07T21:13:18Z	bin		
+re2c	3.0-2	re2c			2022-12-05T21:26:38Z	not-in-debian-security
+readline	8.2-1.3	libreadline8			2023-01-14T09:16:57Z	not-in-debian-security
+rpcsvc-proto	1.4.3-1	rpcsvc-proto			2022-12-03T15:06:21Z	not-in-debian-security
+rtmpdump	2.4+20151223.gitfa8646d.1-2	librtmp1			2018-05-21T21:56:16Z	not-in-debian-security
+rust-sequoia-sq	0.27.0-2	sq			2023-02-11T15:16:57Z	not-in-debian-security
+sed	4.9-1	sed			2023-01-06T15:24:26Z	not-in-debian-security
+sed	4.9-1+deb12u1	sed			2026-05-03T03:32:40Z	not-in-debian-security
+sensible-utils	0.0.17+nmu1	sensible-utils			2023-01-15T03:12:29Z	not-in-debian-security
+serf	1.3.9-11	libserf-1-1			2022-05-15T04:07:55Z	not-in-debian-security
+shadow	1:4.13+dfsg1-1+deb12u1	login			2025-05-10T20:44:02Z	not-in-debian-security
+shadow	1:4.13+dfsg1-1+deb12u2	login			2025-12-28T02:37:50Z	not-in-debian-security
+shared-mime-info	2.2-1	shared-mime-info			2022-04-29T20:53:42Z	not-in-debian-security
+sqlite3	3.40.1-2+deb12u1	libsqlite3-0			2024-11-03T14:53:34Z	not-in-debian-security
+sqlite3	3.40.1-2+deb12u2	libsqlite3-0			2025-08-31T14:49:53Z	not-in-debian-security
+subversion	1.14.2-4+deb12u1	libsvn1			2025-01-11T20:48:45Z	not-in-debian-security
+systemd	252.11-1~deb12u1	libsystemd0			2023-06-25T03:35:24Z	not-in-debian-security
+systemd	252.12-1~deb12u1	libsystemd0			2023-07-12T09:13:00Z	not-in-debian-security
+systemd	252.14-1~deb12u1	libsystemd0			2023-09-06T02:46:26Z	not-in-debian-security
+systemd	252.16-1~deb12u1	libsystemd0			2023-09-17T02:59:12Z	not-in-debian-security
+systemd	252.17-1~deb12u1	libsystemd0			2023-09-24T08:44:40Z	not-in-debian-security
+systemd	252.18-1~deb12u1	libsystemd0			2023-11-30T03:25:51Z	no-binary-and-not-in-debian-security
+systemd	252.19-1~deb12u1	libsystemd0			2023-12-01T09:23:18Z	not-in-debian-security
+systemd	252.20-1~deb12u1	libsystemd0			2024-01-21T03:25:14Z	no-binary-and-not-in-debian-security
+systemd	252.21-1~deb12u1	libsystemd0			2024-01-21T03:25:14Z	not-in-debian-security
+systemd	252.22-1~deb12u1	libsystemd0			2024-01-30T09:08:18Z	not-in-debian-security
+systemd	252.23-1~deb12u1	libsystemd0			2024-03-25T09:13:29Z	not-in-debian-security
+systemd	252.24-1~deb12u1	libsystemd0			2024-05-26T03:11:47Z	no-binary-and-not-in-debian-security
+systemd	252.25-1~deb12u1	libsystemd0			2024-05-26T03:11:47Z	not-in-debian-security
+systemd	252.26-1~deb12u1	libsystemd0			2024-05-29T02:38:19Z	not-in-debian-security
+systemd	252.26-1~deb12u2	libsystemd0			2024-06-17T02:36:17Z	not-in-debian-security
+systemd	252.26-1~deb12u2~bpo11+1	libsystemd0			2024-07-15T20:45:11Z	not-in-debian-security
+systemd	252.27-1~deb12u1	libsystemd0			2024-08-07T08:43:42Z	no-binary-and-not-in-debian-security
+systemd	252.28-1~deb12u1	libsystemd0			2024-08-07T08:43:42Z	no-binary-and-not-in-debian-security
+systemd	252.29-1~deb12u1	libsystemd0			2024-08-07T08:43:42Z	not-in-debian-security
+systemd	252.29-1~deb12u1~bpo11+1	libsystemd0			2024-08-26T14:42:30Z	not-in-debian-security
+systemd	252.30-1~deb12u1	libsystemd0			2024-08-25T14:52:53Z	not-in-debian-security
+systemd	252.30-1~deb12u2	libsystemd0			2024-08-26T02:35:10Z	not-in-debian-security
+systemd	252.31-1~deb12u1	libsystemd0			2024-10-27T21:56:52Z	not-in-debian-security
+systemd	252.32-1~deb12u1	libsystemd0			2024-12-21T20:48:40Z	no-binary-and-not-in-debian-security
+systemd	252.33-1~deb12u1	libsystemd0			2024-12-21T20:48:40Z	not-in-debian-security
+systemd	252.36-1~deb12u1	libsystemd0			2025-03-08T02:55:45Z	not-in-debian-security
+systemd	252.38-1~deb12u1	libsystemd0	2025-05-29T21:17:54Z	bin	2025-05-30T20:55:06Z	
+systemd	252.39-1~deb12u1	libsystemd0			2025-08-25T20:50:37Z	not-in-debian-security
+systemd	252.39-1~deb12u2	libsystemd0			2026-05-03T20:48:01Z	not-in-debian-security
+sysvinit	3.06-4	sysvinit-utils			2023-04-03T08:43:01Z	not-in-debian-security
+tar	1.34+dfsg-1.2+deb12u1	tar			2024-01-21T03:25:14Z	not-in-debian-security
+tiff	4.5.0-6+deb12u1	libtiff-dev	2023-11-27T04:27:28Z	bin	2023-11-30T03:25:51Z	
+tiff	4.5.0-6+deb12u2	libtiff-dev			2025-01-03T21:35:31Z	not-in-debian-security
+tiff	4.5.0-6+deb12u3	libtiff-dev	2025-10-10T18:46:34Z	bin	2025-10-19T15:11:46Z	
+tiff	4.5.0-6+deb12u4	libtiff-dev	2026-04-08T18:31:42Z	bin	2026-04-18T20:34:06Z	
+tzdata	2023c-5+deb12u1	tzdata			2023-12-01T09:23:18Z	not-in-debian-security
+tzdata	2023d-0+deb12u1	tzdata			2024-01-30T09:08:18Z	not-in-debian-security
+tzdata	2024a-0+deb12u1	tzdata			2024-02-04T22:13:34Z	not-in-debian-security
+tzdata	2024b-0+deb12u1	tzdata			2024-11-25T20:45:53Z	not-in-debian-security
+tzdata	2025a-0+deb12u1	tzdata			2025-03-01T21:13:06Z	not-in-debian-security
+tzdata	2025b-0+deb12u1	tzdata			2025-03-27T08:30:35Z	not-in-debian-security
+tzdata	2025b-0+deb12u2	tzdata			2025-08-25T02:38:29Z	not-in-debian-security
+tzdata	2026b-0+deb12u1	tzdata			2026-05-03T03:32:40Z	not-in-debian-security
+tzdata	2026c-0+deb12u1	tzdata	2026-09-22T12:12:35Z	bin		
+tzdata	2026e-0+deb12u1	tzdata	2026-10-23T17:43:02Z	bin		
+tzdata	2026f-0+deb12u1	tzdata	2026-10-29T15:42:52Z	bin		
+ucf	3.0043+nmu1+deb12u1	ucf			2024-12-29T20:47:59Z	not-in-debian-security
+unzip	6.0-28	unzip			2023-02-19T21:09:57Z	not-in-debian-security
+unzip	6.0-28+deb12u1	unzip	2026-08-16T14:43:15Z	bin		
+usrmerge	37~deb12u1	usr-is-merged			2024-01-16T15:15:34Z	not-in-debian-security
+utf8proc	2.8.0-1	libutf8proc2			2022-11-17T09:10:02Z	not-in-debian-security
+util-linux	2.38.1-5+deb12u1	bsdutils	2024-03-31T11:51:50Z	bin	2024-04-01T21:13:45Z	
+util-linux	2.38.1-5+deb12u2	bsdutils			2024-11-02T15:11:00Z	not-in-debian-security
+util-linux	2.38.1-5+deb12u3	bsdutils			2024-12-09T14:44:08Z	not-in-debian-security
+wget	1.21.3-1+deb12u1	wget			2025-03-09T04:05:17Z	not-in-debian-security
+x265	3.5-2	libx265-199			2021-09-24T02:47:23Z	not-in-debian-security
+xorg	1:7.7+23	x11-common			2021-08-18T14:46:18Z	not-in-debian-security
+xorg-sgml-doctools	1:1.11-1.1	xorg-sgml-doctools			2020-12-23T20:38:10Z	not-in-debian-security
+xorgproto	2022.1-1	x11proto-core-dev			2022-04-22T08:50:53Z	not-in-debian-security
+xtrans	1.4.0-1	xtrans-dev			2020-02-26T15:18:11Z	not-in-debian-security
+xxhash	0.8.1-1	libxxhash0			2022-01-14T21:17:02Z	not-in-debian-security
+xz-utils	5.4.1-1	liblzma5	2025-04-05T11:19:51Z	bin	2025-04-05T20:55:33Z	
+xz-utils	5.4.1-1+deb12u1	liblzma5			2026-07-04T21:13:17Z	not-in-debian-security
+xz-utils	5.4.1-1+deb12u2	liblzma5	2026-09-17T14:52:48Z	bin		
+zlib	1:1.2.13.dfsg-1	zlib1g	2025-08-21T17:54:18Z	src	2022-11-05T21:15:06Z	

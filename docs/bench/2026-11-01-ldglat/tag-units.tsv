@@ -1,0 +1,101 @@
+base	tag	source	version	start	result	t2	t2_commit	stage2_h	total_h	lower_h
+debian:bookworm-slim	node:22-bookworm-slim	gnutls28	3.7.9-2+deb12u6	2026-02-18T11:58:05Z	reached	2026-02-25T06:55:20Z	94de5981909169032aad51e3bd95794e8fe4859f	-54.3	163	6123
+debian:bookworm-slim	node:24-bookworm-slim	gnutls28	3.7.9-2+deb12u6	2026-02-18T11:58:05Z	reached	2026-02-25T06:55:20Z	94de5981909169032aad51e3bd95794e8fe4859f	-54.3	163	6123
+debian:bookworm-slim	php:8.2-cli-bookworm	gnutls28	3.7.9-2+deb12u6	2026-02-18T11:58:05Z	reached	2026-02-26T22:23:44Z	f83bf8a37f7f6a3bf898d80b2b6d610f29a8ae83	-14.9	202.4	6123
+debian:bookworm-slim	php:8.3-cli-bookworm	gnutls28	3.7.9-2+deb12u6	2026-02-18T11:58:05Z	reached	2026-02-26T22:23:44Z	f83bf8a37f7f6a3bf898d80b2b6d610f29a8ae83	-14.9	202.4	6123
+debian:bookworm-slim	php:8.4-cli-bookworm	gnutls28	3.7.9-2+deb12u6	2026-02-18T11:58:05Z	reached	2026-02-26T22:23:44Z	f83bf8a37f7f6a3bf898d80b2b6d610f29a8ae83	-14.9	202.4	6123
+debian:bookworm-slim	php:8.4-fpm-bookworm	gnutls28	3.7.9-2+deb12u6	2026-02-18T11:58:05Z	reached	2026-02-26T22:23:44Z	f83bf8a37f7f6a3bf898d80b2b6d610f29a8ae83	-14.9	202.4	6123
+debian:bookworm-slim	php:8.4-apache-bookworm	gnutls28	3.7.9-2+deb12u6	2026-02-18T11:58:05Z	reached	2026-02-26T22:23:44Z	f83bf8a37f7f6a3bf898d80b2b6d610f29a8ae83	-14.9	202.4	6123
+debian:bookworm-slim	php:8.5-cli-bookworm	gnutls28	3.7.9-2+deb12u6	2026-02-18T11:58:05Z	reached	2026-02-26T22:23:44Z	f83bf8a37f7f6a3bf898d80b2b6d610f29a8ae83	-14.9	202.4	6123
+debian:bookworm	node:22-bookworm	gnutls28	3.7.9-2+deb12u6	2026-02-18T11:58:05Z	reached	2026-02-25T06:55:20Z	94de5981909169032aad51e3bd95794e8fe4859f	-54.3	163	6123
+debian:bookworm	node:24-bookworm	gnutls28	3.7.9-2+deb12u6	2026-02-18T11:58:05Z	reached	2026-02-25T06:55:20Z	94de5981909169032aad51e3bd95794e8fe4859f	-54.3	163	6123
+debian:bookworm-slim	node:22-bookworm-slim	gnutls28	3.7.9-2+deb12u7	2026-05-19T20:39:50Z	reached	2026-06-13T06:20:07Z	6b212abc6f3c41daa58fe5339f0b4bea3d0f5c62	17.3	585.7	3954.3
+debian:bookworm-slim	node:24-bookworm-slim	gnutls28	3.7.9-2+deb12u7	2026-05-19T20:39:50Z	reached	2026-06-13T06:20:07Z	6b212abc6f3c41daa58fe5339f0b4bea3d0f5c62	17.3	585.7	3954.3
+debian:bookworm-slim	php:8.2-cli-bookworm	gnutls28	3.7.9-2+deb12u7	2026-05-19T20:39:50Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	553.2	3954.3
+debian:bookworm-slim	php:8.3-cli-bookworm	gnutls28	3.7.9-2+deb12u7	2026-05-19T20:39:50Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	553.2	3954.3
+debian:bookworm-slim	php:8.4-cli-bookworm	gnutls28	3.7.9-2+deb12u7	2026-05-19T20:39:50Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	553.2	3954.3
+debian:bookworm-slim	php:8.4-fpm-bookworm	gnutls28	3.7.9-2+deb12u7	2026-05-19T20:39:50Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	553.2	3954.3
+debian:bookworm-slim	php:8.4-apache-bookworm	gnutls28	3.7.9-2+deb12u7	2026-05-19T20:39:50Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	553.2	3954.3
+debian:bookworm-slim	php:8.5-cli-bookworm	gnutls28	3.7.9-2+deb12u7	2026-05-19T20:39:50Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	553.2	3954.3
+debian:bookworm	node:22-bookworm	gnutls28	3.7.9-2+deb12u7	2026-05-19T20:39:50Z	reached	2026-06-13T06:20:07Z	6b212abc6f3c41daa58fe5339f0b4bea3d0f5c62	17.3	585.7	3954.3
+debian:bookworm	node:24-bookworm	gnutls28	3.7.9-2+deb12u7	2026-05-19T20:39:50Z	reached	2026-06-13T06:20:07Z	6b212abc6f3c41daa58fe5339f0b4bea3d0f5c62	17.3	585.7	3954.3
+debian:bookworm-slim	node:22-bookworm-slim	libgcrypt20	1.10.1-3+deb12u1	2026-05-22T21:49:30Z	reached	2026-06-13T06:20:07Z	6b212abc6f3c41daa58fe5339f0b4bea3d0f5c62	17.3	512.5	3881.2
+debian:bookworm-slim	node:24-bookworm-slim	libgcrypt20	1.10.1-3+deb12u1	2026-05-22T21:49:30Z	reached	2026-06-13T06:20:07Z	6b212abc6f3c41daa58fe5339f0b4bea3d0f5c62	17.3	512.5	3881.2
+debian:bookworm-slim	php:8.2-cli-bookworm	libgcrypt20	1.10.1-3+deb12u1	2026-05-22T21:49:30Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	480	3881.2
+debian:bookworm-slim	php:8.3-cli-bookworm	libgcrypt20	1.10.1-3+deb12u1	2026-05-22T21:49:30Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	480	3881.2
+debian:bookworm-slim	php:8.4-cli-bookworm	libgcrypt20	1.10.1-3+deb12u1	2026-05-22T21:49:30Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	480	3881.2
+debian:bookworm-slim	php:8.4-fpm-bookworm	libgcrypt20	1.10.1-3+deb12u1	2026-05-22T21:49:30Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	480	3881.2
+debian:bookworm-slim	php:8.4-apache-bookworm	libgcrypt20	1.10.1-3+deb12u1	2026-05-22T21:49:30Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	480	3881.2
+debian:bookworm-slim	php:8.5-cli-bookworm	libgcrypt20	1.10.1-3+deb12u1	2026-05-22T21:49:30Z	reached	2026-06-11T21:49:24Z	037fa3efe67d04f929600cf8b3aed1ccde46ea7f	-15.2	480	3881.2
+debian:bookworm	node:22-bookworm	libgcrypt20	1.10.1-3+deb12u1	2026-05-22T21:49:30Z	reached	2026-06-13T06:20:07Z	6b212abc6f3c41daa58fe5339f0b4bea3d0f5c62	17.3	512.5	3881.2
+debian:bookworm	node:24-bookworm	libgcrypt20	1.10.1-3+deb12u1	2026-05-22T21:49:30Z	reached	2026-06-13T06:20:07Z	6b212abc6f3c41daa58fe5339f0b4bea3d0f5c62	17.3	512.5	3881.2
+debian:bookworm-slim	node:22-bookworm-slim	pcre2	10.42-1+deb12u1	2026-09-04T09:43:38Z	reached	2026-09-19T06:07:29Z	680e90cf33798bbbf2010b0100255d091c02fcc0	-78.8	356.4	1373.3
+debian:bookworm-slim	node:24-bookworm-slim	pcre2	10.42-1+deb12u1	2026-09-04T09:43:38Z	reached	2026-09-19T06:07:29Z	680e90cf33798bbbf2010b0100255d091c02fcc0	-78.8	356.4	1373.3
+debian:bookworm-slim	php:8.2-cli-bookworm	pcre2	10.42-1+deb12u1	2026-09-04T09:43:38Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	420.3	1373.3
+debian:bookworm-slim	php:8.3-cli-bookworm	pcre2	10.42-1+deb12u1	2026-09-04T09:43:38Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	420.3	1373.3
+debian:bookworm-slim	php:8.4-cli-bookworm	pcre2	10.42-1+deb12u1	2026-09-04T09:43:38Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	420.3	1373.3
+debian:bookworm-slim	php:8.4-fpm-bookworm	pcre2	10.42-1+deb12u1	2026-09-04T09:43:38Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	420.3	1373.3
+debian:bookworm-slim	php:8.4-apache-bookworm	pcre2	10.42-1+deb12u1	2026-09-04T09:43:38Z	reached	2026-09-17T21:57:10Z	9236c616e8091db30c675ae420399e448ffa9861	-111	324.2	1373.3
+debian:bookworm-slim	php:8.5-cli-bookworm	pcre2	10.42-1+deb12u1	2026-09-04T09:43:38Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	420.3	1373.3
+debian:bookworm	node:22-bookworm	pcre2	10.42-1+deb12u1	2026-09-04T09:43:38Z	reached	2026-09-19T06:07:29Z	680e90cf33798bbbf2010b0100255d091c02fcc0	-78.8	356.4	1373.3
+debian:bookworm	node:24-bookworm	pcre2	10.42-1+deb12u1	2026-09-04T09:43:38Z	reached	2026-09-19T06:07:29Z	680e90cf33798bbbf2010b0100255d091c02fcc0	-78.8	356.4	1373.3
+debian:bookworm-slim	node:22-bookworm-slim	pcre2	10.42-1+deb12u2	2026-10-03T21:13:04Z	reached	2026-10-07T06:07:25Z	81970c796741f94bcac0f9a00c1a8dc47c1f4662	17.2	80.9	665.8
+debian:bookworm-slim	node:24-bookworm-slim	pcre2	10.42-1+deb12u2	2026-10-03T21:13:04Z	reached	2026-10-07T06:07:25Z	81970c796741f94bcac0f9a00c1a8dc47c1f4662	17.2	80.9	665.8
+debian:bookworm-slim	php:8.2-cli-bookworm	pcre2	10.42-1+deb12u2	2026-10-03T21:13:04Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	120.6	665.8
+debian:bookworm-slim	php:8.3-cli-bookworm	pcre2	10.42-1+deb12u2	2026-10-03T21:13:04Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	120.6	665.8
+debian:bookworm-slim	php:8.4-cli-bookworm	pcre2	10.42-1+deb12u2	2026-10-03T21:13:04Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	120.6	665.8
+debian:bookworm-slim	php:8.4-fpm-bookworm	pcre2	10.42-1+deb12u2	2026-10-03T21:13:04Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	120.6	665.8
+debian:bookworm-slim	php:8.4-apache-bookworm	pcre2	10.42-1+deb12u2	2026-10-03T21:13:04Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	120.6	665.8
+debian:bookworm-slim	php:8.5-cli-bookworm	pcre2	10.42-1+deb12u2	2026-10-03T21:13:04Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	120.6	665.8
+debian:bookworm	node:22-bookworm	pcre2	10.42-1+deb12u2	2026-10-03T21:13:04Z	reached	2026-10-07T06:07:25Z	81970c796741f94bcac0f9a00c1a8dc47c1f4662	17.2	80.9	665.8
+debian:bookworm	node:24-bookworm	pcre2	10.42-1+deb12u2	2026-10-03T21:13:04Z	reached	2026-10-07T06:07:25Z	81970c796741f94bcac0f9a00c1a8dc47c1f4662	17.2	80.9	665.8
+debian:bookworm-slim	node:22-bookworm-slim	perl	5.36.0-7+deb12u4	2026-10-05T09:03:07Z	reached	2026-10-21T06:09:00Z	366619621cb04659037f5f061c5c21ace72b32e5	-54.8	381.1	629.9
+debian:bookworm-slim	node:24-bookworm-slim	perl	5.36.0-7+deb12u4	2026-10-05T09:03:07Z	reached	2026-10-21T06:09:00Z	366619621cb04659037f5f061c5c21ace72b32e5	-54.8	381.1	629.9
+debian:bookworm-slim	php:8.2-cli-bookworm	perl	5.36.0-7+deb12u4	2026-10-05T09:03:07Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	-351.2	84.7	629.9
+debian:bookworm-slim	php:8.3-cli-bookworm	perl	5.36.0-7+deb12u4	2026-10-05T09:03:07Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	-351.2	84.7	629.9
+debian:bookworm-slim	php:8.4-cli-bookworm	perl	5.36.0-7+deb12u4	2026-10-05T09:03:07Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	-351.2	84.7	629.9
+debian:bookworm-slim	php:8.4-fpm-bookworm	perl	5.36.0-7+deb12u4	2026-10-05T09:03:07Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	-351.2	84.7	629.9
+debian:bookworm-slim	php:8.4-apache-bookworm	perl	5.36.0-7+deb12u4	2026-10-05T09:03:07Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	-351.2	84.7	629.9
+debian:bookworm-slim	php:8.5-cli-bookworm	perl	5.36.0-7+deb12u4	2026-10-05T09:03:07Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	-351.2	84.7	629.9
+debian:bookworm	node:22-bookworm	perl	5.36.0-7+deb12u4	2026-10-05T09:03:07Z	reached	2026-10-07T06:07:25Z	81970c796741f94bcac0f9a00c1a8dc47c1f4662	-390.8	45.1	629.9
+debian:bookworm	node:24-bookworm	perl	5.36.0-7+deb12u4	2026-10-05T09:03:07Z	reached	2026-10-07T06:07:25Z	81970c796741f94bcac0f9a00c1a8dc47c1f4662	-390.8	45.1	629.9
+debian:bookworm-slim	node:22-bookworm-slim	tzdata	2026c-0+deb12u1	2026-09-22T12:12:35Z	reached	2026-10-07T06:07:25Z	81970c796741f94bcac0f9a00c1a8dc47c1f4662	17.2	353.9	938.8
+debian:bookworm-slim	node:24-bookworm-slim	tzdata	2026c-0+deb12u1	2026-09-22T12:12:35Z	reached	2026-10-07T06:07:25Z	81970c796741f94bcac0f9a00c1a8dc47c1f4662	17.2	353.9	938.8
+debian:bookworm-slim	php:8.2-cli-bookworm	tzdata	2026c-0+deb12u1	2026-09-22T12:12:35Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	393.6	938.8
+debian:bookworm-slim	php:8.3-cli-bookworm	tzdata	2026c-0+deb12u1	2026-09-22T12:12:35Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	393.6	938.8
+debian:bookworm-slim	php:8.4-cli-bookworm	tzdata	2026c-0+deb12u1	2026-09-22T12:12:35Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	393.6	938.8
+debian:bookworm-slim	php:8.4-fpm-bookworm	tzdata	2026c-0+deb12u1	2026-09-22T12:12:35Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	393.6	938.8
+debian:bookworm-slim	php:8.4-apache-bookworm	tzdata	2026c-0+deb12u1	2026-09-22T12:12:35Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	393.6	938.8
+debian:bookworm-slim	php:8.5-cli-bookworm	tzdata	2026c-0+deb12u1	2026-09-22T12:12:35Z	reached	2026-10-08T21:47:19Z	bd97bb179564d3a2eaa14137c0bd8a70a1cae23c	56.9	393.6	938.8
+debian:bookworm	node:22-bookworm	tzdata	2026c-0+deb12u1	2026-09-22T12:12:35Z	reached	2026-10-07T06:07:25Z	81970c796741f94bcac0f9a00c1a8dc47c1f4662	17.2	353.9	938.8
+debian:bookworm	node:24-bookworm	tzdata	2026c-0+deb12u1	2026-09-22T12:12:35Z	reached	2026-10-07T06:07:25Z	81970c796741f94bcac0f9a00c1a8dc47c1f4662	17.2	353.9	938.8
+debian:bookworm-slim	node:22-bookworm-slim	tzdata	2026e-0+deb12u1	2026-10-23T17:43:02Z	reached	2026-10-28T06:06:43Z	6ae6ba2bf24a660e1e448af8a98c4aa680725c65	-54.8	108.4	189.3
+debian:bookworm-slim	node:24-bookworm-slim	tzdata	2026e-0+deb12u1	2026-10-23T17:43:02Z	reached	2026-10-28T06:06:43Z	6ae6ba2bf24a660e1e448af8a98c4aa680725c65	-54.8	108.4	189.3
+debian:bookworm-slim	php:8.2-cli-bookworm	tzdata	2026e-0+deb12u1	2026-10-23T17:43:02Z	reached	2026-10-29T21:50:40Z	ad816d3ff0c5ceb10ed5cc95056dbed30e60d0c0	-15.1	148.1	189.3
+debian:bookworm-slim	php:8.3-cli-bookworm	tzdata	2026e-0+deb12u1	2026-10-23T17:43:02Z	reached	2026-10-29T21:50:40Z	ad816d3ff0c5ceb10ed5cc95056dbed30e60d0c0	-15.1	148.1	189.3
+debian:bookworm-slim	php:8.4-cli-bookworm	tzdata	2026e-0+deb12u1	2026-10-23T17:43:02Z	reached	2026-10-29T21:50:40Z	ad816d3ff0c5ceb10ed5cc95056dbed30e60d0c0	-15.1	148.1	189.3
+debian:bookworm-slim	php:8.4-fpm-bookworm	tzdata	2026e-0+deb12u1	2026-10-23T17:43:02Z	reached	2026-10-29T21:50:40Z	ad816d3ff0c5ceb10ed5cc95056dbed30e60d0c0	-15.1	148.1	189.3
+debian:bookworm-slim	php:8.4-apache-bookworm	tzdata	2026e-0+deb12u1	2026-10-23T17:43:02Z	reached	2026-10-29T21:50:40Z	ad816d3ff0c5ceb10ed5cc95056dbed30e60d0c0	-15.1	148.1	189.3
+debian:bookworm-slim	php:8.5-cli-bookworm	tzdata	2026e-0+deb12u1	2026-10-23T17:43:02Z	reached	2026-10-29T21:50:40Z	ad816d3ff0c5ceb10ed5cc95056dbed30e60d0c0	-15.1	148.1	189.3
+debian:bookworm	node:22-bookworm	tzdata	2026e-0+deb12u1	2026-10-23T17:43:02Z	reached	2026-10-31T06:07:04Z	64148fdf2f38a82f70b48fa30a58f269d7770393	17.2	180.4	189.3
+debian:bookworm	node:24-bookworm	tzdata	2026e-0+deb12u1	2026-10-23T17:43:02Z	reached	2026-10-31T06:07:04Z	64148fdf2f38a82f70b48fa30a58f269d7770393	17.2	180.4	189.3
+debian:bookworm-slim	node:22-bookworm-slim	tzdata	2026f-0+deb12u1	2026-10-29T15:42:52Z	not-reached					47.3
+debian:bookworm-slim	node:24-bookworm-slim	tzdata	2026f-0+deb12u1	2026-10-29T15:42:52Z	not-reached					47.3
+debian:bookworm-slim	php:8.2-cli-bookworm	tzdata	2026f-0+deb12u1	2026-10-29T15:42:52Z	not-reached					47.3
+debian:bookworm-slim	php:8.3-cli-bookworm	tzdata	2026f-0+deb12u1	2026-10-29T15:42:52Z	not-reached					47.3
+debian:bookworm-slim	php:8.4-cli-bookworm	tzdata	2026f-0+deb12u1	2026-10-29T15:42:52Z	not-reached					47.3
+debian:bookworm-slim	php:8.4-fpm-bookworm	tzdata	2026f-0+deb12u1	2026-10-29T15:42:52Z	not-reached					47.3
+debian:bookworm-slim	php:8.4-apache-bookworm	tzdata	2026f-0+deb12u1	2026-10-29T15:42:52Z	not-reached					47.3
+debian:bookworm-slim	php:8.5-cli-bookworm	tzdata	2026f-0+deb12u1	2026-10-29T15:42:52Z	not-reached					47.3
+debian:bookworm	node:22-bookworm	tzdata	2026f-0+deb12u1	2026-10-29T15:42:52Z	not-reached					47.3
+debian:bookworm	node:24-bookworm	tzdata	2026f-0+deb12u1	2026-10-29T15:42:52Z	not-reached					47.3
+debian:bookworm-slim	node:22-bookworm-slim	xz-utils	5.4.1-1+deb12u2	2026-09-17T14:52:48Z	reached	2026-09-19T06:07:29Z	680e90cf33798bbbf2010b0100255d091c02fcc0	-78.8	39.2	1056.1
+debian:bookworm-slim	node:24-bookworm-slim	xz-utils	5.4.1-1+deb12u2	2026-09-17T14:52:48Z	reached	2026-09-19T06:07:29Z	680e90cf33798bbbf2010b0100255d091c02fcc0	-78.8	39.2	1056.1
+debian:bookworm-slim	php:8.2-cli-bookworm	xz-utils	5.4.1-1+deb12u2	2026-09-17T14:52:48Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	103.2	1056.1
+debian:bookworm-slim	php:8.3-cli-bookworm	xz-utils	5.4.1-1+deb12u2	2026-09-17T14:52:48Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	103.2	1056.1
+debian:bookworm-slim	php:8.4-cli-bookworm	xz-utils	5.4.1-1+deb12u2	2026-09-17T14:52:48Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	103.2	1056.1
+debian:bookworm-slim	php:8.4-fpm-bookworm	xz-utils	5.4.1-1+deb12u2	2026-09-17T14:52:48Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	103.2	1056.1
+debian:bookworm-slim	php:8.4-apache-bookworm	xz-utils	5.4.1-1+deb12u2	2026-09-17T14:52:48Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	103.2	1056.1
+debian:bookworm-slim	php:8.5-cli-bookworm	xz-utils	5.4.1-1+deb12u2	2026-09-17T14:52:48Z	reached	2026-09-21T22:02:22Z	38abd8a1cd613c9e0b69450ec339161a28cb31b6	-14.9	103.2	1056.1
+debian:bookworm	node:22-bookworm	xz-utils	5.4.1-1+deb12u2	2026-09-17T14:52:48Z	reached	2026-09-19T06:07:29Z	680e90cf33798bbbf2010b0100255d091c02fcc0	-78.8	39.2	1056.1
+debian:bookworm	node:24-bookworm	xz-utils	5.4.1-1+deb12u2	2026-09-17T14:52:48Z	reached	2026-09-19T06:07:29Z	680e90cf33798bbbf2010b0100255d091c02fcc0	-78.8	39.2	1056.1

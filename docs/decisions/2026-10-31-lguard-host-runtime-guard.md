@@ -65,6 +65,11 @@ The review found three places where the guard read a command line differently fr
 - **A `#` starts a comment only after a space, tab, new line or `;&|()<>`,** so a CR (or another space character) before it hides nothing. A CR still ends a word, which only judges more.
 - **PowerShell:** curly quotes are read as quotes and en and em dashes as `-`, as the review says PowerShell's tokenizer reads them. A lone CR and the Unicode line separators are taken as new lines, and any white space ends a word; how PowerShell itself treats each was not checked, and cutting there only judges more.
 
+The same review of the fix (62d2648) found two more, also fixed with tests that fail on 62d2648:
+
+- **A delimiter word with `$( )`, `${ }`, `$[ ]` or a backtick cannot be read** (bash reads such a word to its own end, and `cat <<$(x)` ended at `$`): the heredoc is refused, as above.
+- **The backtick check no longer skips text after a `<<` only mentioned inside double quotes:** a word it cannot read, or one that runs past the string's closing quote, is not taken as a heredoc, and what follows is still read.
+
 ## The tests
 
 The tests stay where the guard's tests are, `.claude/hooks/guard.test.ts`, which the root `vitest.config.ts` (project `node`, `.claude/hooks/*.test.ts`) and CI already run. They run in Docker only (`--network none`, `--memory 2g`, `--cap-drop ALL`, a non-root user), never on the host. Every refusal rule above gets at least one mutation that turns it off, applied in Docker; each must make the tests fail. The mutations and their results are in docs/bench/2026-10-31-lguard/.

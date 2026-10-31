@@ -255,6 +255,14 @@ describe("guard hook: reading a command line as the shell does", () => {
     "cat <<\nnode x\n\nls",
     "<<'EOF\nnode x",
     "cat <<\"EOF\nnode x\nEOF",
+    // A delimiter with $( ), ${ } or a backtick (the security review of 62d2648): bash reads the word to its own end.
+    "cat <<$(x)\n$(x)\nnode y\n$",
+    "cat <<${x}\n${x}\nnode y\n$",
+    "cat <<$[x]\n$[x]\nnode y\n$",
+    // A << only mentioned inside double quotes does not make the backtick check skip what follows.
+    'echo "a <<b" `id`',
+    'echo "a <<b`id`"',
+    "echo \"a <<'b\" `id`",
     // In bash a CR is part of a word, so the # after it starts no comment.
     "echo x\r# ; node y",
   ])("blocks in bash: %j", (command) => {
@@ -263,6 +271,12 @@ describe("guard hook: reading a command line as the shell does", () => {
 
   it("says why a heredoc it cannot read is refused", () => {
     expect(run("cat <<EOF\nnode x").stderr).toContain("terminator line");
+    // bash's delimiter is a`b c`, so node x is text; the guard cannot read that word, and says so.
+    expect(run("cat <<a`b c`\na`b\nnode x\na`b c`").stderr).toContain("terminator line");
+  });
+
+  it("still reads a quoted heredoc inside $( ) in double quotes, the way to pass text", () => {
+    expect(exitFor("gh pr comment 1 --body \"$(cat <<'EOF'\nsee `x` and a <<b mention\nEOF\n)\"")).toBe(0);
   });
 
   it.each([

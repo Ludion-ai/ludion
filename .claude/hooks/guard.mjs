@@ -42,7 +42,8 @@ function lex(src) {
 /**
  * The heredoc whose << ends just before i, as bash reads it: its delimiter word without quotes and backslashes,
  * literal when any part of the word was quoted, strip for <<-, and where the word ends. A word that cannot be read
- * (no word, an unclosed single quote, $'…' or $"…", a new line inside it) gives unread.
+ * (no word, an unclosed single quote, $'…', $"…", $( ), ${ }, $[ ] or a backtick, a new line inside it) gives unread:
+ * bash reads such a word to its own end, which this does not try to match.
  */
 function heredocWord(src, i) {
   const strip = src[i] === "-";
@@ -68,7 +69,7 @@ function heredocWord(src, i) {
       literal = true;
       i++;
       delim += src[i] ?? "";
-    } else if (c === "$" && (src[i + 1] === "'" || src[i + 1] === '"')) return { unread: true, strip, end: i };
+    } else if (c === "`" || (c === "$" && i + 1 < src.length && "'\"({[".includes(src[i + 1]))) return { unread: true, strip, end: i };
     else delim += c;
   }
   return delim && !delim.includes("\n") ? { delim, literal, strip, end: i } : { unread: true, strip, end: i };
@@ -539,8 +540,13 @@ function runsBacktick(line) {
       }
       if (text.startsWith("<<", i)) {
         const h = heredocWord(text, i + 2);
-        if (!h.unread) heredocs.push(h);
-        i = Math.max(i + 1, h.end - 1);
+        // A word it cannot read, or one that runs past the closing quote of a double-quoted string (a << only mentioned
+        // in the text), is not taken as a heredoc: only the << is skipped, and what follows is still read.
+        if (h.unread || (quote === '"' && text.slice(i + 2, h.end).includes('"'))) i += 1;
+        else {
+          heredocs.push(h);
+          i = h.end - 1;
+        }
       }
     }
     if (heredocs.length) body = heredocs.shift();

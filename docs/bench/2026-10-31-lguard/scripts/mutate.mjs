@@ -155,12 +155,16 @@ M.push(
       delim += src[i] ?? "";`, R`      i++;
       delim += src[i] ?? "";`],
   ["H6", "delimiter: a backslash is removed", R`      delim += src[i] ?? "";`, R`      delim += "\\" + (src[i] ?? "");`],
-  ["H7", "delimiter: $'...' cannot be read", R`} else if (c === "$" && (src[i + 1] === "'" || src[i + 1] === '"')) return { unread: true, strip, end: i };`, R`} else if (false) return { unread: true, strip, end: i };`],
+  ["H7", "delimiter: $'...' cannot be read", R`"'\"({[".includes(src[i + 1])`, R`"({[".includes(src[i + 1])`],
+  ["H7b", "delimiter: $( ), ${ } and $[ ] cannot be read (review of 62d2648)", R`"'\"({[".includes(src[i + 1])`, R`"'\"".includes(src[i + 1])`],
+  ["H7c", "delimiter: a backtick cannot be read (review of 62d2648)", R`} else if (c === "${"`"}" || (c === "$" &&`, R`} else if ((c === "$" &&`],
   ["H8", "delimiter: an unclosed single quote cannot be read", R`      if (end < 0) return { unread: true, strip, end: src.length };`, R`      if (end < 0) return { delim: "x", literal: true, strip, end: src.length };`],
   ["H9", "delimiter: an empty one or one with a new line cannot be read", R`return delim && !delim.includes("\n") ? `, R`return true ? `],
   ["H10", "a heredoc with no terminator line", R`    if (!ended) h.stage.unread = true;`, R``],
   ["H11", "an unread heredoc is refused", R`      if (stage.unread) return UNREAD;`, R``],
   ["H12", "a stage with only an unread heredoc is kept", R`stage.stdin.length || stage.unread) pipeline`, R`stage.stdin.length) pipeline`],
+  ["R1", "runsBacktick: a << word that runs past the closing double quote is not a heredoc (review of 62d2648)", R` || (quote === '"' && text.slice(i + 2, h.end).includes('"'))) i += 1;`, R`) i += 1;`],
+  ["R2", "runsBacktick: an unread << word is not a heredoc (review of 62d2648)", R`if (h.unread || (quote === '"'`, R`if ((quote === '"'`],
   ["H13", "runsBacktick reads the delimiter the same way", R`const h = heredocWord(text, i + 2);`, R`const h = { delim: text.slice(i + 2).replace(/^-?\s*'?(\w).*$/s, "$1"), literal: true, strip: false, end: i + 2 };`],
   // PowerShell's look-alike characters and white space (finding 3), and the comment after a CR (finding 2: L6b).
   ["W1", "PowerShell: curly double quotes", R`

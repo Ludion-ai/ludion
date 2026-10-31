@@ -72,6 +72,13 @@ The same review of the fix (62d2648) found two more, also fixed with tests that 
 
 Its review of that fix (695424c) found that a `<<'EOF'` mentioned inside double quotes still made the backtick check skip the next lines as a heredoc's body, which bash runs (a miss main's guard already listed). The backtick check now keeps a stack of open single quotes, double quotes and `( )`/`$( )`, and takes `<<` as a heredoc only outside quotes or inside `( )` and `$( )`, so `"$(cat <<'EOF' … EOF)"` still passes text safely.
 
+**Open: the review of 4d97495 found two more, not fixed.** Both are in the backtick check's reading of quotes:
+
+- `${…}` inside double quotes: bash lets `"` and `'` nest inside it, the check does not, so a `"` there closes its double-quoted string early and a later `<<'EOF'` can be taken as a heredoc whose body hides a backtick. The reader (`doubleQuoted`) has the same gap.
+- a `case … )` inside `$( )`: the pattern's `)` closes the check's `$( )` early, and its view of the quotes after it can go wrong.
+
+A backtick runs a command in bash, a runtime included, and the reader does not judge what is inside backticks; it relies on the backtick check. Main's backtick check has these gaps too, and more (it took any `<<` inside double quotes as a heredoc). The lane stopped fixing them one by one: the security review found a reading that differs from bash's in four commits in a row, and the brief says to stop work that fails the same way three times and report it. The chat decides the way on, for example: refuse any backtick in bash outside a quoted heredoc's body or a single-quoted string as the reader sees them, and refuse a command with a backtick that also has `${` with a quote inside, `case`, or `$((`; or judge the inside of backticks as commands; or keep the guard a backstop and say so.
+
 ## The tests
 
 The tests stay where the guard's tests are, `.claude/hooks/guard.test.ts`, which the root `vitest.config.ts` (project `node`, `.claude/hooks/*.test.ts`) and CI already run. They run in Docker only (`--network none`, `--memory 2g`, `--cap-drop ALL`, a non-root user), never on the host. Every refusal rule above gets at least one mutation that turns it off, applied in Docker; each must make the tests fail. The mutations and their results are in docs/bench/2026-10-31-lguard/.

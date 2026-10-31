@@ -245,6 +245,7 @@ describe("guard hook: reading a command line as the shell does", () => {
     "cat <<E\"OF\"\nEOF\nnode x\nE\"OF\"",
     "cat <<E\\OF\nEOF\nnode x\nE\\OF",
     "cat <<\"E\\\"F\"\nE\"F\nnode x\nE\\\"F",
+    "cat <<\"E\\$F\"\nE$F\nnode x\nE\\$F",
     "cat <<'E'OF\nEOF\necho `id`\nE",
     // A heredoc it cannot read, or with no terminator line.
     "cat <<EOF\nnode x",

@@ -13,6 +13,7 @@
 - **Remaining holes** (whether to close them is the chat's decision):
   - **A script file's contents are not seen.** For `sh x.sh`, `bash x.sh`, `pwsh -File x.ps1` or `cat x.sh | sh`, the hook sees the shell and the file's name; a `node` written inside the file runs (audit comment 6542250801, finding 5).
   - A program named through a variable or a lookup, a node or Python program installed on the PATH under its own name (`tsc`, `wrangler`), and other ways to read third-party files; listed in the decision record.
+  - **A runtime inside backticks** is refused only by the backtick check, whose reading of quotes still differs from bash's after a `${…}` holding quotes inside double quotes, or a `case` pattern's `)` inside `$( )` (two open findings of the automated security review; the decision record).
   - The hook refuses; it does not count. A run that slips past it is seen only if the agent reports it, or by a record of every process started (Windows event 4688 with command lines, or Sysmon event 1), which is the PC's setting and the owner's decision.
   - The hook itself is node on the host (`.claude/settings.json`), the owner's tool and not an agent's command (comment 6528291928, 5).
 - **Check:** `.claude/hooks/guard.test.ts` — the five commands and the other forms are refused; Docker, git, gh, claude and mentions are allowed.

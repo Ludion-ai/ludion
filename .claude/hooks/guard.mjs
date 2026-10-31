@@ -504,7 +504,9 @@ function check(line, depth = 0) {
  * is how text is passed safely. It keeps a stack of what is open: single quotes, double quotes, and ( or $( ), also
  * a $( ) opened inside double quotes. A heredoc operator counts outside quotes or inside ( ) and $( ) only, so a <<
  * mentioned in double-quoted text is text; its delimiter is read as bash reads it (heredocWord). A backstop, not a
- * parser: it misses a backtick after an apostrophe in a # comment, and inside $'...'.
+ * parser: it misses a backtick after an apostrophe in a # comment and inside $'...', and its reading of quotes can go
+ * wrong after a ${…} holding quotes inside double quotes, or a case pattern's ) inside $( ) (open findings of the
+ * security review of 4d97495; docs/decisions/2026-10-31-lguard-host-runtime-guard.md).
  */
 function runsBacktick(line) {
   const open = [];

@@ -1,0 +1,19 @@
+# started 2026-10-31T04:34:26Z, node v24.22.1, git version 2.39.5
+stand-in repository: 1220 files
+== npm run typecheck
+typecheck exit 0
+> typecheck
+> tsc -p tsconfig.json && tsc -p apps/worker/tsconfig.json
+
+== npm run build
+build exit 0
+04:34:30 [build] ✓ Completed in 354ms.
+04:34:30 [build] 5 page(s) built in 500ms
+04:34:30 [build] Complete!
+== npm test -- --maxWorkers=2
+npm test exit 1
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |node| packages/cli/test/branch.test.ts > a fix on its own branch > refuses a symbolic link inside .git where Git would write, and a reflog the branch already has
+ Test Files  1 failed | 38 passed (39)
+      Tests  1 failed | 1254 passed | 24 skipped (1279)
+# finished 2026-10-31T04:34:47Z

@@ -15,6 +15,11 @@ const UNSUPPORTED = ["requirements.txt", "pyproject.toml", "go.mod", "Cargo.lock
 const message = (error: unknown) => error instanceof Error ? error.message : String(error);
 /** A known vulnerability: any finding of a dependency scan; a read-only scan's informational findings do not count. */
 export const vulnerable = (result: DependencyScan | ReadOnlyScan): boolean => "fixed_versions_note" in result ? result.findings.some(f => f.kind === "vulnerability") : result.findings.length > 0;
+/**
+ * An image move that scan counts (exit 1, attention_required): one with a newer security release between. A move to the
+ * line's newest release with none, waiting or not, is shown but not counted (docs/decisions/2026-11-01-scan-exit-non-security-move.md).
+ */
+export const securityMove = (result: Scan): boolean => result.candidate !== null && result.security_releases.length > 0;
 
 /** `readers` and `client` exist for tests; callers use the registered readers and OSV. */
 export async function scanProject(root: string, selected?: string, deps: { readers?: readonly ReadOnlyReader[]; client?: OsvClient } = {}): Promise<ProjectScan> {
@@ -82,6 +87,6 @@ export async function scanProject(root: string, selected?: string, deps: { reade
   }
   const unsupported = !auto ? [] : UNSUPPORTED.filter(f => existsSync(join(root, f)) && !handled.has(f));
   if (!checks.length && !unsupported.length) throw new Error(`No supported project inventory found. Expected PHP or Node.js Dockerfile, npm lockfile, composer.lock or pom.xml${readers.length ? `, or for a read-only scan ${readers.flatMap(r => r.files).join(", ")}` : ""}.`);
-  const attention = unsupported.length > 0 || checks.some(c => "error" in c || ("findings" in c.result ? vulnerable(c.result) || c.result.status === "incomplete" : c.result.candidate !== null));
+  const attention = unsupported.length > 0 || checks.some(c => "error" in c || ("findings" in c.result ? vulnerable(c.result) || c.result.status === "incomplete" : securityMove(c.result)));
   return { schema: 1, checked_at: new Date().toISOString(), status: attention ? "attention_required" : "no_known_updates", checks, unsupported };
 }

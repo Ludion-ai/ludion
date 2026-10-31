@@ -5,9 +5,10 @@ import { setTimeout as delay } from "node:timers/promises";
 import { patchProject } from "./patch.ts";
 import { patchDependencies } from "./dependency-patch.ts";
 import { detectEcosystems, DEFAULT_IMAGES, textFile, type Ecosystem } from "./inventory.ts";
-import { scanProject, vulnerable } from "./scan.ts";
+import { scanProject, securityMove, vulnerable } from "./scan.ts";
 import { CONFIG, DEFAULT_CONFIG, DEFAULT_NODE_CONFIG, readConfig, regularFile, rootPath } from "./project.ts";
 import { namesNodeImage } from "./node.ts";
+import type { Scan } from "./php.ts";
 import { useProject } from "../../../sandbox/src/docker.ts";
 import type { ReadOnlyFinding, ReadOnlyScan } from "./osv.ts";
 import { isReadOnlyCliName, READONLY_CLI_NAMES, readOnlyRefusal } from "./readonly/index.ts";
@@ -15,6 +16,10 @@ import { isReadOnlyCliName, READONLY_CLI_NAMES, readOnlyRefusal } from "./readon
 /** Read-only checks can quote project files (limitations, reader errors): no C0 or C1 control character reaches the terminal. */
 const plain = (text: string) => String(text).replace(/[\x00-\x1f\x7f-\x9f]/g, " ");
 const READONLY_ECOSYSTEMS: readonly string[] = Object.values(READONLY_CLI_NAMES).map(r => r.ecosystem);
+/** An image check's text after its current version: a move with no newer security release says so, and where its wait is. */
+const imageText = (result: Scan): string => !result.candidate ? "no newer security release found"
+  : securityMove(result) ? `update ${result.candidate.version}`
+  : `newest release ${result.candidate.version} of the line (no newer security release); ${result.status === "wait" ? "waits until" : "its wait ended"} ${result.wait_until}`;
 
 /** The text lines for one read-only check, in the form of the other dependency checks. Informational findings come last. */
 export function readOnlyText(ecosystem: string, result: ReadOnlyScan): string[] {
@@ -70,12 +75,12 @@ export async function securityCli(command: string, args: string[]): Promise<numb
           for (const finding of check.result.findings) console.log(`  ${finding.package.name}@${finding.package.version} · ${finding.advisory.id} · ${finding.advisory.summary}`);
           for (const limit of check.result.inventory.limitations) console.log(`  Incomplete: ${limit}`);
           console.log(`  Scope: ${check.result.inventory.scope}`);
-        } else console.log(`${check.ecosystem}: ${check.result.current.version} · ${check.result.candidate ? `update ${check.result.candidate.version}` : "no newer security release found"}`);
+        } else console.log(`${check.ecosystem}: ${check.result.current.version} · ${imageText(check.result)}`);
       }
       if (report.unsupported.length) console.error(`Unsupported inventories: ${report.unsupported.join(", ")}. These have not been checked.`);
       console.log("Known data only; no match is not a security guarantee. Dependency coordinates are sent to OSV; source stays local to your Docker setup.");
     }
-    const found = report.checks.some(c => "result" in c && ("findings" in c.result ? vulnerable(c.result) : c.result.candidate !== null));
+    const found = report.checks.some(c => "result" in c && ("findings" in c.result ? vulnerable(c.result) : securityMove(c.result)));
     return found ? 1 : report.status === "attention_required" ? 2 : 0;
   }
   async function patch(signal?: AbortSignal): Promise<number> {

@@ -1,0 +1,2 @@
+{"ecosystem":"npm","url":"https://osv-vulnerabilities.storage.googleapis.com/npm/all.zip","fetched_at":"2026-10-31T03:50:00.668Z","last_modified":"Sat, 31 Oct 2026 03:03:11 GMT","bytes":219692908,"sha256":"49a43c99756a84092c1b53f514a1bbccabf0e106dc76ebed73b1660423f14575"}
+{"ecosystem":"Packagist","url":"https://osv-vulnerabilities.storage.googleapis.com/Packagist/all.zip","fetched_at":"2026-10-31T03:50:17.051Z","last_modified":"Sat, 31 Oct 2026 03:03:06 GMT","bytes":11087332,"sha256":"4effe961117ef2559d36a5f719b0397fcf048a5d30617fd36df6cd201e0d99f1"}

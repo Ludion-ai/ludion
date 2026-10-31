@@ -1,0 +1,20 @@
+# started 2026-10-31T04:05:35Z, node v24.22.1
+without mutations: passed
+caught: MAL- is not trap
+caught: MAL- anywhere in the id is trap
+caught: the weakest class wins
+caught: the first CWE wins
+caught: CWE-78 leaves the table
+caught: CWE-506 becomes trap
+caught: cwe_ids not read
+caught: any severity string kept
+caught: | not escaped
+caught: line breaks kept
+caught: fence not lengthened
+caught: minutes rounded, not floored
+caught: action before the fix accepted
+caught: Feb 30 accepted
+caught: summary counts every action as fixed
+after restoring: passed
+15 of 15 mutations caught
+# finished 2026-10-31T04:05:48Z

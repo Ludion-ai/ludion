@@ -1,0 +1,936 @@
+{
+  "fetched": {
+    "npm": {
+      "url": "https://osv-vulnerabilities.storage.googleapis.com/npm/all.zip",
+      "fetched_at": "2026-10-31T03:50:00.668Z",
+      "last_modified": "Sat, 31 Oct 2026 03:03:11 GMT",
+      "bytes": 219692908,
+      "sha256": "49a43c99756a84092c1b53f514a1bbccabf0e106dc76ebed73b1660423f14575"
+    },
+    "Packagist": {
+      "url": "https://osv-vulnerabilities.storage.googleapis.com/Packagist/all.zip",
+      "fetched_at": "2026-10-31T03:50:17.051Z",
+      "last_modified": "Sat, 31 Oct 2026 03:03:06 GMT",
+      "bytes": 11087332,
+      "sha256": "4effe961117ef2559d36a5f719b0397fcf048a5d30617fd36df6cd201e0d99f1"
+    }
+  },
+  "table": {
+    "mapped_cwes": 125,
+    "decided_unclassified": 54
+  },
+  "ecosystems": {
+    "npm": {
+      "all": {
+        "records": 230992,
+        "mal": 222919,
+        "withdrawn": 742,
+        "with_cwe": {
+          "count": 7839,
+          "pct": 3.4,
+          "low": 3.3,
+          "high": 3.5
+        },
+        "classified": {
+          "count": 228982,
+          "pct": 99.1,
+          "low": 99.1,
+          "high": 99.2
+        },
+        "by_class": {
+          "trap": {
+            "count": 222919,
+            "pct": 96.5,
+            "low": 96.4,
+            "high": 96.6
+          },
+          "takeover": {
+            "count": 953,
+            "pct": 0.4,
+            "low": 0.4,
+            "high": 0.4
+          },
+          "impersonate": {
+            "count": 2151,
+            "pct": 0.9,
+            "low": 0.9,
+            "high": 1
+          },
+          "steal": {
+            "count": 1568,
+            "pct": 0.7,
+            "low": 0.6,
+            "high": 0.7
+          },
+          "alter": {
+            "count": 603,
+            "pct": 0.3,
+            "low": 0.2,
+            "high": 0.3
+          },
+          "disrupt": {
+            "count": 788,
+            "pct": 0.3,
+            "low": 0.3,
+            "high": 0.4
+          },
+          "unclassified": {
+            "count": 2010,
+            "pct": 0.9,
+            "low": 0.8,
+            "high": 0.9
+          }
+        },
+        "by_severity": {
+          "unknown": 222922,
+          "high": 3188,
+          "moderate": 2886,
+          "critical": 1467,
+          "low": 529
+        },
+        "unclassified_with_cwe": 1776,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-506",
+            402
+          ],
+          [
+            "CWE-20",
+            167
+          ],
+          [
+            "CWE-74",
+            73
+          ],
+          [
+            "CWE-347",
+            64
+          ],
+          [
+            "CWE-693",
+            59
+          ],
+          [
+            "CWE-248",
+            58
+          ],
+          [
+            "CWE-367",
+            50
+          ],
+          [
+            "CWE-346",
+            44
+          ],
+          [
+            "CWE-184",
+            39
+          ],
+          [
+            "CWE-59",
+            38
+          ],
+          [
+            "CWE-345",
+            38
+          ],
+          [
+            "CWE-436",
+            38
+          ],
+          [
+            "CWE-668",
+            31
+          ],
+          [
+            "CWE-295",
+            26
+          ],
+          [
+            "CWE-913",
+            26
+          ],
+          [
+            "CWE-116",
+            25
+          ],
+          [
+            "CWE-754",
+            25
+          ],
+          [
+            "CWE-88",
+            24
+          ],
+          [
+            "CWE-362",
+            23
+          ],
+          [
+            "CWE-755",
+            23
+          ]
+        ]
+      },
+      "not_mal": {
+        "records": 8073,
+        "mal": 0,
+        "withdrawn": 410,
+        "with_cwe": {
+          "count": 7839,
+          "pct": 97.1,
+          "low": 96.7,
+          "high": 97.4
+        },
+        "classified": {
+          "count": 6063,
+          "pct": 75.1,
+          "low": 74.1,
+          "high": 76
+        },
+        "by_class": {
+          "trap": {
+            "count": 0,
+            "pct": 0,
+            "low": 0,
+            "high": 0
+          },
+          "takeover": {
+            "count": 953,
+            "pct": 11.8,
+            "low": 11.1,
+            "high": 12.5
+          },
+          "impersonate": {
+            "count": 2151,
+            "pct": 26.6,
+            "low": 25.7,
+            "high": 27.6
+          },
+          "steal": {
+            "count": 1568,
+            "pct": 19.4,
+            "low": 18.6,
+            "high": 20.3
+          },
+          "alter": {
+            "count": 603,
+            "pct": 7.5,
+            "low": 6.9,
+            "high": 8.1
+          },
+          "disrupt": {
+            "count": 788,
+            "pct": 9.8,
+            "low": 9.1,
+            "high": 10.4
+          },
+          "unclassified": {
+            "count": 2010,
+            "pct": 24.9,
+            "low": 24,
+            "high": 25.9
+          }
+        },
+        "by_severity": {
+          "high": 3188,
+          "moderate": 2886,
+          "critical": 1467,
+          "low": 529,
+          "unknown": 3
+        },
+        "unclassified_with_cwe": 1776,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-506",
+            402
+          ],
+          [
+            "CWE-20",
+            167
+          ],
+          [
+            "CWE-74",
+            73
+          ],
+          [
+            "CWE-347",
+            64
+          ],
+          [
+            "CWE-693",
+            59
+          ],
+          [
+            "CWE-248",
+            58
+          ],
+          [
+            "CWE-367",
+            50
+          ],
+          [
+            "CWE-346",
+            44
+          ],
+          [
+            "CWE-184",
+            39
+          ],
+          [
+            "CWE-59",
+            38
+          ],
+          [
+            "CWE-345",
+            38
+          ],
+          [
+            "CWE-436",
+            38
+          ],
+          [
+            "CWE-668",
+            31
+          ],
+          [
+            "CWE-295",
+            26
+          ],
+          [
+            "CWE-913",
+            26
+          ],
+          [
+            "CWE-116",
+            25
+          ],
+          [
+            "CWE-754",
+            25
+          ],
+          [
+            "CWE-88",
+            24
+          ],
+          [
+            "CWE-362",
+            23
+          ],
+          [
+            "CWE-755",
+            23
+          ]
+        ]
+      }
+    },
+    "Packagist": {
+      "all": {
+        "records": 7397,
+        "mal": 1,
+        "withdrawn": 155,
+        "with_cwe": {
+          "count": 6254,
+          "pct": 84.5,
+          "low": 83.7,
+          "high": 85.4
+        },
+        "classified": {
+          "count": 5541,
+          "pct": 74.9,
+          "low": 73.9,
+          "high": 75.9
+        },
+        "by_class": {
+          "trap": {
+            "count": 1,
+            "pct": 0,
+            "low": 0,
+            "high": 0.1
+          },
+          "takeover": {
+            "count": 724,
+            "pct": 9.8,
+            "low": 9.1,
+            "high": 10.5
+          },
+          "impersonate": {
+            "count": 3453,
+            "pct": 46.7,
+            "low": 45.5,
+            "high": 47.8
+          },
+          "steal": {
+            "count": 1195,
+            "pct": 16.2,
+            "low": 15.3,
+            "high": 17
+          },
+          "alter": {
+            "count": 36,
+            "pct": 0.5,
+            "low": 0.4,
+            "high": 0.7
+          },
+          "disrupt": {
+            "count": 132,
+            "pct": 1.8,
+            "low": 1.5,
+            "high": 2.1
+          },
+          "unclassified": {
+            "count": 1856,
+            "pct": 25.1,
+            "low": 24.1,
+            "high": 26.1
+          }
+        },
+        "by_severity": {
+          "moderate": 3576,
+          "high": 1908,
+          "unknown": 801,
+          "critical": 658,
+          "low": 454
+        },
+        "unclassified_with_cwe": 714,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            155
+          ],
+          [
+            "CWE-74",
+            91
+          ],
+          [
+            "CWE-345",
+            22
+          ],
+          [
+            "CWE-1236",
+            21
+          ],
+          [
+            "CWE-93",
+            19
+          ],
+          [
+            "CWE-347",
+            18
+          ],
+          [
+            "CWE-732",
+            18
+          ],
+          [
+            "CWE-331",
+            16
+          ],
+          [
+            "CWE-116",
+            15
+          ],
+          [
+            "CWE-470",
+            15
+          ],
+          [
+            "CWE-436",
+            14
+          ],
+          [
+            "CWE-73",
+            13
+          ],
+          [
+            "CWE-327",
+            13
+          ],
+          [
+            "CWE-668",
+            13
+          ],
+          [
+            "CWE-346",
+            12
+          ],
+          [
+            "CWE-330",
+            11
+          ],
+          [
+            "CWE-693",
+            11
+          ],
+          [
+            "CWE-88",
+            10
+          ],
+          [
+            "CWE-276",
+            10
+          ],
+          [
+            "CWE-362",
+            10
+          ]
+        ]
+      },
+      "not_mal": {
+        "records": 7396,
+        "mal": 0,
+        "withdrawn": 155,
+        "with_cwe": {
+          "count": 6254,
+          "pct": 84.6,
+          "low": 83.7,
+          "high": 85.4
+        },
+        "classified": {
+          "count": 5540,
+          "pct": 74.9,
+          "low": 73.9,
+          "high": 75.9
+        },
+        "by_class": {
+          "trap": {
+            "count": 0,
+            "pct": 0,
+            "low": 0,
+            "high": 0.1
+          },
+          "takeover": {
+            "count": 724,
+            "pct": 9.8,
+            "low": 9.1,
+            "high": 10.5
+          },
+          "impersonate": {
+            "count": 3453,
+            "pct": 46.7,
+            "low": 45.6,
+            "high": 47.8
+          },
+          "steal": {
+            "count": 1195,
+            "pct": 16.2,
+            "low": 15.3,
+            "high": 17
+          },
+          "alter": {
+            "count": 36,
+            "pct": 0.5,
+            "low": 0.4,
+            "high": 0.7
+          },
+          "disrupt": {
+            "count": 132,
+            "pct": 1.8,
+            "low": 1.5,
+            "high": 2.1
+          },
+          "unclassified": {
+            "count": 1856,
+            "pct": 25.1,
+            "low": 24.1,
+            "high": 26.1
+          }
+        },
+        "by_severity": {
+          "moderate": 3576,
+          "high": 1908,
+          "unknown": 800,
+          "critical": 658,
+          "low": 454
+        },
+        "unclassified_with_cwe": 714,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-20",
+            155
+          ],
+          [
+            "CWE-74",
+            91
+          ],
+          [
+            "CWE-345",
+            22
+          ],
+          [
+            "CWE-1236",
+            21
+          ],
+          [
+            "CWE-93",
+            19
+          ],
+          [
+            "CWE-347",
+            18
+          ],
+          [
+            "CWE-732",
+            18
+          ],
+          [
+            "CWE-331",
+            16
+          ],
+          [
+            "CWE-116",
+            15
+          ],
+          [
+            "CWE-470",
+            15
+          ],
+          [
+            "CWE-436",
+            14
+          ],
+          [
+            "CWE-73",
+            13
+          ],
+          [
+            "CWE-327",
+            13
+          ],
+          [
+            "CWE-668",
+            13
+          ],
+          [
+            "CWE-346",
+            12
+          ],
+          [
+            "CWE-330",
+            11
+          ],
+          [
+            "CWE-693",
+            11
+          ],
+          [
+            "CWE-88",
+            10
+          ],
+          [
+            "CWE-276",
+            10
+          ],
+          [
+            "CWE-362",
+            10
+          ]
+        ]
+      }
+    },
+    "both": {
+      "all": {
+        "records": 238389,
+        "mal": 222920,
+        "withdrawn": 897,
+        "with_cwe": {
+          "count": 14093,
+          "pct": 5.9,
+          "low": 5.8,
+          "high": 6
+        },
+        "classified": {
+          "count": 234523,
+          "pct": 98.4,
+          "low": 98.3,
+          "high": 98.4
+        },
+        "by_class": {
+          "trap": {
+            "count": 222920,
+            "pct": 93.5,
+            "low": 93.4,
+            "high": 93.6
+          },
+          "takeover": {
+            "count": 1677,
+            "pct": 0.7,
+            "low": 0.7,
+            "high": 0.7
+          },
+          "impersonate": {
+            "count": 5604,
+            "pct": 2.4,
+            "low": 2.3,
+            "high": 2.4
+          },
+          "steal": {
+            "count": 2763,
+            "pct": 1.2,
+            "low": 1.1,
+            "high": 1.2
+          },
+          "alter": {
+            "count": 639,
+            "pct": 0.3,
+            "low": 0.2,
+            "high": 0.3
+          },
+          "disrupt": {
+            "count": 920,
+            "pct": 0.4,
+            "low": 0.4,
+            "high": 0.4
+          },
+          "unclassified": {
+            "count": 3866,
+            "pct": 1.6,
+            "low": 1.6,
+            "high": 1.7
+          }
+        },
+        "by_severity": {
+          "unknown": 223723,
+          "moderate": 6462,
+          "high": 5096,
+          "critical": 2125,
+          "low": 983
+        },
+        "unclassified_with_cwe": 2490,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-506",
+            403
+          ],
+          [
+            "CWE-20",
+            322
+          ],
+          [
+            "CWE-74",
+            164
+          ],
+          [
+            "CWE-347",
+            82
+          ],
+          [
+            "CWE-693",
+            70
+          ],
+          [
+            "CWE-248",
+            64
+          ],
+          [
+            "CWE-345",
+            60
+          ],
+          [
+            "CWE-367",
+            58
+          ],
+          [
+            "CWE-346",
+            56
+          ],
+          [
+            "CWE-436",
+            52
+          ],
+          [
+            "CWE-184",
+            47
+          ],
+          [
+            "CWE-59",
+            45
+          ],
+          [
+            "CWE-668",
+            44
+          ],
+          [
+            "CWE-116",
+            40
+          ],
+          [
+            "CWE-93",
+            39
+          ],
+          [
+            "CWE-732",
+            36
+          ],
+          [
+            "CWE-88",
+            34
+          ],
+          [
+            "CWE-295",
+            33
+          ],
+          [
+            "CWE-327",
+            33
+          ],
+          [
+            "CWE-362",
+            33
+          ]
+        ]
+      },
+      "not_mal": {
+        "records": 15469,
+        "mal": 0,
+        "withdrawn": 565,
+        "with_cwe": {
+          "count": 14093,
+          "pct": 91.1,
+          "low": 90.6,
+          "high": 91.5
+        },
+        "classified": {
+          "count": 11603,
+          "pct": 75,
+          "low": 74.3,
+          "high": 75.7
+        },
+        "by_class": {
+          "trap": {
+            "count": 0,
+            "pct": 0,
+            "low": 0,
+            "high": 0
+          },
+          "takeover": {
+            "count": 1677,
+            "pct": 10.8,
+            "low": 10.4,
+            "high": 11.3
+          },
+          "impersonate": {
+            "count": 5604,
+            "pct": 36.2,
+            "low": 35.5,
+            "high": 37
+          },
+          "steal": {
+            "count": 2763,
+            "pct": 17.9,
+            "low": 17.3,
+            "high": 18.5
+          },
+          "alter": {
+            "count": 639,
+            "pct": 4.1,
+            "low": 3.8,
+            "high": 4.5
+          },
+          "disrupt": {
+            "count": 920,
+            "pct": 5.9,
+            "low": 5.6,
+            "high": 6.3
+          },
+          "unclassified": {
+            "count": 3866,
+            "pct": 25,
+            "low": 24.3,
+            "high": 25.7
+          }
+        },
+        "by_severity": {
+          "moderate": 6462,
+          "high": 5096,
+          "critical": 2125,
+          "low": 983,
+          "unknown": 803
+        },
+        "unclassified_with_cwe": 2490,
+        "unclassified_top20_cwes": [
+          [
+            "CWE-506",
+            403
+          ],
+          [
+            "CWE-20",
+            322
+          ],
+          [
+            "CWE-74",
+            164
+          ],
+          [
+            "CWE-347",
+            82
+          ],
+          [
+            "CWE-693",
+            70
+          ],
+          [
+            "CWE-248",
+            64
+          ],
+          [
+            "CWE-345",
+            60
+          ],
+          [
+            "CWE-367",
+            58
+          ],
+          [
+            "CWE-346",
+            56
+          ],
+          [
+            "CWE-436",
+            52
+          ],
+          [
+            "CWE-184",
+            47
+          ],
+          [
+            "CWE-59",
+            45
+          ],
+          [
+            "CWE-668",
+            44
+          ],
+          [
+            "CWE-116",
+            40
+          ],
+          [
+            "CWE-93",
+            39
+          ],
+          [
+            "CWE-732",
+            36
+          ],
+          [
+            "CWE-88",
+            34
+          ],
+          [
+            "CWE-295",
+            33
+          ],
+          [
+            "CWE-327",
+            33
+          ],
+          [
+            "CWE-362",
+            33
+          ]
+        ]
+      }
+    }
+  }
+}

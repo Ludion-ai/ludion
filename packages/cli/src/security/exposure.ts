@@ -1,5 +1,6 @@
 import type { Change, Ecosystem } from "./inventory.ts";
-import { compare, type Scan } from "./php.ts";
+import { compare, phpDay, type Scan } from "./php.ts";
+import { nodeDay } from "./node.ts";
 import { composerVersion, npmReleases, packagistReleases } from "./time-cap.ts";
 
 /**
@@ -8,24 +9,35 @@ import { composerVersion, npmReleases, packagistReleases } from "./time-cap.ts";
  */
 export type FixPublished = { at: string | null; note: string };
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+/**
+ * An image move with no newer security release has no advisory, so it is no (project, advisory) pair and stays out of the
+ * exposure-time median (docs/decisions/2026-10-31-limgv-image-newest-built-release.md, item 7); null otherwise.
+ */
+function notCounted(scan: Scan, label: string): FixPublished | null {
+  return scan.candidate && !scan.security_releases.length
+    ? { at: null, note: `Not counted: no newer ${label} security release; a move to the line's newest release has no advisory, so it is outside exposure time.` }
+    : null;
+}
 
 /** PHP: php.net's release date of the first security release newer than the Dockerfile's version. */
 export function phpFixPublished(scan: Scan): FixPublished {
+  const outside = notCounted(scan, "PHP");
+  if (outside) return outside;
   const first = [...scan.security_releases].sort((a, b) => compare(a.version, b.version))[0];
   if (!first) return { at: null, note: "Not found: php.net lists no security release newer than the Dockerfile's version." };
-  const match = /^(\d{1,2}) ([A-Z][a-z]{2}) (\d{4})$/.exec(first.date.trim());
-  const at = match && MONTHS.includes(match[2]!) ? new Date(Date.UTC(Number(match[3]), MONTHS.indexOf(match[2]!), Number(match[1]))) : null;
-  if (!at || at.getUTCDate() !== Number(match![1])) return { at: null, note: `Not read: php.net's date for PHP ${first.version} is not in the form "21 Oct 2026".` };
+  const at = phpDay(first.date);
+  if (!at) return { at: null, note: `Not read: php.net's date for PHP ${first.version} is not in the form "21 Oct 2026".` };
   return { at: at.toISOString(), note: `php.net's release date of PHP ${first.version}, the first security release newer than the Dockerfile's version. php.net gives a day only; recorded as 00:00 UTC that day.` };
 }
 
 /** Node.js: nodejs.org's index date of the first security release of the line newer than the Dockerfile's version. */
 export function nodeFixPublished(scan: Scan): FixPublished {
+  const outside = notCounted(scan, "Node.js");
+  if (outside) return outside;
   const first = [...scan.security_releases].sort((a, b) => compare(a.version, b.version))[0];
   if (!first) return { at: null, note: "Not found: nodejs.org lists no security release of the line newer than the Dockerfile's version." };
-  const at = /^\d{4}-\d{2}-\d{2}$/.test(first.date) ? new Date(`${first.date}T00:00:00.000Z`) : null;
-  if (!at || Number.isNaN(at.getTime()) || at.toISOString().slice(0, 10) !== first.date) return { at: null, note: `Not read: nodejs.org's date for Node.js ${first.version} is not in the form "2026-10-21".` };
+  const at = nodeDay(first.date);
+  if (!at) return { at: null, note: `Not read: nodejs.org's date for Node.js ${first.version} is not in the form "2026-10-21".` };
   return { at: at.toISOString(), note: `nodejs.org's release date of Node.js ${first.version}, the first security release of the line newer than the Dockerfile's version. nodejs.org gives a day only; recorded as 00:00 UTC that day.` };
 }
 

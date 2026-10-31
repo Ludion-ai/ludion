@@ -8,13 +8,16 @@ export type Release = { version: string; date: string; security: boolean };
 export type Scan = {
   schema: 1;
   checked_at: string;
-  status: "update_available" | "no_newer_security_release";
+  /** "wait": a move with no newer security release, before its 72 hours have passed (`wait_until`). */
+  status: "update_available" | "wait" | "no_newer_security_release";
   scope: "dockerfile_base_image";
   /** Absent for PHP, as before Node.js images were read (docs/decisions/2026-10-31-lnode-node-image.md). */
   runtime?: "node";
   current: RuntimeImage;
   candidate: { version: string; reference: string } | null;
   security_releases: Release[];
+  /** A move with no newer security release only: the end of its wait, 72 hours after the end of the candidate's release day. */
+  wait_until?: string;
   source: string;
   note: string;
 };
@@ -82,6 +85,71 @@ export function parseReleases(input: unknown, branch: string): Release[] {
   return releases.sort((a, b) => compare(b.version, a.version));
 }
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+/** php.net's release day ("21 Oct 2026") as 00:00 UTC that day; null when it is not in that form or not a real day. */
+export function phpDay(date: string): Date | null {
+  const match = /^(\d{1,2}) ([A-Z][a-z]{2}) (\d{4})$/.exec(date.trim());
+  const at = match && MONTHS.includes(match[2]!) ? new Date(Date.UTC(Number(match[3]), MONTHS.indexOf(match[2]!), Number(match[1]))) : null;
+  return at && at.getUTCDate() === Number(match![1]) ? at : null;
+}
+
+const HOUR = 60 * 60 * 1000;
+/** The official images Ludion moves: their Docker Hub repository under `library/`. */
+export type OfficialRepository = "php" | "node";
+/**
+ * The digest Docker Hub gives for an official image's tag now, by a HEAD on its manifest (the manifest list's digest,
+ * what `docker pull` records); null when Docker Hub has no such tag (HTTP 404). Only the tag name is sent.
+ */
+export async function dockerHubTag(repository: OfficialRepository, tag: string, fetchFn: typeof fetch = fetch): Promise<string | null> {
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(tag)) throw new Error("Invalid image tag.");
+  if (repository !== "php" && repository !== "node") throw new Error("Not an official image Ludion updates.");
+  const auth = await releaseJson(`https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/${repository}:pull`, "Docker Hub token", 1, 30_000, fetchFn) as { token?: unknown } | null;
+  if (typeof auth?.token !== "string") throw new Error("Docker Hub gave no pull token.");
+  const res = await fetchFn(`https://registry-1.docker.io/v2/library/${repository}/manifests/${tag}`, {
+    method: "HEAD", redirect: "error", signal: AbortSignal.timeout(30_000),
+    headers: { authorization: `Bearer ${auth.token}`, accept: ["application/vnd.oci.image.index.v1+json", "application/vnd.docker.distribution.manifest.list.v2+json", "application/vnd.docker.distribution.manifest.v2+json", "application/vnd.oci.image.manifest.v1+json"].join(", ") },
+  });
+  if (res.status === 404) return null;
+  const digest = res.headers.get("docker-content-digest") ?? "";
+  if (!res.ok || !/^sha256:[a-f0-9]{64}$/.test(digest)) throw new Error(`Docker Hub gave no digest for ${repository}:${tag} (HTTP ${res.status}).`);
+  return digest;
+}
+
+/**
+ * An official image's move (docs/decisions/2026-10-31-limgv-image-newest-built-release.md): when the Dockerfile's version is
+ * older than the newest release of its line, to that release, marked security or not, since Docker's official images
+ * rebuild (with OS-package fixes) only the line's newest tag. `releases` is newest first; `fixes` are the line's security
+ * releases newer than the Dockerfile's version, newest first. With none, the move waits 72 hours from the end of the
+ * candidate's release day (`day` reads it). A move that does not wait, or whose wait has ended, needs its tag in the
+ * Dockerfile's variant on Docker Hub. A Dockerfile version newer than every listed release means the official list is
+ * missing releases, so whether the tag is still the newest cannot be read: the lookup fails.
+ */
+export async function imageMove(repository: OfficialRepository, releases: Release[], current: RuntimeImage, line: string, day: (date: string) => Date | null, now: Date, fetchFn: typeof fetch): Promise<Pick<Scan, "status" | "candidate" | "security_releases" | "wait_until">> {
+  const top = releases[0]!;
+  if (compare(current.version, top.version) > 0) {
+    throw new Error(`The official ${line} release list has no release as new as ${current.version}; it is missing releases. No update decision was made.`);
+  }
+  const fixes = releases.filter(r => r.security && compare(r.version, current.version) > 0);
+  if (compare(top.version, current.version) <= 0) return { status: "no_newer_security_release", candidate: null, security_releases: fixes };
+  const tag = `${top.version}${current.flavor}`, candidate = { version: top.version, reference: `${repository}:${tag}` };
+  let wait: { wait_until: string } | Record<string, never> = {};
+  if (!fixes.length) {
+    const published = day(top.date);
+    if (!published) throw new Error(`The official day of ${line.split(" ")[0]} ${top.version} is not in the form Ludion reads, so its 72-hour wait cannot be counted. No update decision was made.`);
+    wait = { wait_until: new Date(published.getTime() + 96 * HOUR).toISOString() };
+    if (now.getTime() < Date.parse(wait.wait_until)) return { status: "wait", candidate, security_releases: fixes, ...wait };
+  }
+  if (await dockerHubTag(repository, tag, fetchFn) === null) {
+    throw new Error(`Docker Hub has no ${repository}:${tag}, the newest release of ${line} in the Dockerfile's variant: Docker has not published it yet, or no longer builds this variant. Ludion does not move the variant or its OS release. No update decision was made.`);
+  }
+  return { status: "update_available", candidate, security_releases: fixes, ...wait };
+}
+
+/** An image fix's commit paragraph (patch.ts writes it, deliver.ts rebuilds it): its security releases, or the fact of a move without one. */
+export const imageReason = (label: string, to: string, releases: readonly string[]): string => releases.length
+  ? `Official ${label} security releases: ${releases.join(", ")}.`
+  : `${label} ${to}, the newest release of the line (no newer security release); Docker rebuilds only the newest tag of a line.`;
+
 /** An official release list as JSON: no redirect, at most `mib` MiB. `what` names it in errors ("PHP release"). */
 export async function releaseJson(url: string, what: string, mib: number, timeoutMs: number, fetchFn: typeof fetch): Promise<unknown> {
   const res = await fetchFn(url, { redirect: "error", signal: AbortSignal.timeout(timeoutMs), headers: { "User-Agent": "Ludion-Security-Preview", "Accept": "application/json" } });
@@ -106,15 +174,11 @@ export async function scanPhp(dockerfile: string, fetchFn: typeof fetch = fetch)
   const current = phpImage(dockerfile);
   const url = `${RELEASES_URL}?json&version=${current.branch}&max=100`;
   const releases = parseReleases(await releaseJson(url, "PHP release", 1, 15_000, fetchFn), current.branch);
-  const fixes = releases.filter(r => r.security && compare(r.version, current.version) > 0);
-  // As for Node.js (node.ts): a branch's releases are cumulative, so the newest security release is the smallest version
-  // holding every published fix; later releases not tagged security are not taken (docs/decisions/2026-10-31-lphpv-php-security-release.md).
-  const fixed = fixes[0];
-  const candidate = fixed ? { version: fixed.version, reference: `php:${fixed.version}${current.flavor}` } : null;
+  const now = new Date(), move = await imageMove("php", releases, current, `PHP ${current.branch}`, phpDay, now, fetchFn);
   return {
-    schema: 1, checked_at: new Date().toISOString(), status: candidate ? "update_available" : "no_newer_security_release",
-    scope: "dockerfile_base_image", current, candidate, security_releases: fixes, source: url,
-    note: "Checks official PHP security-release metadata against the Dockerfile, not live deployment inventory or every CVE. No match is not a security guarantee. No major/minor upgrades, EOL certification, or automatic production deployment.",
+    schema: 1, checked_at: now.toISOString(), status: move.status,
+    scope: "dockerfile_base_image", current, candidate: move.candidate, security_releases: move.security_releases, ...(move.wait_until ? { wait_until: move.wait_until } : {}), source: url,
+    note: "Checks php.net's release list (the branch's newest release and its security tags), and Docker Hub's tag for a move, against the Dockerfile, not live deployment inventory or every CVE. No match is not a security guarantee. No major/minor upgrades, EOL certification, or automatic production deployment.",
   };
 }
 

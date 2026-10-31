@@ -2,6 +2,8 @@
 
 **Decided 2026-10-31 12:44 JST** by the owner's Claude chat (ludion-ops#1 comment 6538576259), after the owner's words below. It replaces the CWE → plain-sentence table of comment 6538391108 (12:26 JST), which that comment withdrew. The CWE table's content and the doubtful CWEs below are the lane's (LMR1), made by the rule the chat set; they are listed here so they can be reviewed.
 
+**Changed in part the same day** by docs/decisions/2026-10-31-impact-classes-trap-published-record.md (comments 6538877641 and 6538690397): trap also covers a MAL- alias and CWE-506, and a stop in the protection record carries its reason. Point 3 and the CWE-506 row below are kept as first written.
+
 ## The owner's words (Claude chat, 2026-10-31)
 
 - 12:25 JST: 「表を作って、どれだけの危険性から守ったのかってのを」

@@ -156,7 +156,15 @@ const mutations = [
   // The identity rule and the alias locks npm writes (docs/decisions/2026-10-31-lock-corpus-alias.md).
   ["requirements: another package at a location accepted, against the corpus's V3", J, "return found.name === wanted && semver.satisfies", "return semver.satisfies", C],
   ["requirements: an alias read under its location's name, against the corpus's alias locks", J, "const [wanted, range] = alias ? [alias[1]!, alias[2]!] : [name, spec];", "const [wanted, range] = alias ? [name, alias[2]!] : [name, spec];", C],
+  // An unplanned entry may differ from the base in its flags only (docs/decisions/2026-10-31-lock-flags-only.md; review 6538813186, B1).
+  ["npm: an unplanned entry's flags compared with the base's again (B1)", D, "if (!sameButFlags(before, after)) return `package-lock.json changes", "if (!isDeepStrictEqual(before, after)) return `package-lock.json changes", T],
+  ["npm: an unplanned entry's other keys not compared when its flags change", D, "&& isDeepStrictEqual(rest(before), rest(after));", "&& true;", T],
+  ["npm: a flag that is not true accepted", D, "NPM_FLAGS.every(flag => !Object.hasOwn(after, flag) || after[flag] === true) && ", "", T],
+  ["npm: inBundle counted as a flag", D, "const NPM_FLAGS = [\"dev\", \"optional\", \"devOptional\", \"peer\"];", "const NPM_FLAGS = [\"dev\", \"optional\", \"devOptional\", \"peer\", \"inBundle\"];", T],
+  ["npm: an entry whose flags alone changed compared with the registry again", D, "isObject(was[path]) && sameButFlags(was[path], item)) continue;", "isDeepStrictEqual(was[path], item)) continue;", T],
 ];
+// MUTATE_FROM=n runs only the mutations from the n-th on (a later round's new ones); the others are not counted.
+const FROM = Number(process.env.MUTATE_FROM ?? 1);
 /** "pass", "fail", or "timeout" when the run does not end within LIMIT; then its whole process group is killed. */
 const vitest = file => new Promise(resolve => {
   const child = spawn("npx", ["vitest", "run", "--project", "node", "--maxWorkers=2", file], { stdio: "ignore", detached: true, env: { ...process.env, NO_COLOR: "1" } });
@@ -173,7 +181,9 @@ if (RESULTS && existsSync(RESULTS)) for (const line of readFileSync(RESULTS, "ut
   if (head === HEAD && name) done.set(name, { result, seconds });
 }
 let caught = 0, timedOut = 0;
-for (const [i, [name, file, from, to, test]] of mutations.entries()) {
+const run = mutations.slice(FROM - 1);
+for (const [j, [name, file, from, to, test]] of run.entries()) {
+  const i = j + FROM - 1;
   const original = readFileSync(file, "utf8");
   if (original.split(from).length !== 2) { console.log(`${i + 1}. NOT APPLIED  ${name} (the text is not found exactly once)`); continue; }
   const earlier = done.get(name);
@@ -193,5 +203,5 @@ for (const [i, [name, file, from, to, test]] of mutations.entries()) {
   console.log(`${i + 1}. ${label}  ${name} — ${test} (${seconds} s${earlier ? ", recorded by an earlier run" : ""})`);
 }
 const clean = [];
-for (const t of new Set(mutations.map(m => m[4]))) clean.push(`${t} ${await vitest(t)}`);
-console.log(`${caught} of ${mutations.length} caught, ${timedOut} of them by the time limit; without mutations: ${clean.join(", ")}`);
+for (const t of new Set(run.map(m => m[4]))) clean.push(`${t} ${await vitest(t)}`);
+console.log(`${caught} of ${run.length} caught (mutations ${FROM} to ${mutations.length}), ${timedOut} of them by the time limit; without mutations: ${clean.join(", ")}`);

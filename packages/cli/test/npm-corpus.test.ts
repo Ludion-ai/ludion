@@ -112,6 +112,45 @@ describe("the npm corpus", () => {
   });
 });
 
+// The locks added for review 6538813186 (docs/decisions/2026-10-31-lock-flags-only.md), under fixtures/npm-corpus/extra/,
+// written as the corpus was (docs/bench/2026-10-31-lb2a-npm-corpus/scripts/gen-extra.sh).
+const inBundle = npmVersions.flatMap(npm => ["v2", "v3"].map(v => `extra/inbundle/${npm}/${v}/`));
+const nodeFetch = ["v2", "v3"].flatMap(v => [`extra/node-fetch/${v}/base/`, `extra/node-fetch/${v}/fix/`]);
+const extraLocks = [...inBundle, ...nodeFetch];
+
+describe("the npm corpus's bundled entries and B1's pair", () => {
+  // N1: npm 10.9.2 bundles its dependencies, so every npm writes its 215 of them as inBundle entries.
+  it("N1: every lock with inBundle entries npm 7 to 12 wrote is read by main's reader and this one, and leaves no requirement unmet", () => {
+    expect(inBundle).toHaveLength(12);
+    for (const lock of inBundle) {
+      const text = read(`${lock}package-lock.json`), manifest = JSON.parse(read(`${lock}package.json`)) as unknown;
+      expect(Number(read(`${lock}npm.exit`)), lock).toBe(0);
+      expect(JSON.parse(text).lockfileVersion, lock).toBe(lock.startsWith("extra/inbundle/7.10.0/") || lock.endsWith("/v2/") ? 2 : 3);
+      expect(Object.values(JSON.parse(text).packages as Record<string, { inBundle?: boolean }>).filter(e => e.inBundle === true), lock).toHaveLength(215);
+      expect(mainReads(text), lock).toBe(true);
+      expect(prReads(text), lock).toBe(true);
+      expect(lockEntries(text), lock).toHaveLength(216);
+      expect([...unmetRequirements(text, manifest).values()], lock).toEqual([]);
+      for (const npm of ["12.2.1", "11.19.1"]) expect(counted(lock, npm), `${lock} ${npm}`).toEqual(new Set());
+    }
+  });
+
+  // N2: a changed lock npm takes. G2's other variants are all ones npm reports.
+  it("N2: B1's node-fetch fix, which npm 12.2.1 wrote and reports nothing new on, leaves no requirement unmet", () => {
+    for (const v of ["v2", "v3"]) {
+      const [base, fix] = [`extra/node-fetch/${v}/base/`, `extra/node-fetch/${v}/fix/`];
+      for (const lock of [base, fix]) {
+        expect(Number(read(`${lock}npm.exit`)), lock).toBe(0);
+        expect(JSON.parse(read(`${lock}package-lock.json`)).lockfileVersion, lock).toBe(Number(v.slice(1)));
+        expect(mainReads(read(`${lock}package-lock.json`)) && prReads(read(`${lock}package-lock.json`)), lock).toBe(true);
+      }
+      for (const npm of ["12.2.1", "11.19.1"]) expect([...counted(fix, npm)].filter(p => !counted(base, npm).has(p)), `${v} ${npm}`).toEqual([]);
+      const side = (lock: string) => ({ lock: read(`${lock}package-lock.json`), manifest: JSON.parse(read(`${lock}package.json`)) as unknown });
+      expect(newUnmetRequirements(side(base), side(fix)), v).toEqual([]);
+    }
+  });
+});
+
 // npm 12.2.1's reports are npm's own: it runs again in Docker, with no network, on every lock. As in action.test.ts, it
 // is skipped only when Docker is missing outside CI; in CI it runs, and fails without Docker.
 const docker = spawnSync("docker", ["version"], { stdio: "ignore" }).status === 0;
@@ -119,7 +158,7 @@ describe.skipIf(!docker && !process.env.CI)("the npm corpus, against npm 12.2.1 
   const work = mkdtempSync(join(tmpdir(), "ludion-npm-corpus-"));
   afterAll(() => rmSync(work, { recursive: true, force: true }));
 
-  it("npm 12.2.1's counted problems on every lock are the committed ones", () => {
+  it("npm 12.2.1's counted problems on every lock, the extra ones included, are the committed ones", () => {
     const image = "ludion-test-npm-12.2.1";
     const build = spawnSync("docker", ["build", "-q", "-t", image, "-"], { input: read("npm-12.2.1.Dockerfile"), encoding: "utf8", timeout: 300_000 });
     expect(build.status, build.stderr).toBe(0);
@@ -127,7 +166,7 @@ describe.skipIf(!docker && !process.env.CI)("the npm corpus, against npm 12.2.1 
     writeFileSync(join(work, "ls.sh"), [
       "set -u",
       "cp -r /in /tmp/w && cd /tmp/w",
-      "for d in */v*/*/ */v*/*/variants/*/; do",
+      "for d in */v*/*/ */v*/*/variants/*/ extra/inbundle/*/v*/ extra/node-fetch/v*/*/; do",
       '  [ -f "$d/package-lock.json" ] || continue',
       '  (cd "$d" && npm ls --all --package-lock-only --json > /tmp/ls.json 2>/dev/null)',
       '  printf "%s\\t" "$d"; node /s/problems.js /tmp/ls.json',
@@ -139,8 +178,8 @@ describe.skipIf(!docker && !process.env.CI)("the npm corpus, against npm 12.2.1 
       "-v", `${fileURLToPath(root)}:/in:ro`, "-v", `${work}:/s:ro`, image, "sh", "/s/ls.sh"], { encoding: "utf8", timeout: 600_000, maxBuffer: 64 * 1024 * 1024 });
     expect(run.status, run.stderr).toBe(0);
     const live = new Map(run.stdout.trim().split("\n").map(line => { const [lock, problems] = line.split("\t"); return [lock!.replace(/\/\/+/g, "/"), countedIn(JSON.stringify({ problems: JSON.parse(problems!) }))]; }));
-    expect([...live.keys()].sort()).toEqual([...locks].sort());
-    const differ = locks.filter(lock => JSON.stringify([...live.get(lock)!].sort()) !== JSON.stringify([...counted(lock, "12.2.1")].sort()));
+    expect([...live.keys()].sort()).toEqual([...locks, ...extraLocks].sort());
+    const differ = [...locks, ...extraLocks].filter(lock => JSON.stringify([...live.get(lock)!].sort()) !== JSON.stringify([...counted(lock, "12.2.1")].sort()));
     expect(differ).toEqual([]);
   }, 900_000);
 });

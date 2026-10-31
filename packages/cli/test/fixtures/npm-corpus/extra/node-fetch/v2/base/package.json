@@ -1,0 +1,1 @@
+{ "name": "s9", "version": "1.0.0", "dependencies": { "node-fetch": "2.6.1" }, "devDependencies": { "whatwg-url": "5.0.0" } }

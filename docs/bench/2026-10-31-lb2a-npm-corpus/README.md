@@ -63,8 +63,22 @@ Changed in judge.ts:
 - The views compare each entry's requirements by name. Whether each copy is what its spec asks is the requirement check's question, asked in each view.
 - Where an override applies to a requirement, the copy is checked against the override's spec only, as npm does (review 6533374683, B2). Before, a copy meeting the requirement's own range was also taken. V5 shows the difference: npm reports `invalid` and Ludion now agrees.
 
+## Added for review 6538813186: bundled entries and B1's pair
+
+Under docs/decisions/2026-10-31-lock-flags-only.md (committed at 97f9cfc, before them), in fixtures/npm-corpus/extra/, made as above in the volume `ludion-lb2a-extra`:
+1. `scripts/gen-extra.sh`, with the network:
+   - `MODE=inbundle`, in each of the six images: the project `{"dependencies": {"npm": "10.9.2"}}` (npm 10.9.2 bundles its dependencies), `npm install --package-lock-only --ignore-scripts --no-audit --no-fund --lockfile-version=<2|3>`. All twelve exited 0, each lock with 215 `inBundle` entries; npm 7.10.0 again wrote lockfileVersion 2 when 3 was asked. **npm 12.2.1 first stopped** (exit 1, `EALLOWREMOTE`, "Refusing to fetch https://registry.npmjs.org/npm/-/npm-10.9.2.tgz"; logs/gen-extra-npm12-eallowremote.log): its default `allow-remote` is `none`, and npm reads a bundling package's tarball to list what it bundles. Its two locks were written again with `--allow-remote=all`.
+   - `MODE=node-fetch`, in npm 12.2.1's image: B1's project (node-fetch 2.6.1, and whatwg-url 5.0.0 as a dev dependency) at lockfileVersion 2 and 3, then the fix from that lock with node-fetch at 2.6.7, with dependency-patch.ts's npm flags (twice, as the pinned and the final manifest, which are the same here). npm drops `"dev": true` from whatwg-url, tr46 and webidl-conversions; their version, `resolved` and `integrity` do not change (both views of the v2 lock).
+2. `scripts/ls-extra.sh`, in npm 12.2.1's image and npm 11.19.1's, with `--network none`: `npm ls` on all 16 locks. Every one exited 0 with no problem.
+
+The gates of the decision:
+- **B1: met.** For both node-fetch pairs, `contentProblem("npm", …)` is null, `lockEntryChanges` is only node_modules/node-fetch@2.6.7, npm 12.2.1 and npm 11.19.1 report no new problem, and `newUnmetRequirements` is empty. The PR job opens the fix (deliver.test.ts), and asks the registry only for node-fetch 2.6.7. The pair with tr46 changed in another key, its integrity, a flag that is not `true`, `inBundle`, or a flag together with another key is refused.
+- **N1: met.** All 12 inbundle locks are read by main's reader and by #215's (216 entries each), and leave no requirement unmet.
+- The Docker test runs npm 12.2.1 again on these 16 locks too.
+
 ## What this does not cover
 
-- Bundled entries (`inBundle`): npm wrote none here.
+- Bundled entries beyond one registry package that bundles its dependencies (npm 10.9.2): a workspace's `bundleDependencies` is still never written (exit 254 above).
+- Whether a flag in a fix's lock is the one npm computes from the lock's graph (docs/decisions/2026-10-31-lock-flags-only.md: LFLAGS, after #215).
 - npm versions and shapes outside the table; what npm does at install time beyond `npm ls --package-lock-only`.
 - V3's form in real lockfiles: how often an entry is another package than its spec names was not measured. V3 is refused by the identity rule, so a real lock of that form is refused too.

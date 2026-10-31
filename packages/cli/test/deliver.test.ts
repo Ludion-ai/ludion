@@ -10,7 +10,7 @@ import { describe, expect, it, vi } from "vitest";
 import { fixBranch, fixBranchName, gitBase } from "../src/security/branch.ts";
 import { ADVISORY, BUNDLE_LIMIT, checkArtifact, closedWarnings, contentProblem, deliverCli, FILE_LIMIT, fileLimit, openFixes, packFixes, packagistRelease, pullRequestBody, pushInvocation, type CheckedFix } from "../src/security/deliver.ts";
 import { changedManifest } from "../src/security/inventory.ts";
-import type { Judgement } from "../src/security/judge.ts";
+import { lockEntries, lockEntryChanges, type Judgement } from "../src/security/judge.ts";
 import { registryManifest } from "../src/security/npm-facts.ts";
 import { PKSA_ID } from "../src/security/packagist.ts";
 import { snapshot } from "../src/security/project.ts";
@@ -392,6 +392,35 @@ describe("the PR job refuses an artifact the validation job would not write", { 
     receipt.fixes.pop();
     return { receipt, refs: [`refs/heads/${branch}`], base, branch };
   }
+  /**
+   * Review 6538813186's B1, as npm 12.2.1 wrote it (fixtures/npm-corpus/extra/node-fetch, docs/decisions/2026-10-31-lock-flags-only.md):
+   * node-fetch 2.6.1 -> 2.6.7, whose new requirement on the project's dev-only whatwg-url makes npm drop `dev` from
+   * whatwg-url, tr46 and webidl-conversions, with their versions, resolved and integrity unchanged.
+   */
+  const nodeFetch = (v: string, side: "base" | "fix") => readFileSync(new URL(`fixtures/npm-corpus/extra/node-fetch/${v}/${side}/package-lock.json`, import.meta.url), "utf8");
+  it("an npm fix that npm 12.2.1 writes with other entries' flags changed is opened (review 6538813186, B1)", async () => {
+    for (const v of ["v2", "v3"]) {
+      const p = project(), before = nodeFetch(v, "base"), lock = nodeFetch(v, "fix");
+      const pkg = readFileSync(new URL(`fixtures/npm-corpus/extra/node-fetch/${v}/base/package.json`, import.meta.url), "utf8");
+      writeFileSync(join(p.work, "package.json"), pkg); writeFileSync(join(p.work, "package-lock.json"), before);
+      git(p.work, "add", "-A"); git(p.work, "commit", "-qm", "node-fetch"); git(p.work, "push", "-q", p.origin, "HEAD:refs/heads/main");
+      const change = { name: "node-fetch", from: "2.6.1", to: "2.6.7", advisories: ["GHSA-35jh-r3h4-6jhm", "CVE-2021-23337"] };
+      const base = git(p.work, "rev-parse", "HEAD"), branch = fixBranchName("", "npm", "node-fetch", ["2.6.7"]), fixedPkg = changedManifest(p.work, "npm", [change]);
+      const made = forge(p.work, branch, base, { "package.json": fixedPkg, "package-lock.json": lock }, { subject: "ludion: node-fetch 2.6.1 -> 2.6.7 (npm)" });
+      const receipt = receiptFor(base, made) as { fixes: Record<string, unknown>[] };
+      Object.assign(receipt.fixes[0]!, { package: "node-fetch", branch, changes: [change], files: [{ path: "package.json", before_hash: sha256(pkg), after_hash: sha256(fixedPkg) }, { path: "package-lock.json", before_hash: sha256(before), after_hash: sha256(lock) }] });
+      receipt.fixes.pop();
+      // The registry's node-fetch 2.6.7. Every other name is unknown to it: an entry whose flags alone changed declares
+      // what the base's did, so it is not asked for (a "registry lists no" would refuse it).
+      const asked: string[] = [];
+      const npmManifest = async (name: string, version: string) => { asked.push(`${name}@${version}`); return name === "node-fetch" && version === "2.6.7" ? { name, version, dependencies: { "whatwg-url": "^5.0.0" }, peerDependencies: { encoding: "^0.1.0" }, peerDependenciesMeta: { encoding: { optional: true } } } : null; };
+      const gh = github(p.origin);
+      const result = await open(checkout(p.origin), artifact(p.work, receipt, [`refs/heads/${branch}`], base), base, p.origin, gh, "refs/heads/main", { npmManifest });
+      expect(result.deliveries, v).toMatchObject([{ package: "node-fetch", branch, outcome: "opened" }]);
+      expect(asked, v).toEqual(["node-fetch@2.6.7"]);
+      expect(gh.opened, v).toHaveLength(1);
+    }
+  });
   it("a transitive npm fix as patch makes it is opened", async () => {
     const p = project(), s = minimistFix(p, { ...MKDIRP, "node_modules/minimist": { version: "1.2.6" } }), gh = github(p.origin);
     const result = await open(checkout(p.origin), artifact(p.work, s.receipt, s.refs, s.base), s.base, p.origin, gh);
@@ -841,6 +870,39 @@ describe("the policy at the base decides what a fix may change, and what it may 
     // out, one held by a copy outside its range (the axios 0.21.2 / follow-redirects 1.13.3 form), and npm 6's tree alike.
     expect(contentProblem("npm", transitive, vulnerable, lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "is-number": "^7.0.0" } } }))).toContain("node_modules/minimist requires is-number ^7.0.0, and npm finds no copy of it in the lock.");
     expect(contentProblem("npm", transitive, lockOf({ "node_modules/minimist": { version: "1.2.5" }, "node_modules/is-number": { version: "6.0.0" } }), lockOf({ "node_modules/minimist": { version: "1.2.6", dependencies: { "is-number": "^7.0.0" } }, "node_modules/is-number": { version: "6.0.0" } }))).toContain("node_modules/minimist requires is-number ^7.0.0, and node_modules/is-number has is-number@6.0.0, which is not that.");
+  });
+  it("npm: an entry the fix does not plan may differ from the base in its flags only (review 6538813186, B1)", () => {
+    const fix = fixOf("node-fetch", "2.6.1", "2.6.7", ["package.json", "package-lock.json"]);
+    const side = (v: string, s: "base" | "fix") => readFileSync(new URL(`fixtures/npm-corpus/extra/node-fetch/${v}/${s}/package-lock.json`, import.meta.url), "utf8");
+    const pkg = (v: string, s: "base" | "fix") => readFileSync(new URL(`fixtures/npm-corpus/extra/node-fetch/${v}/${s}/package.json`, import.meta.url), "utf8");
+    for (const v of ["v2", "v3"]) {
+      const was = side(v, "base"), is = side(v, "fix");
+      // What npm wrote: whatwg-url, tr46 and webidl-conversions lose `dev`, and nothing else of theirs changes.
+      for (const path of ["node_modules/whatwg-url", "node_modules/tr46", "node_modules/webidl-conversions"]) {
+        const [a, b] = [JSON.parse(was).packages[path], JSON.parse(is).packages[path]];
+        expect(a.dev, `${v} ${path}`).toBe(true);
+        expect({ ...b, dev: true }, `${v} ${path}`).toEqual(a);
+      }
+      expect(lockEntryChanges(lockEntries(was), lockEntries(is)).map(e => `${e.path}@${e.version}`), v).toEqual(["node_modules/node-fetch@2.6.7"]);
+      expect(contentProblem("npm", fix, files({ "package.json": pkg(v, "base"), "package-lock.json": was }), files({ "package.json": pkg(v, "fix"), "package-lock.json": is })), v).toBeNull();
+    }
+    // The same fix with one more change to tr46 (v3, which has no npm 6 tree to keep in step).
+    const was = files({ "package.json": pkg("v3", "base"), "package-lock.json": side("v3", "base") });
+    const tr46 = (change: (entry: Record<string, unknown>) => void) => {
+      const lock = JSON.parse(side("v3", "fix"));
+      change(lock.packages["node_modules/tr46"]);
+      return contentProblem("npm", fix, was, files({ "package.json": pkg("v3", "fix"), "package-lock.json": JSON.stringify(lock, null, 2) }));
+    };
+    for (const [what, change] of [
+      ["another key", (e: Record<string, unknown>) => { e.license = "0BSD"; }],
+      ["its integrity", (e: Record<string, unknown>) => { e.integrity = "sha512-AAAA"; }],
+      ["a flag that is not true", (e: Record<string, unknown>) => { e.dev = false; }],
+      ["a flag as a string", (e: Record<string, unknown>) => { e.optional = "true"; }],
+      ["inBundle", (e: Record<string, unknown>) => { e.inBundle = true; }],
+      ["a flag change with another key", (e: Record<string, unknown>) => { e.peer = true; e.hasInstallScript = true; }],
+    ] as const) expect(tr46(change), what).toContain("package-lock.json changes node_modules/tr46 (0.0.3 -> 0.0.3), which this fix does not plan.");
+    // Flags npm would not write there pass: whether they are the ones npm computes is not checked (the hole docs/status.md lists).
+    expect(tr46(e => { e.dev = true; e.devOptional = true; })).toBeNull();
   });
   it("advisory IDs: only the forms a receipt can hold (OSV's for npm, Packagist and Maven, and Packagist's own)", () => {
     for (const id of ["GHSA-35jh-r3h4-6jhm", "CVE-2021-23337", "CVE-2024-1234567", "MAL-2024-12345", "PKSA-n8pg-4n3p-wcn3"]) expect(ADVISORY.test(id), id).toBe(true);

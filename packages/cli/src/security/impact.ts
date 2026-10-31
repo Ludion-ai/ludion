@@ -132,10 +132,12 @@ function vectors(record: Record<string, unknown>): { affects: Affects[] } | { un
     if (typeof score !== "string" || !spec.prefix.test(score)) return { unreadable: `its ${type} score is not a CVSS ${type.slice(6)} vector` };
     const values = new Map<string, string[]>();
     for (const part of score.split("/").slice(1)) {
-      // One metric and its value: a part with no ":" or with two (C:H:junk) makes the vector unreadable.
+      // A part with a second ":" (C:H:junk) is not one metric and its value, so the vector is unreadable. A part with no
+      // ":" (the empty part after a trailing "/", which two records in the 2026-10-31 exports have) names no metric read
+      // here unless it is one of C, I, A (VC... for CVSS 4), which then has the value "" and is unreadable below.
       const fields = part.split(":");
-      if (fields.length !== 2) return { unreadable: `its ${type} vector cannot be read: ${JSON.stringify(part)} is not one metric and its value` };
-      const [key, value] = fields as [string, string];
+      if (fields.length > 2) return { unreadable: `its ${type} vector cannot be read: ${JSON.stringify(part)} is not one metric and its value` };
+      const [key = "", value = ""] = fields;
       values.set(key, [...(values.get(key) ?? []), value]);
     }
     const affected = (keys: readonly string[]): boolean | string => {

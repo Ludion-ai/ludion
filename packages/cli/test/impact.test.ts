@@ -250,13 +250,17 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
       [v3("C:H/I:N/A:"), 'its CVSS_V3 vector cannot be read: A is given 1 time (""), not once as N, L or H'],
       [v4("VC:H/VI:N/VA:N/SI:N/SA:N"), "its CVSS_V4 vector cannot be read: SC is given 0 times, not once as N, L or H"],
       [v4("VC:H/VI:N/VA:N/SC:N/SI:N/SA:S"), 'its CVSS_V4 vector cannot be read: SA is given 1 time ("S"), not once as N, L or H'],
-      // A part that is not one metric and its value (R236, point 2): a second ":", none, or an empty part.
+      // A part with a second ":" is not one metric and its value (R236, point 2), whichever metric it names.
       [v3("C:H:junk/I:H:zzz/A:N"), 'its CVSS_V3 vector cannot be read: "C:H:junk" is not one metric and its value'],
       [v3("C:H/I:H/A:N/E:P:x"), 'its CVSS_V3 vector cannot be read: "E:P:x" is not one metric and its value'],
-      [v3("C:H/I:H/A:N/X"), 'its CVSS_V3 vector cannot be read: "X" is not one metric and its value'],
-      [v3("C:H/I:H/A:N/"), 'its CVSS_V3 vector cannot be read: "" is not one metric and its value'],
       [v4("VC:H/VI:H:H/VA:N/SC:N/SI:N/SA:N"), 'its CVSS_V4 vector cannot be read: "VI:H:H" is not one metric and its value'],
+      // A part with no ":" that names a metric read here gives it the value "".
+      [v3("C/I:H/A:N"), 'its CVSS_V3 vector cannot be read: C is given 1 time (""), not once as N, L or H'],
     ];
+    // A trailing "/" or another part with no ":" names no metric read here: the vector is read (GHSA-g357-x5c3-c72p and
+    // GHSA-9p7c-v5x3-rfx8 end their CVSS 4 vectors with "/").
+    expect(classify(withVectors(["CWE-78"], v4("VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/"))).class).toBe("disrupt");
+    expect(classify(withVectors(["CWE-78"], v3("C:H/I:H/A:N/"), v3("C:H/I:H/A:N/X"))).class).toBe("takeover");
     for (const [vector, why] of bad) {
       expect(classify(withVectors(["CWE-78"], vector))).toEqual({ class: "unclassified", severity: "unknown", cwes: ["CWE-78"], reason: `GHSA-xxxx-xxxx-xxxx: ${why}, so no class can be ruled out.` });
       expect(classify(withVectors(["CWE-78"], v3("C:H/I:H/A:H"), vector)).class).toBe("unclassified");

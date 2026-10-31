@@ -107,8 +107,8 @@ const mutations = [
   ["the class trap shown on any row", 'if (row.class === "trap" && stop?.reason !== "trap") throw', "if (false) throw"],
   ["the class trap shown on any stopped row", 'if (row.class === "trap" && stop?.reason !== "trap") throw', 'if (row.class === "trap" && row.action !== "stopped") throw'],
   ["the class trap shown on any row with a stop", 'if (row.class === "trap" && stop?.reason !== "trap") throw', 'if (row.class === "trap" && stop == null) throw'],
-  ["a vector part with a second : read as its first two", "if (fields.length !== 2) return", "if (fields.length < 2) return"],
-  ["a vector part with no : skipped", "if (fields.length !== 2) return", "if (fields.length > 2) return"],
+  ["a vector part with a second : read as its first two", "if (fields.length > 2) return", "if (false) return"],
+  ["a vector part with no : unreadable", "if (fields.length > 2) return", "if (fields.length !== 2) return"],
   ["a language found through the prototype", "!Object.hasOwn(LABELS, lang)", "!(lang in LABELS)"],
 ];
 const run = () => {

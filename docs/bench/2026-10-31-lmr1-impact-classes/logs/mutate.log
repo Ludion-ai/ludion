@@ -1,4 +1,4 @@
-# started 2026-10-31T07:24:04Z, node v24.22.1
+# started 2026-10-31T07:51:52Z, node v24.22.1
 without mutations: passed
 caught: MAL- is not trap
 caught: MAL- anywhere in the id is trap
@@ -20,6 +20,9 @@ caught: takeover from C:H and I:H of different systems
 caught: takeover not from CVSS 4's subsequent system
 caught: the table argument ignored
 caught: with no vector, the strongest of several classes
+caught: chooseClass does not sort the set
+caught: chooseClass reads an unreadable vector as none
+caught: chooseClass ignores the vectors
 caught: CVSS 4's subsequent systems not read
 caught: a vector of another version accepted
 caught: a score of another form skipped
@@ -75,5 +78,5 @@ caught: the severity list not checked
 caught: Composer names with capitals accepted
 caught: a trap's record id not checked
 after restoring: passed
-74 of 74 mutations caught
-# finished 2026-10-31T07:25:04Z
+77 of 77 mutations caught
+# finished 2026-10-31T07:52:56Z

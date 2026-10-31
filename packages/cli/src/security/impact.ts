@@ -177,24 +177,44 @@ export function classify(record: unknown, table: CweTable = CWE_CLASSES): Classi
     return classes ? [{ cwe, classes }] : [];
   });
   if (!inTable.length) return { class: "unclassified", severity, cwes, reason: `${id}: no CWE listed (${cwes.join(", ")}) is in Ludion's table.${ignoredNote}` };
-  const rank = (cls: ImpactClass) => IMPACT_ORDER.indexOf(cls);
   const read = vectors(record as Record<string, unknown>);
   if ("unreadable" in read) return { class: "unclassified", severity, cwes, reason: `${id}: ${read.unreadable}, so no class can be ruled out.${ignoredNote}` };
   const unclassified = (why: string): Classification => ({ class: "unclassified", severity, cwes, reason: `${id}: ${why}.${ignoredNote}` });
-  // The record's set is the union of its CWEs' sets, strongest first.
-  const allowed = [...new Set(inTable.flatMap(l => l.classes))].sort((a, b) => rank(a) - rank(b));
+  // The record's set is the union of its CWEs' sets.
+  const allowed = byStrength(inTable.flatMap(l => l.classes));
+  const best = choose(allowed, read.affects);
   if (read.affects.length) {
-    // The vectors keep only the classes consistent with every one of them; the record takes the strongest kept.
-    const best = allowed.find(cls => read.affects.every(CONSISTENT[cls]));
     const vector = read.affects.length > 1 ? "CVSS vectors" : "CVSS vector";
     if (!best) return unclassified(`its ${vector} rule${read.affects.length > 1 ? "" : "s"} out every class its CWEs allow (${allowed.join(", ")})`);
     const from = inTable.find(l => l.classes.includes(best))!.cwe;
     return { class: best, severity, cwes, reason: `${id}: ${best} (${from}), the strongest class its CWEs allow (${allowed.join(", ")}) that its ${vector} do${read.affects.length > 1 ? "" : "es"} not rule out.${ignoredNote}` };
   }
-  // No vector: only a record whose CWEs together allow one class gets it.
-  if (allowed.length > 1) return unclassified(`its CWEs allow ${allowed.slice(0, -1).join(", ")} or ${allowed.at(-1)}, and the record has no CVSS vector to choose`);
-  const only = allowed[0]!;
-  return { class: only, severity, cwes, reason: `${id}: ${inTable.map(l => l.cwe).join(", ")} ${inTable.length > 1 ? "are" : "is"} ${only}.${ignoredNote}` };
+  if (!best) return unclassified(`its CWEs allow ${allowed.slice(0, -1).join(", ")} or ${allowed.at(-1)}, and the record has no CVSS vector to choose`);
+  return { class: best, severity, cwes, reason: `${id}: ${inTable.map(l => l.cwe).join(", ")} ${inTable.length > 1 ? "are" : "is"} ${best}.${ignoredNote}` };
+}
+
+const rank = (cls: ImpactClass) => IMPACT_ORDER.indexOf(cls);
+/** The classes without repeats, strongest first. */
+const byStrength = (classes: readonly TableClass[]): TableClass[] => [...new Set(classes)].sort((a, b) => rank(a) - rank(b));
+
+/**
+ * The step after the union: with vectors, the strongest class consistent with every one of them; with none, the set's
+ * class when it has only one. Undefined when nothing is left. `allowed` is strongest first.
+ */
+function choose(allowed: readonly TableClass[], affects: readonly Affects[]): TableClass | undefined {
+  if (affects.length) return allowed.find(cls => affects.every(CONSISTENT[cls]));
+  return allowed.length === 1 ? allowed[0] : undefined;
+}
+
+/**
+ * The class `classify()` gives a record whose CWEs together allow `set`, from the record's OSV `severity` list: the same
+ * step classify() runs after taking the union. Exported so the tests can give it every set directly
+ * (docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md, point 1).
+ */
+export function chooseClass(set: readonly TableClass[], severity: unknown): TableClass | "unclassified" {
+  const read = vectors({ severity });
+  if ("unreadable" in read) return "unclassified";
+  return choose(byStrength(set), read.affects) ?? "unclassified";
 }
 
 /** What Ludion did: opened a PR, stopped the update, is waiting before it, or the fix was merged. */

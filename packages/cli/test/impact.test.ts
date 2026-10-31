@@ -6,7 +6,7 @@
 // that could not be verified.
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { CWE_CLASSES, DECIDED_UNCLASSIFIED, IMPACT_ORDER, TRAP_CWES, classify, codeSpan, renderRecord, type CweTable, type ImpactClass, type RecordRow, type StopReason, type TableClass } from "../src/security/impact.ts";
+import { CWE_CLASSES, DECIDED_UNCLASSIFIED, IMPACT_ORDER, TRAP_CWES, chooseClass, classify, codeSpan, renderRecord, type CweTable, type ImpactClass, type RecordRow, type StopReason, type TableClass } from "../src/security/impact.ts";
 
 const record = (cwes: unknown, extra: Record<string, unknown> = {}) => ({ id: "GHSA-xxxx-xxxx-xxxx", database_specific: { cwe_ids: cwes, ...extra } });
 const MAPPED = ["takeover", "impersonate", "steal", "alter", "disrupt"] as const;
@@ -94,32 +94,53 @@ describe("the strength order", () => {
 
 describe("the design rule (comment 6540209072, item 1)", () => {
   // For every set and every class W in it, some vector gives W: it is consistent with W and with no stronger class of
-  // the set. The 31 sets are built from CWEs that each allow one class; each of the 80 pairs is run through classify().
-  it("holds for each of the 80 pairs of a set and a class in it, among the 27 CVSS 3 and among the 729 CVSS 4 vectors", () => {
+  // the set. Checked at the step that chooses (chooseClass) for all 31 sets, and through classify() with real CWEs for
+  // every set the shipped table's rows can form (decision record, point 1).
+  it("holds at the step that chooses for each of the 80 pairs of the 31 sets, among the 27 CVSS 3 and among the 729 CVSS 4 vectors", () => {
     expect([ALL_V3.length, ALL_V4.length]).toEqual([27, 729]);
     let sets = 0, pairs = 0;
     for (let mask = 1; mask < 1 << MAPPED.length; mask++) {
       const set = MAPPED.filter((_, i) => mask & (1 << i));
-      const cwes = set.map(cls => CWE_OF[cls]);
       sets++;
       for (const want of set) {
         pairs++;
         for (const [name, vectors] of [["CVSS 3", ALL_V3], ["CVSS 4", ALL_V4]] as const) {
-          expect([set.join(" "), want, name, vectors.some(v => classify(withVectors(cwes, v), ONE_EACH).class === want)]).toEqual([set.join(" "), want, name, true]);
+          expect([set.join(" "), want, name, vectors.some(v => chooseClass(set, [v]) === want)]).toEqual([set.join(" "), want, name, true]);
         }
       }
     }
     expect([sets, pairs]).toEqual([31, 80]);
   });
 
-  it("holds for every set of the table Ludion ships", () => {
-    for (const [classes, ids] of CWE_CLASSES) {
-      for (const want of classes) {
+  it("holds through classify() with real CWEs for each of the 13 sets and 33 pairs the shipped table's rows can form", () => {
+    // Every union of the table's rows, with one real CWE from each row in it.
+    const formed = new Map<string, { set: TableClass[]; cwes: string[] }>();
+    for (let mask = 1; mask < 1 << CWE_CLASSES.length; mask++) {
+      const rows = CWE_CLASSES.filter((_, i) => mask & (1 << i));
+      const set = MAPPED.filter(cls => rows.some(([classes]) => classes.includes(cls)));
+      if (!formed.has(set.join(" "))) formed.set(set.join(" "), { set, cwes: rows.map(([, ids]) => `CWE-${ids[0]}`) });
+    }
+    let pairs = 0;
+    for (const { set, cwes } of formed.values()) {
+      for (const want of set) {
+        pairs++;
         for (const [name, vectors] of [["CVSS 3", ALL_V3], ["CVSS 4", ALL_V4]] as const) {
-          expect([ids[0], want, name, vectors.some(v => classify(withVectors([`CWE-${ids[0]}`], v)).class === want)]).toEqual([ids[0], want, name, true]);
+          expect([cwes.join(","), want, name, vectors.some(v => classify(withVectors(cwes, v)).class === want)]).toEqual([cwes.join(","), want, name, true]);
         }
       }
     }
+    expect([formed.size, pairs]).toEqual([13, 33]);
+  });
+
+  it("gives at the step that chooses what classify() gives, with no vector, an unreadable one, or one that rules every class out", () => {
+    expect(chooseClass(["disrupt"], [])).toBe("disrupt");
+    expect(chooseClass(["steal", "alter"], [])).toBe("unclassified");
+    expect(chooseClass(["alter", "steal", "alter"], [v3("C:H/I:H/A:N")])).toBe("steal");
+    expect(chooseClass(["steal"], [v3("C:N/I:H/A:H")])).toBe("unclassified");
+    expect(chooseClass(["steal"], [v3("C:X/I:H/A:H")])).toBe("unclassified");
+    expect(chooseClass(["steal"], [v3("C:H/I:N/A:N"), v3("C:X/I:N/A:N")])).toBe("unclassified");
+    expect(chooseClass(["takeover", "steal"], [v3("C:H/I:H/A:H"), v4("VC:L/VI:L/VA:N/SC:N/SI:N/SA:N")])).toBe("steal");
+    for (const v of ALL_V3) expect([v.score, chooseClass(["takeover", "steal", "alter", "disrupt"], [v])]).toEqual([v.score, classify(withVectors(["CWE-78"], v)).class]);
   });
 });
 

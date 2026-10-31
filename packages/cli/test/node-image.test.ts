@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NODE_INDEX_URL, nodeImage, parseNodeReleases, scanNode } from "../src/security/node.ts";
 import { nodeFixPublished } from "../src/security/exposure.ts";
-import { compare, MissingImageTag } from "../src/security/php.ts";
+import { compare, ImageMoveStopped, MissingImageTag } from "../src/security/php.ts";
 import { withHub } from "./hub.ts";
 import { DEFAULT_NODE_CONFIG, readConfig, snapshot } from "../src/security/project.ts";
 import { patchProject, type Command } from "../src/security/patch.ts";
@@ -106,6 +106,21 @@ describe("official Node.js image decisions: the newest release of the line that 
     expect(stop).toBeInstanceOf(MissingImageTag);
     expect((stop as MissingImageTag).message).toBe(`${named}Docker Hub has no node:${tag}, the newest release of Node.js 22 in the Dockerfile's variant: Docker has not published it yet, or no longer builds this variant. Ludion does not move the variant or its OS release. No update decision was made.`);
     expect((stop as MissingImageTag).security_releases.map(r => r.version)).toEqual(versions);
+  });
+  // Docker Hub failing other than with a 404 keeps the newer security releases too; with none, its error is as before.
+  const down: typeof fetch = async (input, init) => String(input).startsWith("https://registry-1.docker.io/") ? new Response(null, { status: 503 }) : fetchFn(input, init);
+  it("keeps the newer security releases when Docker Hub cannot be read", async () => {
+    const stop = await scanNode("FROM node:22.11.0-alpine\n", down).then(() => undefined, (error: unknown) => error);
+    expect(stop).toBeInstanceOf(ImageMoveStopped);
+    expect(stop).not.toBeInstanceOf(MissingImageTag);
+    expect((stop as ImageMoveStopped).message).toBe("Node.js 22.23.4 and 22.23.2 are security releases newer than 22.11.0; Docker Hub could not be checked for node:22.23.5-alpine, the newest release of Node.js 22 in the Dockerfile's variant: Docker Hub gave no digest for node:22.23.5-alpine (HTTP 503). Ludion does not move the image without that check. No update decision was made.");
+    expect((stop as ImageMoveStopped).security_releases.map(r => r.version)).toEqual(["22.23.4", "22.23.2"]);
+  });
+  it("throws Docker Hub's error as before when no newer security release lies between", async () => {
+    const stop = await scanNode("FROM node:22.23.4\n", down).then(() => undefined, (error: unknown) => error);
+    expect(stop).toBeInstanceOf(Error);
+    expect(stop).not.toBeInstanceOf(ImageMoveStopped);
+    expect((stop as Error).message).toBe("Docker Hub gave no digest for node:22.23.5 (HTTP 503).");
   });
   it.each([
     "FROM node:22\n", "FROM node:lts-alpine\n", "FROM node:22-alpine\n", "FROM node:22.11-alpine\n", "FROM node:v22.11.0\n", "FROM node:22.11.0-Alpine\n",

@@ -4,7 +4,7 @@ Committed before the alias shape is generated. It extends docs/decisions/2026-10
 
 ## 1. The identity rule
 
-The package at a location must be the one the spec that requires it names: for an ordinary spec, the package named by the location (`node_modules/minimist` must hold minimist); for an `npm:` alias spec, the package the alias points at (`"minimist": "npm:left-pad@1.3.0"` must find left-pad there). A location whose package is another one refuses the change, in `packages` and in a v2 lock's npm 6 tree, at the top and nested. This is what `newUnmetRequirements` (judge.ts) already does; this entry makes it a rule with its own tests.
+The package at a location must be the one the spec that requires it names: for an ordinary spec, the package named by the location (`node_modules/minimist` must hold minimist); for an `npm:` alias spec, the package the alias points at (`"minimist": "npm:left-pad@1.3.0"` must find left-pad there). A location whose package is another one refuses the change, in `packages` and in a v2 lock's npm 6 tree, at the top and nested. This is what `newUnmetRequirements` (judge.ts) already does; this entry makes it a rule with its own tests. (Until LFLAGS this held for every requirement but an optional peer, which the check left out; since docs/decisions/2026-10-31-lock-flags-from-graph.md, section 1, an optional peer that the lookup finds a copy for is held to it too, and one it finds nothing for is met. Audit 6541743253, item 1; docs/mistakes/2026-10-31-optional-peer-location.md.)
 
 ## 2. V3 stays refused
 

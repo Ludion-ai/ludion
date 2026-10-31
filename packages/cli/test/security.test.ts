@@ -62,6 +62,31 @@ describe("official PHP security update decisions", () => {
     const result = await scanPhp(SOURCE.replace("8.4.25", from), sampleFetch);
     expect(result).toMatchObject({ status: "no_newer_security_release", candidate: null, security_releases: [] });
   });
+  // The same made-up sample with its entries oldest first, as php.net's JSON is not promised to be in order: the choice
+  // must not come from the response's order, which would give the oldest newer security release, 8.4.26 (R237 finding 1).
+  const reversedFetch: typeof fetch = async () => new Response(JSON.stringify(Object.fromEntries(Object.entries(JSON.parse(sample)).reverse())));
+  it("takes the same newest security release when php.net lists its releases oldest first", async () => {
+    const result = await scanPhp(SOURCE, reversedFetch);
+    expect(result).toMatchObject({ status: "update_available", candidate: { version: "8.4.28", reference: "php:8.4.28-cli-alpine" } });
+    expect(result.security_releases.map(r => r.version)).toEqual(["8.4.28", "8.4.26"]);
+  });
+  // The made-up sample with a newer 8.4.31 whose tag is not "security" (a made-up tag): only "security" makes a release
+  // a candidate (R237 finding 2).
+  const otherTagFetch: typeof fetch = async () => new Response(JSON.stringify({ "8.4.31": { tags: ["bugfix"], date: "31 Oct 2026" }, ...JSON.parse(sample) }));
+  it("never takes a release tagged with anything other than security", async () => {
+    const result = await scanPhp(SOURCE, otherTagFetch);
+    expect(result).toMatchObject({ status: "update_available", candidate: { version: "8.4.28", reference: "php:8.4.28-cli-alpine" } });
+    expect(result.security_releases.map(r => r.version)).toEqual(["8.4.28", "8.4.26"]);
+    expect(await scanPhp(SOURCE.replace("8.4.25", "8.4.28"), otherTagFetch)).toMatchObject({ status: "no_newer_security_release", candidate: null, security_releases: [] });
+  });
+  // Made up: from 8.4.9, the security release 8.4.10 is newer by number though "8.4.10" < "8.4.9" as text, so the scan must
+  // find it and not report the silent "no update" (R237 finding 3).
+  it("compares versions by number in the scan, across a digit boundary", async () => {
+    const digits = { "8.4.11": { tags: [], date: "06 Nov 2026" }, "8.4.10": { tags: ["security"], date: "23 Oct 2026" }, "8.4.9": { tags: [], date: "09 Oct 2026" } };
+    const result = await scanPhp("FROM php:8.4.9-cli\n", async () => new Response(JSON.stringify(digits)));
+    expect(result).toMatchObject({ status: "update_available", candidate: { version: "8.4.10", reference: "php:8.4.10-cli" } });
+    expect(result.security_releases.map(r => r.version)).toEqual(["8.4.10"]);
+  });
   it.each(["FROM php:8.4-cli\n", "ARG PHP=8.4.25\nFROM php:${PHP}-cli\n", "FROM evil/php:8.4.25-cli\n", "FROM php:8.4.25-cli\nFROM scratch\n", "FROM php:8.4.25-cli AS build\n", "# syntax=evil/build\nFROM php:8.4.25-cli\n", "FROM php:8.4.25-cli\nADD https://example.com/app /app\n", "FROM php:8.4.25-cli\nCOPY --from=evil / /app\n", "FROM php:8.4.25-cli\nRUN --network=host true\n", `FROM php:8.4.25-cli@sha256:${"a".repeat(63)}\n`, `FROM php:8.4.25-cli@md5:${"a".repeat(32)}\n`, "\u{FEFF}\u{FEFF}FROM php:8.4.25-cli\nFROM scratch\n"])("refuses ambiguous or external build input: %s", text => {
     expect(() => phpImage(text)).toThrow();
   });

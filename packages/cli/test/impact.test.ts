@@ -1,6 +1,7 @@
 // Impact Classes (docs/decisions/2026-10-31-impact-classes.md, docs/decisions/2026-10-31-impact-classes-trap-published-record.md,
 // docs/decisions/2026-10-31-impact-classes-cvss-vector.md, docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md,
-// docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md, docs/decisions/2026-10-31-impact-classes-takeover-direct.md):
+// docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md, docs/decisions/2026-10-31-impact-classes-takeover-direct.md,
+// docs/decisions/2026-10-31-impact-classes-impersonate-direct.md):
 // the fixed CWE table and each CWE's set of classes, the CVSS vectors that choose among them, the design rule that a
 // vector can give every class of every set, the strength order, trap as a published record (MAL- id or alias, CWE-506
 // to 512), GHSA severity only, and the protection record's table in English and Japanese, with traps apart from stops
@@ -52,7 +53,8 @@ describe("the CWE table", () => {
       434: all, 494: code, 502: code, 829: code, 918: files, 611: files, 912: all,
       77: code, 78: code, 94: code, 95: code, 96: code, 98: code, 917: code, 1336: code,
       // takeover only where code running is the direct result of the mechanism (comment 6541666295, (1)).
-      15: login, 89: login, 943: login, 1321: login,
+      // impersonate too only where it is the direct result (comment 6542470518, point 6 item 3).
+      15: files, 89: files, 943: files, 1321: ["alter", "disrupt"],
       22: files, 23: files, 40: files, 59: files, 73: files, 276: files, 552: files, 732: files,
       79: login, 80: login, 87: login, 287: login, 306: login, 384: login, 613: login, 620: login, 640: login, 798: login, 1390: login, 862: login, 863: login, 284: login, 266: login,
       352: ["impersonate", "alter", "disrupt"], 601: ["impersonate", "steal", "alter"], 90: ["impersonate", "steal", "alter"], 91: ["impersonate", "steal", "alter"],
@@ -120,7 +122,7 @@ describe("the design rule (comment 6540209072, item 1)", () => {
     expect([sets, pairs]).toEqual([31, 80]);
   });
 
-  it("holds through classify() with real CWEs for each of the 12 sets and 33 pairs the shipped table's rows can form", () => {
+  it("holds through classify() with real CWEs for each of the 13 sets and 35 pairs the shipped table's rows can form", () => {
     // Every union of the table's rows, with one real CWE from each row in it.
     const formed = new Map<string, { set: TableClass[]; cwes: string[] }>();
     for (let mask = 1; mask < 1 << CWE_CLASSES.length; mask++) {
@@ -137,7 +139,7 @@ describe("the design rule (comment 6540209072, item 1)", () => {
         }
       }
     }
-    expect([formed.size, pairs]).toEqual([12, 33]);
+    expect([formed.size, pairs]).toEqual([13, 35]);
   });
 
   it("gives at the step that chooses what classify() gives, with no vector, an unreadable one, or one that rules every class out", () => {
@@ -158,15 +160,17 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
       // takeover: C:H and I:H; impersonate: C and I not N; steal: C not N; alter: I not N; disrupt: A not N.
       ["CWE-78", "C:H/I:H/A:N", "takeover"], ["CWE-78", "C:H/I:L/A:H", "steal"], ["CWE-78", "C:L/I:L/A:L", "steal"], ["CWE-78", "C:N/I:H/A:H", "alter"],
       ["CWE-78", "C:N/I:N/A:L", "disrupt"], ["CWE-78", "C:N/I:N/A:N", "unclassified"],
-      ["CWE-89", "C:H/I:H/A:N", "impersonate"], ["CWE-89", "C:L/I:L/A:N", "impersonate"], ["CWE-89", "C:H/I:N/A:N", "steal"], ["CWE-89", "C:N/I:H/A:N", "alter"], ["CWE-89", "C:N/I:N/A:H", "disrupt"],
+      ["CWE-89", "C:H/I:H/A:N", "steal"], ["CWE-89", "C:L/I:L/A:N", "steal"], ["CWE-89", "C:H/I:N/A:N", "steal"], ["CWE-89", "C:N/I:H/A:N", "alter"], ["CWE-89", "C:N/I:N/A:H", "disrupt"],
       ["CWE-862", "C:L/I:L/A:N", "impersonate"], ["CWE-862", "C:L/I:N/A:N", "steal"], ["CWE-862", "C:N/I:L/A:N", "alter"], ["CWE-862", "C:N/I:N/A:H", "disrupt"], ["CWE-862", "C:N/I:N/A:N", "unclassified"],
       ["CWE-79", "C:L/I:L/A:N", "impersonate"], ["CWE-79", "C:H/I:N/A:N", "steal"], ["CWE-79", "C:N/I:H/A:N", "alter"], ["CWE-79", "C:N/I:N/A:H", "disrupt"],
       ["CWE-352", "C:L/I:L/A:N", "impersonate"], ["CWE-352", "C:N/I:H/A:N", "alter"], ["CWE-352", "C:N/I:N/A:L", "disrupt"], ["CWE-352", "C:H/I:N/A:N", "unclassified"],
       ["CWE-643", "C:L/I:L/A:N", "impersonate"], ["CWE-643", "C:H/I:N/A:H", "steal"], ["CWE-643", "C:N/I:H/A:H", "unclassified"],
       ["CWE-471", "C:L/I:L/A:N", "impersonate"], ["CWE-471", "C:N/I:H/A:N", "alter"], ["CWE-471", "C:H/I:N/A:H", "unclassified"],
-      // C:H and I:H do not say a further step ran code: no takeover for files, SQL, a setting or prototype pollution.
+      // C:H and I:H do not say a further step ran code or acted as someone: no takeover for files, and neither takeover nor
+      // impersonate for SQL, a setting or prototype pollution.
       ["CWE-22", "C:H/I:H/A:H", "steal"], ["CWE-276", "C:H/I:H/A:H", "steal"], ["CWE-552", "C:H/I:H/A:N", "steal"], ["CWE-732", "C:H/I:H/A:N", "steal"],
-      ["CWE-943", "C:H/I:H/A:H", "impersonate"], ["CWE-1321", "C:H/I:H/A:H", "impersonate"], ["CWE-15", "C:H/I:H/A:H", "impersonate"],
+      ["CWE-943", "C:H/I:H/A:H", "steal"], ["CWE-1321", "C:H/I:H/A:H", "alter"], ["CWE-15", "C:H/I:H/A:H", "steal"],
+      ["CWE-1321", "C:H/I:N/A:N", "unclassified"], ["CWE-1321", "C:H/I:N/A:L", "disrupt"], ["CWE-89,CWE-287", "C:H/I:H/A:N", "impersonate"],
       ["CWE-1321", "C:N/I:H/A:H", "alter"], ["CWE-434", "C:H/I:H/A:N", "takeover"], ["CWE-912", "C:H/I:H/A:N", "takeover"], ["CWE-502", "C:H/I:H/A:N", "takeover"],
       ["CWE-22", "C:H/I:N/A:N", "steal"], ["CWE-22", "C:L/I:H/A:N", "steal"], ["CWE-22", "C:N/I:L/A:N", "alter"], ["CWE-22", "C:N/I:N/A:H", "disrupt"],
       ["CWE-918", "C:L/I:N/A:N", "steal"], ["CWE-918", "C:N/I:H/A:H", "alter"], ["CWE-918", "C:N/I:N/A:L", "disrupt"], ["CWE-918", "C:N/I:N/A:N", "unclassified"],
@@ -190,9 +194,17 @@ describe("CVSS vectors (docs/decisions/2026-10-31-impact-classes-conditions-and-
       ["CWE-643", "VC:N/VI:N/VA:H/SC:N/SI:N/SA:H", "unclassified"], ["CWE-643", "VC:N/VI:N/VA:N/SC:L/SI:N/SA:N", "steal"],
       ["CWE-400", "VC:N/VI:N/VA:N/SC:N/SI:N/SA:L", "disrupt"], ["CWE-400", "VC:H/VI:H/VA:N/SC:H/SI:H/SA:N", "unclassified"],
       ["CWE-22", "SA:N/SI:N/SC:H/VA:N/VI:N/VC:N/E:A/U:Red/MVC:H", "steal"], ["CWE-78", "SA:N/SI:H/SC:H/VA:N/VI:N/VC:N", "takeover"],
-      ["CWE-22", "VC:H/VI:H/VA:H/SC:H/SI:H/SA:H", "steal"], ["CWE-89", "VC:H/VI:H/VA:N/SC:N/SI:N/SA:N", "impersonate"],
+      ["CWE-22", "VC:H/VI:H/VA:H/SC:H/SI:H/SA:H", "steal"], ["CWE-89", "VC:H/VI:H/VA:N/SC:N/SI:N/SA:N", "steal"],
     ];
     for (const [cwes, metrics, want] of cases) expect([cwes, metrics, classify(withVectors(cwes.split(","), v4(metrics))).class]).toEqual([cwes, metrics, want]);
+  });
+
+  it("never give takeover or impersonate to SQL injection, data query logic, a setting or prototype pollution, nor steal to prototype pollution", () => {
+    // Whatever the vector (comment 6542470518, point 6 item 3): reading and changing data is not acting as someone.
+    for (const cwe of ["CWE-89", "CWE-943", "CWE-15", "CWE-1321"]) {
+      const given = new Set([...ALL_V3, ...ALL_V4].map(v => classify(withVectors([cwe], v)).class));
+      expect([cwe, [...given].sort()]).toEqual([cwe, (cwe === "CWE-1321" ? ["alter", "disrupt", "unclassified"] : ["alter", "disrupt", "steal", "unclassified"]).sort()]);
+    }
   });
 
   it("keep a class only when every vector of the record is consistent with it", () => {

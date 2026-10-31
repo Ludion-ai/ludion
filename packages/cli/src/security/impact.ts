@@ -1,8 +1,8 @@
 // Impact Classes: Ludion's own classification of a vulnerability record by what the attacker gains, not by how the
 // hole works (CWE), and the protection record's Markdown table (docs/decisions/2026-10-31-impact-classes.md,
 // docs/decisions/2026-10-31-impact-classes-trap-published-record.md, docs/decisions/2026-10-31-impact-classes-cvss-vector.md,
-// docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md, docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md
-// and docs/decisions/2026-10-31-impact-classes-takeover-direct.md).
+// docs/decisions/2026-10-31-impact-classes-conditions-and-sets.md, docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md,
+// docs/decisions/2026-10-31-impact-classes-takeover-direct.md and docs/decisions/2026-10-31-impact-classes-impersonate-direct.md).
 // The CWE table is fixed in this file and reviewed with it; nothing is inferred. Not wired into a PR body or a job
 // summary yet.
 
@@ -23,15 +23,16 @@ export type CweTable = readonly (readonly [readonly TableClass[], readonly numbe
 /**
  * Each CWE in the table with every class an attacker can gain through its mechanism, strongest first; the record's
  * CVSS vector says which (docs/decisions/2026-10-31-impact-classes-every-cwe-widened.md, one line of reason per CWE).
- * When in doubt the set is the wider one, except that takeover is in a set only when the attacker's code running is the
- * direct result of the mechanism (docs/decisions/2026-10-31-impact-classes-takeover-direct.md): a vector's C:H and I:H
- * do not say whether a further step ran code. A set has one class only when the mechanism can give only that. A CWE not
+ * When in doubt the set is the wider one, except that takeover and impersonate are in a set only when they are the
+ * direct result of the mechanism (docs/decisions/2026-10-31-impact-classes-takeover-direct.md and
+ * docs/decisions/2026-10-31-impact-classes-impersonate-direct.md): a vector's C and I do not say whether a further step
+ * ran code or acted as someone. A set has one class only when the mechanism can give only that. A CWE not
  * listed is unclassified. trap is a published record that says the version is malicious: a MAL- id or alias, or one
  * of TRAP_CWES.
  */
 export const CWE_CLASSES: CweTable = [
-  // takeover only where the attacker's code or commands running is the direct result of the mechanism, not one more
-  // step away (docs/decisions/2026-10-31-impact-classes-takeover-direct.md).
+  // takeover only where the attacker's code or commands running, and impersonate only where acting with another
+  // person's identity or rights, is the direct result of the mechanism, not one more step away.
   // Dangerous upload (434), hidden functionality (912): any of the five.
   [["takeover", "impersonate", "steal", "alter", "disrupt"], [434, 912]],
   // Runs code or commands, or only reads, writes or stops: command (77, 78), code (94, 95, 96) and PHP include (98)
@@ -41,9 +42,8 @@ export const CWE_CLASSES: CweTable = [
   // Gets past login or permissions, then acts as someone, reads, changes or removes: XSS and its variants (79, 80, 83 to
   // 87), privileges (266, 269), access control and authorization (284, 285, 425, 639, 862, 863), authentication and its
   // bypasses (287 to 290, 294, 302, 303, 305 to 307), sessions (384, 613), passwords (620, 640), credentials (798, 1390 to
-  // 1393); external control of a setting (15), SQL injection (89), data query logic (943), prototype pollution (1321),
-  // whose code runs only through a further step (a command a setting names, a database feature, a chain of gadgets).
-  [["impersonate", "steal", "alter", "disrupt"], [15, 79, 80, 83, 84, 85, 86, 87, 89, 266, 269, 284, 285, 287, 288, 289, 290, 294, 302, 303, 305, 306, 307, 384, 425, 613, 620, 639, 640, 798, 862, 863, 943, 1321, 1390, 1391, 1392, 1393]],
+  // 1393).
+  [["impersonate", "steal", "alter", "disrupt"], [79, 80, 83, 84, 85, 86, 87, 266, 269, 284, 285, 287, 288, 289, 290, 294, 302, 303, 305, 306, 307, 384, 425, 613, 620, 639, 640, 798, 862, 863, 1390, 1391, 1392, 1393]],
   // CSRF (352): the user is made to change or remove something; the answer cannot be read.
   [["impersonate", "alter", "disrupt"], [352]],
   // Open redirect (601), LDAP injection (90), XML injection (91), missing or cleartext encryption (311, 319), critical
@@ -57,10 +57,14 @@ export const CWE_CLASSES: CweTable = [
   // XXE (611), SSRF (918): reads, sends requests that change or stop. Files reached outside their place, read, written
   // or removed; a written file runs only if something later runs it: path traversal and its variants (22 to 40), link
   // following (59), external control of a file name (73), default and assigned permissions (276, 732), files accessible
-  // to external parties (552).
-  [["steal", "alter", "disrupt"], [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 59, 73, 276, 552, 611, 732, 918]],
+  // to external parties (552). External control of a setting (15), SQL injection (89), data query logic (943): read,
+  // change or stop; acting as someone or running code is a further step.
+  [["steal", "alter", "disrupt"], [15, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 59, 73, 89, 276, 552, 611, 732, 918, 943]],
   // Out-of-bounds reads (125 to 127): reads memory, or crashes.
   [["steal", "disrupt"], [125, 126, 127]],
+  // Prototype pollution (1321): changes object behaviour, or crashes; reading, a login check or code running comes only
+  // through a chain of gadgets.
+  [["alter", "disrupt"], [1321]],
   // Exposure of information through a response, a timing, an error, a cache, a log, a listing or a query string: read
   // only (200 to 204, 208, 209, 212 to 215, 226, 359, 497, 524 to 526, 532, 538, 548, 598).
   [["steal"], [200, 201, 202, 203, 204, 208, 209, 212, 213, 214, 215, 226, 359, 497, 524, 525, 526, 532, 538, 548, 598]],

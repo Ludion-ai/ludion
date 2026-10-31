@@ -1,11 +1,12 @@
-// node count.mjs <osv dir> <impact.ts> <impact.ts of LMR1e-2> <impact.ts of LMR1d> [--stronger]: classify every record
-// of OSV's npm and Packagist exports three times and print the counts as JSON (LMR1f,
-// docs/decisions/2026-10-31-impact-classes-takeover-direct.md, "Measured with it"):
-//   lmr1d   the impact.ts of f25d51b (LMR1d's sets, the "before" of LMR1e-2's count);
-//   lmr1e2  the impact.ts of 42e30b6 (every CWE widened, takeover through a further step too);
-//   after   the worktree's impact.ts (takeover only where code running is the direct result of the mechanism).
+// node count.mjs <osv dir> <impact.ts> <impact.ts of LMR1f> <impact.ts of LMR1d> [--stronger]: classify every record
+// of OSV's npm and Packagist exports three times and print the counts as JSON (LMR1g,
+// docs/decisions/2026-10-31-impact-classes-impersonate-direct.md, "Measured with it"):
+//   lmr1d   the impact.ts of f25d51b (LMR1d's sets);
+//   lmr1f   the impact.ts of 84ef289 (takeover only where code running is the direct result of the mechanism);
+//   after   the worktree's impact.ts (impersonate too only where it is the direct result).
 // With --stronger it prints instead, one per line (tab-separated), every record whose class moved to a stronger one
-// from lmr1d or from lmr1e2 to after, with which comparison it is.
+// from lmr1d or from lmr1f to after, with which comparison it is. Moves to takeover and to impersonate are counted apart.
+// The count.mjs of LMR1f (three ways with LMR1e-2's 42e30b6) is in git history at 84ef289.
 // Runs in Docker only, with --network none. Every record of the exports is counted, so the shares have no interval.
 // Each trap's basis (MAL- id, MAL- alias, CWE-506 to 512) is read from the record's own fields, apart from classify(),
 // and the run fails if it and any of the three disagree on any record. It also fails if a zip's sha256 is not the one
@@ -15,11 +16,11 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { entries } from "./zip.mjs";
 
-const [dir, impactPath, lmr1e2Path, lmr1dPath] = process.argv.slice(2);
-const after = await import(impactPath), lmr1e2 = await import(lmr1e2Path), lmr1d = await import(lmr1dPath);
+const [dir, impactPath, lmr1fPath, lmr1dPath] = process.argv.slice(2);
+const after = await import(impactPath), lmr1f = await import(lmr1fPath), lmr1d = await import(lmr1dPath);
 const { IMPACT_ORDER, TRAP_CWES } = after;
-const WAYS = { lmr1d, lmr1e2, after };
-const PAIRS = [["lmr1e2", "after"], ["lmr1d", "after"]];
+const WAYS = { lmr1d, lmr1f, after };
+const PAIRS = [["lmr1f", "after"], ["lmr1d", "after"]];
 const fetched = JSON.parse(readFileSync(join(dir, "fetch.json"), "utf8"));
 
 const pct = (k, n) => (n ? Math.round((k / n) * 1000) / 10 : null);
@@ -72,7 +73,7 @@ function tally(records, key) {
 
 /** From → to counts, with how many went to a stronger and to a weaker class, and the moves to takeover apart. */
 function changes(records, from, to) {
-  const matrix = new Map(), toTakeover = new Map();
+  const matrix = new Map(), toTakeover = new Map(), toImpersonate = new Map();
   let changed = 0, stronger = 0, weaker = 0, fromUnclassified = 0, toUnclassified = 0;
   for (const r of records) {
     const a = r[from].class, b = r[to].class;
@@ -82,12 +83,15 @@ function changes(records, from, to) {
     if (a === "unclassified") fromUnclassified++;
     if (b === "unclassified") toUnclassified++;
     if (b === "takeover") bump(toTakeover, a);
+    if (b === "impersonate") bump(toImpersonate, a);
     bump(matrix, `${a} -> ${b}`);
   }
-  const takeoverTotal = [...toTakeover.values()].reduce((s, k) => s + k, 0);
+  const total = m => [...m.values()].reduce((s, k) => s + k, 0);
+  const byFrom = m => Object.fromEntries([...m].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)));
   return {
     changed, to_stronger: stronger, to_weaker: weaker, from_unclassified: fromUnclassified, to_unclassified: toUnclassified,
-    to_takeover: { count: takeoverTotal, by_class_before: Object.fromEntries([...toTakeover].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))) },
+    to_takeover: { count: total(toTakeover), by_class_before: byFrom(toTakeover) },
+    to_impersonate: { count: total(toImpersonate), by_class_before: byFrom(toImpersonate) },
     by_class: Object.fromEntries([...matrix].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))),
   };
 }

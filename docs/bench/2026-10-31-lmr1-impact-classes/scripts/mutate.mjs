@@ -42,18 +42,25 @@ const mutations = [
   ["an unreadable metric read as affected", "if (typeof result === \"string\") return { unreadable:", "if (typeof result === \"string\") continue; if (false) return { unreadable:"],
   ["the reason names the first CWE", "inTable.find(l => l.classes.includes(best))!.cwe", "inTable[0]!.cwe"],
   // LMR1e-2: every CWE with every class its mechanism can give.
-  // LMR1f moved rows: their first CWE changed, so the texts below name the rows as they now start.
+  // LMR1f and LMR1g moved rows: their first CWE changed, so the texts below name the rows as they now start.
   ["code injection loses alter", '[["takeover", "steal", "alter", "disrupt"], [77,', '[["takeover", "steal", "disrupt"], [77,'],
   ["code injection loses disrupt", '[["takeover", "steal", "alter", "disrupt"], [77,', '[["takeover", "steal", "alter"], [77,'],
-  ["the login and authorization set loses steal, alter and disrupt", '[["impersonate", "steal", "alter", "disrupt"], [15,', '[["impersonate"], [15,'],
+  ["the login and authorization set loses steal, alter and disrupt", '[["impersonate", "steal", "alter", "disrupt"], [79,', '[["impersonate"], [79,'],
   ["CSRF can steal", '[["impersonate", "alter", "disrupt"], [352]]', '[["impersonate", "steal", "alter", "disrupt"], [352]]'],
   ["the five-class row loses impersonate", '[["takeover", "impersonate", "steal", "alter", "disrupt"], [434,', '[["takeover", "steal", "alter", "disrupt"], [434,'],
-  ["the file, SSRF and XXE row loses disrupt", '[["steal", "alter", "disrupt"], [22,', '[["steal", "alter"], [22,'],
+  ["the {steal, alter, disrupt} row (files, SQL, 15, 611, 918) loses disrupt", '[["steal", "alter", "disrupt"], [15,', '[["steal", "alter"], [15,'],
   ["out-of-bounds reads lose disrupt", '[["steal", "disrupt"], [125,', '[["steal"], [125,'],
   ["CWE-912 leaves the table", "[434, 912]]", "[434]]"],
   // LMR1f: takeover only where code running is the direct result of the mechanism (comment 6541666295, (1)).
-  ["path traversal and the file CWEs get takeover back", '[["steal", "alter", "disrupt"], [22,', '[["takeover", "steal", "alter", "disrupt"], [22,'],
-  ["SQL injection, 15, 943 and 1321 get takeover back (with the login set)", '[["impersonate", "steal", "alter", "disrupt"], [15,', '[["takeover", "impersonate", "steal", "alter", "disrupt"], [15,'],
+  ["the {steal, alter, disrupt} row (files, SQL, 15, 611, 918) gets takeover back", '[["steal", "alter", "disrupt"], [15,', '[["takeover", "steal", "alter", "disrupt"], [15,'],
+  ["the login set gets takeover", '[["impersonate", "steal", "alter", "disrupt"], [79,', '[["takeover", "impersonate", "steal", "alter", "disrupt"], [79,'],
+  // LMR1g: impersonate too only where it is the direct result (comment 6542470518, point 6 item 3).
+  ["SQL injection, 15 and 943 get impersonate back (with the files row)", '[["steal", "alter", "disrupt"], [15,', '[["impersonate", "steal", "alter", "disrupt"], [15,'],
+  ["1321 gets impersonate back", '[["alter", "disrupt"], [1321]]', '[["impersonate", "alter", "disrupt"], [1321]]'],
+  ["1321 gets steal back", '[["alter", "disrupt"], [1321]]', '[["steal", "alter", "disrupt"], [1321]]'],
+  ["1321 loses disrupt", '[["alter", "disrupt"], [1321]]', '[["alter"], [1321]]'],
+  ["1321 leaves the table", '  [["alter", "disrupt"], [1321]],\n', ""],
+  ["the login set loses impersonate", '[["impersonate", "steal", "alter", "disrupt"], [79,', '[["steal", "alter", "disrupt"], [79,'],
   ["434 and 912 lose takeover", '[["takeover", "impersonate", "steal", "alter", "disrupt"], [434, 912]]', '[["impersonate", "steal", "alter", "disrupt"], [434, 912]]'],
   ["code injection loses takeover", '[["takeover", "steal", "alter", "disrupt"], [77,', '[["steal", "alter", "disrupt"], [77,'],
   // LMR1b: trap as a published record, and stops with their reasons; LMR1d: CWE-506 to 512.

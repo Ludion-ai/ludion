@@ -8,7 +8,11 @@ The conditions of the vector record were nested: every vector consistent with st
 
 ## Decided
 
-1. **The design rule** (comment 6540209072, item 1, which replaces the pairwise rule of 6539943852 (a)). For every set of classes and every class W in it, at least one vector is consistent with W and with no class of the set that is stronger than W. The tests check it with the real `classify()`. Each of the 31 non-empty sets of the five table classes is built from CWEs that each allow one class. For each of the 80 pairs of a set and a class in it, a vector among the 27 CVSS 3 ones (C, I and A each N, L or H) and one among the 729 CVSS 4 ones (VC, VI, VA, SC, SI and SA each N, L or H) must give that class.
+1. **The design rule** (comment 6540209072, item 1, which replaces the pairwise rule of 6539943852 (a)). For every set of classes and every class W in it, at least one vector is consistent with W and with no class of the set that is stronger than W. The tests check it in two ways, each with every one of the 27 CVSS 3 vectors (C, I and A each N, L or H) and of the 729 CVSS 4 vectors (VC, VI, VA, SC, SI and SA each N, L or H):
+   - **Every set, at the step that chooses.** `chooseClass` is the step `classify()` runs after it has taken the union of the CWEs' sets: it keeps the classes consistent with the vectors (CONSISTENT) and takes the strongest (IMPACT_ORDER). It is given each of the 31 non-empty sets of the five table classes directly. For each of the 80 pairs of a set and a class in it, a CVSS 3 vector and a CVSS 4 vector must give that class.
+   - **Every set the shipped table can form, through the real `classify()` with real CWEs.** The sets a record's CWEs can form are the unions of the table's rows (point 7): 13 sets and 33 pairs. Each pair must be given by some vector. A row added later whose unions include a set with no such vector fails this test.
+
+   *Corrected in LMR1e* (ludion-ops#1 comment 6540622832, point 2). This point first said that each of the 31 sets is built from CWEs that each allow one class. The table of point 7 cannot do that: only steal, alter and disrupt keep CWEs with one class.
 2. **The conditions.** Confidentiality, integrity and availability are "not N" as before (CVSS 4: the vulnerable or the subsequent system).
    - takeover: CVSS 3 C:H and I:H; CVSS 4 VC:H and VI:H, or SC:H and SI:H.
    - impersonate: confidentiality and integrity both not N.

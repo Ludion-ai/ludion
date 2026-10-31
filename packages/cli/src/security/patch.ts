@@ -4,9 +4,10 @@ import { tmpdir } from "node:os";
 import { join, posix, resolve } from "node:path";
 import { runContainer, runDockerImageCommand } from "../../../sandbox/src/docker.ts";
 import { hash, replaceImage, scanPhp, type Scan } from "./php.ts";
+import { scanNode } from "./node.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
 import { branchName, branchTip, fixBranch, gitBase, skippedReason } from "./branch.ts";
-import { phpFixPublished } from "./exposure.ts";
+import { nodeFixPublished, phpFixPublished, type FixPublished } from "./exposure.ts";
 
 export type Command = (args: string[], timeoutMs: number) => Promise<string>;
 export type Receipt = {
@@ -24,23 +25,37 @@ export type Receipt = {
 
 export const dockerCommand: Command = runDockerImageCommand;
 
-function digestFrom(text: string): string {
+/** The official runtime images `patch` updates: its repository, release lookup, exposure start and version probe. */
+const RUNTIMES = {
+  php: {
+    label: "PHP", scan: scanPhp, published: phpFixPublished,
+    probe: (version: string) => ["php", "-r", `exit(PHP_VERSION === '${version}' ? 0 : 1);`],
+  },
+  node: {
+    label: "Node.js", scan: scanNode, published: nodeFixPublished,
+    probe: (version: string) => ["node", "-e", `process.exit(process.version === 'v${version}' ? 0 : 1)`],
+  },
+} satisfies Record<"php" | "node", { label: string; scan: (dockerfile: string, fetchFn?: typeof fetch) => Promise<Scan>; published: (scan: Scan) => FixPublished; probe: (version: string) => string[] }>;
+
+function digestFrom(text: string, repository: keyof typeof RUNTIMES): string {
+  const label = RUNTIMES[repository].label;
   let entries: unknown;
-  try { entries = JSON.parse(text); } catch { throw new Error("Could not read downloaded PHP image digest."); }
-  if (!Array.isArray(entries)) throw new Error("Missing official PHP image digest.");
-  const digest = entries.find(v => typeof v === "string" && /^(?:(?:docker\.io\/)?library\/)?php@sha256:[a-f0-9]{64}$/.test(v));
-  if (typeof digest !== "string") throw new Error("Downloaded image has no official PHP repository digest.");
-  return `php@${digest.split("@")[1]!}`;
+  try { entries = JSON.parse(text); } catch { throw new Error(`Could not read downloaded ${label} image digest.`); }
+  if (!Array.isArray(entries)) throw new Error(`Missing official ${label} image digest.`);
+  const digest = entries.find(v => typeof v === "string" && new RegExp(`^(?:(?:docker\\.io/)?library/)?${repository}@sha256:[a-f0-9]{64}$`).test(v));
+  if (typeof digest !== "string") throw new Error(`Downloaded image has no official ${label} repository digest.`);
+  return `${repository}@${digest.split("@")[1]!}`;
 }
 
 export async function patchProject(dir: string, apply: boolean, deps: { signal?: AbortSignal; fetchFn?: typeof fetch; command?: Command; testRun?: (name: string, image: string, command: readonly string[], timeoutMs: number) => Promise<void> } = {}): Promise<{ receipt: Receipt | null; path: string | null; scan: Scan }> {
   const active = () => { if (deps.signal?.aborted) throw new Error("Update cancelled. No pending source change will be applied."); };
   active();
   const root = rootPath(dir), config = readConfig(root);
-  if (!("dockerfile" in config)) throw new Error("PHP patch requires a PHP Dockerfile configuration.");
+  if (!("dockerfile" in config)) throw new Error("A PHP or Node.js image patch requires a Dockerfile configuration.");
+  const repository = config.ecosystem === "node" ? "node" : "php", runtime = RUNTIMES[repository];
   const dockerfile = regularFile(root, config.dockerfile);
   const original = readFileSync(dockerfile, "utf8");
-  const scan = await scanPhp(original, deps.fetchFn);
+  const scan = await runtime.scan(original, deps.fetchFn);
   active();
   if (!scan.candidate) return { receipt: null, path: null, scan };
   const state = privateState(root), lock = join(state, "patch.lock");
@@ -48,7 +63,7 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
   try { lockFd = openSync(lock, "wx", 0o600); } catch { throw new Error("Another patch may be running, or patch.lock remains after an interruption. Inspect it before retrying."); }
   const id = randomUUID(), images: string[] = [];
   let temporary = "";
-  const receiptPath = join(state, `${id}.json`), published = phpFixPublished(scan);
+  const receiptPath = join(state, `${id}.json`), published = runtime.published(scan);
   const receipt: Receipt = {
     schema: 1, id, started_at: new Date().toISOString(), finished_at: "", outcome: "failed", scope: "dockerfile_only_not_deployed",
     scan, tree_hash: "", dockerfile_before: hash(original), dockerfile_after: null, old_digest: null, new_digest: null,
@@ -71,8 +86,8 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     // Before any Docker work: the branch starts from the commit whose files are the ones validated.
     const base = apply ? gitBase(root, temporary) : null;
     receipt.base_commit = base?.commit ?? null;
-    const branch = base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), "php", scan.candidate.version);
-    const subject = `ludion: PHP ${scan.current.version} -> ${scan.candidate.version} in ${config.dockerfile}`;
+    const branch = base && branchName("ludion", ...(base.prefix ? [base.prefix] : []), repository, scan.candidate.version);
+    const subject = `ludion: ${runtime.label} ${scan.current.version} -> ${scan.candidate.version} in ${config.dockerfile}`;
     const tip = base && branch ? branchTip(base, branch) : null;
     // A branch of the same name is this update only when its tip says so; otherwise the name is taken and the update stops.
     if (tip !== null && tip.subject !== subject) throw new Error(`The branch ${branch} already exists and holds another change ("${tip.subject.slice(0, 200)}"); it was not changed, and this update was not validated.`);
@@ -88,7 +103,7 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
       active();
       await command(["pull", ref], 300_000);
       active();
-      const digest = digestFrom(await command(["image", "inspect", ref, "--format", "{{json .RepoDigests}}"], 15_000));
+      const digest = digestFrom(await command(["image", "inspect", ref, "--format", "{{json .RepoDigests}}"], 15_000), repository);
       active();
       if (label === "baseline") receipt.old_digest = digest; else receipt.new_digest = digest;
       const pinned = `${ref.split("@")[0]}@${digest.split("@")[1]}`;
@@ -100,8 +115,8 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
       const imageId = await command(["image", "inspect", image, "--format", "{{.Id}}"], 15_000);
       active();
       const versionName = `ludion-security-${id}-${label}-runtime`;
-      // Probe the built image as well as its base; a Dockerfile may replace the PHP binary.
-      await run(versionName, imageId, ["php", "-r", `exit(PHP_VERSION === '${expected}' ? 0 : 1);`], config.timeout_seconds * 1000);
+      // Probe the built image as well as its base; a Dockerfile may replace the runtime's binary.
+      await run(versionName, imageId, runtime.probe(expected), config.timeout_seconds * 1000);
       active();
       const name = `ludion-security-${id}-${label}-test`;
       await run(name, imageId, config.test, config.timeout_seconds * 1000);
@@ -119,7 +134,7 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { flag: "wx", mode: 0o600 });
     if (base && branch) {
       active();
-      const message = `${subject}\n\nOfficial PHP security releases: ${scan.security_releases.map(r => r.version).join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+      const message = `${subject}\n\nOfficial ${runtime.label} security releases: ${scan.security_releases.map(r => r.version).join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.commit.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
       // The path as Git names it: "./Dockerfile" in the config is "Dockerfile" in the commit.
       receipt.commit = fixBranch(base, branch, [{ path: posix.normalize(config.dockerfile), content: updated }], message);
       receipt.branch = branch; receipt.applied_at = new Date().toISOString(); receipt.outcome = "applied";

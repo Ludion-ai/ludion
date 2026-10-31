@@ -6,7 +6,8 @@ import { patchProject } from "./patch.ts";
 import { patchDependencies } from "./dependency-patch.ts";
 import { detectEcosystems, DEFAULT_IMAGES, textFile, type Ecosystem } from "./inventory.ts";
 import { scanProject, vulnerable } from "./scan.ts";
-import { CONFIG, DEFAULT_CONFIG, readConfig, regularFile, rootPath } from "./project.ts";
+import { CONFIG, DEFAULT_CONFIG, DEFAULT_NODE_CONFIG, readConfig, regularFile, rootPath } from "./project.ts";
+import { namesNodeImage } from "./node.ts";
 import { useProject } from "../../../sandbox/src/docker.ts";
 import type { ReadOnlyFinding, ReadOnlyScan } from "./osv.ts";
 import { isReadOnlyCliName, READONLY_CLI_NAMES, readOnlyRefusal } from "./readonly/index.ts";
@@ -35,7 +36,7 @@ export async function securityCli(command: string, args: string[]): Promise<numb
   if (values.apply && !["patch", "watch"].includes(command)) throw new Error("--apply is only valid with patch or watch.");
   if (isReadOnlyCliName(values.ecosystem) && command !== "scan") throw new Error(readOnlyRefusal(values.ecosystem));
   if (values.ecosystem && !["init", "scan"].includes(command)) throw new Error("--ecosystem selects init/scan only; patch/watch use the saved project policy.");
-  if (values.ecosystem && !["auto", "php", "npm", "composer", "maven"].includes(values.ecosystem) && !isReadOnlyCliName(values.ecosystem)) throw new Error("Supported ecosystems: php, npm, composer, maven, python, go, rust (scan only), auto.");
+  if (values.ecosystem && !["auto", "php", "node", "npm", "composer", "maven"].includes(values.ecosystem) && !isReadOnlyCliName(values.ecosystem)) throw new Error("Supported ecosystems: php, node, npm, composer, maven, python, go, rust (scan only), auto.");
   const root = rootPath(values.dir!);
   // docker is never taken from a PATH folder inside the project (packages/sandbox/src/docker.ts, findDocker).
   useProject(root);
@@ -43,10 +44,11 @@ export async function securityCli(command: string, args: string[]): Promise<numb
     if (existsSync(join(root, CONFIG))) throw new Error(`${CONFIG} already exists. Edit it to choose your real validation command.`);
     const choices: string[] = detectEcosystems(root);
     if (existsSync(join(root, "Dockerfile")) && /\bphp:/.test(textFile(root, "Dockerfile"))) choices.push("php");
+    if (existsSync(join(root, "Dockerfile")) && namesNodeImage(textFile(root, "Dockerfile"))) choices.push("node");
     const selected = values.ecosystem && values.ecosystem !== "auto" ? values.ecosystem : choices.length === 1 ? choices[0]! : undefined;
-    if (!selected) throw new Error("Choose the update policy with --ecosystem php|npm|composer|maven. A multi-ecosystem project can be scanned together; each patch policy chooses its dependency manager.");
-    let config: unknown = DEFAULT_CONFIG;
-    if (selected === "php") regularFile(root, "Dockerfile");
+    if (!selected) throw new Error("Choose the update policy with --ecosystem php|node|npm|composer|maven. A multi-ecosystem project can be scanned together; each patch policy chooses its dependency manager.");
+    let config: unknown = selected === "node" ? DEFAULT_NODE_CONFIG : DEFAULT_CONFIG;
+    if (selected === "php" || selected === "node") regularFile(root, "Dockerfile");
     else {
       const ecosystem = selected as Ecosystem;
       config = { schema: 1, ecosystem, image: DEFAULT_IMAGES[ecosystem], test: ecosystem === "npm" ? ["npm", "test"] : ecosystem === "composer" ? ["php", "tests/smoke.php"] : ["mvn", "--offline", "--batch-mode", "-Dmaven.repo.local=/opt/ludion-m2", "-DfailIfNoTests=true", "verify"], timeout_seconds: 120 };
@@ -58,7 +60,7 @@ export async function securityCli(command: string, args: string[]): Promise<numb
   if (command === "scan") {
     const report = await scanProject(root, values.ecosystem);
     const only = report.checks.length === 1 ? report.checks[0] : undefined;
-    if (values.json) console.log(JSON.stringify(only && only.ecosystem === "php" && "result" in only && !report.unsupported.length ? only.result : report, null, 2));
+    if (values.json) console.log(JSON.stringify(only && (only.ecosystem === "php" || only.ecosystem === "node") && "result" in only && !report.unsupported.length ? only.result : report, null, 2));
     else {
       for (const check of report.checks) {
         if ("error" in check) { console.error(`${check.ecosystem}: unavailable — ${READONLY_ECOSYSTEMS.includes(check.ecosystem) ? plain(check.error) : check.error}`); continue; }
@@ -68,7 +70,7 @@ export async function securityCli(command: string, args: string[]): Promise<numb
           for (const finding of check.result.findings) console.log(`  ${finding.package.name}@${finding.package.version} · ${finding.advisory.id} · ${finding.advisory.summary}`);
           for (const limit of check.result.inventory.limitations) console.log(`  Incomplete: ${limit}`);
           console.log(`  Scope: ${check.result.inventory.scope}`);
-        } else console.log(`php: ${check.result.current.version} · ${check.result.candidate ? `update ${check.result.candidate.version}` : "no newer security release found"}`);
+        } else console.log(`${check.ecosystem}: ${check.result.current.version} · ${check.result.candidate ? `update ${check.result.candidate.version}` : "no newer security release found"}`);
       }
       if (report.unsupported.length) console.error(`Unsupported inventories: ${report.unsupported.join(", ")}. These have not been checked.`);
       console.log("Known data only; no match is not a security guarantee. Dependency coordinates are sent to OSV; source stays local to your Docker setup.");

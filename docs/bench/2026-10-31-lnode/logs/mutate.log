@@ -1,0 +1,31 @@
+# at commit ba04725e8c0b8b56a23501c515bed0b02cd43445, 0 files differing from it
+# started 2026-10-30T19:06:07Z
+caught (3 failed, exit 1)  candidate: the smallest security release, not the newest
+caught (4 failed, exit 1)  candidate: the newest release, security or not
+caught (5 failed, exit 1)  the security mark ignored
+caught (6 failed, exit 1)  other lines counted
+caught (1 failed, exit 1)  a date that is not a real day accepted
+caught (1 failed, exit 1)  a version listed twice accepted
+caught (4 failed, exit 1)  floating tags read as versions
+caught (2 failed, exit 1)  any repository named node
+caught (1 failed, exit 1)  index size limit raised
+caught (1 failed, exit 1)  probe without the v
+caught (1 failed, exit 1)  digest of any repository taken
+caught (1 failed, exit 1)  branch named php for node
+caught (3 failed, exit 1)  node policy run as PHP
+caught (2 failed, exit 1)  fix published: the newest security release
+caught (1 failed, exit 1)  scan: FROM node not detected
+caught (1 failed, exit 1)  init: node not offered
+caught (2 failed, exit 1)  PR job: receipt runtime not checked
+caught (3 failed, exit 1)  PR job: node policy read as PHP
+caught (1 failed, exit 1)  PR job: Dockerfile + other ecosystem accepted
+caught (1 failed, exit 1)  PR job: any repository in the new FROM
+caught (2 failed, exit 1)  PR job: another major accepted
+caught (2 failed, exit 1)  PR job: digest not compared
+caught (1 failed, exit 1)  PR job: PHP's digest asked for node
+caught (1 failed, exit 1)  PR job: Docker Hub asked for library/php
+caught (1 failed, exit 1)  PR job: Docker Hub manifest of library/php
+caught (1 failed, exit 1)  PR body: no Node.js advisory note
+26 of 26 caught; 0 survived; 0 not applied
+every mutated file is again the worktree's
+# finished 2026-10-30T19:09:23Z

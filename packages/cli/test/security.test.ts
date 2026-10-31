@@ -42,8 +42,11 @@ describe("official PHP security update decisions", () => {
     expect(result.candidate).toBeNull();
     expect(result.note).toContain("not a security guarantee");
   });
-  it.each(["FROM php:8.4-cli\n", "ARG PHP=8.4.25\nFROM php:${PHP}-cli\n", "FROM evil/php:8.4.25-cli\n", "FROM php:8.4.25-cli\nFROM scratch\n", "FROM php:8.4.25-cli AS build\n", "# syntax=evil/build\nFROM php:8.4.25-cli\n", "FROM php:8.4.25-cli\nADD https://example.com/app /app\n", "FROM php:8.4.25-cli\nCOPY --from=evil / /app\n", "FROM php:8.4.25-cli\nRUN --network=host true\n"])("refuses ambiguous or external build input: %s", text => {
+  it.each(["FROM php:8.4-cli\n", "ARG PHP=8.4.25\nFROM php:${PHP}-cli\n", "FROM evil/php:8.4.25-cli\n", "FROM php:8.4.25-cli\nFROM scratch\n", "FROM php:8.4.25-cli AS build\n", "# syntax=evil/build\nFROM php:8.4.25-cli\n", "FROM php:8.4.25-cli\nADD https://example.com/app /app\n", "FROM php:8.4.25-cli\nCOPY --from=evil / /app\n", "FROM php:8.4.25-cli\nRUN --network=host true\n", `FROM php:8.4.25-cli@sha256:${"a".repeat(63)}\n`, `FROM php:8.4.25-cli@md5:${"a".repeat(32)}\n`, "\u{FEFF}\u{FEFF}FROM php:8.4.25-cli\nFROM scratch\n"])("refuses ambiguous or external build input: %s", text => {
     expect(() => phpImage(text)).toThrow();
+  });
+  it("refuses a PHP flavor that does not follow a hyphen", () => {
+    expect(() => phpImage("FROM php:8.4.26cli\n")).toThrow("PHP image flavor must follow a hyphen.");
   });
   it("handles official pinned images and changes only FROM", () => {
     const original = `# php:8.4.25-cli is old\nFROM docker.io/library/php:8.4.25-cli@${DIGEST}\nRUN echo php:8.4.25-cli\n`;

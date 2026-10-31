@@ -4,11 +4,12 @@ import { detectEcosystems, inventory, textFile, type Ecosystem } from "./invento
 import { resolvedMavenInventory } from "./dependency-patch.ts";
 import { OsvClient, type DependencyScan, type ReadOnlyScan } from "./osv.ts";
 import { scanPhp, type Scan } from "./php.ts";
+import { namesNodeImage, scanNode } from "./node.ts";
 import { CONFIG, readConfig } from "./project.ts";
 import { isReadOnlyCliName, READONLY_CLI_NAMES, READONLY_READERS, type ReadOnlyReader } from "./readonly/index.ts";
 import type { ReadOnlyEcosystem } from "./readonly/types.ts";
 
-export type ProjectScan = { schema: 1; checked_at: string; status: "attention_required" | "no_known_updates"; checks: ({ ecosystem: "php"; result: Scan } | { ecosystem: Ecosystem; result: DependencyScan } | { ecosystem: ReadOnlyEcosystem; result: ReadOnlyScan } | { ecosystem: string; error: string })[]; unsupported: string[] };
+export type ProjectScan = { schema: 1; checked_at: string; status: "attention_required" | "no_known_updates"; checks: ({ ecosystem: "php" | "node"; result: Scan } | { ecosystem: Ecosystem; result: DependencyScan } | { ecosystem: ReadOnlyEcosystem; result: ReadOnlyScan } | { ecosystem: string; error: string })[]; unsupported: string[] };
 /** Inventories scan does not read. A file a registered read-only reader handled is left out. */
 const UNSUPPORTED = ["requirements.txt", "pyproject.toml", "go.mod", "Cargo.lock", "build.gradle", "build.gradle.kts"];
 const message = (error: unknown) => error instanceof Error ? error.message : String(error);
@@ -20,12 +21,12 @@ export async function scanProject(root: string, selected?: string, deps: { reade
   const readers = deps.readers ?? READONLY_READERS;
   const checks: ProjectScan["checks"] = [];
   const saved = existsSync(join(root, CONFIG)) ? readConfig(root) : undefined;
-  const phpFile = saved && "dockerfile" in saved ? saved.dockerfile : "Dockerfile";
+  const imageFile = saved && "dockerfile" in saved ? saved.dockerfile : "Dockerfile";
   const auto = !selected || selected === "auto", readOnly = isReadOnlyCliName(selected) ? READONLY_CLI_NAMES[selected] : undefined;
-  const detected = detectEcosystems(root), ecosystems = !auto ? selected === "php" || readOnly ? [] : [selected as Ecosystem] : detected;
+  const detected = detectEcosystems(root), ecosystems = !auto ? selected === "php" || selected === "node" || readOnly ? [] : [selected as Ecosystem] : detected;
   const client = deps.client ?? new OsvClient();
   for (const ecosystem of ecosystems) {
-    if (!["npm", "composer", "maven"].includes(ecosystem)) throw new Error("Supported ecosystems: php, npm, composer, maven, python, go, rust (scan only), auto.");
+    if (!["npm", "composer", "maven"].includes(ecosystem)) throw new Error("Supported ecosystems: php, node, npm, composer, maven, python, go, rust (scan only), auto.");
     try {
       let installed = inventory(root, ecosystem);
       const originals = installed.files.map(f => [f, textFile(root, f)] as const);
@@ -68,13 +69,19 @@ export async function scanProject(root: string, selected?: string, deps: { reade
     const present = readOnly.files.filter(f => existsSync(join(root, f)));
     checks.push({ ecosystem: readOnly.ecosystem, error: present.length ? `${present.join(", ")} present, but this build has no ${selected} reader; not checked.` : `No ${selected} inventory found, and this build has no ${selected} reader.` });
   }
-  if (selected === "php" || (auto && existsSync(join(root, phpFile)) && /\bphp:/.test(textFile(root, phpFile)))) {
+  if (selected === "php" || (auto && existsSync(join(root, imageFile)) && /\bphp:/.test(textFile(root, imageFile)))) {
     try {
-      checks.push({ ecosystem: "php", result: await scanPhp(textFile(root, phpFile)) });
+      checks.push({ ecosystem: "php", result: await scanPhp(textFile(root, imageFile)) });
     } catch (error) { checks.push({ ecosystem: "php", error: message(error) }); }
   }
+  // The official Node.js image (node.ts): when the policy or --ecosystem says node, or, unselected, a FROM line names it.
+  if (selected === "node" || (auto && saved && "dockerfile" in saved && saved.ecosystem === "node") || (auto && existsSync(join(root, imageFile)) && namesNodeImage(textFile(root, imageFile)))) {
+    try {
+      checks.push({ ecosystem: "node", result: await scanNode(textFile(root, imageFile)) });
+    } catch (error) { checks.push({ ecosystem: "node", error: message(error) }); }
+  }
   const unsupported = !auto ? [] : UNSUPPORTED.filter(f => existsSync(join(root, f)) && !handled.has(f));
-  if (!checks.length && !unsupported.length) throw new Error(`No supported project inventory found. Expected PHP Dockerfile, npm lockfile, composer.lock or pom.xml${readers.length ? `, or for a read-only scan ${readers.flatMap(r => r.files).join(", ")}` : ""}.`);
+  if (!checks.length && !unsupported.length) throw new Error(`No supported project inventory found. Expected PHP or Node.js Dockerfile, npm lockfile, composer.lock or pom.xml${readers.length ? `, or for a read-only scan ${readers.flatMap(r => r.files).join(", ")}` : ""}.`);
   const attention = unsupported.length > 0 || checks.some(c => "error" in c || ("findings" in c.result ? vulnerable(c.result) || c.result.status === "incomplete" : c.result.candidate !== null));
   return { schema: 1, checked_at: new Date().toISOString(), status: attention ? "attention_required" : "no_known_updates", checks, unsupported };
 }

@@ -277,7 +277,7 @@ describe("scan with read-only readers", () => {
     expect(result.unsupported).toEqual(LEGACY);
     expect(result.status).toBe("attention_required");
     // Files outside today's list are not reported, as before.
-    await expect(scanProject(project({ "poetry.lock": "", "uv.lock": "", "Pipfile.lock": "", "Cargo.toml": "" }), undefined, { readers: [] })).rejects.toThrow(/^No supported project inventory found\. Expected PHP Dockerfile, npm lockfile, composer\.lock or pom\.xml\.$/);
+    await expect(scanProject(project({ "poetry.lock": "", "uv.lock": "", "Pipfile.lock": "", "Cargo.toml": "" }), undefined, { readers: [] })).rejects.toThrow(/^No supported project inventory found\. Expected PHP or Node\.js Dockerfile, npm lockfile, composer\.lock or pom\.xml\.$/);
     expect((await scanProject(project({ "requirements.txt": "x\n" }), "auto", { readers: [] })).unsupported).toEqual(["requirements.txt"]);
   });
   it("adds a check for a registered reader and removes only the files it handled from unsupported", async () => {
@@ -358,7 +358,7 @@ describe("the CLI keeps read-only ecosystems out of update policies", () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
     expect(await securityCli("scan", ["--dir", project({}), "--ecosystem", "go"])).toBe(2);
     expect(errors[0]).toMatch(/^Go: unavailable — No go inventory found/);
-    await expect(securityCli("scan", ["--dir", project({}), "--ecosystem", "ruby"])).rejects.toThrow("Supported ecosystems: php, npm, composer, maven, python, go, rust (scan only), auto.");
+    await expect(securityCli("scan", ["--dir", project({}), "--ecosystem", "ruby"])).rejects.toThrow("Supported ecosystems: php, node, npm, composer, maven, python, go, rust (scan only), auto.");
   });
   it("prints a read-only check like the others, plus what Ludion does not do", async () => {
     const result = await osv({ "django@3.2.0": ["GHSA-aaaa-bbbb-cccc"] }, { "GHSA-aaaa-bbbb-cccc": record("GHSA-aaaa-bbbb-cccc") }).scanReadOnly(pypi([django, requests], ["Unpinned requirement: flask>=2\u001b[2J"]));

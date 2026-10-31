@@ -993,9 +993,53 @@ describe("the policy at the base decides what a fix may change, and what it may 
       ["a flag as a string", (e: Record<string, unknown>) => { e.optional = "true"; }],
       ["inBundle", (e: Record<string, unknown>) => { e.inBundle = true; }],
       ["a flag change with another key", (e: Record<string, unknown>) => { e.peer = true; e.hasInstallScript = true; }],
+      // Review 6541119866, N2: a changed `name`, here the entry's own (another package's is the identity rule's, below).
+      ["its name", (e: Record<string, unknown>) => { e.name = "tr46"; }],
     ] as const) expect(tr46(change), what).toContain("package-lock.json changes node_modules/tr46 (0.0.3 -> 0.0.3), which this fix does not plan.");
-    // Flags npm would not write there pass: whether they are the ones npm computes is not checked (the hole docs/status.md lists).
+    expect(tr46(e => { e.name = "evil"; })).toContain("node_modules/whatwg-url requires tr46 ~0.0.3, and node_modules/tr46 has evil@0.0.3, which is not that.");
+    // Flags npm would not write there pass: whether they are the ones npm computes is not checked (the hole docs/status.md
+    // lists; the graph-computed flags are a separate lane, docs/decisions/2026-10-31-lock-flags-from-graph.md, section 2).
     expect(tr46(e => { e.dev = true; e.devOptional = true; })).toBeNull();
+  });
+  // Review 6541119866, N1: `optional` and `peer` change alone as npm 12.2.1 writes it (X1 and X2 of
+  // docs/decisions/2026-10-31-lock-flags-from-graph.md): node-fetch 2.6.7 makes the project's optional (X1) or peer (X2)
+  // whatwg-url, and what it requires, production dependencies. X5: an optional peer that finds its package, in range.
+  it("npm: npm 12.2.1's fixes whose flags alone change (optional, peer) are taken, and an optional peer in range (N1)", () => {
+    const fix = fixOf("node-fetch", "2.6.1", "2.6.7", ["package.json", "package-lock.json"]);
+    const at = (dir: string, v: string, s: "base" | "fix", file: string) => readFileSync(new URL(`fixtures/npm-corpus/extra/${dir}/${v}/${s}/${file}`, import.meta.url), "utf8");
+    for (const [dir, flag] of [["optional", "optional"], ["peer", "peer"], ["optional-peer-in-range", null]] as const) for (const v of ["v2", "v3"]) {
+      const [was, is] = [JSON.parse(at(dir, v, "base", "package-lock.json")).packages, JSON.parse(at(dir, v, "fix", "package-lock.json")).packages];
+      if (flag) for (const path of ["node_modules/whatwg-url", "node_modules/tr46", "node_modules/webidl-conversions"]) {
+        expect(was[path][flag], `${dir} ${v} ${path}`).toBe(true);
+        expect({ ...is[path], [flag]: true }, `${dir} ${v} ${path}`).toEqual(was[path]);
+      }
+      const side = (s: "base" | "fix") => files({ "package.json": at(dir, v, s, "package.json"), "package-lock.json": at(dir, v, s, "package-lock.json") });
+      expect(contentProblem("npm", fix, side("base"), side("fix")), `${dir} ${v}`).toBeNull();
+    }
+  });
+  // Audit 6541743253, item 1 (docs/decisions/2026-10-31-lock-flags-from-graph.md, section 1): node-fetch 2.6.7's optional
+  // peer `encoding ^0.1.0`. The forged variants of npm 12.2.1's node-fetch fix (fixtures/npm-corpus/extra/optional-peer-forged).
+  it("npm: an optional peer adds nothing, and where the lock has one it is the package its spec names, in range (audit 6541743253, item 1)", () => {
+    const fix = fixOf("node-fetch", "2.6.1", "2.6.7", ["package.json", "package-lock.json"]);
+    const read = (path: string) => readFileSync(new URL(`fixtures/npm-corpus/extra/${path}`, import.meta.url), "utf8");
+    for (const v of ["v2", "v3"]) {
+      const base = files({ "package.json": read(`node-fetch/${v}/base/package.json`), "package-lock.json": read(`node-fetch/${v}/base/package-lock.json`) });
+      const variant = (name: string) => contentProblem("npm", fix, base, files({ "package.json": read(`optional-peer-forged/${name}/${v}/package.json`), "package-lock.json": read(`optional-peer-forged/${name}/${v}/package-lock.json`) }));
+      // B, C, E and P: rule 2, the requirement check (npm ls reports C and E; it does not look at B's nested peer or P's identity).
+      expect(variant("B"), `B ${v}`).toContain("node_modules/node-fetch requires encoding ^0.1.0, and node_modules/node-fetch/node_modules/encoding has evil-pkg@1.0.0, which is not that.");
+      expect(variant("C"), `C ${v}`).toContain("node_modules/node-fetch requires encoding ^0.1.0, and node_modules/encoding has evil-pkg@1.0.0, which is not that.");
+      expect(variant("E"), `E ${v}`).toContain("node_modules/node-fetch requires encoding ^0.1.0, and node_modules/encoding has encoding@9.9.9, which is not that.");
+      expect(variant("P"), `P ${v}`).toContain("node_modules/node-fetch requires encoding ^0.1.0, and node_modules/encoding has left-pad@0.1.13, which is not that.");
+      // R: the real encoding, in range, nested under node-fetch: rule 1, the walk (npm 12.2.1 leaves it extraneous).
+      expect(variant("R"), `R ${v}`).toBe("package-lock.json adds node_modules/node-fetch/node_modules/encoding, node_modules/node-fetch/node_modules/iconv-lite, node_modules/node-fetch/node_modules/safer-buffer, which no package the fix moves or adds requires.");
+    }
+    // Rule 2 where nothing is added: X4's project requires `"encoding": "npm:left-pad@1.3.0"`, so node-fetch 2.6.7's
+    // optional peer finds left-pad. npm 12.2.1 refuses to write that fix (ERESOLVE); forged here from its base.
+    const x4 = JSON.parse(read("optional-peer-other/v3/base/package-lock.json")), nf = JSON.parse(read("node-fetch/v3/fix/package-lock.json")).packages;
+    x4.packages[""].dependencies["node-fetch"] = "2.6.7";
+    for (const path of ["node_modules/node-fetch", "node_modules/whatwg-url", "node_modules/tr46", "node_modules/webidl-conversions"]) x4.packages[path] = nf[path];
+    expect(contentProblem("npm", fix, files({ "package.json": read("optional-peer-other/v3/base/package.json"), "package-lock.json": read("optional-peer-other/v3/base/package-lock.json") }), files({ "package.json": read("optional-peer-other/v3/fix/package.json"), "package-lock.json": JSON.stringify(x4, null, 2) })))
+      .toBe("package-lock.json's packages: node_modules/node-fetch requires encoding ^0.1.0, and node_modules/encoding has left-pad@1.3.0, which is not that.");
   });
   it("advisory IDs: only the forms a receipt can hold (OSV's for npm, Packagist and Maven, and Packagist's own)", () => {
     for (const id of ["GHSA-35jh-r3h4-6jhm", "CVE-2021-23337", "CVE-2024-1234567", "MAL-2024-12345", "PKSA-n8pg-4n3p-wcn3"]) expect(ADVISORY.test(id), id).toBe(true);

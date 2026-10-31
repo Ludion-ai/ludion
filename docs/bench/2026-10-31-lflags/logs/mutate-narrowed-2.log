@@ -1,0 +1,13 @@
+# at commit ac86c2657d6899d530b49f28560b5fa85b996e12, 4 files differing from it
+# started 2026-10-31T11:33:56Z, node v24.22.1, git version 2.39.5
+8. caught  gate 2: ludion judge does not ask for their facts — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+11. caught  gate 2: its MAL- record ignored — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+12. caught  gate 2: its withdrawal ignored — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+13. caught  gate 2: its deprecation ignored — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+14. caught  gate 2: no facts for it passes — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+15. caught  gate 2: its advisories not reported — packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts (1 s)
+16. caught  N1: optional left out of the flag list — packages/cli/test/deliver.test.ts (19 s)
+17. caught  N1: peer left out of the flag list — packages/cli/test/deliver.test.ts (19 s)
+18. caught  N2: name left out of the comparison — packages/cli/test/deliver.test.ts (19 s)
+9 of 9 applied mutations caught (9 run, 18 in all), 0 of them by the time limit; without mutations: packages/cli/test/judge.test.ts packages/cli/test/candidate-judge.test.ts packages/cli/test/judge-cli.test.ts: pass, packages/cli/test/deliver.test.ts: pass
+# finished 2026-10-31T11:35:22Z

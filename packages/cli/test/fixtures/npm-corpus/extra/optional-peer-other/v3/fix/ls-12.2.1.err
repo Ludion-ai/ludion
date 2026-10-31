@@ -1,0 +1,3 @@
+npm error code ELSPROBLEMS
+npm error invalid: node-fetch@2.6.1 /out/optional-peer-other/v3/fix/node_modules/node-fetch
+npm error A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-31T09_56_38_287Z-debug-0.log

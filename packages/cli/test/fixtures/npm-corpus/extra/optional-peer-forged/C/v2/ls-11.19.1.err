@@ -1,0 +1,3 @@
+npm error code ELSPROBLEMS
+npm error invalid: encoding@npm:evil-pkg@1.0.0 /out/optional-peer-forged/C/v2/node_modules/encoding
+npm error A complete log of this run can be found in: /home/node/.npm/_logs/2026-10-31T09_56_41_494Z-debug-0.log

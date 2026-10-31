@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "name": "x5",
+  "dependencies": {
+    "encoding": {
+      "version": "0.1.13",
+      "resolved": "https://registry.npmjs.org/encoding/-/encoding-0.1.13.tgz",
+      "overridden": false,
+      "dependencies": {
+        "iconv-lite": {
+          "version": "0.6.3",
+          "resolved": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz",
+          "overridden": false,
+          "dependencies": {
+            "safer-buffer": {
+              "version": "2.1.2",
+              "resolved": "https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz",
+              "overridden": false
+            }
+          }
+        }
+      }
+    },
+    "node-fetch": {
+      "version": "2.6.1",
+      "resolved": "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.1.tgz",
+      "overridden": false
+    }
+  }
+}

@@ -53,6 +53,21 @@ describe("ludion judge on dev-flagged lockfile entries", () => {
   });
 });
 
+// docs/decisions/2026-10-31-flag-only-entries-gate2.md: b 2.0.0 stays, and only its `dev` flag goes; `ludion judge`
+// asks OSV (and the registry) for it, by name and version.
+describe("ludion judge on an entry whose flags alone changed", () => {
+  it("asks OSV for its name and version", async () => {
+    const after = JSON.parse(lock("1.0.1", "2.0.0"));
+    delete after.packages["node_modules/eslint/node_modules/b"].dev;
+    const sent: string[] = [];
+    vi.stubGlobal("fetch", async (url: unknown, init?: { body?: unknown }) => { sent.push(`${String(url)} ${String(init?.body ?? "")}`); throw new Error("offline"); });
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    try { await judgeCli(["--before", checkout(lock("1.0.0", "2.0.0")), "--after", checkout(JSON.stringify(after)), "--files", "package-lock.json", "--json"]); }
+    finally { log.mockRestore(); vi.unstubAllGlobals(); }
+    expect(sent.filter(s => s.startsWith("https://api.osv.dev/v1/querybatch ") && s.includes('"name":"b"') && s.includes('"version":"2.0.0"'))).toHaveLength(1);
+  });
+});
+
 describe("ludion judge and npm-shrinkwrap.json (review of aa5d75b)", () => {
   it("does not judge package-lock.json when npm would install from npm-shrinkwrap.json instead", async () => {
     for (const side of ["before", "after"] as const) {

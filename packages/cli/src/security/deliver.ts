@@ -9,7 +9,7 @@ import { fixBranchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { registryManifest } from "./npm-facts.ts";
 import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
-import { DECLARED, lockEntries, lockKey, newUnmetRequirements, readLock, requireName, resolveFrom, type Judgement, type LockEntry } from "./judge.ts";
+import { DECLARED, lockEntries, lockKey, newUnmetRequirements, readLock, requiredNames, requireName, resolveFrom, type Judgement, type LockEntry } from "./judge.ts";
 import semver from "semver";
 import { comparableVersion } from "./osv.ts";
 import { compare, phpImage } from "./php.ts";
@@ -268,7 +268,7 @@ const ROOT_GROUPS = ["dependencies", "devDependencies", "optionalDependencies", 
  *   the package's own path is not it) (review 6529858505, B2). Each change has one, and in the fix each is at the same
  *   path at that change's `to`, as the same package; no install path has the package at a `from` any more;
  * - every added path is installed, and is what a planned path or another added path resolves for one of its own
- *   requirements (DECLARED, by Node's lookup), so none comes from nowhere;
+ *   requirements (requiredNames, by Node's lookup: an optional peer is not one), so none comes from nowhere;
  * - every other key is as at the base apart from its flags (sameButFlags); the root's only change is the fix's
  *   package's requirement;
  * - the fix leaves no requirement unmet that the base meets (newUnmetRequirements, with each side's package.json
@@ -344,7 +344,8 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix,
   while (queue.length) {
     const path = queue.shift()!, item = entry(is, path)!;
     // Whether each added copy is what its requirer asks for is newUnmetRequirements' question, above (review 6529858505, N5).
-    for (const group of DECLARED) for (const name of isObject(item[group]) ? Object.keys(item[group]) : []) {
+    // Only what npm installs for it: an optional peer adds nothing (audit 6541743253, item 1).
+    for (const name of requiredNames(item)) {
       const target = resolveFrom(installed, `${path}/`, name)?.path;
       if (target && added.includes(target) && !reached.has(target)) { reached.add(target); queue.push(target); }
     }
@@ -372,8 +373,9 @@ const NPM_FLAGS = ["dev", "optional", "devOptional", "peer"];
  * Whether a lock entry is the base's apart from its flags, each `true` or absent, as npm writes them. A fix moves
  * an entry's flags where it changes how the entry is reached: node-fetch 2.6.7 requires whatwg-url, which was dev-only,
  * so npm drops `dev` from it and its dependencies (review 6538813186, B1). Version, resolved and integrity stay the
- * base's, so no new code comes in; whether the flags are the ones npm computes is not checked
- * (docs/decisions/2026-10-31-lock-flags-only.md).
+ * base's, so no code comes in that is not already in the base's lock; whether the flags are the ones npm computes is
+ * not checked (docs/decisions/2026-10-31-lock-flags-only.md). The judge, run again, gives such an entry gate 2's checks
+ * (docs/decisions/2026-10-31-flag-only-entries-gate2.md).
  */
 function sameButFlags(before: Record<string, unknown>, after: Record<string, unknown>): boolean {
   const rest = (item: Record<string, unknown>) => Object.fromEntries(Object.entries(item).filter(([key]) => !NPM_FLAGS.includes(key)));
@@ -654,7 +656,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**What was checked**",
     "",
     `- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.`,
-    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${isImage(ecosystem) ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them, changes no other entry beyond its flags and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
+    `- This commit changes only ${fix.files.map(f => code(f.path)).join(", ")}, Git reads its only parent as the base commit, and ${code("git fsck")} finds no error in it. The job that opened this PR, which runs no project code, checked again that ${isImage(ecosystem) ? "only the FROM image changes, to the official image pinned by the digest Docker Hub gave for its tag" : ecosystem === "npm" ? "package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them (an optional peer adds nothing, and where the lock has one it must be the package its spec names, in range), changes no other entry beyond its flags and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`" : ecosystem === "composer" ? "composer.json is what Ludion writes for this change, that composer.lock moves only this package, up, from the version the base locks, and adds only packages it requires, none of them a plugin or installer, each as Packagist lists it, and that OSV lists no advisory for the version moved to" : "pom.xml is what Ludion writes for this change, that the version goes up, and that OSV lists no advisory for the version moved to"}.`,
     ecosystem === "npm"
       ? `- Ludion's judge on the lockfile change, in both jobs: ${code(fix.verdict!)}. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).`
       : `- ${isImage(ecosystem) ? `${IMAGES[ecosystem].label} image` : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
@@ -662,7 +664,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     "**Not checked**",
     "",
     "- Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.",
-    ...(ecosystem === "npm" ? ["- In package-lock.json, a moved or added entry's `hasShrinkwrap`, flags (`dev`, `optional`, `devOptional`, `peer`), `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap; the flags decide what a production install leaves out). Another entry's flags may differ from the base's, and are not checked against what npm computes, so a forged lock could have a production install take a package the base locks for development only, or leave a production one out."] : []),
+    ...(ecosystem === "npm" ? ["- In package-lock.json, a moved or added entry's `hasShrinkwrap`, `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap). Nor are its flags (`dev`, `optional`, `devOptional`, `peer`), which decide what a production install leaves out. Another entry's flags may differ from the base's, and are not checked against what npm computes from the lock's graph, so a forged lock could have a production install take a package the base locks for development only, or leave a production one out; the judge gives each entry whose flags alone changed gate 2's checks (OSV's malicious-package records, deprecation, withdrawal), not the rest of the gates."] : []),
     "- Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.",
     "- Production: nothing is deployed.",
     "",

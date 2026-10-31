@@ -257,6 +257,9 @@ describe("LFLAGS: the flags from the lock's graph, and optional peers (docs/deci
     expect([...unmetRequirements(lock(null)).values()]).toEqual([]);
     expect([...unmetRequirements(lock({ version: "1.2.0", peer: true })).values()]).toEqual([]);
     expect(newUnmetRequirements({ lock: lock({ version: "1.2.0" }) }, { lock: lock({ version: "2.0.0" }) })).toEqual(["package-lock.json's packages: the project requires x ^1.0.0, and node_modules/x has x@2.0.0, which is not that."]);
+    // A name another group lists too is that group's: npm's later edge replaces the peer's (node.js `_loadDeps`).
+    const both = JSON.stringify({ name: "x", lockfileVersion: 3, packages: { "": { dependencies: { a: "1.0.0" } }, "node_modules/a": { version: "1.0.0", dependencies: { x: "^2.0.0" }, peerDependencies: { x: "^1.0.0" }, peerDependenciesMeta: { x: { optional: true } } }, "node_modules/x": { version: "2.0.0" } } });
+    expect([...unmetRequirements(both).values()]).toEqual([]);
   });
 });
 

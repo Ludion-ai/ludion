@@ -1,0 +1,49 @@
+# at commit 51e905e37a024483589e2d6ccdd4336c7898a96f, 0 files differing from it
+# started 2026-10-30T23:59:15Z
+caught (5 failed, exit 1)  candidate: the smallest security release, not the newest
+caught (6 failed, exit 1)  candidate: the newest release, security or not
+caught (8 failed, exit 1)  the security mark ignored
+caught (9 failed, exit 1)  other lines counted
+caught (1 failed, exit 1)  a date that is not a real day accepted
+caught (1 failed, exit 1)  a version listed twice accepted
+caught (4 failed, exit 1)  floating tags read as versions
+caught (2 failed, exit 1)  any repository named node
+caught (1 failed, exit 1)  index size limit raised
+caught (1 failed, exit 1)  probe without the v
+caught (1 failed, exit 1)  digest of any repository taken
+caught (2 failed, exit 1)  branch named php for node
+caught (4 failed, exit 1)  node policy run as PHP
+caught (2 failed, exit 1)  fix published: the newest security release
+caught (14 failed, exit 1)  scan: FROM node not detected
+caught (3 failed, exit 1)  init: node not offered
+caught (2 failed, exit 1)  PR job: receipt runtime not checked
+caught (3 failed, exit 1)  PR job: node policy read as PHP
+caught (1 failed, exit 1)  PR job: Dockerfile + other ecosystem accepted
+caught (1 failed, exit 1)  PR job: any repository in the new FROM
+caught (2 failed, exit 1)  PR job: another major accepted
+caught (2 failed, exit 1)  PR job: digest not compared
+caught (1 failed, exit 1)  PR job: PHP's digest asked for node
+caught (1 failed, exit 1)  PR job: Docker Hub asked for library/php
+caught (1 failed, exit 1)  PR job: Docker Hub manifest of library/php
+caught (1 failed, exit 1)  PR body: no Node.js advisory note
+caught (1 failed, exit 1)  M1: the index request follows redirects
+caught (1 failed, exit 1)  M9: the index deadline 300 s
+caught (2 failed, exit 1)  D2: the PR job takes the same version
+caught (1 failed, exit 1)  H1: PHP's hyphen check removed
+caught (8 failed, exit 1)  N1: detection back to the three forms of a4ee125
+caught (2 failed, exit 1)  N2: no --flag before the image
+caught (3 failed, exit 1)  N3: no registry or namespace prefix
+caught (3 failed, exit 1)  N4: only node: (no digest, no bare node)
+caught (2 failed, exit 1)  N5: any name starting with node
+caught (6 failed, exit 1)  N6: not anchored on FROM
+caught (1 failed, exit 1)  N7: case-sensitive
+caught (3 failed, exit 1)  B1: detection reads the byte-order mark
+caught (3 failed, exit 1)  B2: withoutBom removes nothing
+caught (4 failed, exit 1)  B3: the image's offsets leave out the mark
+SURVIVED  B4 (equivalent: \s matches U+FEFF): reading keeps the mark
+caught (6 failed, exit 1)  R2: any pin after @
+caught (1 failed, exit 1)  R4: a PHP policy takes a receipt that says node
+caught (1 failed, exit 1)  R5: a saved node policy does not force the node check
+43 of 44 caught; 1 survived; 0 not applied
+every mutated file is again the worktree's
+# finished 2026-10-31T00:04:48Z

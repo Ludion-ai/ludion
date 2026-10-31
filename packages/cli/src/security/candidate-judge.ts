@@ -17,7 +17,7 @@ export async function judgeNpmCandidate(before: string, after: string, fetchFn: 
   const lock = packageLockInputs({ before: a.lock, after: b.lock }, { before: a.manifest, after: b.manifest });
   const changes = lock.changes.map(c => ({ ...c, dev: false }));
   let facts = new Map<string, VersionFacts>(), fixes: FixedAdvisory[] = [], created = new Map<string, string | null>(), errors: string[] = [];
-  try { ({ facts, fixes, created } = await gatherFacts(changes, fetchFn, lock.entries.map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
+  try { ({ facts, fixes, created } = await gatherFacts(changes, fetchFn, [...lock.entries, ...lock.flagged].map(e => ({ name: e.name, version: e.version })))); } catch (error) { errors = [error instanceof Error ? error.message : String(error)]; facts = new Map(); }
   const files = [a.manifest === b.manifest ? null : "package.json", a.lock === b.lock ? null : "package-lock.json"].filter((f): f is string => f !== null);
   const judgement = judge({ ...lock, changes, facts, fixes, created, errors, files, now });
   return { ...judgement, findings: [{ gate: 1, effect: "info", message: NO_SPLIT }, ...judgement.findings] };

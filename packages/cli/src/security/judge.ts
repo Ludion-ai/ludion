@@ -432,6 +432,21 @@ export function lockEntryChanges(before: LockEntry[], after: LockEntry[]): LockE
   });
 }
 
+/** The flags npm writes from how an entry is reached, which decide what a production install leaves out. */
+const LOCK_FLAGS = ["dev", "optional", "devOptional", "peer"];
+/**
+ * Every install path both locks have with the same package, version, `resolved` and `integrity`, whose flags alone
+ * differ: lockEntryChanges leaves them out, and gate 2 checks them (docs/decisions/2026-10-31-flag-only-entries-gate2.md).
+ */
+export function lockFlagChanges(beforeText: string, afterText: string): LockEntry[] {
+  const [before, after] = [readLock(beforeText), readLock(afterText)], atPath = new Map(lockEntries(beforeText).map(e => [e.path, e]));
+  const flags = (item: Record<string, unknown>) => LOCK_FLAGS.filter(flag => item[flag] === true).join(",");
+  return lockEntries(afterText).filter(e => {
+    const b = atPath.get(e.path);
+    return !!b && b.name === e.name && b.version === e.version && b.resolved === e.resolved && b.integrity === e.integrity && flags(before[e.path]) !== flags(after[e.path]);
+  });
+}
+
 /** What Node would load for `name` required from the package at `dir` ("" for the project root): the nearest node_modules. */
 export function resolveFrom<T>(entries: Map<string, T>, dir: string, name: string): T | undefined {
   let at = dir;
@@ -442,92 +457,6 @@ export function resolveFrom<T>(entries: Map<string, T>, dir: string, name: strin
     // A workspace folder has no node_modules segment to climb; the project root is next.
     at = up === at ? "" : up;
   }
-}
-
-/** The flags npm writes on a `packages` entry, in this order. */
-const ENTRY_FLAGS = ["dev", "devOptional", "extraneous", "optional", "peer"];
-/** An entry's flags as one text ("dev,peer"; "" for none), or null when one of them is there with a value other than `true`. */
-export function writtenFlags(item: Record<string, unknown>): string | null {
-  if (ENTRY_FLAGS.some(flag => Object.hasOwn(item, flag) && item[flag] !== true)) return null;
-  return ENTRY_FLAGS.filter(flag => item[flag] === true).join(",");
-}
-
-type FlagNode = { path: string; item: Record<string, any>; top: boolean; link: boolean; dev: boolean; optional: boolean; devOptional: boolean; peer: boolean; extraneous: boolean };
-type FlagEdge = { name: string; dev: boolean; optional: boolean; peer: boolean };
-/** A glob of a root's `workspaces` ("packages/*") as a test of a folder key. */
-const workspaceTest = (pattern: string) => new RegExp(`^${pattern.replace(/^\.\//, "").replace(/\/+$/, "").split("/").map(part => part === "**" ? ".*" : part.split("*").map(s => s.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join("[^/]*")).join("/")}$`);
-/** The node a `packages` key is installed under, as arborist's resolveParent: the path above its last node_modules, else the root. */
-const parentOf = (path: string) => { const at = path.lastIndexOf("/node_modules/"); return at >= 0 ? path.slice(0, at) : ""; };
-
-/**
- * The flags npm 12.2.1 writes on each entry of a lock's `packages` that is not the root or a link, computed from the
- * lock's graph as writtenFlags writes them (docs/decisions/2026-10-31-lock-flags-from-graph.md, section 2; arborist's
- * calc-dep-flags.js, node.js `_loadDeps`, edge.js and shrinkwrap.js). Every node but the root starts with every flag;
- * walking out from the root, an edge takes off its target what neither it nor its source has, and an optional peer
- * leaves its target extraneous. A link passes its flags to its target. npm writes `extraneous` alone, and
- * `devOptional` only without `dev` and `optional`.
- */
-export function computedFlags(lockText: string): Map<string, string> {
-  const packages = readLock(lockText);
-  const nodes = new Map<string, FlagNode>();
-  const node = (path: string, item: Record<string, any>, top: boolean, link: boolean): FlagNode => ({ path, item, top, link, dev: path !== "", optional: path !== "", devOptional: path !== "", peer: path !== "", extraneous: path !== "" });
-  for (const [path, item] of Object.entries(packages)) {
-    if (!isPlain(item)) continue;
-    const kind = lockKey(path, item);
-    if (kind === "extraneous") continue;
-    nodes.set(path, node(path, item, kind !== "install", kind === "install" && item.link === true));
-  }
-  if (!nodes.has("")) nodes.set("", node("", {}, true, false));
-  // The edges out of a node, by name: peers, then dependencies, optional ones and (the root's and folders') dev ones,
-  // each later group replacing an earlier one; the root's workspaces last, which nothing replaces.
-  const edgesOut = (from: FlagNode): FlagEdge[] => {
-    const out = new Map<string, FlagEdge>(), item = from.item;
-    const group = (value: unknown, kind: (name: string) => Omit<FlagEdge, "name">) => { if (isPlain(value)) for (const name of Object.keys(value)) out.set(name, { name, ...kind(name) }); };
-    const meta = isPlain(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {};
-    group(item.peerDependencies, name => ({ dev: false, optional: !!(meta[name] !== null && typeof meta[name] === "object" && meta[name].optional), peer: true }));
-    group(item.dependencies, () => ({ dev: false, optional: false, peer: false }));
-    group(item.optionalDependencies, () => ({ dev: false, optional: true, peer: false }));
-    if (from.top) group(item.devDependencies, () => ({ dev: true, optional: false, peer: false }));
-    const patterns = Array.isArray(item.workspaces) ? item.workspaces : isPlain(item.workspaces) && Array.isArray(item.workspaces.packages) ? item.workspaces.packages : [];
-    if (from.path === "" && patterns.length) {
-      const tests = patterns.filter((p: unknown): p is string => typeof p === "string").map(workspaceTest);
-      for (const [path, target] of nodes) {
-        if (!target.link || !/^node_modules\/(?:@[^/]+\/)?[^/]+$/.test(path) || typeof target.item.resolved !== "string" || !tests.some((t: RegExp) => t.test(target.item.resolved))) continue;
-        out.set(requireName(path), { name: requireName(path), dev: false, optional: false, peer: false });
-      }
-    }
-    return [...out.values()];
-  };
-  const seen = new Set<FlagNode>(), queue = [nodes.get("")!];
-  for (let at = queue.pop(); at; at = queue.pop()) {
-    seen.add(at);
-    if (!at.extraneous) for (let up = at.path === "" ? undefined : nodes.get(parentOf(at.path)); up?.extraneous; up = up.path === "" ? undefined : nodes.get(parentOf(up.path))) up.extraneous = false;
-    if (at.link) {
-      const target = typeof at.item.resolved === "string" ? nodes.get(at.item.resolved) : undefined;
-      if (!target) continue;
-      let changed = false;
-      for (const flag of ["dev", "optional", "devOptional", "peer", "extraneous"] as const) if (target[flag] && !at[flag]) { target[flag] = false; changed = true; }
-      if (changed || !seen.has(target)) queue.push(target);
-      continue;
-    }
-    for (const edge of edgesOut(at)) {
-      const to = resolveFrom(nodes, at.path ? `${at.path}/` : "", edge.name);
-      if (!to) continue;
-      let changed = false;
-      if (to.extraneous && !at.extraneous && !(edge.peer && edge.optional)) { to.extraneous = false; changed = true; }
-      if (to.dev && !at.dev && !edge.dev) { to.dev = false; changed = true; }
-      if (to.optional && !at.optional && !edge.optional) { to.optional = false; changed = true; }
-      if (to.devOptional && !at.devOptional && !at.dev && !at.optional && !edge.dev && !edge.optional) { to.devOptional = false; changed = true; }
-      if (to.peer && !at.peer && !edge.peer) { to.peer = false; changed = true; }
-      if (changed) queue.push(to);
-    }
-  }
-  const out = new Map<string, string>();
-  for (const [path, n] of nodes) {
-    if (path === "" || n.link) continue;
-    out.set(path, n.extraneous ? "extraneous" : ENTRY_FLAGS.filter(flag => flag === "devOptional" ? n.devOptional && !n.dev && !n.optional : flag !== "extraneous" && n[flag as "dev" | "optional" | "peer"]).join(","));
-  }
-  return out;
 }
 
 /**
@@ -711,6 +640,8 @@ export function judge(input: {
   links?: string[];
   /** Every installed entry that changed at its path (lockEntryChanges); by default the first copy of each change. */
   entries?: LockEntry[];
+  /** Every entry whose flags alone changed (lockFlagChanges): gate 2's checks of its version, nothing else. */
+  flagged?: LockEntry[];
   now: Date;
   /** A stricter project wait, in hours, per urgency (design: the stricter setting wins). */
   projectWait?: Partial<Record<Urgency, number>>;
@@ -829,6 +760,18 @@ export function judge(input: {
     if (prev.publisher !== next.publisher) { add({ gate: 2, package: c.name, effect: "extend", message: `${c.name}@${c.to} was published by ${next.publisher ?? "unknown"}, ${c.from} by ${prev.publisher ?? "unknown"}.` }); extended = true; }
     const newDeps = next.dependencies.filter(d => !prev.dependencies.includes(d));
     if (newDeps.length) { add({ gate: 2, package: c.name, effect: "extend", message: `${c.name}@${c.to} adds dependencies: ${newDeps.join(", ")}.` }); extended = true; }
+  }
+
+  // Gate 2 on every entry whose flags alone changed ("Check every package in the lockfile diff";
+  // docs/decisions/2026-10-31-flag-only-entries-gate2.md): its own version's MAL- records, withdrawal and deprecation.
+  // It is its own predecessor, so nothing is compared, it sets no wait and the time cap does not count it.
+  for (const e of input.flagged ?? []) {
+    const fact = facts.get(`${e.name}@${e.version}`), what = `${e.name}@${e.version} at ${e.path} (its flags alone changed)`;
+    if (!fact) { add({ gate: 2, package: e.name, effect: "stop", message: `No registry facts for ${what}; undecidable.` }); undecidable = true; continue; }
+    if (fact.malicious.length) add({ gate: 2, package: e.name, effect: "stop", message: `${what} is in OSV's malicious-package records (${fact.malicious.join(", ")}).` });
+    if (!fact.present) add({ gate: 2, package: e.name, effect: "stop", message: `${what} is no longer listed by the registry (unpublished or withdrawn).` });
+    if (fact.deprecated) add({ gate: 2, package: e.name, effect: "stop", message: `${what} is deprecated: ${fact.deprecated.slice(0, 200)}` });
+    if (fact.advisories.length) add({ gate: 1, package: e.name, effect: "info", message: `${what} has known advisories, as before: ${fact.advisories.join(", ")}.` });
   }
 
   // Rules 1 and 2: T is the fix's publish time (the changed direct dependencies' when nothing is fixed). A version

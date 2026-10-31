@@ -1,0 +1,5 @@
+# at commit 01ad089, 0 files differing from it
+# started 2026-10-31T06:32:01Z, node v24.22.1, git version 2.39.5, network none
+34. caught  PHP: Docker Hub not asked — packages/cli/test/deliver.test.ts (18 s)
+1 of 1 caught (of 138: only 34), 0 of them by the time limit; without mutations: packages/cli/test/deliver.test.ts pass
+# finished 2026-10-31T06:32:37Z

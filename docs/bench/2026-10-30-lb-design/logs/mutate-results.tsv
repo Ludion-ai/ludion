@@ -406,3 +406,4 @@ ddef04c	fail	18	a parent other than the base accepted
 1d28399	fail	27	npm: a flag that is not true accepted
 1d28399	fail	20	npm: inBundle counted as a flag
 1d28399	fail	18	npm: an entry whose flags alone changed compared with the registry again
+01ad089	fail	18	PHP: Docker Hub not asked

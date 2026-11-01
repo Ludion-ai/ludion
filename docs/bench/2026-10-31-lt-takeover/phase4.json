@@ -1,0 +1,684 @@
+{
+ "run": {
+  "mode": "source",
+  "ended_at": "2026-10-30T16:41:23.257Z",
+  "requests": {}
+ },
+ "rows": [
+  {
+   "index": 216,
+   "name": "@ui-ux-gang/devextreme-rpk",
+   "prev": "24.1.6",
+   "version": "24.1.7",
+   "repository": "DevExpress/DevExtreme",
+   "version_commit": "9d49c4e437f638fe89bc0252283a18b68733d327",
+   "prev_commit": "b8501a969f22e4466c479468c65c06d480986cef",
+   "prev_release": "tag form 2",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 217,
+   "name": "devextreme-rpk",
+   "prev": "21.2.7",
+   "version": "21.2.8",
+   "repository": "DevExpress/DevExtreme",
+   "version_commit": "41778814853afb0be78a6bf360141d51ff5b1d3c",
+   "prev_commit": "faba3542e1d144839d0cbf99a5bfa7b1e3d23b87",
+   "prev_release": "tag form 2",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 335,
+   "name": "@asyncapi/avro-schema-parser",
+   "prev": "3.0.24",
+   "version": "3.0.25",
+   "repository": "asyncapi/avro-schema-parser",
+   "version_commit": "03f8002e51eb204e1ed4acf579d06d18004b8164",
+   "prev_commit": "af2f8a5bef9dc0de89bec6d07fc7b40c6aee6390",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": ""
+   }
+  },
+  {
+   "index": 336,
+   "name": "@asyncapi/openapi-schema-parser",
+   "prev": "3.0.24",
+   "version": "3.0.25",
+   "repository": "asyncapi/openapi-schema-parser",
+   "version_commit": "0797c36bfcedd3ed80818d15c6ac0fcbe55f164d",
+   "prev_commit": "ab33f05ddec1e84ebbfe92342a3a5313bc4bcfff",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": ""
+   }
+  },
+  {
+   "index": 340,
+   "name": "@asyncapi/bundler",
+   "prev": "0.6.4",
+   "version": "0.6.5",
+   "repository": "asyncapi/bundler",
+   "version_commit": "a92d43b2f3afb8f5240aaa4c975a68ea3b5c3185",
+   "prev_commit": "7ae4cd9cb1e6ed5beb1079a9a289aabff80c1e63",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": ""
+   }
+  },
+  {
+   "index": 342,
+   "name": "@asyncapi/generator-components",
+   "prev": "0.3.1",
+   "version": "0.3.2",
+   "repository": "asyncapi/generator",
+   "version_commit": "dfaae2e111b3875a59411202d5c84ec2743df884",
+   "prev_commit": "f7adbf33c8d5374b52a4faba8f99a3553a22aa83",
+   "prev_release": "tag form 2",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: directory not in source"
+   }
+  },
+  {
+   "index": 343,
+   "name": "create-glee-app",
+   "prev": "0.2.1",
+   "version": "0.2.2",
+   "repository": "asyncapi-archived-repos/glee",
+   "version_commit": "46ab01db3c5e51ddb8b650e647ca9e30b4235501",
+   "prev_commit": "80bb6080e0bbe69c5f902e8a3376bb0918038bdb",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 344,
+   "name": "@asyncapi/protobuf-schema-parser",
+   "prev": "3.6.0",
+   "version": "3.6.1",
+   "repository": "asyncapi/protobuf-schema-parser",
+   "version_commit": "e93ca009da4f7dcbc53d7ac7b4dadd7f34da7ae3",
+   "prev_commit": "9db7d0447e61d3583660529c88d59186915773f2",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": ""
+   }
+  },
+  {
+   "index": 345,
+   "name": "go-template",
+   "prev": "0.1.7",
+   "version": "0.1.8",
+   "repository": "asyncapi-archived-repos/go-watermill-template",
+   "version_commit": "7bb7025de5b4fb67957188848e414aac22e639e4",
+   "prev_commit": "48f1b8c6d3bdd15aed3675bbe06c4d97771b2447",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "version commit: package directory not found"
+   }
+  },
+  {
+   "index": 347,
+   "name": "@asyncapi/optimizer",
+   "prev": "1.0.4",
+   "version": "1.0.5",
+   "repository": "asyncapi/optimizer",
+   "version_commit": "cf8e9c55720e34309e5c87b5e9640b3427658e7e",
+   "prev_commit": "16448bba57926972009a34f7b4cf321db0682b7e",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": ""
+   }
+  },
+  {
+   "index": 355,
+   "name": "@asyncapi/markdown-template",
+   "prev": "1.6.7",
+   "version": "1.6.8",
+   "repository": "asyncapi/markdown-template",
+   "version_commit": "ac972689fdc29ee3cc84a0e45e535762ab32f4e4",
+   "prev_commit": "794d7ecc8438815f973b6776d17bc5754efac2e5",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": ""
+   }
+  },
+  {
+   "index": 356,
+   "name": "@asyncapi/generator-react-sdk",
+   "prev": "1.1.3",
+   "version": "1.1.4",
+   "repository": "asyncapi/generator",
+   "version_commit": "55e9b71ac34981daf2a0da83a40f0babc4d880f1",
+   "prev_commit": "e216b8f2b843be310392f26bb4d075b6cc8a41c7",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 358,
+   "name": "asyncapi-preview",
+   "prev": "1.0.0",
+   "version": "1.0.1",
+   "repository": "asyncapi/vs-asyncapi-preview",
+   "version_commit": "42b76999772dffae598246f99843b1771f33dce6",
+   "prev_commit": "869892bae88876c4ee64afe160eae903052fa64e",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": ""
+   }
+  },
+  {
+   "index": 363,
+   "name": "@asyncapi/html-template",
+   "prev": "3.3.1",
+   "version": "3.3.2",
+   "repository": "asyncapi/html-template",
+   "version_commit": "726e61f47f29ce4b4d7d4c52f3a8469644ad5ef1",
+   "prev_commit": "fe4d8f2bff57bac65f3bc4ab0516f4aa323f05a8",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 2,
+    "dir": ""
+   }
+  },
+  {
+   "index": 395,
+   "name": "@asyncapi/avro-schema-parser",
+   "prev": "3.0.24",
+   "version": "3.0.26",
+   "repository": "asyncapi/avro-schema-parser",
+   "version_commit": "5d48a96e9c731ce4aa594614a4d58587cee3bbee",
+   "prev_commit": "af2f8a5bef9dc0de89bec6d07fc7b40c6aee6390",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "new capability in the source",
+    "capabilities": [
+     "api:fetch"
+    ],
+    "changed_code_files": 3,
+    "dir": ""
+   }
+  },
+  {
+   "index": 397,
+   "name": "@asyncapi/generator-components",
+   "prev": "0.3.1",
+   "version": "0.3.3",
+   "repository": "asyncapi/generator",
+   "version_commit": "efdfb037de8a0afe0c81429fb02d430b16338adb",
+   "prev_commit": "f7adbf33c8d5374b52a4faba8f99a3553a22aa83",
+   "prev_release": "tag form 2",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: directory not in source"
+   }
+  },
+  {
+   "index": 401,
+   "name": "go-template",
+   "prev": "0.1.7",
+   "version": "0.1.9",
+   "repository": "asyncapi-archived-repos/go-watermill-template",
+   "version_commit": "a96234f75613551fd1fd0352dfd491543ecb4889",
+   "prev_commit": "48f1b8c6d3bdd15aed3675bbe06c4d97771b2447",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "version commit: package directory not found"
+   }
+  },
+  {
+   "index": 412,
+   "name": "@asyncapi/generator-react-sdk",
+   "prev": "1.1.3",
+   "version": "1.1.5",
+   "repository": "asyncapi/generator",
+   "version_commit": "ac61999c196e4a9f514fdaad2336951906cf88b1",
+   "prev_commit": "e216b8f2b843be310392f26bb4d075b6cc8a41c7",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 430,
+   "name": "@posthog/siphash",
+   "prev": "1.1.1",
+   "version": "1.1.2",
+   "repository": "PostHog/siphash-js",
+   "version_commit": "47b746e0aebdff6c40509173f23daad06dc2c06d",
+   "prev_provenance": "no attestations",
+   "prev_commit": null,
+   "prev_release": null,
+   "source": {
+    "outcome": "not comparable",
+    "reason": "no release for the previous version"
+   }
+  },
+  {
+   "index": 433,
+   "name": "@posthog/nextjs-config",
+   "prev": "1.4.0",
+   "version": "1.5.1",
+   "repository": "PostHog/posthog-js",
+   "version_commit": "6a22ecd1810a170393828840ad63fb44eb102f55",
+   "prev_commit": "56ba0b073d73af02c535ef427db6f08d10fd22a9",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: directory not in source"
+   }
+  },
+  {
+   "index": 454,
+   "name": "@actbase/css-to-react-native-transform",
+   "prev": "1.0.2",
+   "version": "1.0.3",
+   "repository": "actbase/css-to-react-native-transform",
+   "version_commit": "0ee018ba755dcdbb0cf4d2d8600726e9bd900009",
+   "prev_commit": "5e64e095ac097c9e24a3ca7150f2591864e62fa1",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 464,
+   "name": "@postman/tunnel-agent",
+   "prev": "0.6.4",
+   "version": "0.6.5",
+   "repository": "postmanlabs/tunnel-agent",
+   "version_commit": "6291a628302b473b81b066b5cffb12a150998626",
+   "prev_commit": "4fb9cff52df0ddb3febca39078f5913141fa3a24",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 1,
+    "dir": ""
+   }
+  },
+  {
+   "index": 475,
+   "name": "@postman/tunnel-agent",
+   "prev": "0.6.4",
+   "version": "0.6.6",
+   "repository": "postmanlabs/tunnel-agent",
+   "version_commit": "1cd1c1d4223fbf49d1bdbec0e4f548a026f58db4",
+   "prev_commit": "4fb9cff52df0ddb3febca39078f5913141fa3a24",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 1,
+    "dir": ""
+   }
+  },
+  {
+   "index": 488,
+   "name": "@postman/tunnel-agent",
+   "prev": "0.6.4",
+   "version": "0.6.7",
+   "repository": "postmanlabs/tunnel-agent",
+   "version_commit": "0b62570e067aad25191cb174befe24137b54d702",
+   "prev_commit": "4fb9cff52df0ddb3febca39078f5913141fa3a24",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 1,
+    "dir": ""
+   }
+  },
+  {
+   "index": 548,
+   "name": "zapier-platform-legacy-scripting-runner",
+   "prev": "4.0.1",
+   "version": "4.0.2",
+   "repository": "zapier/zapier-platform",
+   "version_commit": "773e8d676fb30eed6a95d48a0298bdf402f52c6d",
+   "prev_commit": "c9b87c328af3c21eebc20aab9a3d180637a2c336",
+   "prev_release": "tag form 3",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": "packages/legacy-scripting-runner"
+   }
+  },
+  {
+   "index": 551,
+   "name": "zapier-platform-schema",
+   "prev": "18.0.1",
+   "version": "18.0.2",
+   "repository": "zapier/zapier-platform",
+   "version_commit": "32d57956b54b4939ce00d1bad6d4ddf2d4b7fbdf",
+   "prev_commit": "7cb2980c292f1313ddec0364159197800f901734",
+   "prev_release": "tag form 3",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": "packages/schema"
+   }
+  },
+  {
+   "index": 553,
+   "name": "zapier-platform-core",
+   "prev": "18.0.1",
+   "version": "18.0.2",
+   "repository": "zapier/zapier-platform",
+   "version_commit": "32d57956b54b4939ce00d1bad6d4ddf2d4b7fbdf",
+   "prev_commit": "7cb2980c292f1313ddec0364159197800f901734",
+   "prev_release": "tag form 3",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": "packages/core"
+   }
+  },
+  {
+   "index": 557,
+   "name": "zapier-platform-cli",
+   "prev": "18.0.1",
+   "version": "18.0.2",
+   "repository": "zapier/zapier-platform",
+   "version_commit": "32d57956b54b4939ce00d1bad6d4ddf2d4b7fbdf",
+   "prev_commit": "7cb2980c292f1313ddec0364159197800f901734",
+   "prev_release": "tag form 3",
+   "source": {
+    "outcome": "new capability in the source",
+    "capabilities": [
+     "new-dependency"
+    ],
+    "changed_code_files": 4,
+    "dir": "packages/cli"
+   }
+  },
+  {
+   "index": 569,
+   "name": "zapier-platform-core",
+   "prev": "18.0.1",
+   "version": "18.0.3",
+   "repository": "zapier/zapier-platform",
+   "version_commit": "66989213677fbf0696f73866e63917f20b9442da",
+   "prev_commit": "7cb2980c292f1313ddec0364159197800f901734",
+   "prev_release": "tag form 3",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": "packages/core"
+   }
+  },
+  {
+   "index": 570,
+   "name": "zapier-platform-schema",
+   "prev": "18.0.1",
+   "version": "18.0.3",
+   "repository": "zapier/zapier-platform",
+   "version_commit": "66989213677fbf0696f73866e63917f20b9442da",
+   "prev_commit": "7cb2980c292f1313ddec0364159197800f901734",
+   "prev_release": "tag form 3",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": "packages/schema"
+   }
+  },
+  {
+   "index": 572,
+   "name": "zapier-platform-cli",
+   "prev": "18.0.1",
+   "version": "18.0.3",
+   "repository": "zapier/zapier-platform",
+   "version_commit": "66989213677fbf0696f73866e63917f20b9442da",
+   "prev_commit": "7cb2980c292f1313ddec0364159197800f901734",
+   "prev_release": "tag form 3",
+   "source": {
+    "outcome": "new capability in the source",
+    "capabilities": [
+     "new-dependency"
+    ],
+    "changed_code_files": 4,
+    "dir": "packages/cli"
+   }
+  },
+  {
+   "index": 594,
+   "name": "zapier-platform-core",
+   "prev": "18.0.1",
+   "version": "18.0.4",
+   "repository": "zapier/zapier-platform",
+   "version_commit": "02c497f9d37095a01633a16af8002eab3fe680ed",
+   "prev_commit": "7cb2980c292f1313ddec0364159197800f901734",
+   "prev_release": "tag form 3",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": "packages/core"
+   }
+  },
+  {
+   "index": 595,
+   "name": "zapier-platform-schema",
+   "prev": "18.0.1",
+   "version": "18.0.4",
+   "repository": "zapier/zapier-platform",
+   "version_commit": "02c497f9d37095a01633a16af8002eab3fe680ed",
+   "prev_commit": "7cb2980c292f1313ddec0364159197800f901734",
+   "prev_release": "tag form 3",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 0,
+    "dir": "packages/schema"
+   }
+  },
+  {
+   "index": 597,
+   "name": "zapier-platform-cli",
+   "prev": "18.0.1",
+   "version": "18.0.4",
+   "repository": "zapier/zapier-platform",
+   "version_commit": "02c497f9d37095a01633a16af8002eab3fe680ed",
+   "prev_commit": "7cb2980c292f1313ddec0364159197800f901734",
+   "prev_release": "tag form 3",
+   "source": {
+    "outcome": "new capability in the source",
+    "capabilities": [
+     "new-dependency"
+    ],
+    "changed_code_files": 4,
+    "dir": "packages/cli"
+   }
+  },
+  {
+   "index": 631,
+   "name": "typeorm-orbit",
+   "prev": "0.2.26",
+   "version": "0.2.27",
+   "repository": "typeorm/typeorm",
+   "version_commit": "78a6ee90854f361bc0721ed338460b563b1fc119",
+   "prev_commit": "716790322908cb377c1eb552ed2604cc84c4afe0",
+   "prev_release": "tag form 2",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 678,
+   "name": "wellness-expert-ng-gallery",
+   "prev": "5.1.0",
+   "version": "5.1.1",
+   "repository": "MurhafSousli/ngx-gallery",
+   "version_commit": "55328edc5b1344fe69ebe65bc80bc16886ba8386",
+   "prev_provenance": "no attestations",
+   "prev_commit": null,
+   "prev_release": null,
+   "source": {
+    "outcome": "not comparable",
+    "reason": "no release for the previous version"
+   }
+  },
+  {
+   "index": 856,
+   "name": "@accordproject/markdown-it-cicero",
+   "prev": "0.16.20-20241108141903",
+   "version": "0.16.26",
+   "repository": "accordproject/markdown-transform",
+   "version_commit": "92f912fc856f54026f3cfaba8d8038bd55b510aa",
+   "prev_provenance": "no attestations",
+   "prev_commit": null,
+   "prev_release": null,
+   "source": {
+    "outcome": "not comparable",
+    "reason": "no release for the previous version"
+   }
+  },
+  {
+   "index": 864,
+   "name": "@accordproject/template-engine",
+   "prev": "2.7.1",
+   "version": "2.7.2",
+   "repository": "accordproject/template-engine",
+   "version_commit": "cc642471bd7c08df906017fce903147b7aa6507e",
+   "prev_commit": "53fd358a187edf6775ef22b5eac1350ff30ac687",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 1,
+    "dir": ""
+   }
+  },
+  {
+   "index": 889,
+   "name": "@voiceflow/anthropic",
+   "prev": "0.4.3",
+   "version": "0.4.4",
+   "repository": "anthropics/anthropic-sdk-typescript",
+   "version_commit": "e071cafd8f9675b00b263b93bb7d104493a16e70",
+   "prev_commit": "ec96afb82dac5f6ab35391e6cdb4239e3d96cc9c",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 1032,
+   "name": "@jayeshsadhwani/telemetry-sdk",
+   "prev": "1.0.13",
+   "version": "1.0.14",
+   "repository": "DrDroidLab/telemetry-sdk",
+   "version_commit": "fef5a080cdb7dd22fe1cab3b1d8d069b2fab15ec",
+   "prev_commit": "2de45700ea5513a6927d3fbe45546db0a80e5f29",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 1033,
+   "name": "@hyperlook/telemetry-sdk",
+   "prev": "1.0.18",
+   "version": "1.0.19",
+   "repository": "DrDroidLab/telemetry-sdk",
+   "version_commit": "a00775170cf99c4ea3e44a404f6b3c38e40fe577",
+   "prev_commit": "ab47ed4c02e3682f75825082c982837602980425",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "none",
+    "capabilities": [],
+    "changed_code_files": 1,
+    "dir": ""
+   }
+  },
+  {
+   "index": 1133,
+   "name": "uniswap-test-sdk-core",
+   "prev": "4.0.7",
+   "version": "4.0.8",
+   "repository": "Uniswap/sdk-core",
+   "version_commit": "cc346f283e9858c436559231b42a29391959f38f",
+   "prev_commit": "499231b78e21933b28db0ea1089c73a55ec8f9e7",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 1134,
+   "name": "buffered-interpolation-babylon6",
+   "prev": "0.2.7",
+   "version": "0.2.8",
+   "repository": "frame-xr/buffered-interpolation",
+   "version_commit": "57019dbaacc4d00bd3737b52774b30be4afd68ef",
+   "prev_commit": "1f2e28ea4f749d4b7e08204d791799a4a2a0f996",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: package directory not found"
+   }
+  },
+  {
+   "index": 1144,
+   "name": "@asyncapi/generator-helpers",
+   "prev": "1.1.0",
+   "version": "1.1.1",
+   "repository": "asyncapi/generator",
+   "version_commit": "1c8ded059a642369dd6f17c9dc7d39fb0e7d33eb",
+   "prev_commit": "fb6b41614a97f74b5cf3e507855513a8ef630031",
+   "prev_release": "tag form 1",
+   "source": {
+    "outcome": "not comparable",
+    "reason": "previous commit: directory not in source"
+   }
+  }
+ ]
+}

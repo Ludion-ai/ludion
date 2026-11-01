@@ -1,0 +1,1171 @@
+2026-10-30T16:25:48.695Z refs 50/1148
+2026-10-30T16:25:55.426Z refs 100/1148
+2026-10-30T16:26:03.518Z refs 150/1148
+2026-10-30T16:26:08.577Z refs 200/1148
+2026-10-30T16:26:15.296Z refs 250/1148
+2026-10-30T16:26:21.579Z refs 300/1148
+2026-10-30T16:26:26.931Z refs 350/1148
+2026-10-30T16:26:35.244Z refs 400/1148
+2026-10-30T16:26:40.721Z refs 450/1148
+2026-10-30T16:26:49.251Z refs 500/1148
+2026-10-30T16:26:56.305Z refs 550/1148
+2026-10-30T16:27:00.610Z refs 600/1148
+2026-10-30T16:27:07.718Z refs 650/1148
+2026-10-30T16:27:16.127Z refs 700/1148
+2026-10-30T16:27:23.706Z refs 750/1148
+2026-10-30T16:27:29.915Z refs 800/1148
+2026-10-30T16:27:35.977Z refs 850/1148
+2026-10-30T16:27:41.348Z refs 900/1148
+2026-10-30T16:27:49.529Z refs 950/1148
+2026-10-30T16:27:53.419Z refs 1000/1148
+2026-10-30T16:28:04.014Z refs 1050/1148
+2026-10-30T16:28:08.059Z refs 1100/1148
+2026-10-30T16:28:14.015Z malicious 1 hyperterm-hipster 1.0.2 -> 1.0.3: P github tiaanduplessis/hyperterm-hipster (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.015Z malicious 2 @ensdomains/buffer 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.016Z malicious 3 @igh/server-updater-ssh 1.2.4 -> 1.2.16: P no repository (registry); refs -; tag -; V no attestations
+2026-10-30T16:28:14.016Z malicious 4 @igh/server-updater-ssh-l1 1.2.8 -> 1.2.17: P no repository (registry); refs -; tag -; V no attestations
+2026-10-30T16:28:14.016Z malicious 5 loliloli 1.0.74 -> 1.0.77: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.017Z malicious 6 loliloli 1.0.74 -> 1.0.78: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.017Z malicious 7 loliloli 1.0.74 -> 1.0.79: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.017Z malicious 8 loliloli 1.0.74 -> 1.0.80: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.018Z malicious 9 loliloli 1.0.74 -> 1.0.81: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.018Z malicious 10 loliloli 1.0.74 -> 1.0.82: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.018Z malicious 11 loliloli 1.0.74 -> 1.0.83: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.019Z malicious 12 loliloli 1.0.74 -> 1.0.84: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.019Z malicious 13 loliloli 1.0.74 -> 1.0.85: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.019Z malicious 14 loliloli 1.0.74 -> 1.0.86: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.020Z malicious 15 loliloli 1.0.74 -> 1.0.87: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.020Z malicious 16 loliloli 1.0.74 -> 1.0.88: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.020Z malicious 17 loliloli 1.0.74 -> 1.0.89: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.021Z malicious 18 loliloli 1.0.74 -> 1.0.90: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.021Z malicious 19 loliloli 1.0.74 -> 1.0.91: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.021Z malicious 20 loliloli 1.0.74 -> 1.0.92: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.022Z malicious 21 @asyncapi/studio 0.20.0 -> 0.20.1: P no repository (registry); refs -; tag -; V no attestations
+2026-10-30T16:28:14.022Z malicious 22 @asyncapi/studio 0.20.0 -> 0.20.2: P no repository (registry); refs -; tag -; V no attestations
+2026-10-30T16:28:14.023Z malicious 23 loliloli 1.0.74 -> 1.0.93: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.023Z malicious 24 loliloli 1.0.74 -> 1.0.94: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.023Z malicious 25 loliloli 1.0.74 -> 1.0.95: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.024Z malicious 26 loliloli 1.0.74 -> 1.0.96: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.024Z malicious 27 loliloli 1.0.74 -> 1.0.97: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.024Z malicious 28 loliloli 1.0.74 -> 1.0.98: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.025Z malicious 29 loliloli 1.0.74 -> 1.0.99: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.025Z malicious 30 loliloli 1.0.74 -> 1.0.100: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.025Z malicious 31 loliloli 1.0.74 -> 1.0.101: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.026Z malicious 32 @mrpudidi/gravatar 1.0.2 -> 1.0.3: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.026Z malicious 33 @mrpudidi/gravatar 1.0.2 -> 1.0.4: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.026Z malicious 34 innocent-package 1.0.0 -> 1.0.3: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.027Z malicious 35 @optimystic99/dev-utils 1.0.7 -> 1.0.15: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.027Z malicious 36 @optimystic99/dev-utils 1.0.10 -> 1.0.22: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.027Z malicious 37 stringify-content 1.0.2 -> 1.0.3: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.028Z malicious 38 @rxap/ngx-bootstrap 19.0.3-dev.0 -> 19.0.3: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.028Z malicious 39 freo-design-system 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V no attestations
+2026-10-30T16:28:14.028Z malicious 40 freo-design-system 1.0.0 -> 1.0.4: P no repository (registry); refs -; tag -; V no attestations
+2026-10-30T16:28:14.029Z malicious 41 climate-wallet 1.1.32 -> 1.2.34: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.029Z malicious 42 @dm3-org/dm3-lib-shared 1.7.1 -> 1.7.2: P no repository (registry); refs -; tag -; V no attestations
+2026-10-30T16:28:14.030Z malicious 43 amazon-chime-sdk-js-exp 10.10.11 -> 10.100.20: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.030Z malicious 44 @rxap/ngx-bootstrap 19.0.4-dev.0 -> 19.0.4: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.030Z malicious 45 loliloli 1.0.74 -> 1.0.102: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.031Z malicious 46 loliloli 1.0.74 -> 1.0.103: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.031Z malicious 47 @react-native-aria/focus 0.2.9 -> 0.2.10: P github intergalacticspacehighway/react-native-bob-mono (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.031Z malicious 48 @react-native-aria/utils 0.2.12 -> 0.2.13: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.032Z malicious 49 @react-native-aria/overlays 0.3.15 -> 0.3.16: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.032Z malicious 50 @react-native-aria/interactions 0.2.16 -> 0.2.17: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.033Z malicious 51 @react-native-aria/toggle 0.2.11 -> 0.2.12: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.033Z malicious 52 @react-native-aria/switch 0.2.4 -> 0.2.5: P github intergalacticspacehighway/react-native-bob-mono (registry); refs HTTP 401; tag -; V no attestations
+2026-10-30T16:28:14.033Z malicious 53 @react-native-aria/checkbox 0.2.10 -> 0.2.11: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.034Z malicious 54 @react-native-aria/radio 0.2.13 -> 0.2.14: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.034Z malicious 55 @react-native-aria/button 0.2.10 -> 0.2.11: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.035Z malicious 56 @react-native-aria/menu 0.2.15 -> 0.2.16: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.035Z malicious 57 @react-native-aria/tabs 0.2.13 -> 0.2.14: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.035Z malicious 58 @react-native-aria/listbox 0.2.9 -> 0.2.10: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.036Z malicious 59 @react-native-aria/combobox 0.2.7 -> 0.2.8: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.036Z malicious 60 @react-native-aria/disclosure 0.2.8 -> 0.2.9: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.037Z malicious 61 @react-native-aria/separator 0.2.6 -> 0.2.7: P github intergalacticspacehighway/react-native-bob-mono (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.037Z malicious 62 @react-native-aria/slider 0.2.12 -> 0.2.13: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.037Z malicious 63 @gluestack-ui/utils 0.1.15 -> 0.1.16: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.038Z malicious 64 @gluestack-ui/utils 0.1.15 -> 0.1.17: P github gluestack/gluestack-ui (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.038Z malicious 65 loliloli 1.0.74 -> 1.0.104: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.039Z malicious 66 loliloli 1.0.74 -> 1.0.105: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.039Z malicious 67 loliloli 1.0.74 -> 1.0.106: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.040Z malicious 68 n8n-nodes-phoai-ultimate-tools 1.1.9 -> 1.3.5: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.040Z malicious 69 eslint-config-prettier 10.1.5 -> 10.1.6: P github prettier/eslint-config-prettier (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.040Z malicious 70 eslint-config-prettier 10.1.5 -> 10.1.7: P github prettier/eslint-config-prettier (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.041Z malicious 71 synckit 0.11.8 -> 0.11.9: P github un-ts/synckit (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.041Z malicious 72 napi-postinstall 0.3.0 -> 0.3.1: P github un-ts/napi-postinstall (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.042Z malicious 73 is 3.3.0 -> 3.3.1: P github enricomarino/is (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.042Z malicious 74 @toptal/picasso 54.0.3-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.3 -> 54.1.3: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.042Z malicious 75 @toptal/davinci-monorepo 12.0.2-alpha-top-support-npm-bd4be099.8 -> 12.1.1: P github toptal/davinci (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.043Z malicious 76 @toptal/picasso-charts 59.0.5-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 59.1.4: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.043Z malicious 77 @toptal/picasso-forms 73.2.2-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 73.3.2: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.043Z malicious 78 @toptal/picasso-lab 27.0.1 -> 27.1.1: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.044Z malicious 79 @toptal/picasso-provider 5.0.1-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.289 -> 5.1.1: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.044Z malicious 80 @toptal/picasso-rich-text-editor 17.2.2-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 17.3.2: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.045Z malicious 81 @toptal/picasso-shared 15.0.1-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.368 -> 15.1.0: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.045Z malicious 82 @toptal/picasso-tailwind 3.0.1-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.155 -> 3.1.0: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.045Z malicious 83 @toptal/picasso-utils 3.1.1-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 3.2.0: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.046Z malicious 84 @toptal/davinci-graphql-codegen-extensions 1.0.6-alpha-top-support-npm-bd4be099.88 -> 1.1.5: P github toptal/davinci (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.046Z malicious 85 @toptal/picasso-accordion 3.0.22-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 3.1.22: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.047Z malicious 86 @toptal/picasso-alert 3.0.34-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 3.1.34: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.047Z malicious 87 @toptal/picasso-button 4.0.23-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 4.1.23: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.047Z malicious 88 @toptal/picasso-calendar 4.1.5-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 4.2.5: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.048Z malicious 89 @toptal/picasso-container 3.1.3-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 3.2.2: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.048Z malicious 90 @toptal/picasso-dropdown 4.2.4-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 4.3.3: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.049Z malicious 91 @toptal/picasso-dropzone 5.0.23-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 5.1.23: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.049Z malicious 92 @toptal/picasso-form 6.3.2-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 6.4.2: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.049Z malicious 93 @toptal/picasso-grid 5.0.10-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 5.1.10: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.050Z malicious 94 @toptal/picasso-icons 1.12.2-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 1.13.1: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.050Z malicious 95 @toptal/picasso-image 3.0.4-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 3.1.3: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.051Z malicious 96 @toptal/picasso-link 3.0.6-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 3.1.6: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.051Z malicious 97 @toptal/picasso-logo 2.0.10-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 2.1.9: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.051Z malicious 98 @toptal/picasso-paper 4.0.4-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 4.1.3: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.052Z malicious 99 @toptal/picasso-popper 2.0.1-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 2.1.0: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.052Z malicious 100 @toptal/picasso-quote 2.0.7-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 2.1.7: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.053Z malicious 101 @toptal/picasso-radio 5.0.13-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 5.1.13: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.053Z malicious 102 @toptal/picasso-select 4.1.2-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.9 -> 4.2.2: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.053Z malicious 103 @toptal/picasso-slider 4.0.5-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 4.1.5: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.054Z malicious 104 @toptal/picasso-switch 4.0.12-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 4.1.11: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.054Z malicious 105 @toptal/picasso-typography 4.0.4-alpha-MP-669-first-batch-of-rework-e1cd7f6d1.22 -> 4.1.4: P github toptal/picasso (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.055Z malicious 106 ethersjs3-wallet 3.0.6 -> 3.0.7: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.055Z malicious 107 ethersjs3-wallet 3.0.6 -> 3.0.8: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.055Z malicious 108 ethersjs3-wallet 3.0.6 -> 3.0.9: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.056Z malicious 109 ethersjs3-wallet 3.0.6 -> 3.0.10: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.056Z malicious 110 ethersjs3-wallet 3.0.6 -> 3.0.11: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.056Z malicious 111 react-native-kraken-oauth 1.0.0 -> 1.0.1: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.057Z malicious 112 checkout-app 1.2.0 -> 1.5.1: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.057Z malicious 113 checkout-app 1.2.0 -> 1.5.2: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.058Z malicious 114 google-profanity-words 1.0.0 -> 1.0.1: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.058Z malicious 115 azure-arm-parameterflattening 5.1.4 -> 5.2.9: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.058Z malicious 116 @nx/devkit 21.5.0-canary.20250819-2307a8d -> 21.5.0: P github nrwl/nx (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.059Z malicious 117 @nx/enterprise-cloud 3.1.0 -> 3.2.0: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.059Z malicious 118 @nx/eslint 21.5.0-canary.20250819-2307a8d -> 21.5.0: P github nrwl/nx (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.060Z malicious 119 @nx/js 21.5.0-canary.20250819-2307a8d -> 21.5.0: P github nrwl/nx (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.060Z malicious 120 @nx/node 21.5.0-canary.20250819-2307a8d -> 21.5.0: P github nrwl/nx (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.060Z malicious 121 nx 21.5.0-canary.20250819-2307a8d -> 21.5.0: P github nrwl/nx (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.061Z malicious 122 @nx/workspace 21.5.0-canary.20250819-2307a8d -> 21.5.0: P github nrwl/nx (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.061Z malicious 123 nx 21.5.0-canary.20250819-2307a8d -> 21.6.0: P github nrwl/nx (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.062Z malicious 124 nx 21.5.0-canary.20250819-2307a8d -> 21.7.0: P github nrwl/nx (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.062Z malicious 125 nx 21.5.0-canary.20250819-2307a8d -> 21.8.0: P github nrwl/nx (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.062Z malicious 126 google-profanity-words 1.0.0 -> 1.0.2: P not obtained (registry 404, ecosyste.ms 404); refs -; tag -; V V not listed
+2026-10-30T16:28:14.063Z malicious 127 prebid-universal-creative 1.17.2 -> 1.17.3: P github prebid/prebid-universal-creative (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.063Z malicious 128 prebid.js 10.9.0 -> 10.9.2: P github prebid/Prebid.js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.064Z malicious 129 ansi-styles 6.2.1 -> 6.2.2: P github chalk/ansi-styles (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.064Z malicious 130 debug 4.4.1 -> 4.4.2: P github debug-js/debug (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.064Z malicious 131 chalk 5.6.0 -> 5.6.1: P github chalk/chalk (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.065Z malicious 132 supports-color 10.2.0 -> 10.2.1: P github chalk/supports-color (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.065Z malicious 133 strip-ansi 7.1.0 -> 7.1.1: P github chalk/strip-ansi (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.066Z malicious 134 ansi-regex 6.2.0 -> 6.2.1: P github chalk/ansi-regex (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.066Z malicious 135 wrap-ansi 9.0.0 -> 9.0.1: P github chalk/wrap-ansi (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.066Z malicious 136 color-convert 3.1.0 -> 3.1.1: P github Qix-/color-convert (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.067Z malicious 137 color-name 2.0.0 -> 2.0.1: P github colorjs/color-name (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.067Z malicious 138 is-arrayish 0.3.2 -> 0.3.3: P github qix-/node-is-arrayish (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.068Z malicious 139 slice-ansi 7.1.0 -> 7.1.1: P github chalk/slice-ansi (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.068Z malicious 140 error-ex 1.3.2 -> 1.3.3: P github qix-/node-error-ex (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.068Z malicious 141 color 5.0.0 -> 5.0.1: P github Qix-/color (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.069Z malicious 142 color-string 2.1.0 -> 2.1.1: P github Qix-/color-string (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.069Z malicious 143 simple-swizzle 0.2.2 -> 0.2.3: P github qix-/node-simple-swizzle (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.069Z malicious 144 supports-hyperlinks 4.1.0 -> 4.1.1: P github chalk/supports-hyperlinks (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.070Z malicious 145 has-ansi 6.0.0 -> 6.0.1: P github chalk/has-ansi (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.070Z malicious 146 backslash 0.2.0 -> 0.2.1: P github Qix-/node-backslash (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.071Z malicious 147 proto-tinker-wc 0.1.82 -> 0.1.87: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.071Z malicious 148 @duckdb/node-bindings 1.3.2-alpha.26 -> 1.3.3: P github duckdb/duckdb-node-neo (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.071Z malicious 149 @duckdb/duckdb-wasm 1.29.1-dev283.0 -> 1.29.2: P github duckdb/duckdb-wasm (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.072Z malicious 150 @duckdb/node-api 1.3.2-alpha.26 -> 1.3.3: P github duckdb/duckdb-node-neo (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.072Z malicious 151 duckdb 1.3.2 -> 1.3.3: P github duckdb/duckdb-node (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.073Z malicious 152 @coveops/abi 2.0.0 -> 2.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.073Z malicious 153 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.3.6: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.073Z malicious 154 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.3.8: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.074Z malicious 155 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.3.9: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.074Z malicious 156 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.5.0: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.075Z malicious 157 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.5.2: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.075Z malicious 158 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.5.3: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.075Z malicious 159 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.5.5: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.076Z malicious 160 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.5.6: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.076Z malicious 161 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.5.8: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.077Z malicious 162 json-rules-engine-simplified 0.2.0 -> 0.2.1: P github RxNT/json-rules-engine-simplified (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.077Z malicious 163 react-jsonschema-form-conditionals 0.3.17 -> 0.3.18: P github RxNT/react-jsonschema-form-conditionals (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.077Z malicious 164 rxnt-healthchecks-nestjs 1.0.1-alpha-1609 -> 1.0.2: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.078Z malicious 165 rxnt-kue 1.0.3 -> 1.0.4: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.078Z malicious 166 react-jsonschema-rxnt-extras 0.4.2 -> 0.4.6: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.079Z malicious 167 airpilot 0.8.7 -> 0.8.8: P github shaneholloman/airpilot-cli-ts (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.079Z malicious 168 mcp-knowledge-graph 1.2.0 -> 1.2.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.079Z malicious 169 airchief 0.3.0 -> 0.3.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.080Z malicious 170 tvi-cli 0.1.4 -> 0.1.5: P github shaneholloman/tvi (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.080Z malicious 171 @tnf-dev/api 1.0.4 -> 1.0.8: P github teknix-saas/teknify-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.081Z malicious 172 html-to-base64-image 1.0.1 -> 1.0.2: P github thangved/html-to-base64-image (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.081Z malicious 173 thangved-react-grid 1.0.2 -> 1.0.3: P github thangved/thangved-react-grid (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.081Z malicious 174 @tnf-dev/js 1.0.4 -> 1.0.8: P github teknix-saas/teknify-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.082Z malicious 175 @tnf-dev/mui 1.0.4 -> 1.0.8: P github teknix-saas/teknify-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.082Z malicious 176 @tnf-dev/react 1.0.4 -> 1.0.8: P github teknix-saas/teknify-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.083Z malicious 177 @tnf-dev/core 1.0.4 -> 1.0.8: P github teknix-saas/teknify-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.083Z malicious 178 rxnt-healthchecks-nestjs 1.0.1-alpha-1609 -> 1.0.3: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.083Z malicious 179 rxnt-kue 1.0.3 -> 1.0.5: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.084Z malicious 180 json-rules-engine-simplified 0.2.0 -> 0.2.2: P github RxNT/json-rules-engine-simplified (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.084Z malicious 181 react-jsonschema-form-conditionals 0.3.17 -> 0.3.19: P github RxNT/react-jsonschema-form-conditionals (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.085Z malicious 182 react-jsonschema-rxnt-extras 0.4.2 -> 0.4.7: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.085Z malicious 183 @hestjs/demo 0.1.1 -> 0.1.2: P github aqz236/hestjs-demo (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.085Z malicious 184 @nexe/eslint-config 0.1.0 -> 0.1.1: P github eve-framework/eve (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.086Z malicious 185 @hestjs/eslint-config 0.1.1 -> 0.1.2: P github aqz236/hestjs-eslint-config (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.086Z malicious 186 @nexe/config-manager 0.1.0 -> 0.1.1: P github aqz236/nexe (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.086Z malicious 187 @nexe/logger 0.1.2 -> 0.1.3: P github aqz236/nexe-logger (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.087Z malicious 188 @hestjs/logger 0.1.5 -> 0.1.6: P github aqz236/hest-logger (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.087Z malicious 189 @hestjs/validation 0.1.5 -> 0.1.6: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.088Z malicious 190 @hestjs/core 0.2.0 -> 0.2.1: P github aqz236/hest (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.088Z malicious 191 @hestjs/cqrs 0.1.5 -> 0.1.6: P github aqz236/hestjs-cqrs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.089Z malicious 192 @hestjs/scalar 0.1.6 -> 0.1.7: P github aqz236/hest (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.089Z malicious 193 create-hest-app 0.1.8 -> 0.1.9: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.089Z malicious 194 tg-redbird 1.3.0 -> 1.3.1: P github TeselaGen/redbird (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.090Z malicious 195 @teselagen/bounce-loader 0.3.15 -> 0.3.16: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.090Z malicious 196 @teselagen/bio-parsers 0.4.29-beta.1 -> 0.4.29: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.091Z malicious 197 @teselagen/liquibase-tools 0.4.0 -> 0.4.1: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.091Z malicious 198 rxnt-kue 1.0.3 -> 1.0.6: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.091Z malicious 199 rxnt-healthchecks-nestjs 1.0.1-alpha-1609 -> 1.0.4: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.092Z malicious 200 json-rules-engine-simplified 0.2.0 -> 0.2.3: P github RxNT/json-rules-engine-simplified (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.092Z malicious 201 react-jsonschema-form-conditionals 0.3.17 -> 0.3.20: P github RxNT/react-jsonschema-form-conditionals (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.093Z malicious 202 react-jsonschema-rxnt-extras 0.4.2 -> 0.4.8: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.093Z malicious 203 @art-ws/config-eslint 2.0.3 -> 2.0.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.093Z malicious 204 @art-ws/slf 2.0.9 -> 2.0.15: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.094Z malicious 205 @art-ws/http-server 2.0.15 -> 2.0.21: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.094Z malicious 206 @art-ws/di 2.0.22 -> 2.0.28: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.094Z malicious 207 @art-ws/di-node 2.0.7 -> 2.0.13: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.095Z malicious 208 @art-ws/config-ts 2.0.6 -> 2.0.7: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.095Z malicious 209 @art-ws/openapi 0.1.3 -> 0.1.9: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.096Z malicious 210 @art-ws/web-app 1.0.2 -> 1.0.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.096Z malicious 211 @art-ws/ssl-info 1.0.8 -> 1.0.9: P github art-ws/ssl-info (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.097Z malicious 212 @art-ws/fastify-http-server 2.0.18 -> 2.0.24: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.097Z malicious 213 printjs-rpk 1.6.0 -> 1.6.1: P github crabbly/Print.js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.097Z malicious 214 globalize-rpk 1.7.3 -> 1.7.4: P github globalizejs/globalize (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.098Z malicious 215 @ui-ux-gang/devextreme-angular-rpk 24.1.6 -> 24.1.7: P github DevExpress/devextreme-angular (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.098Z malicious 216 devextreme-angular-rpk 21.2.7 -> 21.2.8: P github DevExpress/devextreme-angular (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.099Z malicious 217 @ui-ux-gang/devextreme-rpk 24.1.6 -> 24.1.7: P github DevExpress/DevExtreme (registry); refs read; tag 24.1.7; V V not listed
+2026-10-30T16:28:14.099Z malicious 218 devextreme-rpk 21.2.7 -> 21.2.8: P github DevExpress/DevExtreme (registry); refs read; tag 21.2.8; V V not listed
+2026-10-30T16:28:14.099Z malicious 219 mstate-angular 0.4.3 -> 0.4.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.100Z malicious 220 mobioffice-cli 1.0.2 -> 1.0.3: P github mj6uc/mobioffice-cli (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.100Z malicious 221 mstate-react 1.6.4 -> 1.6.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.101Z malicious 222 mstate-cli 0.4.6 -> 0.4.7: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.101Z malicious 223 mstate-dev-react 1.1.0 -> 1.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.101Z malicious 224 @ahmedhfarag/ngx-perfect-scrollbar 20.0.19 -> 20.0.20: P github zefoy/ngx-perfect-scrollbar (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.102Z malicious 225 @ahmedhfarag/ngx-virtual-scroller 4.0.3 -> 4.0.4: P github rintoj/ngx-virtual-scroller (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.102Z malicious 226 @art-ws/di-node 2.0.7 -> 2.0.14: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.103Z malicious 227 @art-ws/di-node 2.0.7 -> 2.0.15: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.103Z malicious 228 @art-ws/di-node 2.0.7 -> 2.0.18: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.104Z malicious 229 @art-ws/http-server 2.0.15 -> 2.0.24: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.104Z malicious 230 @art-ws/fastify-http-server 2.0.18 -> 2.0.26: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.104Z malicious 231 @art-ws/openapi 0.1.3 -> 0.1.11: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.105Z malicious 232 @art-ws/http-server 2.0.15 -> 2.0.25: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.105Z malicious 233 @art-ws/fastify-http-server 2.0.18 -> 2.0.27: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.106Z malicious 234 @art-ws/openapi 0.1.3 -> 0.1.12: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.106Z malicious 235 @art-ws/slf 2.0.9 -> 2.0.22: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.106Z malicious 236 @art-ws/ssl-info 1.0.8 -> 1.0.10: P github art-ws/ssl-info (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.107Z malicious 237 @art-ws/config-eslint 2.0.3 -> 2.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.107Z malicious 238 @art-ws/config-ts 2.0.6 -> 2.0.8: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.108Z malicious 239 @art-ws/web-app 1.0.2 -> 1.0.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.108Z malicious 240 @nativescript-community/ui-material-ripple 7.2.71 -> 7.2.72: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.108Z malicious 241 @nstudio/web-angular 20.0.3 -> 20.0.4: P github nstudio/xplat (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.109Z malicious 242 @nstudio/web 20.0.3 -> 20.0.4: P github nstudio/xplat (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.109Z malicious 243 @nativescript-community/ui-label 1.3.34 -> 1.3.35: P github nativescript-community/ui-label (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.110Z malicious 244 @nativescript-community/ui-material-bottom-navigation 7.2.71 -> 7.2.72: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.110Z malicious 245 @basic-ui-components-stc/basic-ui-components 1.0.2 -> 1.0.5: P github stc-ui-team/basic-ui-components (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.110Z malicious 246 @nativescript-community/ui-material-ripple 7.2.71 -> 7.2.73: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.111Z malicious 247 @nativescript-community/ui-label 1.3.34 -> 1.3.36: P github nativescript-community/ui-label (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.111Z malicious 248 @nativescript-community/ui-material-bottom-navigation 7.2.71 -> 7.2.73: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.112Z malicious 249 @nativescript-community/ui-label 1.3.34 -> 1.3.37: P github nativescript-community/ui-label (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.112Z malicious 250 @nativescript-community/ui-material-ripple 7.2.71 -> 7.2.74: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.112Z malicious 251 @nativescript-community/ui-material-bottom-navigation 7.2.71 -> 7.2.74: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.113Z malicious 252 @nativescript-community/ui-document-picker 1.1.26 -> 1.1.27: P github nativescript-community/ui-document-picker (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.113Z malicious 253 @nativescript-community/ui-document-picker 1.1.26 -> 1.1.28: P github nativescript-community/ui-document-picker (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.114Z malicious 254 @nativescript-community/ui-material-bottom-navigation 7.2.71 -> 7.2.75: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.114Z malicious 255 @nativescript-community/ui-material-ripple 7.2.71 -> 7.2.75: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.114Z malicious 256 mcfly-semantic-release 1.3.0 -> 1.3.1: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.115Z malicious 257 wdio-web-reporter 0.1.2 -> 0.1.3: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.115Z malicious 258 yoo-styles 6.0.325-2 -> 6.0.326: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.116Z malicious 259 config-cordova 0.8.4 -> 0.8.5: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.116Z malicious 260 cordova-plugin-voxeet2 1.0.23-5 -> 1.0.24: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.116Z malicious 261 cordova-voxeet 1.0.31 -> 1.0.32: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.117Z malicious 262 rxnt-healthchecks-nestjs 1.0.1-alpha-1609 -> 1.0.5: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.117Z malicious 263 json-rules-engine-simplified 0.2.0 -> 0.2.4: P github RxNT/json-rules-engine-simplified (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.118Z malicious 264 react-jsonschema-form-conditionals 0.3.17 -> 0.3.21: P github RxNT/react-jsonschema-form-conditionals (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.118Z malicious 265 react-jsonschema-rxnt-extras 0.4.2 -> 0.4.9: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.118Z malicious 266 rxnt-kue 1.0.3 -> 1.0.7: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.119Z malicious 267 mcfly-semantic-release 1.3.0 -> 1.3.4: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.119Z malicious 268 @ctrl/transmission 7.3.0 -> 7.3.1: P github scttcper/transmission (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.120Z malicious 269 @nativescript-community/ui-material-bottomsheet 7.2.71 -> 7.2.72: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.120Z malicious 270 @nativescript-community/ui-drawer 0.1.29 -> 0.1.30: P github nativescript-community/ui-drawer (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.120Z malicious 271 @nativescript-community/gesturehandler 2.0.34 -> 2.0.35: P github nativescript-community/gesturehandler (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.121Z malicious 272 @nativescript-community/ui-image 4.5.5 -> 4.5.6: P github nativescript-community/ui-image (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.121Z malicious 273 @nativescript-community/sentry 4.6.40 -> 4.6.43: P github nativescript-community/sentry (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.122Z malicious 274 @nativescript-community/ui-collectionview 6.0.5 -> 6.0.6: P github nativescript-community/ui-collectionview (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.122Z malicious 275 ngx-trend 8.0.0 -> 8.0.1: P github scttcper/ngx-trend (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.122Z malicious 276 tbssnch 1.0.1 -> 1.0.2: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.123Z malicious 277 @crowdstrike/falcon-shoelace 0.4.0 -> 0.4.1: P github CrowdStrike/falcon-shoelace (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.123Z malicious 278 verror-extra 6.0.0 -> 6.0.1: P github CrowdStrike/verror-extra (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.124Z malicious 279 browser-webdriver-downloader 3.0.7 -> 3.0.8: P github CrowdStrike/browser-webdriver-downloader (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.124Z malicious 280 monorepo-next 13.0.0 -> 13.0.1: P github CrowdStrike/monorepo-next (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.124Z malicious 281 ember-velcro 2.2.0 -> 2.2.1: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.125Z malicious 282 remark-preset-lint-crowdstrike 4.0.0 -> 4.0.1: P github CrowdStrike/remark-preset-lint-crowdstrike (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.125Z malicious 283 eslint-config-crowdstrike-node 4.0.2 -> 4.0.3: P github CrowdStrike/eslint-config-crowdstrike-node (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.126Z malicious 284 ember-browser-services 5.0.1 -> 5.0.2: P github CrowdStrike/ember-browser-services (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.126Z malicious 285 ember-headless-table 2.1.4 -> 2.1.5: P github CrowdStrike/ember-headless-table (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.126Z malicious 286 @crowdstrike/tailwind-toucan-base 5.0.0 -> 5.0.1: P github CrowdStrike/tailwind-toucan-base (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.127Z malicious 287 ember-headless-form 1.1.1 -> 1.1.2: P github CrowdStrike/ember-headless-form (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.127Z malicious 288 @crowdstrike/foundry-js 0.19.0 -> 0.19.1: P github CrowdStrike/foundry-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.128Z malicious 289 @crowdstrike/logscale-file-editor 1.204.0--build-3970--sha-d3ac18652ada03b9d50bee6175b6c4f6e266ad46 -> 1.205.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.128Z malicious 290 @crowdstrike/logscale-search 1.204.0--build-3970--sha-d3ac18652ada03b9d50bee6175b6c4f6e266ad46 -> 1.205.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.128Z malicious 291 @crowdstrike/logscale-dashboard 1.204.0--build-3970--sha-d3ac18652ada03b9d50bee6175b6c4f6e266ad46 -> 1.205.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.129Z malicious 292 ember-headless-form-yup 1.0.0 -> 1.0.1: P github CrowdStrike/ember-headless-form (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.129Z malicious 293 yargs-help-output 5.0.2 -> 5.0.3: P github CrowdStrike/yargs-help-output (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.130Z malicious 294 @crowdstrike/falcon-shoelace 0.4.0 -> 0.4.2: P github CrowdStrike/falcon-shoelace (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.130Z malicious 295 ember-headless-table 2.1.4 -> 2.1.6: P github CrowdStrike/ember-headless-table (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.130Z malicious 296 ember-headless-form 1.1.1 -> 1.1.3: P github CrowdStrike/ember-headless-form (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.131Z malicious 297 ember-velcro 2.2.0 -> 2.2.2: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.131Z malicious 298 remark-preset-lint-crowdstrike 4.0.0 -> 4.0.2: P github CrowdStrike/remark-preset-lint-crowdstrike (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.132Z malicious 299 @crowdstrike/foundry-js 0.19.0 -> 0.19.2: P github CrowdStrike/foundry-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.132Z malicious 300 monorepo-next 13.0.0 -> 13.0.2: P github CrowdStrike/monorepo-next (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.132Z malicious 301 eslint-config-crowdstrike-node 4.0.2 -> 4.0.4: P github CrowdStrike/eslint-config-crowdstrike-node (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.133Z malicious 302 @crowdstrike/tailwind-toucan-base 5.0.0 -> 5.0.2: P github CrowdStrike/tailwind-toucan-base (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.133Z malicious 303 @crowdstrike/logscale-file-editor 1.204.0--build-3970--sha-d3ac18652ada03b9d50bee6175b6c4f6e266ad46 -> 1.205.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.134Z malicious 304 ember-browser-services 5.0.1 -> 5.0.3: P github CrowdStrike/ember-browser-services (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.134Z malicious 305 @crowdstrike/logscale-search 1.204.0--build-3970--sha-d3ac18652ada03b9d50bee6175b6c4f6e266ad46 -> 1.205.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.134Z malicious 306 @crowdstrike/logscale-dashboard 1.204.0--build-3970--sha-d3ac18652ada03b9d50bee6175b6c4f6e266ad46 -> 1.205.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.135Z malicious 307 @tnf-dev/core 1.0.4 -> 1.0.10: P github teknix-saas/teknify-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.135Z malicious 308 @tnf-dev/api 1.0.4 -> 1.0.10: P github teknix-saas/teknify-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.136Z malicious 309 @tnf-dev/js 1.0.4 -> 1.0.10: P github teknix-saas/teknify-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.136Z malicious 310 @tnf-dev/react 1.0.4 -> 1.0.10: P github teknix-saas/teknify-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.136Z malicious 311 @tnf-dev/mui 1.0.4 -> 1.0.10: P github teknix-saas/teknify-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.137Z malicious 312 @teselagen/bio-parsers 0.4.29-beta.1 -> 0.4.30: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.137Z malicious 313 teselagen-interval-tree 1.1.1 -> 1.1.2: P github teselagen/interval-tree2 (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.138Z malicious 314 tg-redbird 1.3.0 -> 1.3.2: P github TeselaGen/redbird (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.138Z malicious 315 @teselagen/bounce-loader 0.3.15 -> 0.3.17: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.138Z malicious 316 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.5.9: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.139Z malicious 317 loliloli 1.0.74 -> 1.0.107: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.139Z malicious 318 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.6.0: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.140Z malicious 319 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.6.3: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.140Z malicious 320 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.6.5: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.140Z malicious 321 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.6.6: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.141Z malicious 322 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.6.7: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.141Z malicious 323 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.6.8: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.142Z malicious 324 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.6.9: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.142Z malicious 325 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.7.0: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.142Z malicious 326 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.7.1: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.143Z malicious 327 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.7.2: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.143Z malicious 328 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.7.3: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.143Z malicious 329 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.7.5: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.144Z malicious 330 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.7.6: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.144Z malicious 331 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.7.8: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.145Z malicious 332 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.7.9: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.145Z malicious 333 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.8.0: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.145Z malicious 334 n8n-nodes-phoai-ultimate-tools 1.2.0 -> 1.8.1: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.146Z malicious 335 loliloli 1.0.74 -> 1.0.108: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.146Z malicious 336 @asyncapi/avro-schema-parser 3.0.24 -> 3.0.25: P github asyncapi/avro-schema-parser (registry); refs read; tag v3.0.25; V V not listed
+2026-10-30T16:28:14.147Z malicious 337 @asyncapi/openapi-schema-parser 3.0.24 -> 3.0.25: P github asyncapi/openapi-schema-parser (registry); refs read; tag v3.0.25; V V not listed
+2026-10-30T16:28:14.147Z malicious 338 @asyncapi/nunjucks-filters 2.1.0 -> 2.1.1: P github asyncapi/generator (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.147Z malicious 339 @asyncapi/generator-helpers 0.2.0 -> 0.2.1: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.148Z malicious 340 @asyncapi/multi-parser 2.2.0 -> 2.2.1: P github asyncapi/parser-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.148Z malicious 341 @asyncapi/bundler 0.6.4 -> 0.6.5: P github asyncapi/bundler (registry); refs read; tag v0.6.5; V V not listed
+2026-10-30T16:28:14.149Z malicious 342 @asyncapi/converter 1.6.2 -> 1.6.3: P github asyncapi/converter-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.149Z malicious 343 @asyncapi/generator-components 0.3.1 -> 0.3.2: P github asyncapi/generator (registry); refs read; tag 0.3.2; V V not listed
+2026-10-30T16:28:14.149Z malicious 344 create-glee-app 0.2.1 -> 0.2.2: P github asyncapi/glee (registry); refs read; tag v0.2.2; V V not listed
+2026-10-30T16:28:14.150Z malicious 345 @asyncapi/protobuf-schema-parser 3.6.0 -> 3.6.1: P github asyncapi/protobuf-schema-parser (registry); refs read; tag v3.6.1; V V not listed
+2026-10-30T16:28:14.150Z malicious 346 go-template 0.1.7 -> 0.1.8: P github asyncapi/go-template (registry); refs read; tag v0.1.8; V V not listed
+2026-10-30T16:28:14.151Z malicious 347 @asyncapi/problem 1.0.0 -> 1.0.1: P github asyncapi/problem (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.151Z malicious 348 @asyncapi/optimizer 1.0.4 -> 1.0.5: P github asyncapi/optimizer (registry); refs read; tag v1.0.5; V V not listed
+2026-10-30T16:28:14.151Z malicious 349 @asyncapi/python-paho-template 0.2.13 -> 0.2.14: P github asyncapi/python-paho-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.152Z malicious 350 @asyncapi/diff 0.5.0 -> 0.5.1: P github asyncapi/diff (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.152Z malicious 351 @asyncapi/dotnet-rabbitmq-template 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.153Z malicious 352 @asyncapi/nodejs-ws-template 0.10.0 -> 0.10.1: P github asyncapi/nodejs-ws-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.153Z malicious 353 @asyncapi/go-watermill-template 0.2.75 -> 0.2.76: P github asyncapi/go-watermill-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.153Z malicious 354 @asyncapi/java-spring-cloud-stream-template 0.13.4 -> 0.13.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.154Z malicious 355 @asyncapi/nodejs-template 3.0.4 -> 3.0.5: P github asyncapi/nodejs-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.154Z malicious 356 @asyncapi/markdown-template 1.6.7 -> 1.6.8: P github asyncapi/markdown-template (registry); refs read; tag v1.6.8; V V not listed
+2026-10-30T16:28:14.155Z malicious 357 @asyncapi/generator-react-sdk 1.1.3 -> 1.1.4: P github asyncapi/generator (registry); refs read; tag v1.1.4; V V not listed
+2026-10-30T16:28:14.155Z malicious 358 @asyncapi/php-template 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.155Z malicious 359 asyncapi-preview 1.0.0 -> 1.0.1: P github asyncapi/vs-asyncapi-preview (registry); refs read; tag v1.0.1; V V not listed
+2026-10-30T16:28:14.156Z malicious 360 @asyncapi/server-api 0.16.22 -> 0.16.24: P github asyncapi/server-api (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.156Z malicious 361 @asyncapi/web-component 2.6.5 -> 2.6.6: P github asyncapi/asyncapi-react (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.157Z malicious 362 @asyncapi/java-template 0.3.4 -> 0.3.5: P github asyncapi/java-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.157Z malicious 363 @asyncapi/java-spring-template 1.6.0 -> 1.6.1: P github asyncapi/java-spring-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.157Z malicious 364 @asyncapi/html-template 3.3.1 -> 3.3.2: P github asyncapi/html-template (registry); refs read; tag v3.3.2; V V not listed
+2026-10-30T16:28:14.158Z malicious 365 @asyncapi/cli 4.1.1 -> 4.1.2: P github asyncapi/cli (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.158Z malicious 366 @asyncapi/edavisualiser 1.2.0 -> 1.2.1: P github asyncapi/EDAVisualiser (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.159Z malicious 367 @asyncapi/react-component 2.6.5 -> 2.6.6: P github asyncapi/asyncapi-react (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.159Z malicious 368 @asyncapi/generator 2.8.4 -> 2.8.5: P github asyncapi/generator (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.159Z malicious 369 @asyncapi/specs 6.10.0 -> 6.10.1: P github asyncapi/spec-json-schemas (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.160Z malicious 370 @asyncapi/parser 3.4.0 -> 3.4.1: P github asyncapi/parser-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.160Z malicious 371 @asyncapi/studio 1.0.1 -> 1.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.161Z malicious 372 react-native-use-modal 1.0.2 -> 1.0.3: P github zeallat/react-native-use-modal (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.161Z malicious 373 axios-builder 1.2.0 -> 1.2.1: P github zeallat/axios-builder (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.161Z malicious 374 eslint-config-zeallat-base 1.0.3 -> 1.0.4: P github zeallat/eslint-config-zeallat-base (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.162Z malicious 375 @quick-start-soft/quick-markdown-translator 1.4.2509202330 -> 1.4.2509202331: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.162Z malicious 376 test23112222-api 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.163Z malicious 377 @quick-start-soft/quick-task-refine 1.4.2511142125 -> 1.4.2511142126: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.163Z malicious 378 @quick-start-soft/quick-markdown-compose 1.4.2506300028 -> 1.4.2506300029: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.164Z malicious 379 manual-billing-system-miniapp-api 1.3.0 -> 1.3.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.164Z malicious 380 @quick-start-soft/quick-markdown-image 1.4.2511142125 -> 1.4.2511142126: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.165Z malicious 381 @quick-start-soft/quick-markdown-print 1.4.2511142125 -> 1.4.2511142126: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.165Z malicious 382 @quick-start-soft/quick-markdown 1.4.2511142125 -> 1.4.2511142126: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.165Z malicious 383 korea-administrative-area-geo-json-util 1.0.6 -> 1.0.7: P github zeallat/korea-administrative-area-geo-json-util (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.166Z malicious 384 @quick-start-soft/quick-document-translator 1.4.2511142125 -> 1.4.2511142126: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.166Z malicious 385 @quick-start-soft/quick-remove-image-background 1.4.2511142125 -> 1.4.2511142126: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.167Z malicious 386 @strapbuild/react-native-date-time-picker 2.0.3 -> 2.0.4: P github ShareChat/react-native-date-time-picker (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.167Z malicious 387 shinhan-limit-scrap 1.0.2 -> 1.0.3: P github zeallat/shinhan-limit-scrap (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.167Z malicious 388 @strapbuild/react-native-perspective-image-cropper-2 0.4.6 -> 0.4.7: P github Michaelvilleneuve/react-native-perspective-image-cropper (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.168Z malicious 389 @quick-start-soft/quick-git-clean-markdown 1.4.2511142125 -> 1.4.2511142126: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.170Z malicious 390 @strapbuild/react-native-perspective-image-cropper 0.4.14 -> 0.4.15: P github datobs/react-native-perspective-image-cropper (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.171Z malicious 391 @strapbuild/react-native-perspective-image-cropper-poojan31 0.4.5 -> 0.4.6: P github Michaelvilleneuve/react-native-perspective-image-cropper (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.171Z malicious 392 @asyncapi/nunjucks-filters 2.1.0 -> 2.1.2: P github asyncapi/generator (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.171Z malicious 393 @asyncapi/multi-parser 2.2.0 -> 2.2.2: P github asyncapi/parser-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.172Z malicious 394 @asyncapi/generator-helpers 0.2.0 -> 0.2.2: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.172Z malicious 395 @asyncapi/openapi-schema-parser 3.0.24 -> 3.0.26: P github asyncapi/openapi-schema-parser (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.173Z malicious 396 @asyncapi/avro-schema-parser 3.0.24 -> 3.0.26: P github asyncapi/avro-schema-parser (registry); refs read; tag v3.0.26; V V not listed
+2026-10-30T16:28:14.173Z malicious 397 @asyncapi/converter 1.6.2 -> 1.6.4: P github asyncapi/converter-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.173Z malicious 398 @asyncapi/generator-components 0.3.1 -> 0.3.3: P github asyncapi/generator (registry); refs read; tag 0.3.3; V V not listed
+2026-10-30T16:28:14.174Z malicious 399 @asyncapi/bundler 0.6.4 -> 0.6.6: P github asyncapi/bundler (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.174Z malicious 400 create-glee-app 0.2.1 -> 0.2.3: P github asyncapi/glee (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.175Z malicious 401 @asyncapi/problem 1.0.0 -> 1.0.2: P github asyncapi/problem (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.175Z malicious 402 go-template 0.1.7 -> 0.1.9: P github asyncapi/go-template (registry); refs read; tag v0.1.9; V V not listed
+2026-10-30T16:28:14.175Z malicious 403 @asyncapi/optimizer 1.0.4 -> 1.0.6: P github asyncapi/optimizer (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.176Z malicious 404 @asyncapi/python-paho-template 0.2.13 -> 0.2.15: P github asyncapi/python-paho-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.176Z malicious 405 @asyncapi/diff 0.5.0 -> 0.5.2: P github asyncapi/diff (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.177Z malicious 406 @asyncapi/go-watermill-template 0.2.75 -> 0.2.77: P github asyncapi/go-watermill-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.177Z malicious 407 @asyncapi/dotnet-rabbitmq-template 1.0.0 -> 1.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.177Z malicious 408 @asyncapi/nodejs-ws-template 0.10.0 -> 0.10.2: P github asyncapi/nodejs-ws-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.178Z malicious 409 @asyncapi/markdown-template 1.6.7 -> 1.6.9: P github asyncapi/markdown-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.178Z malicious 410 @asyncapi/java-spring-cloud-stream-template 0.13.4 -> 0.13.6: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.178Z malicious 411 @asyncapi/web-component 2.6.5 -> 2.6.7: P github asyncapi/asyncapi-react (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.179Z malicious 412 asyncapi-preview 1.0.0 -> 1.0.2: P github asyncapi/vs-asyncapi-preview (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.179Z malicious 413 @asyncapi/generator-react-sdk 1.1.3 -> 1.1.5: P github asyncapi/generator (registry); refs read; tag v1.1.5; V V not listed
+2026-10-30T16:28:14.180Z malicious 414 @asyncapi/nodejs-template 3.0.4 -> 3.0.6: P github asyncapi/nodejs-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.181Z malicious 415 @asyncapi/server-api 0.16.22 -> 0.16.25: P github asyncapi/server-api (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.181Z malicious 416 @asyncapi/java-template 0.3.4 -> 0.3.6: P github asyncapi/java-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.181Z malicious 417 @asyncapi/html-template 3.3.1 -> 3.3.3: P github asyncapi/html-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.182Z malicious 418 @asyncapi/php-template 0.1.0 -> 0.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.182Z malicious 419 @asyncapi/java-spring-template 1.6.0 -> 1.6.2: P github asyncapi/java-spring-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.182Z malicious 420 @asyncapi/edavisualiser 1.2.0 -> 1.2.2: P github asyncapi/EDAVisualiser (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.183Z malicious 421 @asyncapi/cli 4.1.1 -> 4.1.3: P github asyncapi/cli (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.183Z malicious 422 @asyncapi/react-component 2.6.5 -> 2.6.7: P github asyncapi/asyncapi-react (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.184Z malicious 423 @asyncapi/generator 2.8.4 -> 2.8.6: P github asyncapi/generator (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.184Z malicious 424 @asyncapi/parser 3.4.0 -> 3.4.2: P github asyncapi/parser-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.184Z malicious 425 @asyncapi/studio 1.0.1 -> 1.0.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.185Z malicious 426 calc-loan-interest 1.0.3 -> 1.0.4: P github kingsky32/calc_loan_interest (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.185Z malicious 427 @posthog/web-dev-server 1.0.4 -> 1.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.186Z malicious 428 @posthog/maxmind-plugin 0.1.5 -> 0.1.6: P github PostHog/posthog-maxmind-plugin (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.186Z malicious 429 posthog-docusaurus 2.0.5 -> 2.0.6: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.186Z malicious 430 @posthog/cli 0.5.12 -> 0.5.15: P github PostHog/posthog (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.187Z malicious 431 @posthog/siphash 1.1.1 -> 1.1.2: P github PostHog/siphash-js (registry); refs read; tag v1.1.2; V V not listed
+2026-10-30T16:28:14.187Z malicious 432 @posthog/nuxt 1.2.0 -> 1.2.9: P github PostHog/posthog-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.188Z malicious 433 posthog-plugin-hello-world 1.0.0 -> 1.0.1: P github PostHog/posthog-plugin-hello-world (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.188Z malicious 434 @posthog/nextjs-config 1.4.0 -> 1.5.1: P github PostHog/posthog-js (registry); refs read; tag v1.5.1; V V not listed
+2026-10-30T16:28:14.189Z malicious 435 @posthog/clickhouse 1.7.0 -> 1.7.1: P github PostHog/node-clickhouse (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.189Z malicious 436 posthog-react-native-session-replay 1.2.1 -> 1.2.2: P github PostHog/posthog-react-native-session-replay (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.189Z malicious 437 @posthog/ai 7.1.0 -> 7.1.2: P github PostHog/posthog-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.190Z malicious 438 @posthog/piscina 3.2.0-posthog -> 3.2.1: P github piscinajs/piscina (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.190Z malicious 439 posthog-node 5.11.2 -> 5.13.3: P github PostHog/posthog-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.191Z malicious 440 posthog-react-native 4.11.0 -> 4.12.5: P github PostHog/posthog-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.191Z malicious 441 @posthog/core 1.5.2 -> 1.5.6: P github PostHog/posthog-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.192Z malicious 442 @posthog/wizard 1.16.1 -> 1.18.1: P github posthog/wizard (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.192Z malicious 443 @posthog/agent 1.20.0 -> 1.24.1: P github PostHog/posthog-agent (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.192Z malicious 444 posthog-js 1.293.0 -> 1.297.3: P github PostHog/posthog-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.193Z malicious 445 @actbase/react-native-actionsheet 1.0.2 -> 1.0.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.193Z malicious 446 @actbase/react-absolute 0.8.2 -> 0.8.3: P github actbase/react-absolute (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.194Z malicious 447 @actbase/react-native-simple-video 1.0.12 -> 1.0.13: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.194Z malicious 448 @actbase/react-native-naver-login 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.195Z malicious 449 @actbase/react-daum-postcode 1.0.4 -> 1.0.5: P github actbase/react-daum-postcode (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.195Z malicious 450 @seung-ju/react-native-action-sheet 0.2.0 -> 0.2.1: P github seung-ju-org/react-native-action-sheet (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.196Z malicious 451 @actbase/native 0.1.31 -> 0.1.32: P github actbase/native (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.196Z malicious 452 discord-bot-server 0.1.1 -> 0.1.2: P github kingsky32/discord-bot-server (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.197Z malicious 453 @actbase/react-native-kakao-navi 2.0.3 -> 2.0.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.197Z malicious 454 @actbase/react-native-fast-image 8.5.12 -> 8.5.13: P github DylanVann/react-native-fast-image (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.198Z malicious 455 @actbase/css-to-react-native-transform 1.0.2 -> 1.0.3: P github actbase/css-to-react-native-transform (registry); refs read; tag v1.0.3; V V not listed
+2026-10-30T16:28:14.198Z malicious 456 @actbase/react-native-devtools 0.1.2 -> 0.1.3: P github actbase/react-native-devtools (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.198Z malicious 457 @actbase/react-kakaosdk 0.9.26 -> 0.9.27: P github actbase/react-kakaosdk (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.199Z malicious 458 @actbase/node-server 1.1.18 -> 1.1.19: P github actbase/node-server (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.199Z malicious 459 @actbase/react-native-less-transformer 1.0.5 -> 1.0.6: P github kristerkari/react-native-less-transformer (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.200Z malicious 460 @actbase/react-native-tiktok 1.1.2 -> 1.1.3: P github Lg0gs/react-native-tiktok (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.200Z malicious 461 @actbase/react-native-kakao-channel 1.0.1 -> 1.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.201Z malicious 462 react-native-worklet-functions 3.3.2 -> 3.3.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.201Z malicious 463 expo-audio-session 0.2.0 -> 0.2.1: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.202Z malicious 464 @postman/postman-mcp-cli 1.0.2 -> 1.0.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.202Z malicious 465 @postman/tunnel-agent 0.6.4 -> 0.6.5: P github postmanlabs/tunnel-agent (registry); refs read; tag v0.6.5; V V not listed
+2026-10-30T16:28:14.202Z malicious 466 @postman/pretty-ms 6.1.0 -> 6.1.1: P github postmanlabs/pretty-ms (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.203Z malicious 467 @postman/node-keytar 7.9.3 -> 7.9.4: P github opicacek/node-keytar (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.203Z malicious 468 @postman/csv-parse 4.0.2 -> 4.0.3: P github postmanlabs/node-csv-parse (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.204Z malicious 469 @postman/mcp-ui-client 5.5.0-4 -> 5.5.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.204Z malicious 470 @postman/postman-collection-fork 4.3.2 -> 4.3.3: P github postmanlabs/postman-collection (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.204Z malicious 471 @postman/postman-mcp-server 2.4.9 -> 2.4.10: P github postmanlabs/postman-mcp-server (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.205Z malicious 472 @postman/pm-bin-windows-x64 1.24.2 -> 1.24.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.205Z malicious 473 @postman/pm-bin-macos-arm64 1.24.2 -> 1.24.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.206Z malicious 474 @postman/pm-bin-macos-x64 1.24.2 -> 1.24.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.206Z malicious 475 @postman/pm-bin-linux-x64 1.24.2 -> 1.24.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.206Z malicious 476 @postman/tunnel-agent 0.6.4 -> 0.6.6: P github postmanlabs/tunnel-agent (registry); refs read; tag v0.6.6; V V not listed
+2026-10-30T16:28:14.207Z malicious 477 @postman/pretty-ms 6.1.0 -> 6.1.2: P github postmanlabs/pretty-ms (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.207Z malicious 478 @postman/postman-mcp-cli 1.0.2 -> 1.0.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.208Z malicious 479 @postman/node-keytar 7.9.3 -> 7.9.5: P github opicacek/node-keytar (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.208Z malicious 480 @postman/csv-parse 4.0.2 -> 4.0.4: P github postmanlabs/node-csv-parse (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.209Z malicious 481 @postman/mcp-ui-client 5.5.0-4 -> 5.5.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.209Z malicious 482 @postman/postman-collection-fork 4.3.2 -> 4.3.4: P github postmanlabs/postman-collection (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.210Z malicious 483 @postman/postman-mcp-server 2.4.9 -> 2.4.11: P github postmanlabs/postman-mcp-server (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.210Z malicious 484 @postman/pm-bin-windows-x64 1.24.2 -> 1.24.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.210Z malicious 485 @postman/pm-bin-macos-arm64 1.24.2 -> 1.24.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.211Z malicious 486 @postman/pm-bin-macos-x64 1.24.2 -> 1.24.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.211Z malicious 487 @postman/pm-bin-linux-x64 1.24.2 -> 1.24.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.211Z malicious 488 @postman/postman-mcp-cli 1.0.2 -> 1.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.212Z malicious 489 @postman/tunnel-agent 0.6.4 -> 0.6.7: P github postmanlabs/tunnel-agent (registry); refs read; tag v0.6.7; V V not listed
+2026-10-30T16:28:14.212Z malicious 490 @postman/pretty-ms 6.1.0 -> 6.1.3: P github postmanlabs/pretty-ms (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.213Z malicious 491 @postman/node-keytar 7.9.3 -> 7.9.6: P github opicacek/node-keytar (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.213Z malicious 492 @postman/csv-parse 4.0.2 -> 4.0.5: P github postmanlabs/node-csv-parse (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.214Z malicious 493 @postman/mcp-ui-client 5.5.0-4 -> 5.5.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.214Z malicious 494 @postman/postman-collection-fork 4.3.2 -> 4.3.5: P github postmanlabs/postman-collection (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.214Z malicious 495 @postman/postman-mcp-server 2.4.9 -> 2.4.12: P github postmanlabs/postman-mcp-server (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.215Z malicious 496 @postman/pm-bin-windows-x64 1.24.2 -> 1.24.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.215Z malicious 497 @postman/pm-bin-macos-arm64 1.24.2 -> 1.24.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.216Z malicious 498 @postman/pm-bin-macos-x64 1.24.2 -> 1.24.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.216Z malicious 499 @postman/pm-bin-linux-x64 1.24.2 -> 1.24.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.216Z malicious 500 scgsffcreator 1.0.4 -> 1.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.217Z malicious 501 capacitor-voice-recorder-wav 6.0.2 -> 6.0.3: P github scgscorp/capacitor-voice-recorder-wav (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.217Z malicious 502 scgs-capacitor-subscribe 1.0.10 -> 1.0.11: P github scgscorp/capacitor-subscribe (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.217Z malicious 503 capacitor-plugin-purchase 0.1.0 -> 0.1.1: P github scgscorp/capacitorpluginpurchase.git (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.218Z malicious 504 test-hardhat-app 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.218Z malicious 505 create-hardhat3-app 1.1.0 -> 1.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.219Z malicious 506 gate-evm-check-code2 2.0.2 -> 2.0.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.219Z malicious 507 bytecode-checker-cli 1.0.7 -> 1.0.8: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.219Z malicious 508 webpack-loader-httpfile 0.2.0 -> 0.2.1: P github servicex-sh/webpack-loader-httpfile (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.220Z malicious 509 esbuild-plugin-brotli 0.2.0 -> 0.2.1: P github linux-china/esbuild-plugin-brotli (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.220Z malicious 510 open2internet 0.1.0 -> 0.1.1: P github linux-china/open2internet-node-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.221Z malicious 511 bun-plugin-httpfile 0.1.0 -> 0.1.1: P github servicex-sh/bun-plugin-httpfile (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.221Z malicious 512 esbuild-plugin-httpfile 0.4.0 -> 0.4.1: P github servicex-sh/esbuild-plugin-httpfile (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.221Z malicious 513 web-types-lit 0.1.0 -> 0.1.1: P github linux-china/web-types-lit (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.222Z malicious 514 web-types-htmx 0.1.0 -> 0.1.1: P github linux-china/web-types-htmx (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.222Z malicious 515 rollup-plugin-httpfile 0.2.0 -> 0.2.1: P github servicex-sh/rollup-plugin-httpfile (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.222Z malicious 516 esbuild-plugin-eta 0.1.0 -> 0.1.1: P github linux-china/esbuild-plugin-eta (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.223Z malicious 517 vite-plugin-httpfile 0.2.0 -> 0.2.1: P github servicex-sh/vite-plugin-httpfile (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.223Z malicious 518 @ensdomains/curvearithmetics 1.0.0 -> 1.0.1: P github ensdomains/CurveArithmetics (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.224Z malicious 519 @ensdomains/blacklist 1.0.0 -> 1.0.1: P github ensdomains/blacklist (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.224Z malicious 520 @ensdomains/ccip-read-dns-gateway 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.224Z malicious 521 @ensdomains/cypress-metamask 1.2.0-development -> 1.2.1: P github CraftAcademyLabs/cypress-metamask (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.225Z malicious 522 @ensdomains/test-utils 1.3.0 -> 1.3.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.225Z malicious 523 @ensdomains/vite-plugin-i18next-loader 4.0.3 -> 4.0.4: P github ensdomains/vite-plugin-i18next-loader (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.225Z malicious 524 @ensdomains/eth-ens-namehash 2.0.15 -> 2.0.16: P github ensdomains/eth-ens-namehash (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.226Z malicious 525 @ensdomains/ens-test-env 1.0.1 -> 1.0.2: P github ensdomains/ens-test-env (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.226Z malicious 526 @ensdomains/durin 0.1.1 -> 0.1.2: P github ensdomains/durin.js (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.227Z malicious 527 @ensdomains/reverse-records 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.227Z malicious 528 @ensdomains/dnssecoraclejs 0.2.8 -> 0.2.9: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.228Z malicious 529 @ensdomains/ens-avatar 1.0.3 -> 1.0.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.228Z malicious 530 @ensdomains/unicode-confusables 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.228Z malicious 531 ethereum-ens 0.8.0 -> 0.8.1: P github Arachnid/ensjs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.229Z malicious 532 @ensdomains/buffer 0.1.0 -> 0.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.229Z malicious 533 @ensdomains/ens-validation 0.1.0 -> 0.1.1: P github MyCryptoHQ/ens-validation (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.230Z malicious 534 @ensdomains/dnsprovejs 0.5.2 -> 0.5.3: P github ensdomains/dnsprovejs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.230Z malicious 535 @ensdomains/mock 2.1.51 -> 2.1.52: P github ensdomains/mock (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.230Z malicious 536 @ensdomains/renewal-widget 0.1.9 -> 0.1.10: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.231Z malicious 537 @ensdomains/offchain-resolver-contracts 0.2.1 -> 0.2.2: P github ensdomains/offchain-resolver (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.231Z malicious 538 @ensdomains/hackathon-registrar 1.0.4 -> 1.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.231Z malicious 539 crypto-addr-codec 0.1.8 -> 0.1.9: P github jay-dee7/crypto-addr-serialize (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.232Z malicious 540 @ensdomains/ui 3.4.5 -> 3.4.6: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.232Z malicious 541 @ensdomains/hardhat-chai-matchers-viem 0.1.14 -> 0.1.15: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.233Z malicious 542 @ensdomains/name-wrapper 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.233Z malicious 543 @ensdomains/address-encoder 1.1.4 -> 1.1.5: P github ensdomains/address-encoder (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.233Z malicious 544 @ensdomains/subdomain-registrar 0.2.3 -> 0.2.4: P github ensdomains/subdomain-registrar (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.234Z malicious 545 @zapier/secret-scrubber 1.1.2 -> 1.1.3: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.234Z malicious 546 zapier-async-storage 1.0.0 -> 1.0.1: P github zapier/zapier-async-storage (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.235Z malicious 547 @zapier/browserslist-config-zapier 1.0.2 -> 1.0.3: P github zapier/browserslist-config-zapier (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.235Z malicious 548 @zapier/ai-actions 0.1.17 -> 0.1.18: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.235Z malicious 549 zapier-platform-legacy-scripting-runner 4.0.1 -> 4.0.2: P github zapier/zapier-platform (registry); refs read; tag zapier-platform-legacy-scripting-runner@4.0.2; V V not listed
+2026-10-30T16:28:14.236Z malicious 550 @zapier/spectral-api-ruleset 1.9.0 -> 1.9.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.236Z malicious 551 @zapier/babel-preset-zapier 6.4.0 -> 6.4.1: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.237Z malicious 552 zapier-platform-schema 18.0.1 -> 18.0.2: P github zapier/zapier-platform (registry); refs read; tag zapier-platform-schema@18.0.2; V V not listed
+2026-10-30T16:28:14.237Z malicious 553 zapier-scripts 7.8.2 -> 7.8.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.237Z malicious 554 zapier-platform-core 18.0.1 -> 18.0.2: P github zapier/zapier-platform (registry); refs read; tag zapier-platform-core@18.0.2; V V not listed
+2026-10-30T16:28:14.238Z malicious 555 @zapier/stubtree 0.1.1 -> 0.1.2: P github zapier/stubtree (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.238Z malicious 556 @zapier/eslint-plugin-zapier 11.0.2 -> 11.0.3: P github zapier/zapier (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.238Z malicious 557 @zapier/mcp-integration 3.0.0 -> 3.0.1: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.239Z malicious 558 zapier-platform-cli 18.0.1 -> 18.0.2: P github zapier/zapier-platform (registry); refs read; tag zapier-platform-cli@18.0.2; V V not listed
+2026-10-30T16:28:14.239Z malicious 559 @zapier/zapier-sdk 0.15.1 -> 0.15.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.240Z malicious 560 @zapier/ai-actions-react 0.1.11 -> 0.1.12: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.240Z malicious 561 @zapier/browserslist-config-zapier 1.0.2 -> 1.0.4: P github zapier/browserslist-config-zapier (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.240Z malicious 562 @zapier/babel-preset-zapier 6.4.0 -> 6.4.2: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.241Z malicious 563 zapier-platform-legacy-scripting-runner 4.0.1 -> 4.0.3: P github zapier/zapier-platform (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.241Z malicious 564 zapier-async-storage 1.0.0 -> 1.0.2: P github zapier/zapier-async-storage (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.242Z malicious 565 @zapier/ai-actions 0.1.17 -> 0.1.19: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.242Z malicious 566 @zapier/spectral-api-ruleset 1.9.0 -> 1.9.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.242Z malicious 567 @zapier/stubtree 0.1.1 -> 0.1.3: P github zapier/stubtree (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.243Z malicious 568 @zapier/secret-scrubber 1.1.2 -> 1.1.4: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.243Z malicious 569 @zapier/eslint-plugin-zapier 11.0.2 -> 11.0.4: P github zapier/zapier (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.244Z malicious 570 zapier-platform-core 18.0.1 -> 18.0.3: P github zapier/zapier-platform (registry); refs read; tag zapier-platform-core@18.0.3; V V not listed
+2026-10-30T16:28:14.244Z malicious 571 zapier-platform-schema 18.0.1 -> 18.0.3: P github zapier/zapier-platform (registry); refs read; tag zapier-platform-schema@18.0.3; V V not listed
+2026-10-30T16:28:14.244Z malicious 572 @zapier/mcp-integration 3.0.0 -> 3.0.2: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.245Z malicious 573 zapier-platform-cli 18.0.1 -> 18.0.3: P github zapier/zapier-platform (registry); refs read; tag zapier-platform-cli@18.0.3; V V not listed
+2026-10-30T16:28:14.245Z malicious 574 @zapier/zapier-sdk 0.15.1 -> 0.15.6: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.246Z malicious 575 @zapier/ai-actions-react 0.1.11 -> 0.1.13: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.246Z malicious 576 claude-token-updater 1.0.2 -> 1.0.3: P github zonehisa/claude-token-updater (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.246Z malicious 577 @hapheus/n8n-nodes-pgp 1.5.0 -> 1.5.1: P github hapheus/n8n-nodes-pgp (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.247Z malicious 578 @markvivanco/app-version-checker 1.0.0 -> 1.0.1: P github markvivanco/app-version-checker (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.247Z malicious 579 test-hardhat-app 1.0.0 -> 1.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.248Z malicious 580 bytecode-checker-cli 1.0.7 -> 1.0.9: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.248Z malicious 581 create-hardhat3-app 1.1.0 -> 1.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.248Z malicious 582 gate-evm-check-code2 2.0.2 -> 2.0.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.249Z malicious 583 @markvivanco/app-version-checker 1.0.0 -> 1.0.2: P github markvivanco/app-version-checker (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.249Z malicious 584 devstart-cli 1.0.4 -> 1.0.6: P github akshadjaiswal/devstart (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.249Z malicious 585 @zapier/spectral-api-ruleset 1.9.0 -> 1.9.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.250Z malicious 586 zapier-platform-legacy-scripting-runner 4.0.1 -> 4.0.4: P github zapier/zapier-platform (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.250Z malicious 587 @zapier/babel-preset-zapier 6.4.0 -> 6.4.3: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.251Z malicious 588 @zapier/browserslist-config-zapier 1.0.2 -> 1.0.5: P github zapier/browserslist-config-zapier (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.251Z malicious 589 zapier-async-storage 1.0.0 -> 1.0.3: P github zapier/zapier-async-storage (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.251Z malicious 590 @zapier/eslint-plugin-zapier 11.0.2 -> 11.0.5: P github zapier/zapier (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.252Z malicious 591 @zapier/secret-scrubber 1.1.2 -> 1.1.5: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.252Z malicious 592 zapier-scripts 7.8.2 -> 7.8.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.253Z malicious 593 @zapier/ai-actions 0.1.17 -> 0.1.20: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.253Z malicious 594 @zapier/stubtree 0.1.1 -> 0.1.4: P github zapier/stubtree (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.253Z malicious 595 zapier-platform-core 18.0.1 -> 18.0.4: P github zapier/zapier-platform (registry); refs read; tag zapier-platform-core@18.0.4; V V not listed
+2026-10-30T16:28:14.254Z malicious 596 zapier-platform-schema 18.0.1 -> 18.0.4: P github zapier/zapier-platform (registry); refs read; tag zapier-platform-schema@18.0.4; V V not listed
+2026-10-30T16:28:14.254Z malicious 597 @zapier/mcp-integration 3.0.0 -> 3.0.3: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.255Z malicious 598 zapier-platform-cli 18.0.1 -> 18.0.4: P github zapier/zapier-platform (registry); refs read; tag zapier-platform-cli@18.0.4; V V not listed
+2026-10-30T16:28:14.255Z malicious 599 @zapier/zapier-sdk 0.15.1 -> 0.15.7: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.255Z malicious 600 @zapier/ai-actions-react 0.1.11 -> 0.1.14: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.256Z malicious 601 @mcp-use/cli 2.2.2-canary.3 -> 2.2.6: P github mcp-use/mcp-use (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.256Z malicious 602 create-mcp-use-app 0.5.1-canary.2 -> 0.5.3: P github mcp-use/mcp-use (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.256Z malicious 603 mcp-use 1.3.2-canary.3 -> 1.4.2: P github mcp-use/mcp-use (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.257Z malicious 604 skills-use 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.257Z malicious 605 @mcp-use/mcp-use 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.258Z malicious 606 gate-evm-check-code2 2.0.2 -> 2.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.258Z malicious 607 bytecode-checker-cli 1.0.7 -> 1.0.10: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.259Z malicious 608 create-hardhat3-app 1.1.0 -> 1.1.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.259Z malicious 609 test-hardhat-app 1.0.0 -> 1.0.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.259Z malicious 610 zuper-sdk 1.0.56 -> 1.0.57: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.260Z malicious 611 skills-use 0.1.0 -> 0.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.260Z malicious 612 create-mcp-use-app 0.5.1-canary.2 -> 0.5.4: P github mcp-use/mcp-use (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.260Z malicious 613 @mcp-use/cli 2.2.2-canary.3 -> 2.2.7: P github mcp-use/mcp-use (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.261Z malicious 614 @mcp-use/mcp-use 1.0.0 -> 1.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.261Z malicious 615 mcp-use 1.3.2-canary.3 -> 1.4.3: P github mcp-use/mcp-use (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.262Z malicious 616 token.js-fork 0.7.30 -> 0.7.32: P github token-js/token.js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.262Z malicious 617 jan-browser 0.13.0 -> 0.13.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.262Z malicious 618 @louisle2/core 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.263Z malicious 619 @louisle2/cortex-js 0.1.5 -> 0.1.6: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.263Z malicious 620 react-component-taggers 0.1.8 -> 0.1.9: P github shinichimg/react-component-taggers (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.264Z malicious 621 exact-ticker 0.3.4 -> 0.3.5: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.264Z malicious 622 command-irail 0.5.3 -> 0.5.4: P github iRail/command-irail (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.264Z malicious 623 @orbitgtbelgium/mapbox-gl-draw-scale-rotate-mode 1.1.0 -> 1.1.1: P github ReyhaneMasumi/mapbox-gl-draw-scale-rotate-mode (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.265Z malicious 624 orbit-nebula-editor 1.0.1 -> 1.0.2: P github Orbit-GT-Belgium/nebula.gl (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.265Z malicious 625 orbit-soap 0.43.12 -> 0.43.13: P github vpulim/node-soap (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.265Z malicious 626 orbit-nebula-draw-tools 1.0.9 -> 1.0.10: P github Orbit-GT-Belgium/orbit-nebula-editor (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.266Z malicious 627 @orbitgtbelgium/mapbox-gl-draw-cut-polygon-mode 2.0.4 -> 2.0.5: P github ReyhaneMasumi/mapbox-gl-draw-cut-polygon-mode (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.266Z malicious 628 @orbitgtbelgium/orbit-components 1.2.8 -> 1.2.9: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.267Z malicious 629 @orbitgtbelgium/time-slider 1.0.186 -> 1.0.187: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.267Z malicious 630 orbit-boxicons 2.1.2 -> 2.1.3: P github atisawd/boxicons (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.267Z malicious 631 react-element-prompt-inspector 0.1.17 -> 0.1.18: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.268Z malicious 632 typeorm-orbit 0.2.26 -> 0.2.27: P github typeorm/typeorm (registry); refs read; tag 0.2.27; V V not listed
+2026-10-30T16:28:14.268Z malicious 633 trigo-react-app 4.1.1 -> 4.1.2: P github trigo-at/trigo-react-app (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.269Z malicious 634 atrix-mongoose 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.269Z malicious 635 eslint-config-trigo 22.0.1 -> 22.0.2: P github trigo-at/eslint-config-trigo (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.269Z malicious 636 @trigo/eslint-config-trigo 3.3.0 -> 3.3.1: P github trigo-at/eslint-config-trigo (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.270Z malicious 637 @trigo/pathfinder-ui-css 0.1.0 -> 0.1.1: P github kelkes/pathfinder-ui-css (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.270Z malicious 638 @trigo/atrix-postgres 1.0.2 -> 1.0.3: P github trigo-at/atrix-postgres (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.270Z malicious 639 @trigo/atrix 7.0.0-alpha5 -> 7.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.271Z malicious 640 @trigo/hapi-auth-signedlink 1.3.0 -> 1.3.1: P github trigo-at/hapi-auth-signedlink (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.271Z malicious 641 @trigo/bool-expressions 4.1.2 -> 4.1.3: P github trigo-at/bool-expressions (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.272Z malicious 642 bool-expressions 0.1.1 -> 0.1.2: P github trigo-at/bool-expressions (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.272Z malicious 643 @trigo/node-soap 0.5.3 -> 0.5.4: P github milewise/node-soap (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.272Z malicious 644 @trigo/atrix-elasticsearch 2.0.0 -> 2.0.1: P github trigo-at/atrix-elasticsearch (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.273Z malicious 645 @trigo/jsdt 0.2.0 -> 0.2.1: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.273Z malicious 646 @trigo/atrix-orientdb 1.0.1 -> 1.0.2: P github trigo-at/atrix-orientdb (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.273Z malicious 647 @trigo/keycloak-api 1.3.0 -> 1.3.1: P github trigo-at/keycloak-api (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.274Z malicious 648 @trigo/atrix-pubsub 4.0.2 -> 4.0.3: P github trigo-at/atrix-pubsub (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.274Z malicious 649 @trigo/atrix-redis 1.0.1 -> 1.0.2: P github trigo-at/atrix-redis (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.275Z malicious 650 @trigo/atrix-swagger 3.0.0-alpha2 -> 3.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.275Z malicious 651 @trigo/trigo-hapijs 5.0.0 -> 5.0.1: P github trigo-at/trigo-hapijs (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.275Z malicious 652 @trigo/atrix-soap 1.0.1 -> 1.0.2: P github trigo-at/atrix-soap (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.276Z malicious 653 @trigo/atrix-mongoose 1.0.1 -> 1.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.276Z malicious 654 @trigo/fsm 3.4.1 -> 3.4.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.277Z malicious 655 @trigo/atrix-acl 4.0.1 -> 4.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.277Z malicious 656 @alaan/s2s-auth 2.0.2 -> 2.0.3: P github AlaanPay/s2s-auth (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.277Z malicious 657 @trefox/sleekshop-js 0.1.5 -> 0.1.6: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.278Z malicious 658 package-tester 1.0.0 -> 1.0.1: P github donaldtrumpyyy/package-test (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.278Z malicious 659 super-commit 1.0.0 -> 1.0.1: P github osmanekrem/super-commit (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.279Z malicious 660 @osmanekrem/bmad 1.0.5 -> 1.0.6: P github osmanekrem/bmad-core (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.279Z malicious 661 gitsafe 1.0.4 -> 1.0.5: P github osmanekrem/gitsafe (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.279Z malicious 662 @osmanekrem/error-handler 1.2.1 -> 1.2.2: P github osmanekrem/error-handler (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.280Z malicious 663 @commute/market-data-chartjs 2.3.0 -> 2.3.1: P github Commute-Agency/market-data-chartjs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.280Z malicious 664 @commute/market-data 1.0.1 -> 1.0.2: P github Commute-Agency/market-data (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.280Z malicious 665 @commute/bloom 1.0.2 -> 1.0.3: P github Commute-Agency/bloom (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.281Z malicious 666 web-scraper-mcp 1.1.3 -> 1.1.4: P github yourusername/web-scraper-mcp (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.281Z malicious 667 bytecode-checker-cli 1.0.7 -> 1.0.11: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.282Z malicious 668 test-hardhat-app 1.0.0 -> 1.0.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.282Z malicious 669 create-hardhat3-app 1.1.0 -> 1.1.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.282Z malicious 670 gate-evm-check-code2 2.0.2 -> 2.0.6: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.283Z malicious 671 designstudiouiux 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.283Z malicious 672 ngx-useful-swiper-prosenjit 9.0.1 -> 9.0.2: P github jaychase/angular2-useful-swiper (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.283Z malicious 673 email-deliverability-tester 1.1.0 -> 1.1.1: P github prosenjit-manna/send-email-with-email-delivery-test (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.284Z malicious 674 okta-react-router-6 5.0.0 -> 5.0.1: P github okta/okta-react (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.284Z malicious 675 ito-button 8.0.2 -> 8.0.3: P github prosenjit-manna/ito-angular (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.285Z malicious 676 itobuz-angular-button 8.0.10 -> 8.0.11: P github prosenjit-manna/itobuz-angular (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.285Z malicious 677 itobuz-angular-auth 8.0.10 -> 8.0.11: P github prosenjit-manna/itobuz-angular (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.285Z malicious 678 ngx-wooapi 12.0.0 -> 12.0.1: P github angular-studio/wooApi (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.286Z malicious 679 wellness-expert-ng-gallery 5.1.0 -> 5.1.1: P github murhafsousli/ngx-gallery (registry); refs read; tag v5.1.1; V V not listed
+2026-10-30T16:28:14.286Z malicious 680 @ifelsedeveloper/protocol-contracts-svm-idl 0.1.1 -> 0.1.2: P github rarible/protocol-contracts-svm (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.287Z malicious 681 selenium-session-client 1.0.3 -> 1.0.4: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.287Z malicious 682 @dev-blinq/ai-qa-logic 1.0.18 -> 1.0.19: P github blinq-io/ai-qa (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.287Z malicious 683 prompt-eng-server 1.0.17 -> 1.0.18: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.288Z malicious 684 selenium-session 1.0.4 -> 1.0.5: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.288Z malicious 685 blinqio-executions-cli 1.0.39 -> 1.0.41: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.289Z malicious 686 @dev-blinq/ui-systems 1.0.91 -> 1.0.93: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.289Z malicious 687 @dev-blinq/cucumber-js 1.0.123 -> 1.0.131: P github blinq-io/cucumber-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.289Z malicious 688 react-native-email 2.1.0 -> 2.1.1: P github tiaanduplessis/react-native-email (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.290Z malicious 689 react-native-google-maps-directions 2.1.1 -> 2.1.2: P github tiaanduplessis/react-native-google-maps-directions (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.290Z malicious 690 url-encode-decode 1.0.0 -> 1.0.1: P github tiaanduplessis/url-encode-decode (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.291Z malicious 691 jquery-bindings 1.1.1 -> 1.1.2: P github tiaanduplessis/jquery-bindings (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.291Z malicious 692 coinmarketcap-api 3.1.1 -> 3.1.2: P github tiaanduplessis/coinmarketcap-api (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.291Z malicious 693 formik-error-focus 2.0.0 -> 2.0.1: P github tiaanduplessis/formik-error-focus (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.292Z malicious 694 stat-fns 1.0.0 -> 1.0.1: P github tiaanduplessis/stat-fns (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.292Z malicious 695 @lessondesk/babel-preset 1.0.0 -> 1.0.1: P github lessondesk/babel-preset (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.292Z malicious 696 react-native-modest-storage 2.1.0 -> 2.1.1: P github tiaanduplessis/react-native-modest-storage (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.293Z malicious 697 react-native-phone-call 1.2.0 -> 1.2.1: P github tiaanduplessis/react-native-phone-call (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.293Z malicious 698 nanoreset 7.0.0 -> 7.0.1: P github tiaanduplessis/nanoreset (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.294Z malicious 699 gatsby-plugin-cname 1.0.0 -> 1.0.1: P github tiaanduplessis/gatsby-plugin-cname (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.294Z malicious 700 axios-timed 1.0.0 -> 1.0.1: P github tiaanduplessis/axios-timed (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.294Z malicious 701 react-native-fetch 2.0.0 -> 2.0.1: P github tiaanduplessis/react-native-fetch (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.295Z malicious 702 just-toasty 1.7.0 -> 1.7.1: P github tiaanduplessis/just-toasty (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.295Z malicious 703 @ifings/design-system 4.9.1 -> 4.9.2: P github fullfacing/fng-web-hardware (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.296Z malicious 704 kill-port 2.0.1 -> 2.0.2: P github tiaanduplessis/kill-port (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.296Z malicious 705 @thedelta/eslint-config 1.0.1 -> 1.0.2: P github The-Delta-Studio/eslint-config (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.296Z malicious 706 set-nested-prop 2.0.0 -> 2.0.1: P github tiaanduplessis/set-nested-prop (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.297Z malicious 707 stoor 2.3.1 -> 2.3.2: P github tiaanduplessis/stoor (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.297Z malicious 708 react-native-datepicker-modal 1.3.0 -> 1.3.1: P github tiaanduplessis/react-native-datepicker-modal (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.298Z malicious 709 react-native-websocket 1.0.2 -> 1.0.3: P github tiaanduplessis/react-native-websocket (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.298Z malicious 710 ra-auth-firebase 1.0.2 -> 1.0.3: P github tiaanduplessis/ra-auth-firebase (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.298Z malicious 711 fittxt 1.0.1 -> 1.0.2: P github tiaanduplessis/fittxt (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.299Z malicious 712 sort-by-distance 2.0.0 -> 2.0.1: P github tiaanduplessis/sort-by-distance (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.299Z malicious 713 valid-south-african-id 1.0.2 -> 1.0.3: P github tiaanduplessis/valid-south-african-id (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.299Z malicious 714 barebones-css 1.1.2 -> 1.1.3: P github tiaanduplessis/barebones-css (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.300Z malicious 715 pico-uid 1.0.2 -> 1.0.3: P github tiaanduplessis/pico-uid (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.300Z malicious 716 @varsityvibe/api-client 1.3.35 -> 1.3.36: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.301Z malicious 717 @ifings/metatron3 0.1.4 -> 0.1.5: P github ifings/metatron3 (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.301Z malicious 718 axios-cancelable 1.0.0 -> 1.0.1: P github tiaanduplessis/axios-cancelable (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.301Z malicious 719 hyperterm-hipster 1.0.6 -> 1.0.7: P github tiaanduplessis/hyperterm-hipster (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.302Z malicious 720 @lessondesk/api-client 9.12.1 -> 9.12.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.302Z malicious 721 react-linear-loader 1.0.1 -> 1.0.2: P github tiaanduplessis/react-linear-loader (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.303Z malicious 722 @lessondesk/eslint-config 1.4.1 -> 1.4.2: P github lessondesk/eslint-config (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.303Z malicious 723 flatten-unflatten 1.0.0 -> 1.0.1: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.303Z malicious 724 tenacious-fetch 2.3.1 -> 2.3.2: P github tiaanduplessis/tenacious-fetch (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.304Z malicious 725 react-native-modest-checkbox 3.3.0 -> 3.3.1: P github tiaanduplessis/react-native-modest-checkbox (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.304Z malicious 726 react-native-jam-icons 1.0.0 -> 1.0.1: P github tiaanduplessis/react-native-jam-icons (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.305Z malicious 727 image-to-uri 1.0.0 -> 1.0.1: P github tiaanduplessis/image-to-uri (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.305Z malicious 728 sa-id-gen 1.0.3 -> 1.0.4: P github tiaanduplessis/sa-id-gen (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.305Z malicious 729 luno-api 1.2.2 -> 1.2.3: P github tiaanduplessis/luno-api (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.306Z malicious 730 bytes-to-x 1.0.0 -> 1.0.1: P github tiaanduplessis/bytes-to-x (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.306Z malicious 731 @varsityvibe/utils 5.0.5 -> 5.0.6: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.306Z malicious 732 dont-go 1.1.1 -> 1.1.2: P github tiaanduplessis/dont-go (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.307Z malicious 733 @tiaanduplessis/react-progressbar 1.0.0 -> 1.0.1: P github tiaanduplessis/react-progressbar (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.307Z malicious 734 react-qr-image 1.1.0 -> 1.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.308Z malicious 735 @lessondesk/material-icons 1.0.2 -> 1.0.3: P github lessondesk/material-icons (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.308Z malicious 736 css-dedoupe 0.1.1 -> 0.1.2: P github tiaanduplessis/css-dedoupe (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.308Z malicious 737 fuzzy-finder 1.0.4 -> 1.0.5: P github tiaanduplessis/fuzzy-finder (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.309Z malicious 738 svelte-toasty 1.1.1 -> 1.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.309Z malicious 739 mod10-check-digit 1.0.0 -> 1.0.1: P github tiaanduplessis/mod10-check-digit (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.310Z malicious 740 @lessondesk/react-table-context 2.0.3 -> 2.0.4: P github lessondesk/react-table-context (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.310Z malicious 741 next-simple-google-analytics 1.1.0 -> 1.1.1: P github tiaanduplessis/next-simple-google-analytics (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.310Z malicious 742 wenk 1.0.8 -> 1.0.9: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.311Z malicious 743 license-o-matic 1.2.0 -> 1.2.1: P github tiaanduplessis/license-o-matic (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.311Z malicious 744 sa-company-registration-number-regex 1.0.0 -> 1.0.1: P github tiaanduplessis/sa-company-registration-number-regex (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.312Z malicious 745 parcel-plugin-asset-copier 1.1.1 -> 1.1.2: P github tiaanduplessis/parcel-plugin-asset-copier (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.312Z malicious 746 @lessondesk/schoolbus 5.2.1 -> 5.2.2: P github fullfacing/schoolbus (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.312Z malicious 747 blob-to-base64 1.0.2 -> 1.0.3: P github tiaanduplessis/blob-to-base64 (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.313Z malicious 748 eslint-config-nitpicky 4.0.0 -> 4.0.1: P github tiaanduplessis/eslint-config-nitpicky (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.313Z malicious 749 typefence 1.2.1 -> 1.2.2: P github tiaanduplessis/typefence (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.313Z malicious 750 lang-codes 1.0.0 -> 1.0.1: P github tiaanduplessis/lang-codes (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.314Z malicious 751 react-native-log-level 1.2.0 -> 1.2.1: P github tiaanduplessis/react-native-log-level (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.314Z malicious 752 react-hook-form-persist 3.0.0 -> 3.0.1: P github tiaanduplessis/react-hook-form-persist (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.315Z malicious 753 jacob-zuma 1.0.0 -> 1.0.1: P github tiaanduplessis/jacob-zuma (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.315Z malicious 754 pkg-readme 1.1.0 -> 1.1.1: P github tiaanduplessis/pkg-readme (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.315Z malicious 755 compare-obj 1.1.0 -> 1.1.1: P github tiaanduplessis/compare-obj (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.316Z malicious 756 react-native-get-pixel-dimensions 1.0.0 -> 1.0.1: P github tiaanduplessis/react-native-get-pixel-dimensions (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.316Z malicious 757 react-keycloak-context 1.0.7 -> 1.0.8: P github tiaanduplessis/react-keycloak-context (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.317Z malicious 758 colors-regex 2.0.0 -> 2.0.1: P github tiaanduplessis/colors-regex (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.317Z malicious 759 feature-flip 1.0.0 -> 1.0.1: P github tiaanduplessis/feature-flip (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.317Z malicious 760 flapstacks 1.0.0 -> 1.0.1: P github tiaanduplessis/flapstacks (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.318Z malicious 761 hyper-fullfacing 1.0.2 -> 1.0.3: P github tiaanduplessis/hyper-fullfacing (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.318Z malicious 762 next-styled-nprogress 1.0.3 -> 1.0.4: P github tiaanduplessis/next-styled-nprogress (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.319Z malicious 763 upload-to-play-store 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.319Z malicious 764 @varsityvibe/validation-schemas 0.6.6 -> 0.6.7: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.319Z malicious 765 enforce-branch-name 1.1.2 -> 1.1.3: P github tiaanduplessis/enforce-branch-name (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.320Z malicious 766 template-micro-service 1.0.1 -> 1.0.2: P github tiaanduplessis/template-micro-service (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.320Z malicious 767 react-native-retriable-fetch 2.0.0 -> 2.0.1: P github tiaanduplessis/react-native-retriable-fetch (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.321Z malicious 768 lint-staged-imagemin 1.3.0 -> 1.3.1: P github tiaanduplessis/lint-staged-imagemin (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.321Z malicious 769 @tiaanduplessis/json 2.0.1 -> 2.0.2: P github tiaanduplessis/json (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.321Z malicious 770 svelte-autocomplete-select 1.1.0 -> 1.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.322Z malicious 771 obj-to-css 1.0.1 -> 1.0.2: P github tiaanduplessis/obj-to-css (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.322Z malicious 772 fat-fingered 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.323Z malicious 773 react-micromodal.js 1.0.0 -> 1.0.1: P github tiaanduplessis/react-micromodal (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.323Z malicious 774 south-african-id-info 1.0.1 -> 1.0.2: P github tiaanduplessis/south-african-id-info (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.323Z malicious 775 get-them-args 1.3.2 -> 1.3.3: P github tiaanduplessis/get-them-args (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.324Z malicious 776 react-native-view-finder 1.2.0 -> 1.2.1: P github tiaanduplessis/react-native-view-finder (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.324Z malicious 777 httpness 1.0.1 -> 1.0.2: P github tiaanduplessis/httpness (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.324Z malicious 778 count-it-down 1.0.0 -> 1.0.1: P github tiaanduplessis/count-it-down (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.325Z malicious 779 template-lib 1.1.2 -> 1.1.3: P github tiaanduplessis/template-lib (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.325Z malicious 780 shell-exec 1.1.2 -> 1.1.3: P github tiaanduplessis/shell-exec (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.326Z malicious 781 react-jam-icons 1.0.0 -> 1.0.1: P github tiaanduplessis/react-jam-icons (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.326Z malicious 782 formik-store 1.0.0 -> 1.0.1: P github tiaanduplessis/formik-store (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.326Z malicious 783 @everreal/validate-esmoduleinterop-imports 1.4.3 -> 1.4.4: P github EverRealGMBH/er-monorepos-apis (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.327Z malicious 784 haufe-axera-api-client 0.0.1-c4b110b -> 0.0.1: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.327Z malicious 785 @clausehq/flows-step-mqtt 0.1.13 -> 0.1.14: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.328Z malicious 786 @alexcolls/nuxt-ux 0.6.0 -> 0.6.1: P github alexcolls/nuxt-ux (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.328Z malicious 787 @everreal/react-charts 2.0.0-d32fe19 -> 2.0.1: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.328Z malicious 788 @everreal/validate-esmoduleinterop-imports 1.4.3 -> 1.4.5: P github EverRealGMBH/er-monorepos-apis (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.329Z malicious 789 tiaan 1.0.1 -> 1.0.2: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.329Z malicious 790 @clausehq/flows-step-taskscreateurl 0.1.13 -> 0.1.14: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.330Z malicious 791 next-simple-google-analytics 1.1.0 -> 1.1.2: P github tiaanduplessis/next-simple-google-analytics (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.330Z malicious 792 puny-req 1.0.2 -> 1.0.3: P github tiaanduplessis/puny-req (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.330Z malicious 793 gatsby-plugin-cname 1.0.0 -> 1.0.2: P github tiaanduplessis/gatsby-plugin-cname (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.331Z malicious 794 lint-staged-imagemin 1.3.0 -> 1.3.2: P github tiaanduplessis/lint-staged-imagemin (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.331Z malicious 795 @everreal/react-charts 2.0.0-d32fe19 -> 2.0.2: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.331Z malicious 796 upload-to-play-store 1.0.0 -> 1.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.332Z malicious 797 nanoreset 7.0.0 -> 7.0.2: P github tiaanduplessis/nanoreset (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.332Z malicious 798 react-native-email 2.1.0 -> 2.1.2: P github tiaanduplessis/react-native-email (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.333Z malicious 799 next-styled-nprogress 1.0.3 -> 1.0.5: P github tiaanduplessis/next-styled-nprogress (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.333Z malicious 800 axios-timed 1.0.0 -> 1.0.2: P github tiaanduplessis/axios-timed (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.334Z malicious 801 kill-port 2.0.1 -> 2.0.3: P github tiaanduplessis/kill-port (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.334Z malicious 802 compare-obj 1.1.0 -> 1.1.2: P github tiaanduplessis/compare-obj (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.334Z malicious 803 react-native-websocket 1.0.2 -> 1.0.4: P github tiaanduplessis/react-native-websocket (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.335Z malicious 804 fittxt 1.0.1 -> 1.0.3: P github tiaanduplessis/fittxt (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.335Z malicious 805 react-native-retriable-fetch 2.0.0 -> 2.0.2: P github tiaanduplessis/react-native-retriable-fetch (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.335Z malicious 806 lang-codes 1.0.0 -> 1.0.2: P github tiaanduplessis/lang-codes (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.336Z malicious 807 template-micro-service 1.0.1 -> 1.0.3: P github tiaanduplessis/template-micro-service (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.336Z malicious 808 axios-cancelable 1.0.0 -> 1.0.2: P github tiaanduplessis/axios-cancelable (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.337Z malicious 809 @accordproject/concerto-linter-default-ruleset 3.24.1-20251029130616 -> 3.24.1: P github accordproject/concerto (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.337Z malicious 810 @eventcatalog/generator-asyncapi 5.0.4 -> 5.1.0: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.337Z malicious 811 jquery-bindings 1.1.1 -> 1.1.3: P github tiaanduplessis/jquery-bindings (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.338Z malicious 812 fat-fingered 1.0.0 -> 1.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.338Z malicious 813 react-native-view-finder 1.2.0 -> 1.2.2: P github tiaanduplessis/react-native-view-finder (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.339Z malicious 814 @varsityvibe/api-client 1.3.35 -> 1.3.37: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.339Z malicious 815 shell-exec 1.1.2 -> 1.1.4: P github tiaanduplessis/shell-exec (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.339Z malicious 816 svelte-toasty 1.1.1 -> 1.1.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.340Z malicious 817 jacob-zuma 1.0.0 -> 1.0.2: P github tiaanduplessis/jacob-zuma (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.340Z malicious 818 obj-to-css 1.0.1 -> 1.0.3: P github tiaanduplessis/obj-to-css (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.341Z malicious 819 image-to-uri 1.0.0 -> 1.0.2: P github tiaanduplessis/image-to-uri (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.341Z malicious 820 typefence 1.2.1 -> 1.2.3: P github tiaanduplessis/typefence (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.341Z malicious 821 count-it-down 1.0.0 -> 1.0.2: P github tiaanduplessis/count-it-down (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.342Z malicious 822 react-native-get-pixel-dimensions 1.0.0 -> 1.0.2: P github tiaanduplessis/react-native-get-pixel-dimensions (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.342Z malicious 823 pico-uid 1.0.2 -> 1.0.4: P github tiaanduplessis/pico-uid (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.342Z malicious 824 @tiaanduplessis/json 2.0.1 -> 2.0.3: P github tiaanduplessis/json (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.343Z malicious 825 react-native-datepicker-modal 1.3.0 -> 1.3.2: P github tiaanduplessis/react-native-datepicker-modal (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.343Z malicious 826 tenacious-fetch 2.3.1 -> 2.3.3: P github tiaanduplessis/tenacious-fetch (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.344Z malicious 827 sa-company-registration-number-regex 1.0.0 -> 1.0.2: P github tiaanduplessis/sa-company-registration-number-regex (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.344Z malicious 828 url-encode-decode 1.0.0 -> 1.0.2: P github tiaanduplessis/url-encode-decode (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.344Z malicious 829 flapstacks 1.0.0 -> 1.0.2: P github tiaanduplessis/flapstacks (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.345Z malicious 830 @lessondesk/api-client 9.12.1 -> 9.12.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.345Z malicious 831 react-hook-form-persist 3.0.0 -> 3.0.2: P github tiaanduplessis/react-hook-form-persist (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.346Z malicious 832 @tiaanduplessis/react-progressbar 1.0.0 -> 1.0.2: P github tiaanduplessis/react-progressbar (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.346Z malicious 833 @lessondesk/electron-group-api-client 1.0.2 -> 1.0.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.346Z malicious 834 react-native-fetch 2.0.0 -> 2.0.2: P github tiaanduplessis/react-native-fetch (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.347Z malicious 835 license-o-matic 1.2.0 -> 1.2.2: P github tiaanduplessis/license-o-matic (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.347Z malicious 836 fuzzy-finder 1.0.4 -> 1.0.6: P github tiaanduplessis/fuzzy-finder (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.348Z malicious 837 react-native-phone-call 1.2.0 -> 1.2.2: P github tiaanduplessis/react-native-phone-call (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.348Z malicious 838 flatten-unflatten 1.0.0 -> 1.0.2: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.348Z malicious 839 react-native-log-level 1.2.0 -> 1.2.2: P github tiaanduplessis/react-native-log-level (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.349Z malicious 840 react-native-jam-icons 1.0.0 -> 1.0.2: P github tiaanduplessis/react-native-jam-icons (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.349Z malicious 841 sa-id-gen 1.0.3 -> 1.0.5: P github tiaanduplessis/sa-id-gen (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.349Z malicious 842 react-favic 1.0.1 -> 1.0.2: P github tiaanduplessis/react-favic (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.350Z malicious 843 httpness 1.0.1 -> 1.0.3: P github tiaanduplessis/httpness (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.350Z malicious 844 set-nested-prop 2.0.0 -> 2.0.2: P github tiaanduplessis/set-nested-prop (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.351Z malicious 845 @varsityvibe/validation-schemas 0.6.6 -> 0.6.8: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.351Z malicious 846 template-lib 1.1.2 -> 1.1.4: P github tiaanduplessis/template-lib (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.351Z malicious 847 wenk 1.0.8 -> 1.0.10: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.352Z malicious 848 samesame 1.0.2 -> 1.0.3: P github tiaanduplessis/samesame (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.352Z malicious 849 barebones-css 1.1.2 -> 1.1.4: P github tiaanduplessis/barebones-css (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.353Z malicious 850 @lessondesk/schoolbus 5.2.1 -> 5.2.3: P github fullfacing/schoolbus (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.353Z malicious 851 react-jam-icons 1.0.0 -> 1.0.2: P github tiaanduplessis/react-jam-icons (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.354Z malicious 852 react-micromodal.js 1.0.0 -> 1.0.2: P github tiaanduplessis/react-micromodal (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.354Z malicious 853 react-keycloak-context 1.0.7 -> 1.0.9: P github tiaanduplessis/react-keycloak-context (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.354Z malicious 854 coinmarketcap-api 3.1.1 -> 3.1.3: P github tiaanduplessis/coinmarketcap-api (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.355Z malicious 855 parcel-plugin-asset-copier 1.1.1 -> 1.1.3: P github tiaanduplessis/parcel-plugin-asset-copier (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.355Z malicious 856 feature-flip 1.0.0 -> 1.0.2: P github tiaanduplessis/feature-flip (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.355Z malicious 857 @accordproject/markdown-it-cicero 0.16.20-20241108141903 -> 0.16.26: P github accordproject/markdown-transform (registry); refs read; tag v0.16.26; V V not listed
+2026-10-30T16:28:14.356Z malicious 858 tcsp-draw-test 1.0.4 -> 1.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.356Z malicious 859 hopedraw 1.0.2 -> 1.0.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.357Z malicious 860 tcsp-test-vd 2.4.3 -> 2.4.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.357Z malicious 861 @clausehq/flows-step-jsontoxml 0.1.13 -> 0.1.14: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.357Z malicious 862 @clausehq/flows-step-httprequest 0.1.13 -> 0.1.14: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.358Z malicious 863 @accordproject/concerto-analysis 3.24.1-20251029130616 -> 3.24.1: P github accordproject/concerto (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.358Z malicious 864 @accordproject/concerto-linter 3.24.1-20251029130616 -> 3.24.1: P github accordproject/concerto (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.359Z malicious 865 @accordproject/template-engine 2.7.1 -> 2.7.2: P github accordproject/template-engine (registry); refs read; tag v2.7.2; V V not listed
+2026-10-30T16:28:14.359Z malicious 866 @accordproject/concerto-types 3.24.1-20251029130616 -> 3.24.1: P github accordproject/concerto (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.359Z malicious 867 @clausehq/flows-step-sendgridemail 0.1.13 -> 0.1.14: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.360Z malicious 868 mon-package-react-typescript 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.360Z malicious 869 piclite 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.361Z malicious 870 use-unsaved-changes 1.0.8 -> 1.0.9: P github mohamedsaiedd/use-unsaved-changes-hook (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.361Z malicious 871 uplandui 0.5.3 -> 0.5.4: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.361Z malicious 872 firestore-search-engine 1.2.2 -> 1.2.3: P github solarpush/firestore-search-engine (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.362Z malicious 873 invo 0.2.1 -> 0.2.2: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.362Z malicious 874 @pradhumngautam/common-app 1.0.1 -> 1.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.362Z malicious 875 ai-crowl-shield 1.0.6 -> 1.0.7: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.363Z malicious 876 dashboard-empty-state 1.0.2 -> 1.0.3: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.363Z malicious 877 generator-meteor-stock 0.1.5 -> 0.1.6: P github mattcarp/meteor-stock (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.364Z malicious 878 @sme-ui/aoma-vevasound-metadata-lib 0.1.2 -> 0.1.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.364Z malicious 879 benmostyn-frame-print 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.365Z malicious 880 @voiceflow/verror 1.1.3 -> 1.1.4: P github storyflow/verror (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.365Z malicious 881 @voiceflow/prettier-config 1.9.1 -> 1.10.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.365Z malicious 882 @voiceflow/tsconfig 1.11.1 -> 1.12.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.366Z malicious 883 @voiceflow/husky-config 1.2.0 -> 1.3.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.366Z malicious 884 @voiceflow/commitlint-config 2.5.1 -> 2.6.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.367Z malicious 885 @voiceflow/storybook-config 1.1.1 -> 1.2.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.367Z malicious 886 shelf-jwt-sessions 0.1.1 -> 0.1.2: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.367Z malicious 887 @voiceflow/stylelint-config 1.1.0 -> 1.1.1: P github voiceflow/stylelint-config (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.368Z malicious 888 @voiceflow/git-branch-check 1.4.2 -> 1.4.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.368Z malicious 889 @voiceflow/serverless-plugin-typescript 2.1.6 -> 2.1.7: P github serverless/serverless-plugin-typescript (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.368Z malicious 890 @voiceflow/anthropic 0.4.3 -> 0.4.4: P github anthropics/anthropic-sdk-typescript (registry); refs read; tag v0.4.4; V V not listed
+2026-10-30T16:28:14.369Z malicious 891 @voiceflow/vitest-config 1.8.1 -> 1.10.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.369Z malicious 892 @voiceflow/npm-package-json-lint-config 1.1.0 -> 1.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.370Z malicious 893 @voiceflow/openai 3.2.1 -> 3.2.2: P github voiceflow/openai (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.370Z malicious 894 @voiceflow/metrics 1.5.0 -> 1.5.1: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.371Z malicious 895 @voiceflow/semantic-release-config 1.4.0 -> 1.4.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.371Z malicious 896 @voiceflow/widget 1.7.17 -> 1.7.18: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.371Z malicious 897 @voiceflow/eslint-config 7.14.0 -> 7.16.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.372Z malicious 898 @voiceflow/body-parser 1.21.1 -> 1.21.2: P github voiceflow/body-parser (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.372Z malicious 899 @voiceflow/circleci-config-sdk-orb-import 0.2.0 -> 0.2.1: P github voiceflow/circleci-config-sdk-orb-import (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.373Z malicious 900 @voiceflow/eslint-plugin 1.2.0 -> 1.6.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.373Z malicious 901 @voiceflow/pino-pretty 4.4.0 -> 4.4.1: P github voiceflow/pino-pretty (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.373Z malicious 902 @voiceflow/vite-config 2.4.2 -> 2.6.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.374Z malicious 903 docusaurus-plugin-vanilla-extract 1.0.2 -> 1.0.3: P github antstackio/docusaurus-plugin-vanilla-extract (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.374Z malicious 904 @voiceflow/stitches-react 2.3.1 -> 2.3.2: P github stitchesjs/stitches (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.375Z malicious 905 @pruthvi21/use-debounce 1.0.2 -> 1.0.3: P github pruthvi2103/use-debounce (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.375Z malicious 906 @antstackio/json-to-graphql 1.0.2 -> 1.0.3: P github antstackio/json-graphql (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.375Z malicious 907 @hover-design/core 0.0.1-beta -> 0.0.1: P github antstackio/hover-design (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.376Z malicious 908 @antstackio/graphql-body-parser 0.1.0 -> 0.1.1: P github antstackio/graphql-body-parser (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.376Z malicious 909 @antstackio/express-graphql-proxy 0.2.7 -> 0.2.8: P github antstackio/express-graphql-proxy (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.377Z malicious 910 @antstackio/shelbysam 1.1.6 -> 1.1.7: P github antstackio/shelby-sam (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.377Z malicious 911 @voiceflow/slate-serializer 1.7.1 -> 1.7.3: P github voiceflow/slate-serializer (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.377Z malicious 912 @voiceflow/dependency-cruiser-config 1.8.9 -> 1.8.11: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.378Z malicious 913 @faq-component/react 1.0.0 -> 1.0.1: P github pruthvi2103/faq-component (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.378Z malicious 914 @voiceflow/test-common 2.1.0 -> 2.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.379Z malicious 915 @voiceflow/runtime-client-js 1.17.1 -> 1.17.2: P github voiceflow/runtime-client-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.379Z malicious 916 @voiceflow/encryption 0.3.1 -> 0.3.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.379Z malicious 917 @voiceflow/fetch 1.10.2-f91712198.164 -> 1.11.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.380Z malicious 918 @voiceflow/natural-language-commander 0.5.1 -> 0.5.2: P github will-wow/natural-language-commander (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.380Z malicious 919 @voiceflow/backend-utils 5.0.0 -> 5.0.1: P github voiceflow/backend-utils (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.381Z malicious 920 @voiceflow/pino 6.11.2 -> 6.11.3: P github voiceflow/pino (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.381Z malicious 921 @voiceflow/tsconfig-paths 1.1.3 -> 1.1.4: P github voiceflow/toolchain (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.381Z malicious 922 @voiceflow/exception 1.8.2-f91712198.164 -> 1.10.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.382Z malicious 923 @voiceflow/general-types 3.2.21 -> 3.2.22: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.382Z malicious 924 @voiceflow/chat-types 2.14.56 -> 2.14.58: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.382Z malicious 925 @voiceflow/logger 2.4.2-alpha.1 -> 2.4.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.383Z malicious 926 @voiceflow/voice-types 2.10.56 -> 2.10.58: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.383Z malicious 927 @voiceflow/common 8.8.1 -> 8.9.1: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.384Z malicious 928 @voiceflow/google-dfes-types 2.17.11 -> 2.17.12: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.384Z malicious 929 @voiceflow/runtime 1.29.0 -> 1.29.1: P github voiceflow/runtime (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.384Z malicious 930 @voiceflow/sdk-runtime 1.42.1 -> 1.43.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.385Z malicious 931 @voiceflow/alexa-types 2.15.58 -> 2.15.60: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.385Z malicious 932 @voiceflow/api-sdk 3.28.56 -> 3.28.58: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.386Z malicious 933 @voiceflow/voiceflow-types 3.32.43 -> 3.32.45: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.386Z malicious 934 @voiceflow/dtos-interact 1.39.0 -> 1.40.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.386Z malicious 935 @voiceflow/base-types 2.136.0 -> 2.136.2: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.387Z malicious 936 vf-oss-template 1.0.0 -> 1.0.1: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.387Z malicious 937 composite-reducer 1.0.1 -> 1.0.2: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.387Z malicious 938 normal-store 1.3.0 -> 1.3.1: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.388Z malicious 939 bidirectional-adapter 1.2.1 -> 1.2.2: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.388Z malicious 940 @voiceflow/husky-config 1.2.0 -> 1.3.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.389Z malicious 941 @voiceflow/git-branch-check 1.4.2 -> 1.4.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.389Z malicious 942 @voiceflow/stylelint-config 1.1.0 -> 1.1.2: P github voiceflow/stylelint-config (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.389Z malicious 943 @voiceflow/prettier-config 1.9.1 -> 1.10.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.390Z malicious 944 @voiceflow/semantic-release-config 1.4.0 -> 1.4.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.390Z malicious 945 @voiceflow/tsconfig 1.11.1 -> 1.12.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.390Z malicious 946 @voiceflow/verror 1.1.3 -> 1.1.5: P github storyflow/verror (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.391Z malicious 947 @voiceflow/commitlint-config 2.5.1 -> 2.6.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.391Z malicious 948 @voiceflow/npm-package-json-lint-config 1.1.0 -> 1.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.392Z malicious 949 @voiceflow/anthropic 0.4.3 -> 0.4.5: P github anthropics/anthropic-sdk-typescript (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.392Z malicious 950 @voiceflow/circleci-config-sdk-orb-import 0.2.0 -> 0.2.2: P github voiceflow/circleci-config-sdk-orb-import (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.392Z malicious 951 @voiceflow/vitest-config 1.8.1 -> 1.10.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.393Z malicious 952 @voiceflow/storybook-config 1.1.1 -> 1.2.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.393Z malicious 953 @voiceflow/body-parser 1.21.1 -> 1.21.3: P github voiceflow/body-parser (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.394Z malicious 954 @voiceflow/widget 1.7.17 -> 1.7.19: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.394Z malicious 955 @voiceflow/metrics 1.5.0 -> 1.5.2: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.394Z malicious 956 @voiceflow/serverless-plugin-typescript 2.1.6 -> 2.1.8: P github serverless/serverless-plugin-typescript (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.395Z malicious 957 @voiceflow/stitches-react 2.3.1 -> 2.3.3: P github stitchesjs/stitches (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.395Z malicious 958 @voiceflow/eslint-config 7.14.0 -> 7.16.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.395Z malicious 959 @voiceflow/vite-config 2.4.2 -> 2.6.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.396Z malicious 960 @voiceflow/pino-pretty 4.4.0 -> 4.4.2: P github voiceflow/pino-pretty (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.396Z malicious 961 @voiceflow/eslint-plugin 1.2.0 -> 1.6.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.397Z malicious 962 dialogflow-es 1.1.0 -> 1.1.1: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.397Z malicious 963 @voiceflow/openai 3.2.1 -> 3.2.3: P github voiceflow/openai (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.397Z malicious 964 @voiceflow/test-common 2.1.0 -> 2.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.398Z malicious 965 @voiceflow/natural-language-commander 0.5.1 -> 0.5.3: P github will-wow/natural-language-commander (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.398Z malicious 966 @voiceflow/backend-utils 5.0.0 -> 5.0.2: P github voiceflow/backend-utils (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.399Z malicious 967 @voiceflow/slate-serializer 1.7.1 -> 1.7.4: P github voiceflow/slate-serializer (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.399Z malicious 968 @voiceflow/encryption 0.3.1 -> 0.3.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.400Z malicious 969 @voiceflow/fetch 1.10.2-f91712198.164 -> 1.11.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.400Z malicious 970 @voiceflow/dependency-cruiser-config 1.8.9 -> 1.8.12: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.400Z malicious 971 @voiceflow/tsconfig-paths 1.1.3 -> 1.1.5: P github voiceflow/toolchain (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.401Z malicious 972 @voiceflow/runtime-client-js 1.17.1 -> 1.17.3: P github voiceflow/runtime-client-js (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.401Z malicious 973 @voiceflow/pino 6.11.2 -> 6.11.4: P github voiceflow/pino (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.401Z malicious 974 @voiceflow/logger 2.4.2-alpha.1 -> 2.4.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.402Z malicious 975 @voiceflow/exception 1.8.2-f91712198.164 -> 1.10.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.402Z malicious 976 @voiceflow/chat-types 2.14.56 -> 2.14.59: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.403Z malicious 977 @voiceflow/general-types 3.2.21 -> 3.2.23: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.403Z malicious 978 @voiceflow/voice-types 2.10.56 -> 2.10.59: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.403Z malicious 979 @voiceflow/api-sdk 3.28.56 -> 3.28.59: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.404Z malicious 980 @voiceflow/google-dfes-types 2.17.11 -> 2.17.13: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.404Z malicious 981 @voiceflow/alexa-types 2.15.58 -> 2.15.61: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.405Z malicious 982 @voiceflow/common 8.8.1 -> 8.9.2: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.405Z malicious 983 @voiceflow/sdk-runtime 1.42.1 -> 1.43.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.405Z malicious 984 @voiceflow/runtime 1.29.0 -> 1.29.2: P github voiceflow/runtime (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.406Z malicious 985 @voiceflow/voiceflow-types 3.32.43 -> 3.32.46: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.406Z malicious 986 @voiceflow/dtos-interact 1.39.0 -> 1.40.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.407Z malicious 987 @voiceflow/base-types 2.136.0 -> 2.136.3: P github voiceflow/libs (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.407Z malicious 988 arc-cli-fc 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.407Z malicious 989 @suraj_h/medium-common 1.0.4 -> 1.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.408Z malicious 990 vf-oss-template 1.0.0 -> 1.0.2: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.408Z malicious 991 composite-reducer 1.0.1 -> 1.0.3: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.408Z malicious 992 bidirectional-adapter 1.2.1 -> 1.2.3: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.409Z malicious 993 normal-store 1.3.0 -> 1.3.2: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.409Z malicious 994 dialogflow-es 1.1.0 -> 1.1.2: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.410Z malicious 995 n8n-nodes-viral-app 0.2.4 -> 0.2.5: P github fmd-labs/n8n-nodes-viral-app (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.410Z malicious 996 @alexcolls/nuxt-ux 0.6.0 -> 0.6.2: P github alexcolls/nuxt-ux (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.410Z malicious 997 @trpc-rate-limiter/cloudflare 0.1.3 -> 0.1.4: P github j3sch/tRPC-rate-limiter (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.411Z malicious 998 @trpc-rate-limiter/hono 0.1.3 -> 0.1.4: P github j3sch/tRPC-rate-limiter (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.411Z malicious 999 jsonsurge 1.0.6 -> 1.0.7: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.412Z malicious 1000 vf-oss-template 1.0.0 -> 1.0.3: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.412Z malicious 1001 composite-reducer 1.0.1 -> 1.0.4: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.412Z malicious 1002 bidirectional-adapter 1.2.1 -> 1.2.4: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.413Z malicious 1003 normal-store 1.3.0 -> 1.3.3: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.413Z malicious 1004 dialogflow-es 1.1.0 -> 1.1.3: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.414Z malicious 1005 rediff 1.0.4 -> 1.0.5: P github Schibsted-Tech-Polska/rediff (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.414Z malicious 1006 jaetut-varit-test 1.0.1 -> 1.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.414Z malicious 1007 best_gpio_controller 1.0.9 -> 1.0.10: P github SteelFace87/PI_GPIO_controller (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.415Z malicious 1008 @browserbasehq/stagehand 3.0.3 -> 3.0.4: P github browserbase/stagehand (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.415Z malicious 1009 @browserbasehq/mcp-server-browserbase 2.4.0 -> 2.4.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.415Z malicious 1010 @vishadtyagi/full-year-calendar 0.1.10 -> 0.1.11: P github shubhamtyagi2606/FullYearCalendar (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.416Z malicious 1011 composite-reducer 1.0.1 -> 1.0.5: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.416Z malicious 1012 vf-oss-template 1.0.0 -> 1.0.4: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.417Z malicious 1013 bidirectional-adapter 1.2.1 -> 1.2.5: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.417Z malicious 1014 normal-store 1.3.0 -> 1.3.4: P not obtained (registry 404, ecosyste.ms 200); refs -; tag -; V V not listed
+2026-10-30T16:28:14.417Z malicious 1015 dialogflow-es 1.1.0 -> 1.1.4: P no repository (ecosyste.ms); refs -; tag -; V V not listed
+2026-10-30T16:28:14.418Z malicious 1016 react-data-to-export 1.0.0 -> 1.0.1: P github saeedkhal/react-data-export (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.418Z malicious 1017 my-saeed-lib 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.418Z malicious 1018 @livecms/nuxt-live-edit 1.9.1 -> 1.9.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.419Z malicious 1019 ids-css 1.5.0 -> 1.5.1: P github infor-design/css (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.419Z malicious 1020 ids-enterprise-typings 20.1.5 -> 20.1.6: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.420Z malicious 1021 ids-enterprise-ng 20.1.5 -> 20.1.6: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.420Z malicious 1022 @ifelsedeveloper/protocol-contracts-svm-idl 0.1.1 -> 0.1.3: P github rarible/protocol-contracts-svm (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.420Z malicious 1023 asciitranslator 1.0.2 -> 1.0.3: P github harsh-100/AsciiTranslator (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.421Z malicious 1024 simplejsonform 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.421Z malicious 1025 @trackstar/react-trackstar-link-upgrade 1.1.9 -> 1.1.10: P github trackstarhq/react-trackstar-link (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.422Z malicious 1026 @trackstar/angular-trackstar-link 1.0.1 -> 1.0.2: P github trackstarhq/angular-trackstar-link (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.422Z malicious 1027 @trackstar/test-package 1.1.4 -> 1.1.5: P github trackstarhq/react-trackstar-link (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.422Z malicious 1028 gatsby-plugin-antd 2.2.0 -> 2.2.1: P github bskimball/gatsby-plugin-antd (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.423Z malicious 1029 react-packery-component 1.0.2 -> 1.0.3: P github eiriklv/react-packery-component (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.423Z malicious 1030 @bdkinc/knex-ibmi 0.5.6 -> 0.5.7: P github bdkinc/knex-ibmi (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.423Z malicious 1031 express-starter-template 1.0.9 -> 1.0.10: P github jayeshsadhwani99/express-starter-template (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.424Z malicious 1032 react-scrambled-text 1.0.3 -> 1.0.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.424Z malicious 1033 @jayeshsadhwani/telemetry-sdk 1.0.13 -> 1.0.14: P github DrDroidLab/telemetry-sdk (registry); refs read; tag v1.0.14; V V not listed
+2026-10-30T16:28:14.425Z malicious 1034 @hyperlook/telemetry-sdk 1.0.18 -> 1.0.19: P github DrDroidLab/telemetry-sdk (registry); refs read; tag v1.0.19; V V not listed
+2026-10-30T16:28:14.425Z malicious 1035 victoriaxoaquyet-wallet-core 0.2.0 -> 0.2.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.425Z malicious 1036 victoria-wallet-core 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.426Z malicious 1037 victoria-wallet-utils 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.426Z malicious 1038 victoria-wallet-constants 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.426Z malicious 1039 victoria-wallet-type 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.427Z malicious 1040 wallet-evm 0.3.0 -> 0.3.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.427Z malicious 1041 wallet-type 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.428Z malicious 1042 victoria-wallet-validator 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.428Z malicious 1043 tavily-module 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.428Z malicious 1044 @alexadark/reusable-functions 1.5.0 -> 1.5.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.429Z malicious 1045 @alexadark/amadeus-api 1.0.3 -> 1.0.4: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.429Z malicious 1046 typeface-antonio-complete 1.0.4 -> 1.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.430Z malicious 1047 frontity-starter-theme 1.0.0 -> 1.0.1: P github alexadark/frontity-starter-theme (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.430Z malicious 1048 @alexadark/gatsby-theme-wordpress-blog 2.0.0 -> 2.0.1: P github alexadark/gatsby-theme-jam (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.430Z malicious 1049 @alexadark/gatsby-theme-events 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.431Z malicious 1050 @cllbk/ghl 1.3.0 -> 1.3.1: P github CallBackCode/ghlSDK (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.431Z malicious 1051 victoria-wallet-core 0.1.0 -> 0.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.432Z malicious 1052 victoria-wallet-validator 0.1.0 -> 0.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.432Z malicious 1053 victoria-wallet-utils 0.1.0 -> 0.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.432Z malicious 1054 wallet-evm 0.3.0 -> 0.3.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.433Z malicious 1055 wallet-type 0.1.0 -> 0.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.433Z malicious 1056 victoria-wallet-type 0.1.0 -> 0.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.434Z malicious 1057 victoriaxoaquyet-wallet-core 0.2.0 -> 0.2.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.434Z malicious 1058 victoria-wallet-constants 0.1.0 -> 0.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.434Z malicious 1059 @viapip/eslint-config 0.2.3 -> 0.2.4: P github viapip/eslint-config (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.435Z malicious 1060 @chtijs/eslint-config 1.0.0 -> 1.0.1: P github chtijs/eslint-config (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.435Z malicious 1061 csv-tool-cli 1.2.0 -> 1.2.1: P github Florian-mfr/csv-tool-cli (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.435Z malicious 1062 ts-relay-cursor-paging 2.1.0 -> 2.1.1: P github productdevbookcom/ts-relay-cursor-paging (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.436Z malicious 1063 @oku-ui/dialog 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.436Z malicious 1064 @oku-ui/roving-focus 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.437Z malicious 1065 @oku-ui/primitives-nuxt 0.3.0 -> 0.3.1: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.437Z malicious 1066 @lui-ui/lui-nuxt 0.1.0 -> 0.1.1: P github LUI-UI/lui-vue (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.437Z malicious 1067 avvvatars-vue 1.1.1 -> 1.1.2: P github 0fatihyildiz/avvvatars-vue (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.438Z malicious 1068 @oku-ui/slider 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.438Z malicious 1069 @oku-ui/toggle-group 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.439Z malicious 1070 nuxt-keycloak 0.2.1 -> 0.2.2: P github productdevbook/nuxt-keycloak (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.439Z malicious 1071 @oku-ui/tabs 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.439Z malicious 1072 @oku-ui/direction 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.440Z malicious 1073 @oku-ui/checkbox 0.6.2 -> 0.6.3: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.440Z malicious 1074 @oku-ui/radio-group 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.440Z malicious 1075 @oku-ui/dismissable-layer 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.441Z malicious 1076 @oku-ui/switch 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.441Z malicious 1077 @productdevbook/auth 0.2.1 -> 0.2.2: P github productdevbook/okulib (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.442Z malicious 1078 @oku-ui/toolbar 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.442Z malicious 1079 @productdevbook/animejs-vue 0.2.0 -> 0.2.1: P github productdevbook/animejs-vue (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.442Z malicious 1080 @oku-ui/progress 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.443Z malicious 1081 @oku-ui/avatar 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.443Z malicious 1082 @oku-ui/focus-guards 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.443Z malicious 1083 @productdevbook/chatwoot 2.0.0 -> 2.0.1: P github productdevbookcom/chatwoot (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.444Z malicious 1084 @oku-ui/collection 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.444Z malicious 1085 @productdevbook/motion 1.0.3 -> 1.0.4: P repository not understood (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.445Z malicious 1086 @lui-ui/lui-tailwindcss 0.1.1 -> 0.1.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.445Z malicious 1087 @oku-ui/motion-nuxt 0.2.1 -> 0.2.2: P github oku-ui/motion (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.445Z malicious 1088 @oku-ui/popper 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.446Z malicious 1089 @oku-ui/utils 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.446Z malicious 1090 @oku-ui/scroll-area 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.447Z malicious 1091 v-plausible 1.2.0 -> 1.2.1: P github productdevbookcom/v-plausible (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.447Z malicious 1092 @oku-ui/hover-card 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.447Z malicious 1093 create-silgi 0.3.0 -> 0.3.1: P github silgijs/silgi (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.448Z malicious 1094 @productdevbook/ts-i18n 1.4.1 -> 1.4.2: P github productdevbookcom/ts-i18n (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.448Z malicious 1095 @oku-ui/menu 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.449Z malicious 1096 silgi 0.43.29 -> 0.43.30: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.449Z malicious 1097 @oku-ui/collapsible 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.449Z malicious 1098 @lui-ui/lui-vue 1.0.12 -> 1.0.13: P github LUI-UI/lui-vue (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.450Z malicious 1099 schob 1.0.2 -> 1.0.3: P github productdevbookcom/schob (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.450Z malicious 1100 @oku-ui/presence 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.450Z malicious 1101 @oku-ui/tooltip 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.451Z malicious 1102 @oku-ui/portal 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.451Z malicious 1103 @oku-ui/toggle 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.452Z malicious 1104 @oku-ui/arrow 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.452Z malicious 1105 @oku-ui/slot 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.452Z malicious 1106 @oku-ui/toast 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.453Z malicious 1107 @oku-ui/provide 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.453Z malicious 1108 @oku-ui/separator 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.454Z malicious 1109 @oku-ui/motion 0.4.3 -> 0.4.4: P github oku-ui/motion (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.454Z malicious 1110 unadapter 0.1.2 -> 0.1.3: P github productdevbook/unadapter (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.454Z malicious 1111 @oku-ui/aspect-ratio 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.455Z malicious 1112 @oku-ui/popover 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.455Z malicious 1113 @oku-ui/alert-dialog 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.455Z malicious 1114 @oku-ui/focus-scope 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.456Z malicious 1115 @oku-ui/visually-hidden 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.456Z malicious 1116 @oku-ui/use-composable 0.6.1 -> 0.6.2: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.457Z malicious 1117 @oku-ui/primitives 0.7.8 -> 0.7.9: P github oku-ui/primitives (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.457Z malicious 1118 quickswap-default-staking-list-address 1.0.54 -> 1.0.55: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.457Z malicious 1119 soneium-acs 1.0.0 -> 1.0.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.458Z malicious 1120 quickswap-ads-list 1.0.32 -> 1.0.33: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.458Z malicious 1121 kinetix-default-token-list 1.0.4 -> 1.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.459Z malicious 1122 quickswap-v2-sdk 2.0.0 -> 2.0.1: P github QuickSwap/quickswap-v2-sdk (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.459Z malicious 1123 quickswap-default-token-list 1.5.14 -> 1.5.16: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.459Z malicious 1124 quickswap-default-staking-list 1.0.10 -> 1.0.11: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.460Z malicious 1125 quickswap-token-lists 1.0.2 -> 1.0.3: P github QuickSwap/token-lists (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.460Z malicious 1126 uniswap-router-sdk 1.6.1 -> 1.6.2: P github Uniswap/router-sdk (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.460Z malicious 1127 valuedex-sdk 3.0.4 -> 3.0.5: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.461Z malicious 1128 @sameepsi/sor 1.0.2 -> 1.0.3: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.461Z malicious 1129 @sameepsi/sor2 2.0.1 -> 2.0.2: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.462Z malicious 1130 quickswap-smart-order-router 1.0.0 -> 1.0.1: P github QuickSwap/smart-order-router (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.462Z malicious 1131 quickswap-router-sdk 1.0.0 -> 1.0.1: P github Uniswap/router-sdk (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.462Z malicious 1132 uniswap-smart-order-router 3.16.25 -> 3.16.26: P github Uniswap/smart-order-router (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.463Z malicious 1133 quickswap-sdk 3.0.43 -> 3.0.44: P github sameepsi/quickswap-sdk (registry); refs HTTP 401; tag -; V V not listed
+2026-10-30T16:28:14.463Z malicious 1134 uniswap-test-sdk-core 4.0.7 -> 4.0.8: P github Uniswap/uniswap-sdk-core (registry); refs read; tag v4.0.8; V V not listed
+2026-10-30T16:28:14.464Z malicious 1135 buffered-interpolation-babylon6 0.2.7 -> 0.2.8: P github virbela/buffered-interpolation (registry); refs read; tag v0.2.8; V V not listed
+2026-10-30T16:28:14.464Z malicious 1136 kns-error-code 1.0.7 -> 1.0.8: P not GitHub (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.465Z malicious 1137 m25-transaction-utils 1.1.15 -> 1.1.16: P github nguyenkhoa0721/m25-transaction-utils (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.465Z malicious 1138 @micado-digital/stadtmarketing-kufstein-external 1.9.0 -> 1.9.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.465Z malicious 1139 babel-preset-kinvey-flex-service 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.466Z malicious 1140 kinvey-cli-wrapper 0.3.0 -> 0.3.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.466Z malicious 1141 better-queue-nedb 0.1.4 -> 0.1.5: P github dustintownsend/better-queue-nedb (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.467Z malicious 1142 create-kinvey-flex-service 0.2.0 -> 0.2.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.467Z malicious 1143 eslint-config-kinvey-flex-service 0.1.0 -> 0.1.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.467Z malicious 1144 kinvey-flex-scripts 0.5.0 -> 0.5.1: P no repository (registry); refs -; tag -; V V not listed
+2026-10-30T16:28:14.468Z malicious 1145 @asyncapi/generator-helpers 1.1.0 -> 1.1.1: P github asyncapi/generator (registry); refs read; tag v1.1.1; V V not listed
+2026-10-30T16:28:14.468Z malicious 1146 @asyncapi/generator-components 0.7.0 -> 0.7.1: P github asyncapi/generator (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.469Z malicious 1147 @asyncapi/generator 3.3.0 -> 3.3.1: P github asyncapi/generator (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.469Z malicious 1148 @asyncapi/specs 6.11.1 -> 6.11.2: P github asyncapi/spec-json-schemas (registry); refs read; tag -; V V not listed
+2026-10-30T16:28:14.492Z refs done: 1148 rows, 485 repositories, 199 commits

@@ -365,8 +365,14 @@ function requirementsMet(view: Map<string, ViewEntry>, consumers: ViewEntry[], l
   return unmet;
 }
 
-/** A package-lock `packages` key: an optional workspace prefix, then one or more node_modules/<name> segments. */
-const LOCK_PATH = /^(?:[A-Za-z0-9@._-]+(?:\/[A-Za-z0-9@._-]+)*\/)?(?:node_modules\/(?:@[a-z0-9][a-z0-9._-]*\/)?[A-Za-z0-9._-]+\/)*node_modules\/(?:@[a-z0-9][a-z0-9._-]*\/)?[A-Za-z0-9._-]+$/i;
+/**
+ * A package-lock `packages` key: any folders (a workspace, node_modules and the packages inside it), then a last
+ * node_modules/<name>. One way to match any key, so it decides in linear time; the earlier node_modules segments are
+ * folders like any other, and spelling them out made a refusal quadratic (dockerfile-check.test.ts has its old answers).
+ */
+const LOCK_PATH = /^(?:[A-Za-z0-9@._-]+\/)*node_modules\/(?:@[a-z0-9][a-z0-9._-]*\/)?[A-Za-z0-9._-]+$/i;
+/** The longest `packages` key read. npm's longest in the corpus has 93 characters; a longer key is refused, not repeated. */
+const LOCK_KEY_LIMIT = 4096;
 /** The name a package is required by at a path: the last node_modules segment. */
 export const requireName = (path: string) => path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
 /**
@@ -384,6 +390,7 @@ const extraneousFolder = (path: string, item: any) => path.includes("node_module
  * (lockEntries) and the PR job (deliver.ts) read keys through this one function (review 6518582507, B1).
  */
 export function lockKey(path: string, item: unknown): "root" | "install" | "folder" | "extraneous" {
+  if (path.length > LOCK_KEY_LIMIT) throw new Error(`A package-lock path is longer than ${LOCK_KEY_LIMIT} characters.`);
   if (path === "") return "root";
   if (path.includes("\\")) throw new Error(`Unexpected package-lock path: ${path}.`);
   if (!path.includes("node_modules/")) return "folder";

@@ -33,9 +33,9 @@ Not in the text above:
 
 ## Missing before complete
 
-The owner adopted a definition of "complete" as policy on 2026-11-01 (CLAUDE.md, Goal): docs/decisions/2026-11-01-definition-of-complete.md, which quotes it word for word, in Japanese. Parts of it are still open: the lines of C1, C2 and C10, the scope apart from Maven, C4's strata, what gate 3 checks for a project with no tests, and C9's 60 days. Its completion sentence, translated: complete is the state in which, across everything Ludion says it supports, Ludion takes a fix from its official release to the merge with no human hands, through the four gates and the wait, reverts by itself what it breaks, and meets C1 to C16 below at the same time. If one is missing, it is not complete; a wider scope gets the same lines.
+The owner adopted a definition of "complete" as policy on 2026-11-01 (CLAUDE.md, Goal): docs/decisions/2026-11-01-definition-of-complete.md, which quotes it word for word, in Japanese. Parts of it are still open: the lines of C1, C2 and C10, the scope apart from Maven, C4's strata, C10's denominator, what gate 3 checks for a project with no tests, and C9's 60 days. Its completion sentence, translated: complete is the state in which, across everything Ludion says it supports, Ludion takes a fix from its official release to the merge with no human hands, through the four gates and the wait, reverts by itself what it breaks, and meets C1 to C16 below at the same time. If one is missing, it is not complete; a wider scope gets the same lines.
 
-The tables below translate the record's. The "Today" column gives the record's values, not measured again here, with two corrections the record's own text does not carry: C1's is written as narrowly as LT measured it, since the record's sentence (「公開時にタグがあったのは 0」) is stronger than LT's numbers; and C3's and C7's are backtest v4's (the judge of 2026-10-28, docs/bench/2026-10-28-backtest-v4), not measured again with main's judge, which has changed since (LV3, LI and LFLAGS, among others). Where the record leaves something open (空けてある), it is left open here too.
+The tables below translate the record's. The "Today" column gives the record's values, not measured again here, with three changes the quote itself does not carry (the record's preface lists them): C1's is written as narrowly as LT measured it, since the record's sentence (「公開時にタグがあったのは 0」) is stronger than LT's numbers; C3's and C7's are backtest v4's (the judge of 2026-10-28, docs/bench/2026-10-28-backtest-v4), not measured again with main's judge, which has changed since (LV3, LI and LFLAGS, among others); and C9's adds what q is, as the board post that measured q defines it (ludion-ops comment 6542899951). One more addition is in the "How it is measured" column: C7 gives, besides the median, the share of fixes whose wait was extended and the p90 (the Claude chat, ludion-ops comment 6553345976); neither has been measured, so "Today" gives no value for them. Where the record leaves something open (空けてある), it is left open here too.
 
 ### Safety
 
@@ -52,7 +52,7 @@ The tables below translate the record's. The "Today" column gives the record's v
 
 | Condition | How it is measured | Line to pass | Today |
 |---|---|---|---|
-| C7 The delay the gates add | Median from publication to "may be applied", per urgency | 24h, 24h, 72h | Met in backtest v4 (16.4h n=6, 0h n=21, 41.5h n=138); not measured on main |
+| C7 The delay the gates add | Median from publication to "may be applied", per urgency. Given with it: the share of fixes whose wait was extended, and the p90 | 24h, 24h, 72h | Met in backtest v4 (16.4h n=6, 0h n=21, 41.5h n=138); not measured on main |
 | C8 Exposure time | Kaplan–Meier median per (project, advisory) | Median within 72 hours | Not measured (baseline: without Ludion, median 9 days; with Dependabot or Renovate, 0 days) |
 | C9 Runs without being asked | q and its quantiles, with the time GitHub started a run as the unit. It must not stop even in a quiet public repository | Confirmed not to stop; if not, written down as a limit (the owner chooses). The 60 days: left open | q about 0.17 to 0.19 (q: of the hourly slots, the share in which GitHub started a run). Stops at 60 days |
 | C10 The share protected on its own | LV0's strata, and the official images' stratum (floating tags in the denominator too). 97 or more per stratum | Left open (the owner; the denominator after LV0) | 0/100 (only the stratum that pins versions) |
@@ -68,15 +68,15 @@ The tables below translate the record's. The "Today" column gives the record's v
 | C15 Real use | Real repositories of people outside Ludion-ai. Actions are measured, not opinions | 5 people. 0 broken automatic merges. The line on the number of cases is the owner's | 0 people |
 | C16 What is published | npm, the Action, the site | npm from publish.yml, with provenance, 0 dependencies, 0 scripts. The Action pinned by SHA with the CLI bundled. The site: 0 sentences that describe what is not built, the same in English and Japanese, a section at the top for people with no background, why it is needed told from CVE-2024-4577 | Not met |
 
-### Scope (a proposal; decided once LV0's numbers are in)
+### Scope (a proposal, decided once LV0's numbers are in, apart from Maven, decided on 2026-11-01)
 
-| Kind | Ludion today | In "complete" (proposal) |
+| Kind | Ludion today | In "complete" (proposal; Maven decided) |
 |---|---|---|
 | npm (package-lock.json) | Fixes. The only one that goes through gate 2's judgement | In |
 | npm (pnpm, yarn and bun locks) | Not read | In if LV0 shows many |
 | The official PHP and Node.js images (rebuilds of the same tag too) | Moves to the newest release of the line that Docker still builds | In |
 | Composer | Fixes. Does not go through gate 2's judgement | In. If LV0 shows few PHP projects, later in the order |
-| Maven | Runs locally only | Out (the owner's OK, 2026-11-01 13:09 JST; the read-only check stays). Whether and when Maven's code is removed is not decided |
+| Maven | Runs locally only | Out (the owner's OK, 2026-11-01 13:09 JST; the read-only check stays). Whether and when Maven's code is removed is not decided. Until a later change, the code still fixes Maven, and the README and the site still say it does |
 | Python, Go, Rust | Read only | Fixes out. The read-only scan stays |
 | Moving to another OS release, EOL, major updates, other runtimes | Out of scope | Out (OS releases reconsidered with LRR's numbers) |
 
@@ -98,7 +98,7 @@ Each item of the list this section held before, with the condition it became, th
 
 Decided on 2026-10-29: every changed version counts as production (docs/decisions/2026-10-29-every-change-counts-as-production.md), and EPSS scores are downloaded whole (docs/decisions/2026-10-29-epss-downloaded-whole.md). Decided on 2026-10-30 (the owner, in the Claude chat): the shadow's dev-only row stays as it is; the replay keeps judging it at 168h and (b) is still counted on all four rows (docs/decisions/2026-10-29-shadow-counting.md, unchanged).
 
-1. **What the definition of complete leaves open** (docs/decisions/2026-11-01-definition-of-complete.md; "Missing before complete" above). The lines of C1 and C2 (after LT2) and C10's line (the owner); the scope apart from Maven, C4's strata, C10's denominator and what gate 3 checks for a project with no tests (after LV0); C9's 60 days (after the design of something that starts the run from outside). The definition also leaves to the owner C9's choice if the run cannot be shown not to stop, and C15's line on the number of cases. Decided on 2026-11-01 at 13:09 JST: Maven is out of what Ludion fixes, and its read-only check stays.
+1. **What the definition of complete leaves open** (docs/decisions/2026-11-01-definition-of-complete.md; "Missing before complete" above). The lines of C1 and C2 (after LT2; C1's row also names the owner) and C10's line (the owner); the scope apart from Maven, C4's strata, C10's denominator and what gate 3 checks for a project with no tests (after LV0); C9's 60 days (after the design of something that starts the run from outside). The definition also leaves to the owner C9's choice if the run cannot be shown not to stop, and C15's line on the number of cases. Decided on 2026-11-01 at 13:09 JST: Maven is to be taken out of what Ludion fixes, and its read-only check stays.
 2. **Shorter waits for official runtime releases.** The owner's point (2026-10-29): once a fix is public the race is short. Whether a fix from a runtime's own official channel (php.net, the official Docker image) waits less than the table says changes the wait table, so it is the owner's.
 3. **Gates and learned models.** The owner, 2026-10-29 18:24 JST: 「ニューラルネットワーク式にやったらいいじゃない？関門は全てアルゴで まぁ設計はまた後で深掘りする」. Taken for now as: improve the way of working like training, each mistake fed back into a rule or a check, and every checkpoint as code (docs/decisions/2026-10-29-way-of-working.md). Whether any of Ludion's gates should use a learned model is for the design deep-dive. A note for it from the Claude chat: a learned score could add a reason to wait or to notify, but should not lift a stop, because a release can be tuned against a model and a receipt has to say why.
 4. **The design.** docs/design.md's roadmap puts the judge first, and its open decision on where to start says 「推奨は判定役から」; the Goal now wins over both, and the owner redoes the design.

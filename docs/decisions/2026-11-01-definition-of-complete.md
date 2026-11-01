@@ -2,19 +2,21 @@
 
 **Owner-adopted policy, quoted verbatim.** On 2026-11-01 at 11:49 JST the owner told the Claude chat, of its document 「Ludion 完成の定義」 (rev 9): 「それを方針にしような」. The Claude chat posted the decision with the document's full text at 11:50 JST, as comment 6552532457 on the operations board (ludion-ops#1). This record keeps that post from its section 「## オーナーの言葉」 to the end of the document, word for word, below. Left out: the post's opening line, its section 「## Grok がすること」 (the order of work, not part of the definition), and its closing signature.
 
-CLAUDE.md, Goal, says that what "complete" means in measurable terms is fixed with the owner. This is that definition. docs/status.md, "Missing before complete", now lists C1 to C16 with how each is measured, its line and where it stands, as the post's tables give them, apart from the corrections below.
+CLAUDE.md, Goal, says that what "complete" means in measurable terms is fixed with the owner. This is that definition. docs/status.md, "Missing before complete", now lists C1 to C16 with how each is measured, its line and where it stands, as the post's tables give them, apart from the changes below.
 
 ## What this record does and does not settle
 
 - Adopted from today, as the post's 「読み方（頭脳）」 says: the completion sentence, the conditions C1 to C16, the scope proposal and the order. Of the document's eight items for the owner, seven are decided as recommended; the eighth, Maven, was decided later the same day (below).
-- **Maven is out of what Ludion fixes.** Taking Maven out narrows the scope, and an OK to a list does not approve a scope change inside it (CLAUDE.md, How we work, Scope), so the post left the one sentence 「Ludion は Maven の依存を直さなくなる（読むだけの確かめは残す）」 for the owner's own OK. The owner gave it on 2026-11-01 at 13:09 JST (「OK外す」; ludion-ops comment 6553240418). Maven's read-only check stays. Whether and when Maven's code is removed is not part of that decision; until it is, the code is unchanged.
+- **Maven is to be taken out of what Ludion fixes.** Taking Maven out narrows the scope, and an OK to a list does not approve a scope change inside it (CLAUDE.md, How we work, Scope), so the post left the one sentence 「Ludion は Maven の依存を直さなくなる（読むだけの確かめは残す）」 for the owner's own OK. The owner gave it on 2026-11-01 at 13:09 JST (「OK外す」; ludion-ops comment 6553240418). Maven's read-only check stays. Whether and when Maven's code is removed is not part of that decision; until it is, the code is unchanged.
 - **Left open** (空けてある), and not filled in here or in docs/status.md:
   - the lines of C1 and C2: after LT2;
   - the scope apart from Maven, C4's strata, C10's denominator, and what gate 3 checks for a project with no tests: after LV0;
   - C9's 60 days: after the design of something that starts the run from outside (it touches CLAUDE.md:45).
-- **Corrections to the quote's "今" (today) column**, made here and in docs/status.md rather than in the quote, which stays word for word (an audit of the definition, ludion-ops comment 6553002811, item 3):
+- **Three changes to the quote's "今" (today) column**, made here and in docs/status.md rather than in the quote, which stays word for word. The first two correct it (an audit of the definition, ludion-ops comment 6553002811, item 3); the third adds a definition:
   - C1's 「過去の悪性 1,148 版で、公開時にタグがあったのは 0」 is stronger than what LT (#229, not merged) measured: 44 of the 1,148 are tied to a tag in their repository today, and in the 702 with a GitHub repository, GH Archive has no record of that tag being created within 24 hours before or after the version's publication. Tags created earlier than that were not looked at, and the 446 without a GitHub repository could not be checked for tags.
   - C3's 「200 件中 35 件」 and C7's 「合格（16.4h n=6、0h n=21、41.5h n=138）」 are backtest v4's (the judge of 2026-10-28, docs/bench/2026-10-28-backtest-v4). They have not been measured again with main's judge, which has changed since.
+  - C9's 「q 約 0.17〜0.19」 does not say what q is. docs/status.md adds it: of the hourly slots, the share in which GitHub started a run, as the board post that measured q defines it (ludion-ops comment 6542899951; the same audit, item 5 (i)).
+- **One addition to how C7 is measured**, made in docs/status.md and not in the quote: besides the median, C7 gives the share of fixes whose wait was extended and the p90 (the Claude chat, ludion-ops comment 6553345976, item 5, from the same audit's item 5 (iii)). Neither has been measured, and no value is given for them.
 - Not changed by this record: CLAUDE.md (a sentence there pointing to this record is a separate protected change, which the owner merges), the wait table, and the numeric criteria of any gate.
 
 ## The post, from 「## オーナーの言葉」 (comment 6552532457, verbatim)

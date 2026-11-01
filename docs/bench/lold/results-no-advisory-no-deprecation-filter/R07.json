@@ -1,0 +1,432 @@
+{
+  "id": "R07",
+  "name": "@portkey-ai/gateway",
+  "from": "1.13.0",
+  "v": "1.14.0",
+  "advisory": "GHSA-hhh5-2cvx-vmfp",
+  "why": "first eligible rows, one per package",
+  "vulnerable": "<1.14.0",
+  "started_at": "2026-11-01T16:39:54.869Z",
+  "base_before": "2025-10-23T13:57:26.334Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 83,
+    "duplicate_names": 1,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/@portkey-ai/gateway@1.13.0"
+    ]
+  },
+  "t": "2025-12-02T01:08:37.000Z",
+  "v_published": "2025-11-07T14:00:18.262Z",
+  "picks": [
+    {
+      "req": "@portkey-ai/gateway@1.14.0",
+      "picked": "1.14.0",
+      "is_v": true
+    },
+    {
+      "req": "ioredis@^5.8.0",
+      "picked": "5.8.0",
+      "reused_base": false,
+      "published": "2025-09-23T08:25:09.724Z",
+      "counts": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 8,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "debug@^4.3.4",
+      "picked": "4.3.4",
+      "reused_base": false,
+      "published": "2022-03-17T13:38:47.641Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "denque@^2.1.0",
+      "picked": "2.1.0",
+      "reused_base": false,
+      "published": "2022-07-18T10:14:29.117Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "standard-as-callback@^2.1.0",
+      "picked": "2.1.0",
+      "reused_base": false,
+      "published": "2021-03-14T07:17:44.418Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "redis-errors@^1.2.0",
+      "picked": "1.2.0",
+      "reused_base": false,
+      "published": "2017-06-01T00:22:49.218Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "cluster-key-slot@^1.1.0",
+      "picked": "1.1.0",
+      "reused_base": false,
+      "published": "2019-07-18T09:32:37.646Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@ioredis/commands@1.4.0",
+      "picked": "1.4.0",
+      "reused_base": false,
+      "published": "2025-09-15T06:46:34.408Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "redis-parser@^3.0.0",
+      "picked": "3.0.0",
+      "reused_base": false,
+      "published": "2017-05-25T18:52:28.462Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "lodash.isarguments@^3.1.0",
+      "picked": "3.1.0",
+      "reused_base": false,
+      "published": "2016-08-13T17:40:07.017Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "lodash.defaults@^4.2.0",
+      "picked": "4.2.0",
+      "reused_base": false,
+      "published": "2016-08-13T17:37:52.434Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "ms@2.1.2",
+      "picked": "2.1.2",
+      "reused_base": false,
+      "published": "2019-06-06T17:31:55.859Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 8,
+    "withdrawn": 1,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [
+    "debug@^4.3.4"
+  ],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 9,
+    "youngest_age": {
+      "hours": 3606.4,
+      "version": "ioredis@5.11.1",
+      "published": "2026-06-04T10:14:59.752Z"
+    },
+    "published_after_t": 2,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 1,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 11,
+    "youngest_age": {
+      "hours": 995.6,
+      "version": "ioredis@5.8.2",
+      "published": "2025-10-21T13:33:08.781Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 1,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/@ioredis/commands",
+      "name": "@ioredis/commands",
+      "from": null,
+      "to": "1.4.0",
+      "published": "2025-09-15T06:46:34.408Z",
+      "age_at_t_hours": 1866.4,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "1.4.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/cluster-key-slot",
+      "name": "cluster-key-slot",
+      "from": null,
+      "to": "1.1.0",
+      "published": "2019-07-18T09:32:37.646Z",
+      "age_at_t_hours": 55887.6,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^1.1.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/debug",
+      "name": "debug",
+      "from": null,
+      "to": "4.3.4",
+      "published": "2022-03-17T13:38:47.641Z",
+      "age_at_t_hours": 32531.5,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^4.3.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/denque",
+      "name": "denque",
+      "from": null,
+      "to": "2.1.0",
+      "published": "2022-07-18T10:14:29.117Z",
+      "age_at_t_hours": 29582.9,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^2.1.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/ioredis",
+      "name": "ioredis",
+      "from": null,
+      "to": "5.8.0",
+      "published": "2025-09-23T08:25:09.724Z",
+      "age_at_t_hours": 1672.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^5.8.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/lodash.defaults",
+      "name": "lodash.defaults",
+      "from": null,
+      "to": "4.2.0",
+      "published": "2016-08-13T17:37:52.434Z",
+      "age_at_t_hours": 81535.5,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^4.2.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/lodash.isarguments",
+      "name": "lodash.isarguments",
+      "from": null,
+      "to": "3.1.0",
+      "published": "2016-08-13T17:40:07.017Z",
+      "age_at_t_hours": 81535.5,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^3.1.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/ms",
+      "name": "ms",
+      "from": null,
+      "to": "2.1.2",
+      "published": "2019-06-06T17:31:55.859Z",
+      "age_at_t_hours": 56887.6,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "2.1.2"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/redis-errors",
+      "name": "redis-errors",
+      "from": null,
+      "to": "1.2.0",
+      "published": "2017-06-01T00:22:49.218Z",
+      "age_at_t_hours": 74544.8,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^1.2.0",
+        "^1.0.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/redis-parser",
+      "name": "redis-parser",
+      "from": null,
+      "to": "3.0.0",
+      "published": "2017-05-25T18:52:28.462Z",
+      "age_at_t_hours": 74694.3,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^3.0.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/standard-as-callback",
+      "name": "standard-as-callback",
+      "from": null,
+      "to": "2.1.0",
+      "published": "2021-03-14T07:17:44.418Z",
+      "age_at_t_hours": 41369.8,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^2.1.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    }
+  ],
+  "moved_non_v": 11,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 1,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 1672.7,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 7,
+  "differing_paths_vs_normal_at_t": 4,
+  "checks_on_normal_at_t_fail": 3,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 7.499
+}

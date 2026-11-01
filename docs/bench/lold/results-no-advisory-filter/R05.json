@@ -1,0 +1,322 @@
+{
+  "id": "R05",
+  "name": "@angular/platform-server",
+  "from": "20.2.4",
+  "v": "20.3.0",
+  "advisory": "GHSA-68x2-mx4q-78m7",
+  "why": "first eligible rows, one per package",
+  "vulnerable": ">=20.0.0-next.0 <20.3.0",
+  "started_at": "2026-11-01T16:36:04.689Z",
+  "base_before": "2025-09-03T20:37:37.235Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 8,
+    "duplicate_names": 0,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/@angular/platform-server@20.2.4"
+    ]
+  },
+  "t": "2025-09-10T21:56:01.000Z",
+  "v_published": "2025-09-10T15:03:18.580Z",
+  "picks": [
+    {
+      "req": "@angular/platform-server@20.3.0",
+      "picked": "20.3.0",
+      "is_v": true
+    },
+    {
+      "req": "@angular/common@20.3.0",
+      "picked": "20.3.0",
+      "reused_base": false,
+      "published": "2025-09-10T15:02:39.544Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@angular/core@20.3.0",
+      "picked": "20.3.0",
+      "reused_base": false,
+      "published": "2025-09-10T15:02:53.681Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@angular/compiler@20.3.0",
+      "picked": "20.3.0",
+      "reused_base": false,
+      "published": "2025-09-10T15:02:44.251Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "rxjs@^6.5.3 || ^7.4.0",
+      "picked": "7.8.2",
+      "reused_base": true,
+      "published": "2025-02-22T03:00:42.711Z",
+      "counts": {
+        "in_range": 24,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@angular/platform-browser@20.3.0",
+      "picked": "20.3.0",
+      "reused_base": false,
+      "published": "2025-09-10T15:03:11.847Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.3.0",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 16,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.3.0",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 16,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.3.0",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 16,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.3.0",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 16,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.3.0",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 16,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.1.0",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 6,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 5,
+    "youngest_age": {
+      "hours": 44.3,
+      "version": "tslib@2.9.1",
+      "published": "2026-10-30T20:20:28.741Z"
+    },
+    "published_after_t": 1,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 0,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 4,
+    "youngest_age": {
+      "hours": 6.9,
+      "version": "@angular/common@20.3.0",
+      "published": "2025-09-10T15:02:39.544Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 0,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/@angular/common",
+      "name": "@angular/common",
+      "from": "20.2.4",
+      "to": "20.3.0",
+      "published": "2025-09-10T15:02:39.544Z",
+      "age_at_t_hours": 6.9,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "20.3.0",
+        "20.3.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    },
+    {
+      "path": "node_modules/@angular/compiler",
+      "name": "@angular/compiler",
+      "from": "20.2.4",
+      "to": "20.3.0",
+      "published": "2025-09-10T15:02:44.251Z",
+      "age_at_t_hours": 6.9,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "20.3.0",
+        "20.3.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    },
+    {
+      "path": "node_modules/@angular/core",
+      "name": "@angular/core",
+      "from": "20.2.4",
+      "to": "20.3.0",
+      "published": "2025-09-10T15:02:53.681Z",
+      "age_at_t_hours": 6.9,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "20.3.0",
+        "20.3.0",
+        "20.3.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    },
+    {
+      "path": "node_modules/@angular/platform-browser",
+      "name": "@angular/platform-browser",
+      "from": "20.2.4",
+      "to": "20.3.0",
+      "published": "2025-09-10T15:03:11.847Z",
+      "age_at_t_hours": 6.9,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "20.3.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    }
+  ],
+  "moved_non_v": 4,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 0,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 6.9,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 1,
+  "differing_paths_vs_normal_at_t": 0,
+  "checks_on_normal_at_t_fail": 0,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 7.227
+}

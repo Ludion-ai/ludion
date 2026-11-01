@@ -1,0 +1,120 @@
+{
+  "id": "R16",
+  "name": "mcp-server-kubernetes",
+  "from": "2.9.7",
+  "v": "2.9.8",
+  "advisory": "GHSA-wvxp-jp4w-w8wg",
+  "why": "first eligible rows, one per package",
+  "vulnerable": "<=2.9.7",
+  "started_at": "2026-11-01T16:37:42.218Z",
+  "base_before": "2025-10-21T07:00:43.577Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 173,
+    "duplicate_names": 23,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/mcp-server-kubernetes@2.9.7"
+    ]
+  },
+  "t": "2025-12-03T20:44:45.000Z",
+  "v_published": "2025-12-01T03:31:16.720Z",
+  "picks": [
+    {
+      "req": "mcp-server-kubernetes@2.9.8",
+      "picked": "2.9.8",
+      "is_v": true
+    },
+    {
+      "req": "js-yaml@4.1.1",
+      "picked": "4.1.1",
+      "reused_base": false,
+      "published": "2025-11-12T15:18:03.524Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 0,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 1,
+    "youngest_age": {
+      "hours": 8497.3,
+      "version": "js-yaml@4.1.1",
+      "published": "2025-11-12T15:18:03.524Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 23,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 1,
+    "youngest_age": {
+      "hours": 509.4,
+      "version": "js-yaml@4.1.1",
+      "published": "2025-11-12T15:18:03.524Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 23,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/js-yaml",
+      "name": "js-yaml",
+      "from": "4.1.0",
+      "to": "4.1.1",
+      "published": "2025-11-12T15:18:03.524Z",
+      "age_at_t_hours": 509.4,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^4.1.0",
+        "4.1.1"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    }
+  ],
+  "moved_non_v": 1,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 23,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 509.4,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 0,
+  "differing_paths_vs_normal_at_t": 0,
+  "checks_on_normal_at_t_fail": 0,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 3.9
+}

@@ -1,0 +1,2637 @@
+{
+  "answer": "cannot_be_built",
+  "counts": {
+    "examples": 24,
+    "counted": 23,
+    "built": 10,
+    "built_with_a_move": 9,
+    "stopped_no_allowed": 13,
+    "failed": 0,
+    "no_base": 1
+  },
+  "rows": [
+    {
+      "id": "C1",
+      "package": "lodash 4.17.20 -> 4.17.21",
+      "outcome": "built",
+      "t": "2021-02-20T16:42:16.891Z",
+      "base_entries": 1,
+      "moved_non_v": 0,
+      "all_oldest": true,
+      "reused_base": 0,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 0,
+      "differ_vs_normal": 0,
+      "normal_youngest_age_hours": null,
+      "normal_after_t": 0,
+      "normal_at_t_moved": 0,
+      "differ_vs_normal_at_t": 0,
+      "normal_at_t_youngest_age_hours": null,
+      "checks_on_normal_at_t_fail": 0,
+      "duplicates_base": 0,
+      "duplicates_oldest": 0,
+      "duplicates_normal": 0,
+      "duplicates_normal_at_t": 0,
+      "new_ls_problems": 0,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": 0,
+      "engines_not_node24": 0,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": null,
+      "failures": null
+    },
+    {
+      "id": "R01",
+      "package": "react-server-dom-turbopack 19.2.1 -> 19.2.2",
+      "outcome": "built",
+      "t": "2025-12-11T22:36:08.000Z",
+      "base_entries": 7,
+      "moved_non_v": 2,
+      "all_oldest": true,
+      "reused_base": 0,
+      "youngest_age_at_t_hours": 2.6,
+      "normal_moved": 3,
+      "differ_vs_normal": 3,
+      "normal_youngest_age_hours": 431.6,
+      "normal_after_t": 3,
+      "normal_at_t_moved": 2,
+      "differ_vs_normal_at_t": 0,
+      "normal_at_t_youngest_age_hours": 2.6,
+      "checks_on_normal_at_t_fail": 0,
+      "duplicates_base": 0,
+      "duplicates_oldest": 0,
+      "duplicates_normal": 0,
+      "duplicates_normal_at_t": 0,
+      "new_ls_problems": 0,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": 0,
+      "engines_not_node24": 0,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 18,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": null,
+      "failures": null
+    },
+    {
+      "id": "R02",
+      "package": "@react-native-community/cli-server-api 19.1.1 -> 19.1.2",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-11-05T21:56:39.769Z",
+      "base_entries": 142,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 6,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 637.2,
+      "normal_after_t": 5,
+      "normal_at_t_moved": 3,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 0,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 7,
+      "duplicates_oldest": null,
+      "duplicates_normal": 7,
+      "duplicates_normal_at_t": 7,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 9,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 2
+      },
+      "stops": [
+        {
+          "req": "launch-editor@^2.9.1",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 11,
+            "no_time": 0,
+            "after_t": 6,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 5
+          }
+        },
+        {
+          "req": "launch-editor@^2.9.1",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 11,
+            "no_time": 0,
+            "after_t": 6,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 5
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R03",
+      "package": "next 15.5.6 -> 15.5.7",
+      "outcome": "built",
+      "t": "2025-12-03T19:07:11.000Z",
+      "base_entries": 49,
+      "moved_non_v": 9,
+      "all_oldest": true,
+      "reused_base": 0,
+      "youngest_age_at_t_hours": 3.7,
+      "normal_moved": 9,
+      "differ_vs_normal": 0,
+      "normal_youngest_age_hours": 7993,
+      "normal_after_t": 0,
+      "normal_at_t_moved": 9,
+      "differ_vs_normal_at_t": 0,
+      "normal_at_t_youngest_age_hours": 3.7,
+      "checks_on_normal_at_t_fail": 0,
+      "duplicates_base": 0,
+      "duplicates_oldest": 0,
+      "duplicates_normal": 0,
+      "duplicates_normal_at_t": 0,
+      "new_ls_problems": 0,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": 0,
+      "engines_not_node24": 0,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 52,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": null,
+      "failures": null
+    },
+    {
+      "id": "R04",
+      "package": "react-server-dom-webpack 19.1.1 -> 19.1.2",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-12-03T19:07:39.000Z",
+      "base_entries": 82,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 3,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 431.6,
+      "normal_after_t": 3,
+      "normal_at_t_moved": 3,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 3.7,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 1,
+      "duplicates_oldest": null,
+      "duplicates_normal": 1,
+      "duplicates_normal_at_t": 1,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 36,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": [
+        {
+          "req": "webpack@^5.59.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 114,
+            "no_time": 0,
+            "after_t": 30,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 84
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R05",
+      "package": "@angular/platform-server 20.2.4 -> 20.3.0",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-09-10T21:56:01.000Z",
+      "base_entries": 8,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 5,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 44.1,
+      "normal_after_t": 1,
+      "normal_at_t_moved": 4,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 6.9,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 0,
+      "duplicates_oldest": null,
+      "duplicates_normal": 0,
+      "duplicates_normal_at_t": 0,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": [
+        {
+          "req": "@angular/common@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/compiler@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/core@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/common@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/core@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/core@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/common@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/compiler@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/core@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/common@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/core@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/common@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@angular/compiler@20.3.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R06",
+      "package": "@sentry/nextjs 8.48.0 -> 8.49.0",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-01-28T20:37:26.000Z",
+      "base_entries": 317,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 28,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 91.6,
+      "normal_after_t": 10,
+      "normal_at_t_moved": 15,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 21.6,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 16,
+      "duplicates_oldest": null,
+      "duplicates_normal": 16,
+      "duplicates_normal_at_t": 16,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 87,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": [
+        {
+          "req": "next@^13.2.0 || ^14.0 || ^15.0.0-rc.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 171,
+            "no_time": 0,
+            "after_t": 85,
+            "withdrawn": 0,
+            "deprecated": 79,
+            "advisory": 7
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql@0.44.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql2@0.44.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-pg@0.49.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-knex@0.43.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-tedious@0.17.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mongoose@0.45.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-pg@0.49.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-knex@0.43.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql@0.44.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql2@0.44.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-tedious@0.17.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mongoose@0.45.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@1.30.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.22",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 12,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 12,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@1.30.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.22",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 12,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 12,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R07",
+      "package": "@portkey-ai/gateway 1.13.0 -> 1.14.0",
+      "outcome": "built",
+      "t": "2025-12-02T01:08:37.000Z",
+      "base_entries": 83,
+      "moved_non_v": 11,
+      "all_oldest": true,
+      "reused_base": 0,
+      "youngest_age_at_t_hours": 1672.7,
+      "normal_moved": 9,
+      "differ_vs_normal": 7,
+      "normal_youngest_age_hours": 3606.2,
+      "normal_after_t": 2,
+      "normal_at_t_moved": 11,
+      "differ_vs_normal_at_t": 4,
+      "normal_at_t_youngest_age_hours": 995.6,
+      "checks_on_normal_at_t_fail": 3,
+      "duplicates_base": 1,
+      "duplicates_oldest": 1,
+      "duplicates_normal": 1,
+      "duplicates_normal_at_t": 1,
+      "new_ls_problems": 0,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": 0,
+      "engines_not_node24": 0,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 8,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": null,
+      "failures": null
+    },
+    {
+      "id": "R08",
+      "package": "@intlify/core 9.14.4 -> 9.14.5",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-07-16T19:32:48.000Z",
+      "base_entries": 5,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 4,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 770.3,
+      "normal_after_t": 1,
+      "normal_at_t_moved": 3,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 14,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 0,
+      "duplicates_oldest": null,
+      "duplicates_normal": 0,
+      "duplicates_normal_at_t": 0,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": [
+        {
+          "req": "@intlify/core-base@9.14.5",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@intlify/shared@9.14.5",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@intlify/shared@9.14.5",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@intlify/core-base@9.14.5",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R09",
+      "package": "snowflake-sdk 2.0.1 -> 2.0.2",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-01-29T18:42:26.000Z",
+      "base_entries": 298,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 47,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 41.3,
+      "normal_after_t": 45,
+      "normal_at_t_moved": 89,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 51,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 20,
+      "duplicates_oldest": null,
+      "duplicates_normal": 18,
+      "duplicates_normal_at_t": 20,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 4662,
+        "withdrawn": 0,
+        "deprecated": 10,
+        "advisory": 0
+      },
+      "stops": [
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 61,
+            "no_time": 0,
+            "after_t": 59,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 2
+          }
+        },
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 61,
+            "no_time": 0,
+            "after_t": 59,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 2
+          }
+        },
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 61,
+            "no_time": 0,
+            "after_t": 59,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 2
+          }
+        },
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 61,
+            "no_time": 0,
+            "after_t": 59,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 2
+          }
+        },
+        {
+          "req": "fast-xml-parser@4.4.1",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 61,
+            "no_time": 0,
+            "after_t": 59,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 2
+          }
+        },
+        {
+          "req": "uuid@^9.0.1",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 1,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 61,
+            "no_time": 0,
+            "after_t": 59,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 2
+          }
+        },
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 61,
+            "no_time": 0,
+            "after_t": 59,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 2
+          }
+        },
+        {
+          "req": "fast-xml-parser@4.4.1",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 61,
+            "no_time": 0,
+            "after_t": 59,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 2
+          }
+        },
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 61,
+            "no_time": 0,
+            "after_t": 59,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 2
+          }
+        },
+        {
+          "req": "uuid@^9.0.1",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 1,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 61,
+            "no_time": 0,
+            "after_t": 59,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 2
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R10",
+      "package": "psitransfer 2.3.0 -> 2.3.1",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-12-30T19:25:04.000Z",
+      "base_entries": 201,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 7,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 129.1,
+      "normal_after_t": 5,
+      "normal_at_t_moved": 3,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 1047.1,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 12,
+      "duplicates_oldest": null,
+      "duplicates_normal": 12,
+      "duplicates_normal_at_t": 12,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": [
+        {
+          "req": "axios@^1.13.2",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 18,
+            "no_time": 0,
+            "after_t": 17,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "axios@^1.13.2",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 18,
+            "no_time": 0,
+            "after_t": 17,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R11",
+      "package": "@sentry/nestjs 8.48.0 -> 8.49.0",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-01-28T20:37:26.000Z",
+      "base_entries": 98,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 28,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 91.6,
+      "normal_after_t": 16,
+      "normal_at_t_moved": 9,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 18.6,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 4,
+      "duplicates_oldest": null,
+      "duplicates_normal": 4,
+      "duplicates_normal_at_t": 4,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 548,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": [
+        {
+          "req": "@nestjs/common@^8.0.0 || ^9.0.0 || ^10.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 124,
+            "no_time": 0,
+            "after_t": 7,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 117
+          }
+        },
+        {
+          "req": "@nestjs/core@^8.0.0 || ^9.0.0 || ^10.0.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 124,
+            "no_time": 0,
+            "after_t": 7,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 117
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql@0.44.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql2@0.44.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-pg@0.49.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-knex@0.43.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mongoose@0.45.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-tedious@0.17.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-pg@0.49.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-knex@0.43.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql@0.44.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql2@0.44.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-tedious@0.17.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mongoose@0.45.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@1.30.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.22",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 12,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 12,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 32,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 32
+          }
+        },
+        {
+          "req": "@opentelemetry/core@1.30.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.22",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 12,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 12,
+            "advisory": 0
+          }
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 3
+          }
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 3,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 3,
+            "advisory": 0
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R12",
+      "package": "multer 2.0.0 -> 2.0.1",
+      "outcome": "built",
+      "t": "2025-06-05T01:09:35.000Z",
+      "base_entries": 23,
+      "moved_non_v": 2,
+      "all_oldest": true,
+      "reused_base": 0,
+      "youngest_age_at_t_hours": 56578.8,
+      "normal_moved": 4,
+      "differ_vs_normal": 3,
+      "normal_youngest_age_hours": 31975.4,
+      "normal_after_t": 0,
+      "normal_at_t_moved": 4,
+      "differ_vs_normal_at_t": 3,
+      "normal_at_t_youngest_age_hours": 19624.1,
+      "checks_on_normal_at_t_fail": 4,
+      "duplicates_base": 0,
+      "duplicates_oldest": 0,
+      "duplicates_normal": 0,
+      "duplicates_normal_at_t": 0,
+      "new_ls_problems": 0,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": 0,
+      "engines_not_node24": 0,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": null,
+      "failures": null
+    },
+    {
+      "id": "R13",
+      "package": "@vitejs/plugin-rsc 0.5.6 -> 0.5.7",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-12-12T16:41:08.000Z",
+      "base_entries": 76,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 1,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 1838.5,
+      "normal_after_t": 1,
+      "normal_at_t_moved": 1,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 128.1,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 0,
+      "duplicates_oldest": null,
+      "duplicates_normal": 0,
+      "duplicates_normal_at_t": 0,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 45,
+        "withdrawn": 0,
+        "deprecated": 14,
+        "advisory": 35
+      },
+      "stops": [
+        {
+          "req": "vite@*",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 440,
+            "no_time": 0,
+            "after_t": 45,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 395
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R14",
+      "package": "@finos/git-proxy 1.19.1 -> 1.19.2",
+      "outcome": "built",
+      "t": "2025-07-30T16:40:40.000Z",
+      "base_entries": 399,
+      "moved_non_v": 4,
+      "all_oldest": true,
+      "reused_base": 0,
+      "youngest_age_at_t_hours": 551.7,
+      "normal_moved": 4,
+      "differ_vs_normal": 2,
+      "normal_youngest_age_hours": 8752.9,
+      "normal_after_t": 2,
+      "normal_at_t_moved": 4,
+      "differ_vs_normal_at_t": 2,
+      "normal_at_t_youngest_age_hours": 261.3,
+      "checks_on_normal_at_t_fail": 2,
+      "duplicates_base": 22,
+      "duplicates_oldest": 22,
+      "duplicates_normal": 22,
+      "duplicates_normal_at_t": 22,
+      "new_ls_problems": 0,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": 0,
+      "engines_not_node24": 0,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 8,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": null,
+      "failures": null
+    },
+    {
+      "id": "R15",
+      "package": "@node-saml/node-saml 5.0.1 -> 5.1.0",
+      "outcome": "built",
+      "t": "2025-07-25T14:08:50.000Z",
+      "base_entries": 22,
+      "moved_non_v": 1,
+      "all_oldest": true,
+      "reused_base": 0,
+      "youngest_age_at_t_hours": 2204,
+      "normal_moved": 2,
+      "differ_vs_normal": 2,
+      "normal_youngest_age_hours": 434.1,
+      "normal_after_t": 2,
+      "normal_at_t_moved": 1,
+      "differ_vs_normal_at_t": 0,
+      "normal_at_t_youngest_age_hours": 2204,
+      "checks_on_normal_at_t_fail": 0,
+      "duplicates_base": 2,
+      "duplicates_oldest": 2,
+      "duplicates_normal": 2,
+      "duplicates_normal_at_t": 2,
+      "new_ls_problems": 0,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": 0,
+      "engines_not_node24": 0,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": null,
+      "failures": null
+    },
+    {
+      "id": "R16",
+      "package": "mcp-server-kubernetes 2.9.7 -> 2.9.8",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-12-03T20:44:45.000Z",
+      "base_entries": 173,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 1,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 8497.2,
+      "normal_after_t": 0,
+      "normal_at_t_moved": 1,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 509.4,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 23,
+      "duplicates_oldest": null,
+      "duplicates_normal": 23,
+      "duplicates_normal_at_t": 23,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": [
+        {
+          "req": "js-yaml@4.1.1",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "js-yaml@4.1.1",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R17",
+      "package": "@webrecorder/wabac 2.23.10 -> 2.23.11",
+      "outcome": "built",
+      "t": "2025-09-10T17:13:45.000Z",
+      "base_entries": 81,
+      "moved_non_v": 1,
+      "all_oldest": true,
+      "reused_base": 0,
+      "youngest_age_at_t_hours": 159.4,
+      "normal_moved": 1,
+      "differ_vs_normal": 1,
+      "normal_youngest_age_hours": 1392.3,
+      "normal_after_t": 1,
+      "normal_at_t_moved": 1,
+      "differ_vs_normal_at_t": 0,
+      "normal_at_t_youngest_age_hours": 159.4,
+      "checks_on_normal_at_t_fail": 0,
+      "duplicates_base": 2,
+      "duplicates_oldest": 2,
+      "duplicates_normal": 2,
+      "duplicates_normal_at_t": 2,
+      "new_ls_problems": 0,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": 0,
+      "engines_not_node24": 0,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 7,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": null,
+      "failures": null
+    },
+    {
+      "id": "R18",
+      "package": "azle 0.29.0 -> 0.30.0",
+      "outcome": "no_base",
+      "t": null,
+      "base_entries": null,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": null,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": null,
+      "normal_after_t": null,
+      "normal_at_t_moved": null,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": null,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": null,
+      "duplicates_oldest": null,
+      "duplicates_normal": null,
+      "duplicates_normal_at_t": null,
+      "new_ls_problems": null,
+      "normal_ls_problems": null,
+      "normal_at_t_ls_problems": null,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": null,
+      "stops": null,
+      "failures": null
+    },
+    {
+      "id": "R19",
+      "package": "pbkdf2 3.1.2 -> 3.1.3",
+      "outcome": "built",
+      "t": "2025-06-23T22:41:50.000Z",
+      "base_entries": 13,
+      "moved_non_v": 5,
+      "all_oldest": true,
+      "reused_base": 0,
+      "youngest_age_at_t_hours": 144.2,
+      "normal_moved": 30,
+      "differ_vs_normal": 27,
+      "normal_youngest_age_hours": 1050.6,
+      "normal_after_t": 5,
+      "normal_at_t_moved": 30,
+      "differ_vs_normal_at_t": 27,
+      "normal_at_t_youngest_age_hours": 88.4,
+      "checks_on_normal_at_t_fail": 5,
+      "duplicates_base": 0,
+      "duplicates_oldest": 3,
+      "duplicates_normal": 3,
+      "duplicates_normal_at_t": 3,
+      "new_ls_problems": 0,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": 0,
+      "engines_not_node24": 0,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": null,
+      "failures": null
+    },
+    {
+      "id": "R20",
+      "package": "glob 11.0.3 -> 11.1.0",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-11-17T17:38:56.000Z",
+      "base_entries": 40,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 3,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 1146.5,
+      "normal_after_t": 3,
+      "normal_at_t_moved": 1,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 474.7,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 6,
+      "duplicates_oldest": null,
+      "duplicates_normal": 6,
+      "duplicates_normal_at_t": 6,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": [
+        {
+          "req": "minimatch@^10.1.1",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 10,
+            "no_time": 0,
+            "after_t": 9,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "minimatch@^10.1.1",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 10,
+            "no_time": 0,
+            "after_t": 9,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R21",
+      "package": "next-auth 4.24.11 -> 4.24.12",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-10-29T10:43:57.000Z",
+      "base_entries": 45,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 0,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": null,
+      "normal_after_t": 0,
+      "normal_at_t_moved": 0,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": null,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 0,
+      "duplicates_oldest": null,
+      "duplicates_normal": 0,
+      "duplicates_normal_at_t": 0,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 58,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": [
+        {
+          "req": "next@^12.2.5 || ^13 || ^14 || ^15 || ^16",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 240,
+            "no_time": 0,
+            "after_t": 87,
+            "withdrawn": 0,
+            "deprecated": 122,
+            "advisory": 31
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "R22",
+      "package": "@vitest/browser 3.0.3 -> 3.0.4",
+      "outcome": "stopped_no_allowed",
+      "t": "2025-02-04T16:51:08.000Z",
+      "base_entries": 166,
+      "moved_non_v": null,
+      "all_oldest": null,
+      "reused_base": null,
+      "youngest_age_at_t_hours": null,
+      "normal_moved": 122,
+      "differ_vs_normal": null,
+      "normal_youngest_age_hours": 8.7,
+      "normal_after_t": 108,
+      "normal_at_t_moved": 37,
+      "differ_vs_normal_at_t": null,
+      "normal_at_t_youngest_age_hours": 8.7,
+      "checks_on_normal_at_t_fail": null,
+      "duplicates_base": 3,
+      "duplicates_oldest": null,
+      "duplicates_normal": 2,
+      "duplicates_normal_at_t": 3,
+      "new_ls_problems": null,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": null,
+      "engines_not_node24": null,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 527,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 6
+      },
+      "stops": [
+        {
+          "req": "vitest@3.0.4",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "vitest@3.0.4",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@vitest/mocker@3.0.4",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "vitest@3.0.4",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@vitest/mocker@3.0.4",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 1,
+            "no_time": 0,
+            "after_t": 0,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 1
+          }
+        },
+        {
+          "req": "@babel/runtime@^7.12.5",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 89,
+            "no_time": 0,
+            "after_t": 14,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 75
+          }
+        },
+        {
+          "req": "@babel/runtime@^7.12.5",
+          "reason": "no_allowed",
+          "counts": {
+            "in_range": 89,
+            "no_time": 0,
+            "after_t": 14,
+            "withdrawn": 0,
+            "deprecated": 0,
+            "advisory": 75
+          }
+        }
+      ],
+      "failures": null
+    },
+    {
+      "id": "T1",
+      "package": "braces 3.0.2 -> 3.0.3",
+      "outcome": "built",
+      "t": "2024-05-21T09:59:11.390Z",
+      "base_entries": 6,
+      "moved_non_v": 1,
+      "all_oldest": true,
+      "reused_base": 0,
+      "youngest_age_at_t_hours": 1.2,
+      "normal_moved": 1,
+      "differ_vs_normal": 0,
+      "normal_youngest_age_hours": 21463.7,
+      "normal_after_t": 0,
+      "normal_at_t_moved": 1,
+      "differ_vs_normal_at_t": 0,
+      "normal_at_t_youngest_age_hours": 1.2,
+      "checks_on_normal_at_t_fail": 0,
+      "duplicates_base": 0,
+      "duplicates_oldest": 0,
+      "duplicates_normal": 0,
+      "duplicates_normal_at_t": 0,
+      "new_ls_problems": 0,
+      "normal_ls_problems": 0,
+      "normal_at_t_ls_problems": 0,
+      "peer_conflict": false,
+      "install_scripts": 0,
+      "engines_not_node24": 0,
+      "excluded": {
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      },
+      "stops": null,
+      "failures": null
+    }
+  ]
+}

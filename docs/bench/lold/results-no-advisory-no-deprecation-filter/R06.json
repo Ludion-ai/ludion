@@ -1,0 +1,1559 @@
+{
+  "id": "R06",
+  "name": "@sentry/nextjs",
+  "from": "8.48.0",
+  "v": "8.49.0",
+  "advisory": "GHSA-r5w7-f542-q2j4",
+  "why": "first eligible rows, one per package",
+  "vulnerable": ">=8.10.0 <8.49.0",
+  "started_at": "2026-11-01T16:39:32.806Z",
+  "base_before": "2025-01-07T13:23:05.023Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 317,
+    "duplicate_names": 16,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/@sentry/nextjs@8.48.0"
+    ]
+  },
+  "t": "2025-01-28T20:37:26.000Z",
+  "v_published": "2025-01-15T09:38:21.460Z",
+  "picks": [
+    {
+      "req": "@sentry/nextjs@8.49.0",
+      "picked": "8.49.0",
+      "is_v": true
+    },
+    {
+      "req": "next@^13.2.0 || ^14.0 || ^15.0.0-rc.0",
+      "picked": "15.0.0-rc.1",
+      "reused_base": true,
+      "published": "2024-10-15T19:17:38.118Z",
+      "counts": {
+        "in_range": 171,
+        "no_time": 0,
+        "after_t": 85,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "react@^18.2.0 || 19.0.0-rc-cd22717c-20241013",
+      "picked": "19.0.0-rc-cd22717c-20241013",
+      "reused_base": true,
+      "published": "2024-10-13T17:18:22.907Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "react-dom@^18.2.0 || 19.0.0-rc-cd22717c-20241013",
+      "picked": "19.0.0-rc-cd22717c-20241013",
+      "reused_base": true,
+      "published": "2024-10-13T17:18:39.385Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "resolve@1.22.8",
+      "picked": "1.22.8",
+      "reused_base": true,
+      "published": "2023-10-10T21:37:14.696Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@sentry/opentelemetry@8.49.0",
+      "picked": "8.49.0",
+      "reused_base": false,
+      "published": "2025-01-15T09:37:28.602Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@sentry/vercel-edge@8.49.0",
+      "picked": "8.49.0",
+      "reused_base": false,
+      "published": "2025-01-15T09:38:01.695Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/semantic-conventions@^1.28.0",
+      "picked": "1.28.0",
+      "reused_base": true,
+      "published": "2024-11-20T20:31:21.818Z",
+      "counts": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 17,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@sentry/react@8.49.0",
+      "picked": "8.49.0",
+      "reused_base": false,
+      "published": "2025-01-15T09:37:49.695Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@sentry-internal/browser-utils@8.49.0",
+      "picked": "8.49.0",
+      "reused_base": false,
+      "published": "2025-01-15T09:37:23.806Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@sentry/core@8.49.0",
+      "picked": "8.49.0",
+      "reused_base": false,
+      "published": "2025-01-15T09:37:20.966Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@sentry/node@8.49.0",
+      "picked": "8.49.0",
+      "reused_base": false,
+      "published": "2025-01-15T09:37:39.531Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "react@^16.14.0 || 17.x || 18.x || 19.x",
+      "picked": "19.0.0",
+      "reused_base": true,
+      "published": "2024-12-05T18:10:21.804Z",
+      "counts": {
+        "in_range": 42,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/api@^1.9.0",
+      "picked": "1.9.0",
+      "reused_base": true,
+      "published": "2024-06-05T17:15:25.003Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/core@^1.29.0",
+      "picked": "1.29.0",
+      "reused_base": true,
+      "published": "2024-12-04T16:32:09.015Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation@^0.56.0",
+      "picked": "0.56.0",
+      "reused_base": true,
+      "published": "2024-12-04T16:33:04.509Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+      "picked": "1.30.0",
+      "reused_base": true,
+      "published": "2024-12-18T10:10:16.436Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-pg@0.49.0",
+      "picked": "0.49.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:17.945Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-koa@0.46.0",
+      "picked": "0.46.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:14.248Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-hapi@0.44.0",
+      "picked": "0.44.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:13.960Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/resources@^1.29.0",
+      "picked": "1.30.0",
+      "reused_base": true,
+      "published": "2024-12-18T10:10:07.978Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-http@0.56.0",
+      "picked": "0.56.0",
+      "reused_base": true,
+      "published": "2024-12-04T16:33:20.311Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-connect@0.42.0",
+      "picked": "0.42.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:37:55.183Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "import-in-the-middle@^1.11.2",
+      "picked": "1.12.0",
+      "reused_base": true,
+      "published": "2024-12-17T10:58:28.887Z",
+      "counts": {
+        "in_range": 12,
+        "no_time": 0,
+        "after_t": 9,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-mysql@0.44.0",
+      "picked": "0.44.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:16.533Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-fs@0.18.0",
+      "picked": "0.18.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:37:52.627Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-mysql2@0.44.0",
+      "picked": "0.44.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:17.138Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-knex@0.43.0",
+      "picked": "0.43.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:37:57.772Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-amqplib@^0.45.0",
+      "picked": "0.45.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:08.414Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-graphql@0.46.0",
+      "picked": "0.46.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:37:57.557Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-undici@0.9.0",
+      "picked": "0.9.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:37:53.258Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-fastify@0.43.0",
+      "picked": "0.43.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:13.149Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-express@0.46.0",
+      "picked": "0.46.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:12.027Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "import-in-the-middle@^1.8.1",
+      "picked": "1.12.0",
+      "reused_base": true,
+      "published": "2024-12-17T10:58:28.887Z",
+      "counts": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 9,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/context-async-hooks@^1.29.0",
+      "picked": "1.30.0",
+      "reused_base": true,
+      "published": "2024-12-18T10:09:48.708Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-kafkajs@0.6.0",
+      "picked": "0.6.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:08.609Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/core@1.30.0",
+      "picked": "1.30.0",
+      "reused_base": true,
+      "published": "2024-12-18T10:09:53.736Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/resources@1.30.0",
+      "picked": "1.30.0",
+      "reused_base": true,
+      "published": "2024-12-18T10:10:07.978Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-mongodb@0.50.0",
+      "picked": "0.50.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:16.263Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-redis-4@0.45.0",
+      "picked": "0.45.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:19.070Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-tedious@0.17.0",
+      "picked": "0.17.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:11.215Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-mongoose@0.45.0",
+      "picked": "0.45.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:09.379Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-dataloader@0.15.0",
+      "picked": "0.15.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:37:49.988Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-nestjs-core@0.43.0",
+      "picked": "0.43.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:37:58.298Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-generic-pool@0.42.0",
+      "picked": "0.42.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:37:56.341Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "shimmer@^1.2.1",
+      "picked": "1.2.1",
+      "reused_base": true,
+      "published": "2019-01-17T23:46:27.682Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-lru-memoizer@0.43.0",
+      "picked": "0.43.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:09.176Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "require-in-the-middle@^7.1.1",
+      "picked": "7.4.0",
+      "reused_base": true,
+      "published": "2024-07-25T18:49:33.447Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/api-logs@0.56.0",
+      "picked": "0.56.0",
+      "reused_base": true,
+      "published": "2024-12-04T16:31:59.020Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "is-core-module@^2.13.0",
+      "picked": "2.16.1",
+      "reused_base": true,
+      "published": "2024-12-21T21:23:27.215Z",
+      "counts": {
+        "in_range": 9,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "path-parse@^1.0.7",
+      "picked": "1.0.7",
+      "reused_base": true,
+      "published": "2021-05-25T12:57:37.333Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "hoist-non-react-statics@^3.3.2",
+      "picked": "3.3.2",
+      "reused_base": true,
+      "published": "2020-01-22T23:21:02.975Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "supports-preserve-symlinks-flag@^1.0.0",
+      "picked": "1.0.0",
+      "reused_base": true,
+      "published": "2022-01-03T07:22:56.640Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation-ioredis@0.46.0",
+      "picked": "0.46.0",
+      "reused_base": true,
+      "published": "2024-12-05T07:38:14.396Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@sentry/browser@8.49.0",
+      "picked": "8.49.0",
+      "reused_base": false,
+      "published": "2025-01-15T09:37:36.532Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/shimmer@^1.2.0",
+      "picked": "1.2.0",
+      "reused_base": true,
+      "published": "2024-07-08T08:09:27.106Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@prisma/instrumentation@5.22.0",
+      "picked": "5.22.0",
+      "reused_base": true,
+      "published": "2024-11-05T15:32:24.137Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "cjs-module-lexer@^1.2.2",
+      "picked": "1.4.1",
+      "reused_base": true,
+      "published": "2024-09-07T20:51:50.370Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "acorn-import-attributes@^1.9.5",
+      "picked": "1.9.5",
+      "reused_base": true,
+      "published": "2024-03-29T09:47:27.508Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "module-details-from-path@^1.0.3",
+      "picked": "1.0.3",
+      "reused_base": true,
+      "published": "2016-07-09T14:21:00.366Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "module-details-from-path@^1.0.3",
+      "picked": "1.0.3",
+      "reused_base": true,
+      "published": "2016-07-09T14:21:00.366Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/api@>=1.0.0 <1.10.0",
+      "picked": "1.9.0",
+      "reused_base": true,
+      "published": "2024-06-05T17:15:25.003Z",
+      "counts": {
+        "in_range": 16,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/core@1.29.0",
+      "picked": "1.29.0",
+      "reused_base": true,
+      "published": "2024-12-04T16:32:09.015Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/semantic-conventions@1.27.0",
+      "picked": "1.27.0",
+      "reused_base": true,
+      "published": "2024-08-28T09:17:00.414Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/instrumentation@^0.49 || ^0.50 || ^0.51 || ^0.52.0 || ^0.53.0",
+      "picked": "0.53.0",
+      "reused_base": true,
+      "published": "2024-08-28T09:17:43.150Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/connect@3.4.36",
+      "picked": "3.4.36",
+      "reused_base": true,
+      "published": "2023-09-04T16:13:32.146Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/redis-common@^0.36.2",
+      "picked": "0.36.2",
+      "reused_base": true,
+      "published": "2024-04-25T19:01:56.372Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/redis-common@^0.36.2",
+      "picked": "0.36.2",
+      "reused_base": true,
+      "published": "2024-04-25T19:01:56.372Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/mysql@2.15.26",
+      "picked": "2.15.26",
+      "reused_base": true,
+      "published": "2024-03-11T23:35:34.719Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/sql-common@^0.40.1",
+      "picked": "0.40.1",
+      "reused_base": true,
+      "published": "2024-04-25T19:01:57.493Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/sql-common@^0.40.1",
+      "picked": "0.40.1",
+      "reused_base": true,
+      "published": "2024-04-25T19:01:57.493Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/tedious@^4.0.14",
+      "picked": "4.0.14",
+      "reused_base": true,
+      "published": "2023-11-07T17:42:31.655Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "forwarded-parse@2.1.2",
+      "picked": "2.1.2",
+      "reused_base": true,
+      "published": "2021-11-03T19:55:06.517Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/pg@8.6.1",
+      "picked": "8.6.1",
+      "reused_base": true,
+      "published": "2021-07-07T17:07:55.878Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/pg-pool@2.0.6",
+      "picked": "2.0.6",
+      "reused_base": true,
+      "published": "2023-11-07T12:57:10.692Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/api@^1.3.0",
+      "picked": "1.9.0",
+      "reused_base": true,
+      "published": "2024-06-05T17:15:25.003Z",
+      "counts": {
+        "in_range": 10,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "pg-types@^2.2.0",
+      "picked": "2.2.0",
+      "reused_base": true,
+      "published": "2019-08-07T01:15:33.099Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "pg-protocol@*",
+      "picked": "1.7.0",
+      "reused_base": true,
+      "published": "2024-09-17T15:09:14.071Z",
+      "counts": {
+        "in_range": 27,
+        "no_time": 0,
+        "after_t": 15,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/api@^1.8",
+      "picked": "1.9.0",
+      "reused_base": true,
+      "published": "2024-06-05T17:15:25.003Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@opentelemetry/api-logs@0.53.0",
+      "picked": "0.53.0",
+      "reused_base": true,
+      "published": "2024-08-28T09:16:53.754Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "pg-int8@1.0.1",
+      "picked": "1.0.1",
+      "reused_base": true,
+      "published": "2017-11-14T22:39:49.993Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "postgres-bytea@~1.0.0",
+      "picked": "1.0.0",
+      "reused_base": true,
+      "published": "2015-06-14T04:44:18.277Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "postgres-date@~1.0.4",
+      "picked": "1.0.7",
+      "reused_base": true,
+      "published": "2020-08-28T21:29:03.410Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "postgres-interval@^1.1.0",
+      "picked": "1.2.0",
+      "reused_base": true,
+      "published": "2019-02-23T00:06:51.959Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "postgres-array@~2.0.0",
+      "picked": "2.0.0",
+      "reused_base": true,
+      "published": "2018-10-22T18:12:08.067Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "acorn@^8.8.2",
+      "picked": "8.14.0",
+      "reused_base": true,
+      "published": "2024-10-27T11:23:49.958Z",
+      "counts": {
+        "in_range": 17,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "xtend@^4.0.0",
+      "picked": "4.0.2",
+      "reused_base": true,
+      "published": "2019-07-08T13:35:45.491Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "hasown@^2.0.2",
+      "picked": "2.0.2",
+      "reused_base": true,
+      "published": "2024-03-10T17:38:25.117Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "function-bind@^1.1.2",
+      "picked": "1.1.2",
+      "reused_base": true,
+      "published": "2023-10-12T19:08:19.687Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@sentry-internal/replay-canvas@8.49.0",
+      "picked": "8.49.0",
+      "reused_base": false,
+      "published": "2025-01-15T09:37:33.892Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@sentry-internal/replay@8.49.0",
+      "picked": "8.49.0",
+      "reused_base": false,
+      "published": "2025-01-15T09:37:26.216Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@sentry-internal/feedback@8.49.0",
+      "picked": "8.49.0",
+      "reused_base": false,
+      "published": "2025-01-15T09:37:31.283Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "react-is@^16.7.0",
+      "picked": "16.13.1",
+      "reused_base": true,
+      "published": "2020-03-19T19:53:28.493Z",
+      "counts": {
+        "in_range": 16,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 191,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 28,
+    "youngest_age": {
+      "hours": 91.8,
+      "version": "@opentelemetry/semantic-conventions@1.44.0",
+      "published": "2026-10-28T20:49:19.974Z"
+    },
+    "published_after_t": 10,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 16,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 15,
+    "youngest_age": {
+      "hours": 21.6,
+      "version": "require-in-the-middle@7.5.0",
+      "published": "2025-01-27T23:02:49.230Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 16,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/@sentry-internal/browser-utils",
+      "name": "@sentry-internal/browser-utils",
+      "from": "8.48.0",
+      "to": "8.49.0",
+      "published": "2025-01-15T09:37:23.806Z",
+      "age_at_t_hours": 323,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "8.49.0",
+        "8.49.0",
+        "8.49.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@sentry-internal/feedback",
+      "name": "@sentry-internal/feedback",
+      "from": "8.48.0",
+      "to": "8.49.0",
+      "published": "2025-01-15T09:37:31.283Z",
+      "age_at_t_hours": 323,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "8.49.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@sentry-internal/replay",
+      "name": "@sentry-internal/replay",
+      "from": "8.48.0",
+      "to": "8.49.0",
+      "published": "2025-01-15T09:37:26.216Z",
+      "age_at_t_hours": 323,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "8.49.0",
+        "8.49.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@sentry-internal/replay-canvas",
+      "name": "@sentry-internal/replay-canvas",
+      "from": "8.48.0",
+      "to": "8.49.0",
+      "published": "2025-01-15T09:37:33.892Z",
+      "age_at_t_hours": 323,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "8.49.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@sentry/browser",
+      "name": "@sentry/browser",
+      "from": "8.48.0",
+      "to": "8.49.0",
+      "published": "2025-01-15T09:37:36.532Z",
+      "age_at_t_hours": 323,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "8.49.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@sentry/core",
+      "name": "@sentry/core",
+      "from": "8.48.0",
+      "to": "8.49.0",
+      "published": "2025-01-15T09:37:20.966Z",
+      "age_at_t_hours": 323,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "8.49.0",
+        "8.49.0",
+        "8.49.0",
+        "8.49.0",
+        "8.49.0",
+        "8.49.0",
+        "8.49.0",
+        "8.49.0",
+        "8.49.0",
+        "8.49.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@sentry/nextjs/node_modules/@sentry/react",
+      "name": "@sentry/react",
+      "from": "8.48.0",
+      "to": "8.49.0",
+      "published": "2025-01-15T09:37:49.695Z",
+      "age_at_t_hours": 323,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "8.49.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@sentry/node",
+      "name": "@sentry/node",
+      "from": "8.48.0",
+      "to": "8.49.0",
+      "published": "2025-01-15T09:37:39.531Z",
+      "age_at_t_hours": 323,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "8.49.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@sentry/opentelemetry",
+      "name": "@sentry/opentelemetry",
+      "from": "8.48.0",
+      "to": "8.49.0",
+      "published": "2025-01-15T09:37:28.602Z",
+      "age_at_t_hours": 323,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "8.49.0",
+        "8.49.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@sentry/vercel-edge",
+      "name": "@sentry/vercel-edge",
+      "from": "8.48.0",
+      "to": "8.49.0",
+      "published": "2025-01-15T09:38:01.695Z",
+      "age_at_t_hours": 323,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "8.49.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    }
+  ],
+  "moved_non_v": 10,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 16,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 323,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 18,
+  "differing_paths_vs_normal_at_t": 5,
+  "checks_on_normal_at_t_fail": 6,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 22.062
+}

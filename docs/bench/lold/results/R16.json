@@ -1,0 +1,102 @@
+{
+  "id": "R16",
+  "name": "mcp-server-kubernetes",
+  "from": "2.9.7",
+  "v": "2.9.8",
+  "advisory": "GHSA-wvxp-jp4w-w8wg",
+  "why": "first eligible rows, one per package",
+  "vulnerable": "<=2.9.7",
+  "started_at": "2026-11-01T16:32:25.559Z",
+  "base_before": "2025-10-21T07:00:43.577Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 173,
+    "duplicate_names": 23,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/mcp-server-kubernetes@2.9.7"
+    ]
+  },
+  "t": "2025-12-03T20:44:45.000Z",
+  "v_published": "2025-12-01T03:31:16.720Z",
+  "picks": [
+    {
+      "req": "mcp-server-kubernetes@2.9.8",
+      "picked": "2.9.8",
+      "is_v": true
+    }
+  ],
+  "stops": [
+    {
+      "req": "js-yaml@4.1.1",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    }
+  ],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 0,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 1,
+    "youngest_age": {
+      "hours": 8497.2,
+      "version": "js-yaml@4.1.1",
+      "published": "2025-11-12T15:18:03.524Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 23,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 1,
+    "youngest_age": {
+      "hours": 509.4,
+      "version": "js-yaml@4.1.1",
+      "published": "2025-11-12T15:18:03.524Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 23,
+    "ls_problems": 0
+  },
+  "outcome": "stopped_no_allowed",
+  "reason": [
+    {
+      "req": "js-yaml@4.1.1",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    }
+  ],
+  "tool_failure": {
+    "code": "LOLD_STOP",
+    "message": "LOLD: nothing allowed for js-yaml@4.1.1"
+  },
+  "took_s": 3.425
+}

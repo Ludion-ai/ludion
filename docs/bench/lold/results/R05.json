@@ -1,0 +1,220 @@
+{
+  "id": "R05",
+  "name": "@angular/platform-server",
+  "from": "20.2.4",
+  "v": "20.3.0",
+  "advisory": "GHSA-68x2-mx4q-78m7",
+  "why": "first eligible rows, one per package",
+  "vulnerable": ">=20.0.0-next.0 <20.3.0",
+  "started_at": "2026-11-01T16:30:51.491Z",
+  "base_before": "2025-09-03T20:37:37.235Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 8,
+    "duplicate_names": 0,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/@angular/platform-server@20.2.4"
+    ]
+  },
+  "t": "2025-09-10T21:56:01.000Z",
+  "v_published": "2025-09-10T15:03:18.580Z",
+  "picks": [
+    {
+      "req": "@angular/platform-server@20.3.0",
+      "picked": "20.3.0",
+      "is_v": true
+    },
+    {
+      "req": "@angular/platform-browser@20.3.0",
+      "picked": "20.3.0",
+      "reused_base": false,
+      "published": "2025-09-10T15:03:11.847Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "rxjs@^6.5.3 || ^7.4.0",
+      "picked": "7.8.2",
+      "reused_base": true,
+      "published": "2025-02-22T03:00:42.711Z",
+      "counts": {
+        "in_range": 24,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.3.0",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 16,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.3.0",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 16,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.1.0",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [
+    {
+      "req": "@angular/common@20.3.0",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "req": "@angular/compiler@20.3.0",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "req": "@angular/core@20.3.0",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    }
+  ],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 3,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 5,
+    "youngest_age": {
+      "hours": 44.2,
+      "version": "tslib@2.9.1",
+      "published": "2026-10-30T20:20:28.741Z"
+    },
+    "published_after_t": 1,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 0,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 4,
+    "youngest_age": {
+      "hours": 6.9,
+      "version": "@angular/common@20.3.0",
+      "published": "2025-09-10T15:02:39.544Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 0,
+    "ls_problems": 0
+  },
+  "outcome": "stopped_no_allowed",
+  "reason": [
+    {
+      "req": "@angular/common@20.3.0",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "req": "@angular/compiler@20.3.0",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "req": "@angular/core@20.3.0",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    }
+  ],
+  "tool_failure": {
+    "code": "LOLD_STOP",
+    "message": "LOLD: nothing allowed for @angular/common@20.3.0"
+  },
+  "took_s": 5.527
+}

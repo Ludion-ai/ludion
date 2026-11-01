@@ -1,0 +1,14 @@
+{
+  "id": "R14",
+  "name": "@finos/git-proxy",
+  "from": "1.19.1",
+  "v": "1.19.2",
+  "t": "2025-07-30T16:40:40.000Z",
+  "before": "2025-07-27T16:40:40.000Z",
+  "outcome": "built",
+  "moved_non_v": 4,
+  "youngest_age_at_t_hours": 261.3,
+  "duplicate_names": 22,
+  "new_ls_problems": 0,
+  "failures": []
+}

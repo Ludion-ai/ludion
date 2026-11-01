@@ -1,0 +1,12 @@
+{
+  "id": "R02",
+  "name": "@react-native-community/cli-server-api",
+  "from": "19.1.1",
+  "v": "19.1.2",
+  "t": "2025-11-05T21:56:39.769Z",
+  "before": "2025-11-02T21:56:39.769Z",
+  "outcome": "failed",
+  "reason": "npm error code ETARGET\nnpm error notarget No matching version found for @react-native-community/cli-tools@19.1.2 with a date before 11/2/2025, 9:56:39 PM.\nnpm error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.\nnpm error A complete log of this run can be found in: /vol/cache/_logs/2026-11-01T16_33_59_674Z-debug-0.log\n",
+  "peer_conflict": false,
+  "etarget": true
+}

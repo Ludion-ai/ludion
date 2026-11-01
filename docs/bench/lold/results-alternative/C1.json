@@ -1,0 +1,14 @@
+{
+  "id": "C1",
+  "name": "lodash",
+  "from": "4.17.20",
+  "v": "4.17.21",
+  "t": "2021-02-20T16:42:16.891Z",
+  "before": "2021-02-17T16:42:16.891Z",
+  "outcome": "built",
+  "moved_non_v": 0,
+  "youngest_age_at_t_hours": null,
+  "duplicate_names": 0,
+  "new_ls_problems": 0,
+  "failures": []
+}

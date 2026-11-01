@@ -1,0 +1,120 @@
+{
+  "id": "R17",
+  "name": "@webrecorder/wabac",
+  "from": "2.23.10",
+  "v": "2.23.11",
+  "advisory": "GHSA-w765-jm6w-4hhj",
+  "why": "first eligible rows, one per package",
+  "vulnerable": "<2.23.11",
+  "started_at": "2026-11-01T16:37:46.120Z",
+  "base_before": "2025-08-15T04:09:50.148Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 81,
+    "duplicate_names": 2,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/@webrecorder/wabac@2.23.10"
+    ]
+  },
+  "t": "2025-09-10T17:13:45.000Z",
+  "v_published": "2025-09-04T17:47:54.605Z",
+  "picks": [
+    {
+      "req": "@webrecorder/wabac@2.23.11",
+      "picked": "2.23.11",
+      "is_v": true
+    },
+    {
+      "req": "warcio@^2.4.5",
+      "picked": "2.4.5",
+      "reused_base": false,
+      "published": "2025-09-04T01:51:15.868Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 7,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 7,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 1,
+    "youngest_age": {
+      "hours": 1392.4,
+      "version": "warcio@2.4.12",
+      "published": "2026-09-04T16:11:44.158Z"
+    },
+    "published_after_t": 1,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 2,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 1,
+    "youngest_age": {
+      "hours": 159.4,
+      "version": "warcio@2.4.5",
+      "published": "2025-09-04T01:51:15.868Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 2,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/warcio",
+      "name": "warcio",
+      "from": "2.4.4",
+      "to": "2.4.5",
+      "published": "2025-09-04T01:51:15.868Z",
+      "age_at_t_hours": 159.4,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^2.4.5",
+        "^2.4.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    }
+  ],
+  "moved_non_v": 1,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 2,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 159.4,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 1,
+  "differing_paths_vs_normal_at_t": 0,
+  "checks_on_normal_at_t_fail": 0,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 3.599
+}

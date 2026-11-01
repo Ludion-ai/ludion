@@ -41,16 +41,26 @@ describe("the template users copy", () => {
     expect(pr).toEqual(expect.arrayContaining(["needs: patch", "if: ${{ !cancelled() && needs.patch.outputs.packed == 'true' }}", "mode: pull-request"]));
     expect(TEMPLATE).not.toMatch(/secrets\./);
   });
-  it("turns setup-node's npm cache off in both jobs", () => {
+  it("runs a check job first, which reads only, and patch unless it answers work=false (docs/bench/lb2b-next1/definitions.md)", () => {
+    const jobs = TEMPLATE.split("\n").filter(l => /^  [a-z-]+:$/.test(l)).map(l => l.trim());
+    expect(jobs).toEqual(["check:", "patch:", "pull-request:"]);
+    expect(section(TEMPLATE.slice(TEMPLATE.indexOf("\n  check:")), /^    permissions:$/)).toEqual(["contents: read", "pull-requests: read"]);
+    const check = section(TEMPLATE, /^  check:$/);
+    expect(check).toEqual(expect.arrayContaining(["mode: check", "work: ${{ steps.ludion.outputs.work }}"]));
+    expect(check.join("\n")).not.toMatch(/secrets\.|github\.token|id-token|write|needs:/);
+    // A failed check job starts patch too: only a proven work=false skips it.
+    expect(section(TEMPLATE, /^  patch:$/)).toEqual(expect.arrayContaining(["needs: check", "if: ${{ !cancelled() && needs.check.outputs.work != 'false' }}"]));
+  });
+  it("turns setup-node's npm cache off in every job", () => {
     // A cache restored in the job that writes and saved by the job that runs candidate code would cross the split.
-    for (const job of ["patch", "pull-request"]) {
+    for (const job of ["check", "patch", "pull-request"]) {
       const lines = section(TEMPLATE, new RegExp(`^  ${job}:$`)), at = lines.findIndex(l => l.includes("actions/setup-node@"));
       expect(lines.slice(at, at + 4), job).toEqual(expect.arrayContaining(["package-manager-cache: false"]));
     }
   });
   it("pins every action by a full commit SHA", () => {
     const uses = TEMPLATE.split("\n").filter(l => /^\s+(- )?uses:/.test(l));
-    expect(uses.length).toBe(4);
+    expect(uses.length).toBe(6);
     for (const line of uses) expect(line).toMatch(/uses: [A-Za-z0-9-]+\/[A-Za-z0-9-]+@[0-9a-f]{40} # /);
   });
 });
@@ -82,6 +92,19 @@ describe("action.yml's steps for each mode", () => {
     expect(run).not.toMatch(/\b(npm|npx|docker|composer|mvn|patch\.sh|ludion patch)\b/);
     for (const step of mine) expect(step).not.toMatch(/secrets\./);
   });
+  it("mode check: one step holds the token, runs action/check.sh, and reads no artifact", () => {
+    const mine = forMode("check");
+    expect(mine.map(s => s.split("\n")[0])).toEqual([
+      "name: Check the mode, the event and the tools", "name: Check that this commit of the action carries the bundled judge",
+      "name: Check out the run's commit", "name: Decide, before Docker, whether this run has anything to do",
+    ]);
+    const holding = mine.filter(s => /github\.token|GH_TOKEN/.test(s));
+    expect(holding.map(s => s.split("\n")[0])).toEqual(["name: Decide, before Docker, whether this run has anything to do"]);
+    expect(holding[0]).toContain('run: bash "$GITHUB_ACTION_PATH/action/check.sh"');
+    for (const step of mine) expect(step).not.toMatch(/secrets\.|download-artifact|upload-artifact/);
+    expect(mine.find(s => s.includes("actions/checkout@"))).toContain("persist-credentials: false");
+    expect(ACTION).toMatch(/^  work:\n    description: .*\n    value: \$\{\{ steps\.check\.outputs\.work \}\}$/m);
+  });
 });
 
 describe("action/start.sh refuses the scheduled modes outside their place", () => {
@@ -97,7 +120,9 @@ describe("action/start.sh refuses the scheduled modes outside their place", () =
       [{ MODE: "pull-request", EVENT: "workflow_dispatch", REF: "refs/heads/main", DEFAULT_BRANCH: "main", RUNNER_ENVIRONMENT: "self-hosted" }, "mode pull-request runs only on GitHub-hosted runners"],
       [{ MODE: "pull-request", EVENT: "schedule", REF: "refs/heads/main" }, "not on an unknown runner."],
       [{ MODE: "patch", EVENT: "schedule", REF: "refs/heads/main", RUNNER_ENVIRONMENT: "github-hosted", ACTIONS_ID_TOKEN_REQUEST_URL: "https://token.invalid" }, "must hold no secret"],
-      [{ MODE: "nope", EVENT: "schedule" }, "mode must be judge, comment, patch or pull-request."],
+      [{ MODE: "check", EVENT: "pull_request" }, "mode check runs on schedule or workflow_dispatch, not pull_request."],
+      [{ MODE: "check", EVENT: "schedule", REF: "refs/heads/main", RUNNER_ENVIRONMENT: "self-hosted" }, "mode check runs only on GitHub-hosted runners"],
+      [{ MODE: "nope", EVENT: "schedule" }, "mode must be judge, comment, patch, pull-request or check."],
     ] as const) {
       const r = start(env);
       expect(r.status, JSON.stringify(env)).toBe(1);

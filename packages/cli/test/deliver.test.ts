@@ -216,7 +216,7 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
     const p2 = project(), fix2 = applied(p2.work), gh2 = github(p2.origin);
     const refused = await open(checkout(p2.origin), artifact(p2.work, fix2.receipt, [`refs/heads/${BRANCH}`], p2.base), p2.base, p2.origin, gh2, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh2.fetchFn, runs, { refuse: 403 }) });
     expect(refused.deliveries).toMatchObject([{ outcome: "opened" }]);
-    expect(String(gh2.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: earlier runs' records were not read: ");
+    expect(String(gh2.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: earlier runs' records were not used: ");
     expect(String(gh2.opened[0]!.body)).toContain("HTTP 403");
     // Every record that lists the fix is later than this run's lookup: the lookup stays (R252 N2).
     const p3 = project(), fix3 = applied(p3.work), gh3 = github(p3.origin);

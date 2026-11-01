@@ -1,9 +1,17 @@
 // LEXP (docs/bench/lexp/definitions.md): the end of exposure time is the merge of Ludion's PR, recorded on that PR
 // (X1, X2), and the PR's found_at is the first run, of an unbroken row of the workflow's runs, whose check saw the fix
 // (X4). GitHub's API and the artifact download are stand-ins; no test reaches the network.
-import { describe, expect, it } from "vitest";
-import { firstSeen, pullRequestBody, recordMerge, SEEN_WALK_MS, unzipEntry, type CheckedArtifact, type CheckedFix } from "../src/security/deliver.ts";
+import { describe, expect, it, vi } from "vitest";
+import { firstSeen, pullRequestBody, recordMerge, SEEN_BYTES, SEEN_WALK_MS, unzipEntry, type CheckedArtifact, type CheckedFix } from "../src/security/deliver.ts";
 import { seenAt, withRuns, zip, type StandInRun } from "./runs.ts";
+
+// Every options argument deliver.ts passes to inflateRawSync, which is otherwise the real one: the inflated limit cannot
+// be seen in a result (the size check after it gives the same null), only in what inflation may allocate (R252b N11).
+const inflateOptions = vi.hoisted(() => [] as unknown[]);
+vi.mock("node:zlib", async importOriginal => {
+  const zlib = await importOriginal<typeof import("node:zlib")>();
+  return { ...zlib, inflateRawSync: (buffer: Buffer, options?: import("node:zlib").ZlibOptions) => { inflateOptions.push(options); return zlib.inflateRawSync(buffer, options); } };
+});
 
 const H = 3_600_000;
 const iso = (ms: number) => new Date(ms).toISOString();
@@ -74,8 +82,10 @@ describe("the merge of Ludion's PR is recorded on it (X1, X2)", () => {
       [{ base: { ref: "release" } }, "not the default branch"],
       [{ body: BODY.replace("<!-- ludion-fix -->\n", "") }, "Ludion's marker"],
       [{ merged_at: "yesterday" }, "merged_at"],
-      // The form of a time, but no date (R252 N3).
+      // The form of a time, but no date (R252 N3), and days or hours Date.parse rolls over to another date (R252b N9).
       [{ merged_at: "2026-13-45T00:00:00Z" }, "merged_at"],
+      [{ merged_at: "2026-04-31T12:00:00Z" }, "merged_at"],
+      [{ merged_at: "2026-10-31T24:00:00Z" }, "merged_at"],
       [{ merge_commit_sha: "nope" }, "merge commit"],
     ] as const) {
       const gh = github(pr(over));
@@ -102,16 +112,22 @@ describe("the merge of Ludion's PR is recorded on it (X1, X2)", () => {
     expect((await merge(gh2)).outcome).toBe("recorded");
     expect(gh2.posted[0]).toMatch(/Found → merged \| not computed: /);
   });
-  it("a body time that has the form of a time but is no date is recorded as unknown, and the merge is still recorded (R252 N3)", async () => {
-    const body = BODY.replaceAll(`\`${LODASH.found_at}\``, "`2026-13-45T00:00:00Z`");
-    expect(body).toContain("| Found | `2026-13-45T00:00:00Z`");
-    const gh = github(pr({ body }));
-    const r = await merge(gh);
-    expect(r.outcome).toBe("recorded");
-    expect(r.record).toMatchObject({ merged_at: "2026-10-31T09:00:00.000Z", found_at: null, fix_published_at: LODASH.fix_published_at, applied_at: LODASH.applied_at });
-    expect(gh.posted).toHaveLength(1);
-    expect(gh.posted[0]).toContain("| Found | unknown |");
-    expect(gh.posted[0]).toContain("| Found → merged | unknown |");
+  it("a body time that has the form of a time but is no date is recorded as unknown, and the merge is still recorded (R252 N3, R252b N9)", async () => {
+    // A day past the month's end and the hour 24 are rolled over by Date.parse (2026-02-30 to 2026-03-02), so they are
+    // read as no date, not as another one; a time with fewer than three digits of milliseconds is a date.
+    for (const bad of ["2026-13-45T00:00:00Z", "2026-02-30T00:00:00Z", "2026-10-31T24:00:00Z"]) {
+      const body = BODY.replaceAll(`\`${LODASH.found_at}\``, `\`${bad}\``);
+      expect(body, bad).toContain(`| Found | \`${bad}\``);
+      const gh = github(pr({ body }));
+      const r = await merge(gh);
+      expect(r.outcome, bad).toBe("recorded");
+      expect(r.record, bad).toMatchObject({ merged_at: "2026-10-31T09:00:00.000Z", found_at: null, fix_published_at: LODASH.fix_published_at, applied_at: LODASH.applied_at });
+      expect(gh.posted, bad).toHaveLength(1);
+      expect(gh.posted[0], bad).toContain("| Found | unknown |");
+      expect(gh.posted[0], bad).toContain("| Found → merged | unknown |");
+    }
+    const short = github(pr({ body: BODY.replaceAll(`\`${LODASH.found_at}\``, "`2026-10-30T01:00:00.5Z`") }));
+    expect((await merge(short)).record).toMatchObject({ found_at: "2026-10-30T01:00:00.500Z" });
   });
 });
 
@@ -155,6 +171,8 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
       { bytes: zip("seen.json", JSON.stringify(seenAt(started(14), OTHER)), { lie: 1 }) },
       // A deflated zip far under 1 MiB whose valid record, padded with spaces, inflates past 1 MiB (R252 N1).
       { bytes: zip("seen.json", JSON.stringify(seenAt(started(15), OTHER)) + " ".repeat(1024 * 1024), { deflate: true }) },
+      // A checked_at Date.parse rolls over (November 31st to December 1st) into its run's span is no date (R252b N9).
+      { started: "2026-12-01T00:00:00.000Z", record: { ...seenAt("2026-12-01T00:00:00.000Z", OTHER), checked_at: "2026-11-31T00:05:00Z" } },
       SAW,
     ]);
     const r = await walk(runs);
@@ -184,6 +202,25 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
     await expect(firstSeen({ repo: "o/r", runId: 130, defaultBranch: "main", ecosystem: "npm", api: "https://api.github.invalid", token: "t0ken", fetchFn: withRuns(nowhere, runs), now }, [LODASH])).rejects.toThrow("the walk took longer than 5 minutes");
     // It stopped within the first runs, not after reading all 100.
     expect(ticks.length).toBeLessThan(15);
+  });
+  it("the walk's limit holds while the runs are listed, before any record is read (R252b N10)", async () => {
+    // 250 runs of another event: every page is listed and none is kept, so only the check before each page can stop it.
+    let clock = T0, pages = 0;
+    const listing = withRuns(nowhere, Array.from({ length: 250 }, (_, i) => ({ id: i + 1, started: started(i + 1), event: "push" })));
+    const fetchFn = (async (input: string | URL | Request, init?: RequestInit) => {
+      if (new URL(String(input)).pathname.endsWith("/workflows/9/runs")) { pages++; clock += 3 * 60_000; }
+      return listing(input, init);
+    }) as typeof fetch;
+    await expect(firstSeen({ repo: "o/r", runId: 250, defaultBranch: "main", ecosystem: "npm", api: "https://api.github.invalid", token: "t0ken", fetchFn, now: () => clock }, [LODASH])).rejects.toThrow("the walk took longer than 5 minutes");
+    // 3 minutes per page: the third page would start past the limit.
+    expect(pages).toBe(2);
+  });
+  it("inflates a record with the record's own limit, so a deflated entry cannot allocate more than 1 MiB (R252b N11)", async () => {
+    expect(SEEN_BYTES).toBe(1024 * 1024);
+    inflateOptions.length = 0;
+    const r = await walk(row([{ bytes: zip("seen.json", JSON.stringify(seenAt(started(1), SAW)), { deflate: true }) }, SAW]));
+    expect(r.seen.get(LODASH.branch)).toMatchObject({ run: 1, ended: false });
+    expect(inflateOptions).toEqual([{ maxOutputLength: SEEN_BYTES }]);
   });
   it("reads a deflated zip with a data descriptor, as upload-artifact writes it, and asks the redirect without the token", async () => {
     const blobAuth: string[] = [], asked: string[] = [];
@@ -255,7 +292,7 @@ describe("the PR body's Found row (X4, X5)", () => {
     const none = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 3, ended: true } });
     expect(none).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: no record of this workflow's runs lists this fix; `3` records read) |");
     const failed = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 0, ended: false, why: "GitHub did not list this workflow's runs (HTTP 403) | `x`" } });
-    expect(failed).toContain("(this run's lookup: earlier runs' records were not read: GitHub did not list this workflow's runs (HTTP 403)");
+    expect(failed).toContain("(this run's lookup: earlier runs' records were not used: GitHub did not list this workflow's runs (HTTP 403)");
     expect(failed).not.toContain("| `x`");
   });
 });

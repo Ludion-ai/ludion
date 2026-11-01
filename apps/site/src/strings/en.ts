@@ -41,11 +41,11 @@ export const en = {
       "states": [
         {
           "id": "update",
-          "detail": "A relevant PHP security release or known advisory matches an inventoried dependency. Plan an update within the supported version policy."
+          "detail": "A known advisory matches an inventoried dependency, or the Dockerfile's PHP branch has a security release newer than its version. Plan an update within the supported version policy."
         },
         {
           "id": "no-match",
-          "detail": "No matching update was found in the recorded inventory. This is not a guarantee that the application is secure."
+          "detail": "No known advisory or newer PHP security release matches the recorded inventory; the PHP branch's newest release can still be shown when it is not a security release, with its 72-hour wait. This is not a guarantee that the application is secure."
         },
         {
           "id": "unknown",
@@ -129,7 +129,7 @@ export const en = {
     "supported": [
       {
         "name": "PHP runtime",
-        "detect": "Official security releases",
+        "detect": "Official security releases and the branch's newest release (a 72-hour wait when no security release is newer than the Dockerfile's version)",
         "apply": "Dockerfile update",
         "scope": "Exact official PHP image; single stage; same major/minor branch."
       },

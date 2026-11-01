@@ -1,0 +1,48 @@
+R4-inflated-limit caught (2 failing lines)
+R5-receipt-earlier caught (2 failing lines)
+F1-merged-runner caught (2 failing lines)
+F2-body-date caught (2 failing lines)
+F3-merged-at-date caught (2 failing lines)
+F4-earliest caught (2 failing lines)
+F5-walk-limit caught (2 failing lines)
+F6-walk-limit-per-run caught (2 failing lines)
+== mut3-F1-merged-runner.log
+     × refuses another event, another branch, a runner that is not GitHub-hosted, and an OIDC token in mode patch 65ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |node| packages/cli/test/action-patch.test.ts > action/start.sh refuses the scheduled modes outside their place > refuses another event, another branch, a runner that is not GitHub-hosted, and an OIDC token in mode patch
+      Tests  1 failed | 136 passed (137)
+== mut3-F2-body-date.log
+     × a body time that has the form of a time but is no date is recorded as unknown, and the merge is still recorded (R252 N3) 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > a body time that has the form of a time but is no date is recorded as unknown, and the merge is still recorded (R252 N3)
+      Tests  1 failed | 136 passed (137)
+== mut3-F3-merged-at-date.log
+     × records nothing for a PR that is not a merged Ludion fix into the default branch 7ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > records nothing for a PR that is not a merged Ludion fix into the default branch
+      Tests  1 failed | 136 passed (137)
+== mut3-F4-earliest.log
+     × found_at is the earliest record time of the row, not the record of the lowest run id, when an older run was re-run later (R252 N4) 6ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > found_at is the earliest record time of the row, not the record of the lowest run id, when an older run was
+      Tests  1 failed | 136 passed (137)
+== mut3-F5-walk-limit.log
+     × stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7) 27ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7
+      Tests  1 failed | 136 passed (137)
+== mut3-F6-walk-limit-per-run.log
+     × stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7) 28ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7
+      Tests  1 failed | 136 passed (137)
+== mut3-R4-inflated-limit.log
+     × a run with no record, an expired one, a failed list or an invalid one is passed over, and the row goes on 18ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > a run with no record, an expired one, a failed list or an invalid one is passed over, and the row goes on
+      Tests  1 failed | 136 passed (137)
+== mut3-R5-receipt-earlier.log
+     × gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5) 1052ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5)
+      Tests  1 failed | 136 passed (137)

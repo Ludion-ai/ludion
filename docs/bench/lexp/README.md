@@ -21,6 +21,15 @@ Docker: `node:24@sha256:e7add2a490bb17d97b485b8641bd88455fff7839ade0f5eba493c350
 | the five again (scripts/mutate2.sh), after four tests were made stronger and M22 was aimed at the merged mode (its text had matched the judge mode's check first) | the next commit | 5 caught (`logs/mutate2.log`) |
 | the four files, and typecheck, build and every unit test, with the stronger tests and the docs | the next commit | 134 passed; exit 0, exit 0, 1933 passed, 25 skipped (`logs/green3-final.log`, `logs/typecheck-final.log`, `logs/build-final.log`, `logs/full-final.log`) |
 
+After the review of b5097c2 (PR comment 6554139186; definitions.md, section 5): six tests were added or extended to the four files (start.sh's mode merged on a self-hosted or unknown runner, B1; a padded deflated record over 1 MiB once inflated, N1; a deliver run whose records are all later than the receipt's lookup, N2; a body time and a `merged_at` with the form of a time but no date, N3; a re-run older run, N4; the walk's 5-minute limit, N7). The volume `ludion-lexp-w` was made again for this; each `docker run` was typed in full on the host (no host script), with `cat /sys/fs/cgroup/memory.peak` at its end.
+
+| Run | Head | Result |
+|---|---|---|
+| the four files with the new tests, before the fix | 020f7db (tests on b5097c2's code) | 5 failed, 132 passed (137) (`logs/red-b5097c2.log`); the N1 and N2 tests pass there, as they pin what the code already does, and are checked by R4 and R5 below |
+| the same, with the fix | 6859fca | 137 passed |
+| mutations, each alone, the four files (scripts/mutate3.sh): the review's R4 (the inflated limit raised to 1 GiB) and R5 (`else if (true)`), and one or two per fix (F1 start.sh's runner check for mode merged removed; F2 and F3 the date checks of a body time and of `merged_at` removed; F4 the last record of the row taken again; F5 and F6 the walk's time limit removed, or checked only per page) | 6859fca | 8 applied: 8 caught, each by the test written for it (`logs/mutate3.log`) |
+| the four files, typecheck, build, every unit test, and tools/records' test | 6859fca with these docs | 137 passed (`logs/green-fix1.log`); typecheck exit 0, build exit 0, 45 files, 1936 passed, 25 skipped (1961); records 14 passed (`logs/typecheck-fix1.log`, `logs/build-fix1.log`, `logs/full-fix1.log`, `logs/records-fix1.log`) |
+
 The 19 caught in the first pass were not run again against the stronger tests; the tests only gained assertions and cases. The shell that ran the first pass was stopped by the host for low memory while its container went on; the tally was read from the volume after the container exited (exit 0).
 
 New tests: exposure.test.ts (the merge record, the walk, the Found row), deliver.test.ts (one: the PR gets the first run, and is opened with this run's lookup when the runs cannot be read), check.test.ts (the record, and check.sh's `--seen`), action-patch.test.ts (the template, action.yml and start.sh). The stand-ins are test/runs.ts (workflow runs, artifacts, the redirect to the zip) and stand-ins for the PR and comment API; no test reaches the network.

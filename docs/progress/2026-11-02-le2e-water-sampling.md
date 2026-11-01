@@ -1,8 +1,8 @@
 # 2026-11-02 — LE2E: the water contrast check, from minutes to seconds
 
-Definitions, fixed before the runs: `docs/decisions/2026-11-02-le2e-water-sampling.md`. Raw data: `docs/bench/le2e/`.
+Definitions, fixed before the runs, with rule 3 changed after the first five (rule 5's row below): `docs/decisions/2026-11-02-le2e-water-sampling.md`. Raw data: `docs/bench/le2e/`.
 
-**Result.** No moment was dropped and 6 were added. The check got faster because it no longer draws frames it never looks at. In Docker, e2e went from 356.1 s to 85.2 s, and `e2e/water.spec.ts` alone from 313.2 s to 39.6 s. Thresholds, boxes, the pixel step and the accessibility checks are as they were.
+**Result.** None of the old check's 240 moments was dropped and 6 were added. Rule 3 as first written would have added Arm C's 1,269 moments, and those were not added (rule 5's row below). The check got faster because it no longer draws frames it never looks at. In Docker, e2e went from 356.1 s to 85.2 s, and `e2e/water.spec.ts` alone from 313.2 s to 39.6 s. Thresholds, boxes, the pixel step and the accessibility checks are as they were.
 
 ## What was measured about the check as it stood
 
@@ -21,7 +21,7 @@ Under the paused clock a frame depends on its water time alone: B1 and B2 agree 
 | 2. Same boxes | Holds on all 8 tests. |
 | 3. Not kinder than A | **Failed for B alone:** 7 of 152 boxes were kinder in B than in A1 or A2, all in dark. Holds with the 6 added moments: 0 of 152 kinder. |
 | 4. Every box passes | Holds: 0 below threshold. The closest is `span.focus-bracket 2` on `/` and `/ja/` dark, 5.0903 against 4.5. |
-| 5. Worth dropping moments | Not met: the 8 tests sum to 70.1 s in B against the 240 s the rule sets, so **every moment stays**. Rules 6 and 7 do not apply. |
+| 5. Worth dropping moments | Read on B's 240 moments alone, not met: the 8 tests sum to 70.1 s against the 240 s the rule sets, so all 240 stay. **Read on rule 3 as first written, it is met:** that check is B and C, and their runs sum to 348.6 s (B1 70.135 s and C 278.427 s, two separate runs added, not one run). The list actually used takes 6 moments (2 from C, 4 from the sweep) in place of C's 1,269, by rule 6's method, and **went ahead without rule 7**: the check does not notice a changed site and run every moment. The decision's addition made this exception after seeing the results, and says so. |
 
 The sweep (Arm W) found 4 more boxes where B stood above the lowest seen, 11 in all. A chosen list reaches all 11:
 

@@ -58,7 +58,12 @@ Moments are dropped only if all of these also hold:
 
 ## Added after T0, A1, A2, B1 and B2, before any further run
 
-Written after seeing those five runs. It adds measurement and keeps every rule above as written. What those runs showed:
+Written after seeing those five runs. **This section changes a rule after a result, so this file's opening sentence, that nothing is loosened after seeing one, does not hold for it.** Rule 3 says the moments of Arm C are added to the check; "What is added to the check" below puts a chosen list in their place. This paragraph first said that the section adds measurement and keeps every rule as written, and the message of commit ec88fd3 says "It only adds measurement". Both were wrong. The commit message cannot be rewritten, so the correction is here.
+
+- **Stronger than rule 3 as written.** The lowest value the list must reach also includes Arm W's sweep, Arm A3 tests the list against a run that did not choose it, and Arm F runs the list itself. On the site measured, the list is lower than rule 3's B and C on 4 of 152 boxes and higher on none. B and C as written would have been kinder than A3 on 1 box (`/start/` dark, `p.where`, 7.5188 against 7.4753); the list is not.
+- **Weaker than rule 3 as written.** Rule 3 would fix 1,509 moments in the check (B's 240 and C's 1,269); the list fixes 246, so on a changed site the check looks at fewer moments. As written, that check's runs sum to 348.562 s (B1 70.135 s and C 278.427 s, two separate runs added, not one run), over rule 5's 240 s, so a shorter list had to meet rules 6 and 7. The list uses rule 6's method, and rule 7 is not met: the check does not notice a changed site and run every moment. This section made that exception after seeing the results.
+
+What those five runs showed:
 
 - Rule 1 holds: B1 and B2 agree on all 4,480 values, and all 240 moments show the stated water time; each moment after the first drew one frame, and the first moment's count also holds the first 100 ms.
 - Rule 2 holds. Rule 3 does not yet: 7 of 152 boxes are kinder in B than in A1 or A2, all of them in dark, so Arm C is due.

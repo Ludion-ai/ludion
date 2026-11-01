@@ -56,6 +56,26 @@ Moments are dropped only if all of these also hold:
 6. **Everything is contained.** The list contains, for every `(p,s,b)`, at least one moment of `K(p,s,b)`, chosen by this rule: repeatedly take the moment covering the most boxes not yet covered, the lowest `k` on a tie. Arm R must then give, at each kept moment, the `v` of B1 exactly, and so the same `m` for every box.
 7. **It holds for a changed site.** A list is proved for one site only. So the check must notice when the boxes or the water shader differ from those measured, and then run every moment.
 
+## Added after T0, A1, A2, B1 and B2, before any further run
+
+Written after seeing those five runs. It adds measurement and keeps every rule above as written. What those runs showed:
+
+- Rule 1 holds: B1 and B2 agree on all 4,480 values, and all 240 moments show the stated water time; each moment after the first drew one frame, and the first moment's count also holds the first 100 ms.
+- Rule 2 holds. Rule 3 does not yet: 7 of 152 boxes are kinder in B than in A1 or A2, all of them in dark, so Arm C is due.
+- Arm A does not repeat: 398 of 4,480 values and 2 of 152 minimums differ between A1 and A2. It reached 76.906 s of water time in Docker. At the audited CI run's pace, about 4.4 s a moment, it would reach about 176 s on the home pages and 88 s on the start pages.
+
+**What Arm C visits.** A moment of A shows a frame drawn somewhere between the two water times recorded around its screenshot, and that gap is often over a second. So for each kept case (a box of rule 3 that failed, in a run of A where its value is lower than B's, at each moment of that run's `K`), Arm C visits those two times and every 33 ms between them (water.js draws at most every 33 ms), rounded up to a whole millisecond: 1,269 visits over 4 of the 8 tests.
+
+**Arm W, added.** Arm B's clock, one run, the same 300 ms step carried on to 180.1 s of water time on the home pages (600 moments) and 90.1 s on the start pages (300), so past where A can reach on CI. Its first 40 or 20 moments are B's, and must equal B1 exactly. This goes beyond rule 3, because A1 and A2 are two samples of a check that does not repeat: a third run could reach other times.
+
+**What is added to the check.** Rule 3's text says the moments of Arm C are added. Adding all 1,269 would take the check back to minutes for moments that mostly cannot lower anything, so the moments added are the ones that hold the same result: the check's list is B's moments plus a list chosen by rule 6's method, so that for every `(p,s,b)` the list reaches, exactly, the lowest value seen over B, C and W together. No box's minimum may rise by this choice, and rule 3 is read against that list.
+
+**Arm F, added: the final list, two runs.** Every value must equal the same water time's value in B, C or W exactly, and each moment must draw one frame.
+
+**Arm A3, added: a third run of A, after the list is fixed.** It did not choose the list. For every `(p,s,b)`, the list's minimum must be at or below A3's. A box that fails adds its water times the way Arm C does, once, and A3 is not repeated: what remains is reported.
+
+**What this does not show.** A check whose moments depend on the machine's speed has no fixed set of values. These runs show the final list against A1, A2, A3 and a sweep, in Docker, not against every run A could make. Values on CI are compared with Docker's only to the two decimals the CI log prints.
+
 ## What stays in any case
 
 The measurement of every moment stays as a test that is skipped unless asked for, with how to run it. It is not deleted out of view, even if it leaves CI's required path.

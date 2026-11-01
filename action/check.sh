@@ -23,6 +23,10 @@ keys() { awk -F '\t' -v s="$2" '$1 == "key" && $2 == s { print $3 }' "$1" | sort
 scratch="$RUNNER_TEMP/ludion/check"
 mkdir -p "$scratch"
 started=$(date +%s)
+# What this run saw, which action.yml uploads as ludion-seen for a later PR job's found_at
+# (docs/bench/lexp/definitions.md, section 3). The CLI writes it only when it decides; this script never reads it.
+seen="$RUNNER_TEMP/ludion/seen/seen.json"
+mkdir -p "$RUNNER_TEMP/ludion/seen"
 
 # The folder as the compare API names files: no "./", no trailing "/"; "." for the root. Anything else is not decided.
 dir=$DIR
@@ -36,12 +40,13 @@ esac
 # The commit's committer time: a later commit moves every fix's anchor. Without it, every fix that does not wait is due.
 changed=$(git -C "$GITHUB_WORKSPACE" log -1 --format=%cI "$GITHUB_SHA" 2>/dev/null) || changed=""
 if [[ "$changed" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:]{8}([+-][0-9]{2}:[0-9]{2}|Z)$ ]]; then
-  node "$CLI" check --dir "$PROJECT" --changed-at "$changed" > "$scratch/main.txt"
+  node "$CLI" check --dir "$PROJECT" --changed-at "$changed" --seen "$seen" --commit "$GITHUB_SHA" > "$scratch/main.txt"
 else
   echo "The commit's time could not be read; every fix that does not wait is due."
-  node "$CLI" check --dir "$PROJECT" > "$scratch/main.txt"
+  node "$CLI" check --dir "$PROJECT" --seen "$seen" --commit "$GITHUB_SHA" > "$scratch/main.txt"
 fi
 status=$?
+[ -s "$seen" ] && echo "seen=true" >> "$GITHUB_OUTPUT"
 cat "$scratch/main.txt"
 if [ "$status" != 0 ] || [ "$(head -n 1 "$scratch/main.txt" | cut -f 1)" != decided ]; then
   reason=$(awk -F '\t' '$1 == "undecided" { print $2; exit }' "$scratch/main.txt")

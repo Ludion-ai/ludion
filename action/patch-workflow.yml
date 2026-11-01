@@ -2,13 +2,18 @@
 # docs/bench/2026-10-30-lb-design). It needs ludion.security.json in the project's folder (`ludion init`) and the
 # repository setting "Allow GitHub Actions to create and approve pull requests".
 #
-# Three jobs (CLAUDE.md, "Ludion must not become the attack path"):
+# Four jobs (CLAUDE.md, "Ludion must not become the attack path"):
 #   check          runs no dependency code and no Docker, and reads no earlier run's artifact: it decides whether patch
 #                  has anything to do (docs/bench/lb2b-next1/definitions.md). Only the policy's ecosystem is looked at.
 #                  A fix whose wait cannot have ended, one an open Ludion PR already fixes, and one that is not new
-#                  outside the 12-hour slots that double from its last change do not start patch.
+#                  outside the 12-hour slots that double from its last change do not start patch. What it saw is kept
+#                  as the ludion-seen artifact for 90 days (docs/bench/lexp/definitions.md).
 #   patch          runs candidate code, only in Docker, so it holds no write permission and no secret.
 #   pull-request   writes (branches and PRs), so it runs no dependency code; it checks patch's artifact as untrusted data.
+#                  With actions: read, it reads earlier runs' ludion-seen records, so each PR's "Found" is the first
+#                  run that saw its fix.
+#   merged         when a PR Ludion opened is merged into the default branch, records the merge time on it as a comment:
+#                  the end of that fix's exposure time. It checks out nothing and holds pull-requests: write only.
 #
 # The schedule can come hours late or not at all (on 2026-10-29 GitHub's hourly schedule did not fire for five hours in
 # Ludion-ai/ludion-shadow), so it runs every 6 hours, off the hour; run it by hand with workflow_dispatch.
@@ -24,15 +29,20 @@ on:
   schedule:
     - cron: "23 */6 * * *"
   workflow_dispatch:
+  # Only the merged job runs on it, and only for a merged PR from a ludion/ branch.
+  pull_request:
+    types: [closed]
 
 permissions: {}
 
 concurrency:
-  group: ludion-${{ github.workflow }}
+  # A merge's run has its own group, so it neither waits behind nor cancels a pending scheduled run.
+  group: ludion-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'scheduled' }}
   cancel-in-progress: false
 
 jobs:
   check:
+    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -55,7 +65,7 @@ jobs:
   patch:
     needs: check
     # Also when check failed: only a proven work=false skips patch.
-    if: ${{ !cancelled() && needs.check.outputs.work != 'false' }}
+    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.check.outputs.work != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
@@ -83,6 +93,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      # To read earlier runs' ludion-seen records, for each PR's "Found" time; nothing else.
+      actions: read
     steps:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -93,3 +105,21 @@ jobs:
         with:
           mode: pull-request
           dir: .
+
+  merged:
+    # A PR Ludion opened, merged: the end of its fix's exposure time. GitHub starts no workflow for an event made with a
+    # workflow's own token, so a merge made that way is not recorded.
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'ludion/') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          # No npm cache, as in the other jobs.
+          package-manager-cache: false
+      - uses: Ludion-ai/ludion@0000000000000000000000000000000000000000 # a release commit's SHA; none exists yet
+        with:
+          mode: merged

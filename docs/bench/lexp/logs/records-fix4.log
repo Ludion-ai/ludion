@@ -1,0 +1,10 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ✓ |node| tools/records/test/records.test.ts (14 tests) 25ms
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  10:39:23
+   Duration  134ms (transform 21ms, setup 0ms, import 29ms, tests 25ms, environment 0ms)
+

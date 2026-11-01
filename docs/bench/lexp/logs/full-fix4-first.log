@@ -1,0 +1,126 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ✓ |node| packages/cli/test/impact.test.ts (49 tests) 99ms
+ ✓ |node| packages/cli/test/judge.test.ts (135 tests) 215ms
+ ✓ |node| packages/cli/test/exposure.test.ts (26 tests) 209ms
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (36 tests | 18 skipped) 419ms
+     ✓ names the step that failed even when the judge's modules are missing  302ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 253ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (23 tests) 196ms
+ ✓ |node| tools/shadow/test/recorder.test.ts (35 tests) 606ms
+ ✓ |node| packages/cli/test/action.test.ts (15 tests | 6 skipped) 86ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 239ms
+ ✓ |node| packages/cli/test/epss.test.ts (51 tests) 241ms
+ ✓ |node| packages/cli/test/candidate-judge.test.ts (32 tests) 251ms
+ ✓ |node| tools/records/test/records.test.ts (14 tests) 67ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 1142ms
+     ✓ fails deep or very long input with an ordinary error, never a stack overflow  400ms
+ ✓ |node| packages/cli/test/node-image.test.ts (71 tests) 1190ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 776ms
+     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  657ms
+ ✓ |node| tools/records/test/bench-socket.test.ts (5 tests) 71ms
+ ✓ |node| tools/shadow/test/replay.test.ts (61 tests) 1543ms
+     ✓ is final after the window plus 336h: 100 decided versions and no MAL case is met, with no case  499ms
+     ✓ reads the latest poll and OSV read without spreading months of status lines into one call  536ms
+ ✓ |node| packages/sandbox/test/docker.test.ts (18 tests) 174ms
+ ✓ |node| packages/cli/test/scan-exit.test.ts (60 tests) 273ms
+ ✓ |node| packages/cli/test/action-patch.test.ts (11 tests) 186ms
+ ✓ |node| apps/site/test/knowledge.test.ts (12 tests) 31ms
+ ✓ |node| packages/cli/test/npm-corpus.test.ts (14 tests | 1 skipped) 488ms
+ ❯ |node| packages/sandbox/test/guard.test.ts (3 tests | 1 failed) 80ms
+     × starts a run argument list only inside a builder function 74ms
+     ✓ catches a synthetic docker spawn, a run argv, and a template, and allows a version probe 2ms
+     ✓ bounds a builder function at its own closing brace, not at the next export 1ms
+ ✓ |node| tools/backtest/test/archives-v5.test.ts (16 tests) 18ms
+ ✓ |node| packages/cli/test/judge-cli.test.ts (4 tests) 67ms
+ ✓ |node| packages/cli/test/patch-cli.test.ts (5 tests) 20ms
+ ✓ |node| packages/cli/test/osv-note.test.ts (6 tests) 8ms
+ ✓ |node| packages/sandbox/test/docker-lookup.test.ts (4 tests) 33ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 50ms
+ ✓ |node| packages/sandbox/test/safe-fetch.test.ts (32 tests) 75ms
+ ✓ |node| packages/cli/test/check.test.ts (48 tests) 2194ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 876ms
+     ✓ parseRequirements: a run of backslash continuations  355ms
+ ✓ |node| tools/backtest/test/delta.test.ts (21 tests) 1264ms
+     ✓ counts runs of several megabytes without overflowing the stack (docs/mistakes/2026-10-30-delta-regex-stack.md)  954ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 9ms
+ ✓ |node| apps/site/test/build.test.ts (2 tests) 6ms
+ ✓ |node| apps/site/test/privacy-hosts.test.ts (6 tests) 9ms
+ ✓ |node| apps/site/test/discovery.test.ts (3 tests) 8ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 2860ms
+     ✓ duplicate members count once toward the 1,000  752ms
+     ✓ more than 1,000 literal members are read no further, and say so  1445ms
+ ✓ |node| tools/backtest/test/delta-v1-results.test.ts (3 tests) 98ms
+ ✓ |node| packages/cli/test/security.test.ts (69 tests) 2922ms
+ ✓ |worker| apps/worker/test/app.test.ts (6 tests) 182ms
+ ✓ |node| packages/cli/test/branch.test.ts (23 tests) 3390ms
+     ✓ compares the validated copy with HEAD, file by file  522ms
+     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  540ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (165 tests) 7478ms
+     ✓ stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had  877ms
+     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  561ms
+     ✓ gives two fixes whose names clean alike two branches, and stops one whose name an older-named branch holds  413ms
+ ✓ |node| .claude/hooks/guard.test.ts (422 tests) 11089ms
+     ✓ refuses the guard and settings of a worktree and of the repository, however the path is written  307ms
+ ✓ |node| packages/cli/test/deliver.test.ts (64 tests) 22703ms
+     ✓ writes the receipt and a bundle of exactly the applied fixes' branches, on the base  362ms
+     ✓ packs no bundle when nothing was applied, and refuses a branch the receipt does not match  326ms
+     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  1097ms
+     ✓ gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5)  1887ms
+     ✓ says in the Found row, and does not stay silent, when GitHub's times and the runner's do not agree (X7)  630ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  564ms
+     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  470ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  582ms
+     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  421ms
+     ✓ keeps a file's executable mode from the base (a checkout from a file system without modes)  325ms
+     ✓ headers out of Git's order or beyond it, even with the base as Git's parent  627ms
+     ✓ an npm fix that npm 12.2.1 writes with other entries' flags changed is opened (review 6538813186, B1)  537ms
+     ✓ forged transitive npm fixes (review 6518582507, B1 and N-a)  865ms
+     ✓ a lockfile whose npm 6 tree installs another tarball, a lockfileVersion changed, and a base with npm-shrinkwrap.json (review of aa5d75b, B1)  972ms
+     ✓ npm: a moved or added entry must declare what the registry lists (review of 7d25696, B1 (A))  1594ms
+     ✓ npm: a moved entry's forged optional or peer dependency is refused too (review of 6521445720 and 1e6f705, N1)  451ms
+     ✓ an applied fix with no bundle, and a bundle with no applied fix  367ms
+     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  461ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  540ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  556ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  838ms
+     ✓ PHP: the digest must be the one Docker Hub gives for the tag  442ms
+     ✓ Node.js: the digest must be the one Docker Hub gives for the node tag  449ms
+     ✓ Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to  1268ms
+     ✓ PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  583ms
+     ✓ Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  571ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| packages/sandbox/test/guard.test.ts > docker run construction > starts a run argument list only inside a builder function
+AssertionError: expected [ { …(3) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "line": 110,
++     "path": "/w/repo/packages/cli/src/security/deliver.ts",
++     "reason": "run argv",
++   },
++ ]
+
+ ❯ packages/sandbox/test/guard.test.ts:118:61
+    116|     }
+    117|     const hits = scanDockerSources(tree);
+    118|     expect(hits.filter((hit) => !isDockerSource(hit.path))).toEqual([]…
+       |                                                             ^
+    119|     for (const [path, name] of Object.entries(RUN_BUILDERS)) {
+    120|       const text = readFileSync(join(REPO, path), "utf8");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 44 passed (45)
+      Tests  1 failed | 1947 passed | 25 skipped (1973)
+   Start at  10:37:52
+   Duration  23.55s (transform 6.89s, setup 0ms, import 11.73s, tests 64.19s, environment 5ms)
+

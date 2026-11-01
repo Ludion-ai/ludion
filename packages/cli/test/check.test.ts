@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
-import { checkProject, checkLines, slot, SLOT_HOURS, type CheckAnswer } from "../src/security/check.ts";
+import { checkProject, checkLines, seenRecord, slot, SLOT_HOURS, type CheckAnswer } from "../src/security/check.ts";
 import { judge, WAIT_HOURS, type Change, type FixedAdvisory, type VersionFacts } from "../src/security/judge.ts";
 import { EPSS_LIST } from "../src/security/npm-facts.ts";
 import type { ProjectScan } from "../src/security/scan.ts";
@@ -304,6 +304,30 @@ describe("the lines action/check.sh reads", () => {
   });
 });
 
+describe("the record of what this run saw (LEXP X3, docs/bench/lexp/definitions.md section 3)", () => {
+  const COMMIT = "f".repeat(40);
+  it("a dependency key carries the advisory IDs of its findings, and the record lists every key", async () => {
+    const minimist = finding("minimist", "1.2.5", "GHSA-minimist");
+    const { answer } = await run(npmProject(), report([{ ecosystem: "npm", result: depScan([LODASH, minimist, finding("lodash", "4.17.20", "GHSA-lodash-2")], [...LODASH_PLAN, { name: "minimist", from: "1.2.5", to: "1.2.6" }]) }]), lodash(10, { npm: { lodash: registry({ "4.17.20": NOW - 900 * H, "4.17.21": NOW - 10 * H }), minimist: registry({ "1.2.5": NOW - 900 * H, "1.2.6": NOW - 500 * H }) } }));
+    expect(seenRecord(answer, COMMIT)).toEqual({
+      schema: 1, kind: "ludion-seen", checked_at: iso(NOW), commit: COMMIT, ecosystem: "npm",
+      keys: [{ key: "npm:lodash", advisories: ["GHSA-lodash", "GHSA-lodash-2"] }, { key: "npm:minimist", advisories: ["GHSA-minimist"] }],
+    });
+  });
+  it("an image key carries the newer security releases and the candidate; no candidate, no key", async () => {
+    const php = (scan: Scan) => run(project({ "ludion.security.json": PHP_POLICY, Dockerfile: "FROM php:8.4.26-cli\n" }), report([{ ecosystem: "php", result: scan }]), web());
+    const { answer } = await php(image("update_available", "8.4.28", { security_releases: [{ version: "8.4.27", date: "31 Oct 2026", security: true }, { version: "8.4.28", date: "31 Oct 2026", security: true }] }));
+    expect(seenRecord(answer, COMMIT)).toMatchObject({ ecosystem: "php", keys: [{ key: "php", releases: ["8.4.27", "8.4.28"], candidate: "8.4.28" }] });
+    expect(seenRecord((await php(image("no_newer_security_release", null))).answer, COMMIT)).toMatchObject({ ecosystem: "php", keys: [] });
+  });
+  it("no record when the check does not decide, or for a commit that is not a SHA", async () => {
+    const { answer } = await run(project({ "ludion.security.json": MAVEN_POLICY, "pom.xml": "<project/>" }), report([]), web());
+    expect(seenRecord(answer, COMMIT)).toBeNull();
+    const decided = (await run(npmProject(), report([{ ecosystem: "npm", result: depScan([], []) }]), web())).answer;
+    expect(seenRecord(decided, "main")).toBeNull();
+  });
+});
+
 // action/check.sh with stand-in node and gh (T8). The stand-ins answer from files the test writes.
 describe.skipIf(process.platform === "win32")("action/check.sh (T8)", () => {
   const script = fileURLToPath(new URL("../../../action/check.sh", import.meta.url));
@@ -313,7 +337,7 @@ describe.skipIf(process.platform === "win32")("action/check.sh (T8)", () => {
    * (the PR's merge base against this commit) lists, as the --jq in check.sh prints it: the count, then each file name;
    * null makes that compare fail. dir: the action's input `dir`.
    */
-  function sh(main: string[], opts: { mainStatus?: number; pulls?: string; head?: string[]; ghFails?: boolean; behind?: number; moved?: string[] | null; movedStatus?: number; dir?: string } = {}) {
+  function sh(main: string[], opts: { mainStatus?: number; pulls?: string; head?: string[]; ghFails?: boolean; behind?: number; moved?: string[] | null; movedStatus?: number; dir?: string; seen?: boolean } = {}) {
     const dir = mkdtempSync(join(tmpdir(), "ludion-check-sh-")), bin = join(dir, "bin"), temp = join(dir, "temp");
     mkdirSync(bin); mkdirSync(temp);
     writeFileSync(join(dir, "main.txt"), main.map(l => `${l}\n`).join(""));
@@ -322,7 +346,7 @@ describe.skipIf(process.platform === "win32")("action/check.sh (T8)", () => {
     writeFileSync(join(dir, "moved.txt"), (opts.moved ?? []).map(l => `${l}\n`).join(""));
     writeFileSync(join(dir, "calls"), "");
     // node CLI check --dir <d> [...]: the head's answer when --keys-only, else the commit's.
-    writeFileSync(join(bin, "node"), `#!/usr/bin/env bash\necho "node $*" >> "${dir}/calls"\nfor a in "$@"; do [ "$a" = --keys-only ] && { cat "${dir}/head.txt"; exit 0; }; done\ncat "${dir}/main.txt"\nexit ${opts.mainStatus ?? 0}\n`, { mode: 0o755 });
+    writeFileSync(join(bin, "node"), `#!/usr/bin/env bash\necho "node $*" >> "${dir}/calls"\nfor a in "$@"; do [ "$a" = --keys-only ] && { cat "${dir}/head.txt"; exit 0; }; done\nnext=""; for a in "$@"; do [ "$next" = 1 ] && ${opts.seen ? `echo '{}' > "$a"` : "true"}; next=""; [ "$a" = --seen ] && next=1; done\ncat "${dir}/main.txt"\nexit ${opts.mainStatus ?? 0}\n`, { mode: 0o755 });
     const gh = opts.ghFails ? `exit 1` : [
       `case "$*" in`,
       `  *pulls\\?state=open*) cat "${dir}/pulls.txt" ;;`,
@@ -337,7 +361,8 @@ describe.skipIf(process.platform === "win32")("action/check.sh (T8)", () => {
     const out = join(dir, "out"), summary = join(dir, "summary");
     writeFileSync(out, ""); writeFileSync(summary, "");
     const r = spawnSync("bash", [script], { encoding: "utf8", env: { PATH: `${bin}:${process.env.PATH}`, GITHUB_OUTPUT: out, GITHUB_STEP_SUMMARY: summary, RUNNER_TEMP: temp, GITHUB_SHA: SHA, GITHUB_ACTION_PATH: fileURLToPath(new URL("../../../", import.meta.url)), GITHUB_WORKSPACE: dir, CLI: "/cli.js", PROJECT: dir, DIR: opts.dir ?? ".", REPO: "o/r", GH_TOKEN: "x" } });
-    return { status: r.status, stdout: r.stdout + r.stderr, work: readFileSync(out, "utf8").trim(), calls: readFileSync(join(dir, "calls"), "utf8") };
+    const output = readFileSync(out, "utf8").trim().split("\n");
+    return { status: r.status, stdout: r.stdout + r.stderr, work: output.filter(l => !l.startsWith("seen=")).join("\n"), seen: output.filter(l => l.startsWith("seen=")), calls: readFileSync(join(dir, "calls"), "utf8"), temp };
   }
   const PR = `7 ${HEAD} o/r github-actions[bot] ludion/npm/lodash-4.17.21\n`;
   it("work=false without listing PRs when no key is due", () => {
@@ -346,6 +371,14 @@ describe.skipIf(process.platform === "win32")("action/check.sh (T8)", () => {
     expect(r.calls).not.toMatch(/^gh /m);
     expect(r.stdout).toContain("npm:lodash");
     expect(r.calls).toContain("--changed-at 2026-10-31T00:00:00Z");
+  });
+  it("asks the CLI for the record of what it saw, and says seen=true only when the CLI wrote it (LEXP X3)", () => {
+    const wrote = sh(["decided\tnpm\tnormal", "key\twaits\tnpm:lodash\t2026-11-02T00:00:00.000Z\tw"], { seen: true });
+    expect(wrote.calls).toContain(`--seen ${wrote.temp}/ludion/seen/seen.json --commit ${SHA}`);
+    expect(wrote.seen).toEqual(["seen=true"]);
+    expect(wrote.work).toBe("work=false");
+    expect(sh(["decided\tnpm\tnormal"]).seen).toEqual([]);
+    expect(sh(["undecided\ta maven policy"], { mainStatus: 2 }).seen).toEqual([]);
   });
   it("work=false with no key at all", () => {
     expect(sh(["decided\tnpm\tnormal"]).work).toBe("work=false");

@@ -1,0 +1,597 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ❯ |node| packages/cli/test/action-patch.test.ts (11 tests | 10 failed) 40ms
+     × runs on a schedule, by hand, and when a PR is closed, with no permission at the top 5ms
+     × gives the validation job contents: read only and the PR job contents and pull-requests: write and actions: read only 1ms
+     × runs a check job first, which reads only, and patch unless it answers work=false (docs/bench/lb2b-next1/definitions.md) 1ms
+     × runs the merged job only for a merged PR from a ludion/ branch, with pull-requests: write only and no checkout (LEXP X6) 0ms
+     × turns setup-node's npm cache off in every job 1ms
+     × pins every action by a full commit SHA 2ms
+     ✓ mode patch: no step names the token or a secret, and the checkout leaves no credential 1ms
+     × mode pull-request: one step holds the token, and it runs only the bundled CLI's deliver open 2ms
+     × mode check: one step holds the token, runs action/check.sh, reads no artifact, and uploads what it saw as ludion-seen 1ms
+     × mode merged: no checkout, and one step holds the token and runs only the bundled CLI's deliver merged (LEXP X6) 0ms
+     × refuses another event, another branch, a runner that is not GitHub-hosted, and an OIDC token in mode patch 24ms
+ ❯ |node| packages/cli/test/exposure.test.ts (12 tests | 12 failed) 14ms
+     × posts one comment whose first line is the record as JSON and whose table gives the exposure hours; a second call posts nothing 3ms
+     × records nothing for a PR that is not a merged Ludion fix into the default branch 0ms
+     × a failing API call throws; another bot's or a person's marker comment does not count as the record 0ms
+     × an image move with no newer security release is recorded as not counted; a body time later than the merge is not computed 0ms
+     × the earliest run of the row that lists the fix; a run whose valid record does not list it ends the row 1ms
+     × a run with no record, an expired one, a failed list or an invalid one is passed over, and the row goes on 5ms
+     × reads a deflated zip with a data descriptor, as upload-artifact writes it, and asks the redirect without the token 1ms
+     × another advisory of the same package, or another package, does not match; no record lists it: null 0ms
+     × keeps the limit of runs, and does not read runs of another event or branch, or later than this run 0ms
+     × images: a security release the fix lists, or, for a move with none, the same candidate 0ms
+     × throws when the runs cannot be read (no actions: read), so the caller keeps the receipt's found_at 0ms
+     × names the run that saw the fix first, or says why it is this run's lookup 2ms
+ ❯ |node| packages/cli/test/check.test.ts (48 tests | 4 failed) 742ms
+     ✓ scans npm only for an npm policy, even with a floating FROM node: in the folder, and names the image as not checked 18ms
+     ✓ names a composer.lock with findings as not checked, and has no key for it 2ms
+     ✓ scans the policy's Dockerfile only for an image policy 1ms
+     ✓ normal urgency: t* is the fix's publish time plus 72 hours, and the key waits until then 2ms
+     ✓ exploited (KEV): 12 hours, so a fix published 13 hours ago is due 2ms
+     ✓ high: CRITICAL, or an EPSS score of 0.1 or more, gives 24 hours 3ms
+     ✓ unknown urgency is 12 hours: KEV, the EPSS list or an advisory record that cannot be read 4ms
+     ✓ a later version published before the smallest fixed one (a backport) counts with its own, earlier time 2ms
+     ✓ u is the most urgent of every finding: a KEV entry on another package's advisory makes this one's wait 12 hours 1ms
+     ✓ no bound when the package has no planned change or its registry document cannot be read 3ms
+     ✓ normal 2ms
+     ✓ high (CRITICAL) 1ms
+     ✓ exploited 1ms
+     ✓ exploited, provenance not comparable 1ms
+     ✓ an extended wait (another publisher) 1ms
+     ✓ a stricter project wait 1ms
+     ✓ uses the judge's own wait table 0ms
+     ✓ a move in its wait waits until wait_until, exactly 1ms
+     ✓ a move with no newer security release whose wait has ended is a key, and due (scan exits 0 for it) 1ms
+     ✓ a security move is due when its newest security release came out recently, and quiet in a slot that does not double 2ms
+     ✓ a wait_until that is not a time is undecided, not a move with no bound 1ms
+     ✓ no candidate, no key; a node policy reads node's release days 2ms
+     ✓ is due in slots 0, 1, 2, 4 and 8 and quiet in 3, 5, 6, 7 and 9 0ms
+     ✓ an old fix, an old commit and old facts: the anchor is t*, and slot 77 is quiet 2ms
+     ✓ a later commit time, a newer OSV modified or a newer registry time.modified moves the anchor and makes the key due 4ms
+     ✓ a fact that cannot be read makes the key due, and so does a missing commit time 2ms
+     ✓ composer: Packagist's newest release time counts, and a Packagist-only advisory is unknown, so due 2ms
+     ✓ keys only (a PR head): no fact is read, every key is due 1ms
+     ✓ a maven policy is not scanned 1ms
+     ✓ a scan error, an incomplete scan, a scan that throws, a policy that cannot be read 4ms
+     ✓ one tab-separated line per key, with the key cleaned, and undecided as one line 0ms
+     × a dependency key carries the advisory IDs of its findings, and the record lists every key 6ms
+     × an image key carries the newer security releases and the candidate; no candidate, no key 1ms
+     × no record when the check does not decide, or for a commit that is not a SHA 1ms
+     ✓ work=false without listing PRs when no key is due 24ms
+     × asks the CLI for the record of what it saw, and says seen=true only when the CLI wrote it (LEXP X3) 21ms
+     ✓ work=false with no key at all 19ms
+     ✓ work=true when a due key is not covered by an open Ludion PR 70ms
+     ✓ work=false when every due key is covered by an open Ludion PR 46ms
+     ✓ a PR from another author or branch does not cover 49ms
+     ✓ a PR whose head ludion check cannot decide on does not cover, even when it exits 0 39ms
+       ✓ (a) a file under the folder moved: not counted, work=true 31ms
+       ✓ (a') a file renamed away from under the folder counts as moved under it 30ms
+       ✓ (b) files moved only outside the folder (one whose name starts with it, too): counted, work=false 49ms
+       ✓ (c) 300 files moved, all outside the folder: not counted, work=true 78ms
+       ✓ (d) the folder is the root and any file moved: not counted, work=true; nothing moved: counted 78ms
+       ✓ (e) the second compare fails, or its count is not a number: not counted, work=true 84ms
+     ✓ work=true when the CLI is undecided or fails, or when gh fails 43ms
+ ❯ |node| packages/cli/test/deliver.test.ts (63 tests | 1 failed) 19017ms
+     ✓ writes the receipt and a bundle of exactly the applied fixes' branches, on the base 163ms
+     ✓ packs no bundle when nothing was applied, and refuses a branch the receipt does not match 153ms
+     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  423ms
+     × gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5) 298ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  533ms
+     ✓ deliver open warns, on stderr as a workflow command, about a closed PR's fix, and the run stays green 257ms
+     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  441ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  553ms
+     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  403ms
+     ✓ keeps a file's executable mode from the base (a checkout from a file system without modes)  310ms
+     ✓ opens nothing for a run that is not on the default branch, before reading the artifact 169ms
+     ✓ pushes with a plain refspec, the token only in Git's environment, and only to a ludion/ branch 1ms
+     ✓ a commit whose parent is not the base 125ms
+     ✓ two commits on the base, not one 159ms
+     ✓ a parent header after author, which Git does not read as a parent (review 6516135819, N1) 148ms
+     ✓ a merge commit whose first parent is the base and whose second is another commit in the bundle (review 6529858505, N2) 166ms
+     ✓ headers out of Git's order or beyond it, even with the base as Git's parent  593ms
+     ✓ a commit git fsck finds an error in (a zero-padded date), with every other check passing 153ms
+     ✓ a lockfile padded past its limit (review 6516135819, N4) 179ms
+     ✓ a lockfile that does not move the receipt's package and adds another one (review 6516135819, N2) 188ms
+     ✓ an npm fix that npm 12.2.1 writes with other entries' flags changed is opened (review 6538813186, B1)  521ms
+     ✓ a transitive npm fix as patch makes it is opened 245ms
+     ✓ forged transitive npm fixes (review 6518582507, B1 and N-a)  819ms
+     ✓ a lockfile whose npm 6 tree installs another tarball, a lockfileVersion changed, and a base with npm-shrinkwrap.json (review of aa5d75b, B1)  957ms
+     ✓ reads one version's manifest from the registry, by the package's name only 1ms
+     ✓ npm: a moved or added entry must declare what the registry lists (review of 7d25696, B1 (A))  1578ms
+     ✓ npm: a moved entry's forged optional or peer dependency is refused too (review of 6521445720 and 1e6f705, N1)  440ms
+     ✓ a file outside the plan, beside the planned ones 157ms
+     ✓ a receipt that lists a file a fix may not change 242ms
+     ✓ a new file, even at a planned path 169ms
+     ✓ a changed file mode 152ms
+     ✓ an extra branch in the bundle 196ms
+     ✓ a bundle commit other than the receipt's 185ms
+     ✓ an applied fix with no bundle, and a bundle with no applied fix  365ms
+     ✓ a file whose bytes are not the receipt's 294ms
+     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  450ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  528ms
+     ✓ a branch name that is not the one Ludion gives the receipt's fix 122ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  548ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  849ms
+     ✓ a checkout that is not at the base it is given 183ms
+     ✓ PHP: the digest must be the one Docker Hub gives for the tag  447ms
+     ✓ Node.js: the digest must be the one Docker Hub gives for the node tag  449ms
+     ✓ PHP: a move to the line's newest release with no newer security release is pushed and opened 228ms
+     ✓ Node.js: a move to the line's newest release with no newer security release is pushed and opened 231ms
+     ✓ Docker Hub is asked for library/node's tag, with a pull token for library/node only 1ms
+     ✓ Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to  1245ms
+     ✓ reads Packagist only for a plain package name, and a hostile name is refused at once 1ms
+     ✓ a branch with this fix's tree on an older base is left alone 286ms
+     ✓ PHP: only the Dockerfile ludion.security.json names, with the subject, message and branch patch.ts gives 250ms
+     ✓ Node.js: only the Dockerfile the node policy names, with the subject, message and branch patch.ts gives 232ms
+     ✓ PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  569ms
+     ✓ Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  565ms
+     ✓ PHP: only the FROM image may change, to the official image of a newer release, pinned by digest 1ms
+     ✓ Node.js: only the FROM image may change, to the official node image of a newer release of the same major, pinned by digest 1ms
+     ✓ Composer and Maven: the update goes up, and Composer's from is what the base locks; npm: no other package moves 38ms
+     ✓ npm: an entry the fix does not plan may differ from the base in its flags only (review 6538813186, B1) 13ms
+     ✓ npm: npm 12.2.1's fixes whose flags alone change (optional, peer) are taken, and an optional peer in range (N1) 8ms
+     ✓ npm: an optional peer adds nothing, and where the lock has one it is the package its spec names, in range (audit 6541743253, item 1) 11ms
+     ✓ advisory IDs: only the forms a receipt can hold (OSV's for npm, Packagist and Maven, and Packagist's own) 0ms
+     ✓ a changed file's size limit: twice the base's file and 1 MiB, at most 50 MiB 0ms
+     ✓ Maven: pom.xml is exactly what changedManifest makes for the change 6ms
+     ✓ Composer: composer.lock moves only the planned package, from a pinned archive, and adds no plugin 13ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 27 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > the template users copy > runs on a schedule, by hand, and when a PR is closed, with no permission at the top
+AssertionError: expected [ 'schedule:', …(2) ] to deeply equal [ 'schedule:', …(4) ]
+
+- Expected
++ Received
+
+  [
+    "schedule:",
+    "- cron: \"23 */6 * * *\"",
+    "workflow_dispatch:",
+-   "pull_request:",
+-   "types: [closed]",
+  ]
+
+ ❯ packages/cli/test/action-patch.test.ts:30:40
+     28| describe("the template users copy", () => {
+     29|   it("runs on a schedule, by hand, and when a PR is closed, with no pe…
+     30|     expect(section(TEMPLATE, /^on:$/)).toEqual(["schedule:", '- cron: …
+       |                                        ^
+     31|     expect(TEMPLATE).toMatch(/^permissions: \{\}$/m);
+     32|     // A merge's run has its own group, so it neither waits behind nor…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/27]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > the template users copy > gives the validation job contents: read only and the PR job contents and pull-requests: write and actions: read only
+AssertionError: expected [ 'contents: write', …(1) ] to deeply equal [ 'contents: write', …(2) ]
+
+- Expected
++ Received
+
+  [
+    "contents: write",
+    "pull-requests: write",
+-   "actions: read",
+  ]
+
+ ❯ packages/cli/test/action-patch.test.ts:38:98
+     36|     expect(section(TEMPLATE.slice(TEMPLATE.indexOf("\n  patch:")), /^ …
+     37|     // actions: read lets it read earlier runs' ludion-seen records fo…
+     38|     expect(section(TEMPLATE.slice(TEMPLATE.indexOf("\n  pull-request:"…
+       |                                                                                                  ^
+     39|     const patch = section(TEMPLATE, /^  patch:$/);
+     40|     expect(patch).toContain("mode: patch");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/27]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > the template users copy > runs a check job first, which reads only, and patch unless it answers work=false (docs/bench/lb2b-next1/definitions.md)
+AssertionError: expected [ 'check:', 'patch:', 'pull-request:' ] to deeply equal [ 'check:', 'patch:', …(2) ]
+
+- Expected
++ Received
+
+  [
+    "check:",
+    "patch:",
+    "pull-request:",
+-   "merged:",
+  ]
+
+ ❯ packages/cli/test/action-patch.test.ts:48:18
+     46|   it("runs a check job first, which reads only, and patch unless it an…
+     47|     const jobs = TEMPLATE.slice(TEMPLATE.indexOf("\njobs:\n")).split("…
+     48|     expect(jobs).toEqual(["check:", "patch:", "pull-request:", "merged…
+       |                  ^
+     49|     expect(section(TEMPLATE.slice(TEMPLATE.indexOf("\n  check:")), /^ …
+     50|     const check = section(TEMPLATE, /^  check:$/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/27]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > the template users copy > runs the merged job only for a merged PR from a ludion/ branch, with pull-requests: write only and no checkout (LEXP X6)
+Error: no /^  merged:$/
+ ❯ section packages/cli/test/action-patch.test.ts:19:21
+     17| function section(yaml: string, header: RegExp): string[] {
+     18|   const lines = yaml.split("\n"), at = lines.findIndex(l => header.tes…
+     19|   if (at < 0) throw new Error(`no ${header}`);
+       |                     ^
+     20|   const indent = lines[at]!.search(/\S/), body: string[] = [];
+     21|   for (const line of lines.slice(at + 1)) { if (line.trim() && line.se…
+ ❯ packages/cli/test/action-patch.test.ts:57:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/27]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > the template users copy > turns setup-node's npm cache off in every job
+Error: no /^  merged:$/
+ ❯ section packages/cli/test/action-patch.test.ts:19:21
+     17| function section(yaml: string, header: RegExp): string[] {
+     18|   const lines = yaml.split("\n"), at = lines.findIndex(l => header.tes…
+     19|   if (at < 0) throw new Error(`no ${header}`);
+       |                     ^
+     20|   const indent = lines[at]!.search(/\S/), body: string[] = [];
+     21|   for (const line of lines.slice(at + 1)) { if (line.trim() && line.se…
+ ❯ packages/cli/test/action-patch.test.ts:65:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/27]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > the template users copy > pins every action by a full commit SHA
+AssertionError: expected 6 to be 8 // Object.is equality
+
+- Expected
++ Received
+
+- 8
++ 6
+
+ ❯ packages/cli/test/action-patch.test.ts:71:25
+     69|   it("pins every action by a full commit SHA", () => {
+     70|     const uses = TEMPLATE.split("\n").filter(l => /^\s+(- )?uses:/.tes…
+     71|     expect(uses.length).toBe(8);
+       |                         ^
+     72|     for (const line of uses) expect(line).toMatch(/uses: [A-Za-z0-9-]+…
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/27]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > action.yml's steps for each mode > mode pull-request: one step holds the token, and it runs only the bundled CLI's deliver open
+AssertionError: expected 'run: |\n        node "$CLI" deliver o…' to contain '--run-id "$GITHUB_RUN_ID"'
+
+- Expected
++ Received
+
+- --run-id "$GITHUB_RUN_ID"
++ run: |
++         node "$CLI" deliver open --dir "$PROJECT" --artifact "$ARTIFACT" --base "$GITHUB_SHA" --repo "$GITHUB_REPOSITORY" \
++           --ref "$GITHUB_REF" --api "$GITHUB_API_URL" --remote "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" | tee -a "$GITHUB_STEP_SUMMARY"
++
+
+ ❯ packages/cli/test/action-patch.test.ts:101:17
+     99|     expect(run).toContain('node "$CLI" deliver open');
+    100|     // This run's id: the walk back through earlier runs' ludion-seen …
+    101|     expect(run).toContain('--run-id "$GITHUB_RUN_ID"');
+       |                 ^
+    102|     expect(run).not.toMatch(/\b(npm|npx|docker|composer|mvn|patch\.sh|…
+    103|     for (const step of mine) expect(step).not.toMatch(/secrets\./);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/27]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > action.yml's steps for each mode > mode check: one step holds the token, runs action/check.sh, reads no artifact, and uploads what it saw as ludion-seen
+AssertionError: expected [ …(4) ] to deeply equal [ …(5) ]
+
+- Expected
++ Received
+
+  [
+    "name: Check the mode, the event and the tools",
+    "name: Check that this commit of the action carries the bundled judge",
+    "name: Check out the run's commit",
+    "name: Decide, before Docker, whether this run has anything to do",
+-   "uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2",
+  ]
+
+ ❯ packages/cli/test/action-patch.test.ts:107:45
+    105|   it("mode check: one step holds the token, runs action/check.sh, read…
+    106|     const mine = forMode("check");
+    107|     expect(mine.map(s => s.split("\n")[0])).toEqual([
+       |                                             ^
+    108|       "name: Check the mode, the event and the tools", "name: Check th…
+    109|       "name: Check out the run's commit", "name: Decide, before Docker…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/27]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > action.yml's steps for each mode > mode merged: no checkout, and one step holds the token and runs only the bundled CLI's deliver merged (LEXP X6)
+AssertionError: expected [ …(2) ] to deeply equal [ …(3) ]
+
+- Expected
++ Received
+
+  [
+    "name: Check the mode, the event and the tools",
+    "name: Check that this commit of the action carries the bundled judge",
+-   "name: Record the merge of Ludion's PR, the end of its fix's exposure time",
+  ]
+
+ ❯ packages/cli/test/action-patch.test.ts:123:45
+    121|   it("mode merged: no checkout, and one step holds the token and runs …
+    122|     const mine = forMode("merged");
+    123|     expect(mine.map(s => s.split("\n")[0])).toEqual([
+       |                                             ^
+    124|       "name: Check the mode, the event and the tools", "name: Check th…
+    125|       "name: Record the merge of Ludion's PR, the end of its fix's exp…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/27]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > action/start.sh refuses the scheduled modes outside their place > refuses another event, another branch, a runner that is not GitHub-hosted, and an OIDC token in mode patch
+AssertionError: expected '::error::mode must be judge, comment,…' to contain 'mode must be judge, comment, patch, p…'
+
+- Expected
++ Received
+
+- mode must be judge, comment, patch, pull-request, check or merged.
++ ::error::mode must be judge, comment, patch, pull-request or check.
++
+
+ ❯ packages/cli/test/action-patch.test.ts:157:24
+    155|       const r = start(env);
+    156|       expect(r.status, JSON.stringify(env)).toBe(1);
+    157|       expect(r.stdout).toContain(why);
+       |                        ^
+    158|     }
+    159|     const ok = start({ MODE: "pull-request", EVENT: "workflow_dispatch…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/27]⎯
+
+ FAIL  |node| packages/cli/test/check.test.ts > the record of what this run saw (LEXP X3, docs/bench/lexp/definitions.md section 3) > a dependency key carries the advisory IDs of its findings, and the record lists every key
+TypeError: seenRecord is not a function
+ ❯ packages/cli/test/check.test.ts:312:12
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/27]⎯
+
+ FAIL  |node| packages/cli/test/check.test.ts > the record of what this run saw (LEXP X3, docs/bench/lexp/definitions.md section 3) > an image key carries the newer security releases and the candidate; no candidate, no key
+TypeError: seenRecord is not a function
+ ❯ packages/cli/test/check.test.ts:320:12
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/27]⎯
+
+ FAIL  |node| packages/cli/test/check.test.ts > the record of what this run saw (LEXP X3, docs/bench/lexp/definitions.md section 3) > no record when the check does not decide, or for a commit that is not a SHA
+TypeError: seenRecord is not a function
+ ❯ packages/cli/test/check.test.ts:325:12
+    323|   it("no record when the check does not decide, or for a commit that i…
+    324|     const { answer } = await run(project({ "ludion.security.json": MAV…
+    325|     expect(seenRecord(answer, COMMIT)).toBeNull();
+       |            ^
+    326|     const decided = (await run(npmProject(), report([{ ecosystem: "npm…
+    327|     expect(seenRecord(decided, "main")).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/27]⎯
+
+ FAIL  |node| packages/cli/test/check.test.ts > action/check.sh (T8) > asks the CLI for the record of what it saw, and says seen=true only when the CLI wrote it (LEXP X3)
+AssertionError: expected 'node /cli.js check --dir /tmp/ludion-…' to contain '--seen /tmp/ludion-check-sh-xDnGkw/te…'
+
+- Expected
++ Received
+
+- --seen /tmp/ludion-check-sh-xDnGkw/temp/ludion/seen/seen.json --commit aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
++ node /cli.js check --dir /tmp/ludion-check-sh-xDnGkw --changed-at 2026-10-31T00:00:00Z
++
+
+ ❯ packages/cli/test/check.test.ts:377:25
+    375|   it("asks the CLI for the record of what it saw, and says seen=true o…
+    376|     const wrote = sh(["decided\tnpm\tnormal", "key\twaits\tnpm:lodash\…
+    377|     expect(wrote.calls).toContain(`--seen ${wrote.temp}/ludion/seen/se…
+       |                         ^
+    378|     expect(wrote.seen).toEqual(["seen=true"]);
+    379|     expect(wrote.work).toBe("work=false");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/27]⎯
+
+ FAIL  |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5)
+AssertionError: expected '<!-- ludion-fix -->\n**プレビュー：マージは行わない…' to contain '| Found | `2026-10-29T00:05:00.000Z` …'
+
+- Expected
++ Received
+
+- | Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `3` records read) |
++ <!-- ludion-fix -->
++ **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
++
++ Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit `b317029440d4`. This PR holds that one fix (one commit).
++
++ | | |
++ |---|---|
++ | Package | `lodash` (npm) |
++ | Change | `4.17.20` → `4.17.21` |
++ | Advisories | `GHSA-35jh-r3h4-6jhm`, `CVE-2021-23337` |
++ | Fix published | `2021-02-20T15:42:16.891Z` (registry.npmjs.org's publish time: the latest among the fix's planned versions) |
++ | Found | `2026-10-30T01:00:00.000Z` (this run's lookup; an earlier run may have seen it first) |
++ | Branch made | `2026-10-30T01:05:00.000Z` |
++ | Receipt | `0f1e2d3c-4b5a-4968-8776-655443322110` (in this run's ludion-fixes artifact) |
++
++ The times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.
++
++ **What was checked**
++
++ - By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
++ - This commit changes only `package.json`, `package-lock.json`, Git reads its only parent as the base commit, and `git fsck` finds no error in it. The job that opened this PR, which runs no project code, checked again that package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them (an optional peer adds nothing, and where the lock has one it must be the package its spec names, in range), changes no other entry beyond its flags and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`.
++ - Ludion's judge on the lockfile change, in both jobs: `ready_except_build`. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).
++
++ **Not checked**
++
++ - Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
++ - In package-lock.json, a moved or added entry's `hasShrinkwrap`, `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap). Nor are its flags (`dev`, `optional`, `devOptional`, `peer`), which decide what a production install leaves out. Another entry's flags may differ from the base's, and are not checked against what npm computes from the lock's graph, so a forged lock could have a production install take a package the base locks for development only, or leave a production one out; the judge gives each entry whose flags alone changed gate 2's checks (OSV's malicious-package records, deprecation, withdrawal), not the rest of the gates.
++ - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
++ - Production: nothing is deployed.
++
+
+ ❯ packages/cli/test/deliver.test.ts:210:40
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > posts one comment whose first line is the record as JSON and whose table gives the exposure hours; a second call posts nothing
+TypeError: recordMerge is not a function
+ ❯ merge packages/cli/test/exposure.test.ts:46:52
+     44|     return { fetchFn, posted, calls };
+     45|   }
+     46|   const merge = (gh: ReturnType<typeof github>) => recordMerge({ repo:…
+       |                                                    ^
+     47|
+     48|   it("posts one comment whose first line is the record as JSON and who…
+ ❯ packages/cli/test/exposure.test.ts:50:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > records nothing for a PR that is not a merged Ludion fix into the default branch
+TypeError: recordMerge is not a function
+ ❯ merge packages/cli/test/exposure.test.ts:46:52
+     44|     return { fetchFn, posted, calls };
+     45|   }
+     46|   const merge = (gh: ReturnType<typeof github>) => recordMerge({ repo:…
+       |                                                    ^
+     47|
+     48|   it("posts one comment whose first line is the record as JSON and who…
+ ❯ packages/cli/test/exposure.test.ts:80:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > a failing API call throws; another bot's or a person's marker comment does not count as the record
+TypeError: recordMerge is not a function
+ ❯ merge packages/cli/test/exposure.test.ts:46:52
+     44|     return { fetchFn, posted, calls };
+     45|   }
+     46|   const merge = (gh: ReturnType<typeof github>) => recordMerge({ repo:…
+       |                                                    ^
+     47|
+     48|   it("posts one comment whose first line is the record as JSON and who…
+ ❯ packages/cli/test/exposure.test.ts:87:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > an image move with no newer security release is recorded as not counted; a body time later than the merge is not computed
+TypeError: recordMerge is not a function
+ ❯ merge packages/cli/test/exposure.test.ts:46:52
+     44|     return { fetchFn, posted, calls };
+     45|   }
+     46|   const merge = (gh: ReturnType<typeof github>) => recordMerge({ repo:…
+       |                                                    ^
+     47|
+     48|   it("posts one comment whose first line is the record as JSON and who…
+ ❯ packages/cli/test/exposure.test.ts:95:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > the earliest run of the row that lists the fix; a run whose valid record does not list it ends the row
+TypeError: firstSeen is not a function
+ ❯ walk packages/cli/test/exposure.test.ts:118:5
+
+ ❯ packages/cli/test/exposure.test.ts:121:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > a run with no record, an expired one, a failed list or an invalid one is passed over, and the row goes on
+TypeError: firstSeen is not a function
+ ❯ walk packages/cli/test/exposure.test.ts:118:5
+
+ ❯ packages/cli/test/exposure.test.ts:142:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > reads a deflated zip with a data descriptor, as upload-artifact writes it, and asks the redirect without the token
+TypeError: firstSeen is not a function
+ ❯ walk packages/cli/test/exposure.test.ts:118:5
+
+ ❯ packages/cli/test/exposure.test.ts:149:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > another advisory of the same package, or another package, does not match; no record lists it: null
+TypeError: firstSeen is not a function
+ ❯ walk packages/cli/test/exposure.test.ts:118:5
+
+ ❯ packages/cli/test/exposure.test.ts:155:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > keeps the limit of runs, and does not read runs of another event or branch, or later than this run
+TypeError: firstSeen is not a function
+ ❯ walk packages/cli/test/exposure.test.ts:118:5
+
+ ❯ packages/cli/test/exposure.test.ts:160:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > images: a security release the fix lists, or, for a move with none, the same candidate
+TypeError: firstSeen is not a function
+ ❯ image packages/cli/test/exposure.test.ts:179:60
+
+ ❯ packages/cli/test/exposure.test.ts:180:28
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > throws when the runs cannot be read (no actions: read), so the caller keeps the receipt's found_at
+TypeError: firstSeen is not a function
+ ❯ walk packages/cli/test/exposure.test.ts:118:5
+
+ ❯ packages/cli/test/exposure.test.ts:197:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/27]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > the PR body's Found row (X4, X5) > names the run that saw the fix first, or says why it is this run's lookup
+AssertionError: expected '<!-- ludion-fix -->\n**プレビュー：マージは行わない…' to match /\| Found \| `2026-10-29T00:05:00\.000…/
+
+- Expected:
+/\| Found \| `2026-10-29T00:05:00\.000Z` \(the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `7` records read\) \|/
+
++ Received:
+"<!-- ludion-fix -->
+**プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
+
+Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit `cccccccccccc`. This PR holds that one fix (one commit).
+
+| | |
+|---|---|
+| Package | `lodash` (npm) |
+| Change | `4.17.20` → `4.17.21` |
+| Advisories | `GHSA-35jh-r3h4-6jhm`, `CVE-2021-23337` |
+| Fix published | `2021-02-20T15:42:16.891Z` (registry.npmjs.org's publish time: the latest among the fix's planned versions) |
+| Found | `2026-10-29T00:05:00.000Z` (this run's lookup; an earlier run may have seen it first) |
+| Branch made | `2026-10-30T01:05:00.000Z` |
+| Receipt | `0f1e2d3c-4b5a-4968-8776-655443322110` (in this run's ludion-fixes artifact) |
+
+The times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.
+
+**What was checked**
+
+- By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
+- This commit changes only `package-lock.json`, Git reads its only parent as the base commit, and `git fsck` finds no error in it. The job that opened this PR, which runs no project code, checked again that package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them (an optional peer adds nothing, and where the lock has one it must be the package its spec names, in range), changes no other entry beyond its flags and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`.
+- Ludion's judge on the lockfile change, in both jobs: `ready_except_build`. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).
+
+**Not checked**
+
+- Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
+- In package-lock.json, a moved or added entry's `hasShrinkwrap`, `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap). Nor are its flags (`dev`, `optional`, `devOptional`, `peer`), which decide what a production install leaves out. Another entry's flags may differ from the base's, and are not checked against what npm computes from the lock's graph, so a forged lock could have a production install take a package the base locks for development only, or leave a production one out; the judge gives each entry whose flags alone changed gate 2's checks (OSV's malicious-package records, deprecation, withdrawal), not the rest of the gates.
+- Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
+- Production: nothing is deployed.
+"
+
+ ❯ packages/cli/test/exposure.test.ts:204:18
+    202|   it("names the run that saw the fix first, or says why it is this run…
+    203|     const seen = pullRequestBody(ARTIFACT, { ...LODASH, found_at: "202…
+    204|     expect(seen).toMatch(/\| Found \| `2026-10-29T00:05:00\.000Z` \(th…
+       |                  ^
+    205|     const open = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LO…
+    206|     expect(open).toContain("an earlier run may have seen it first");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/27]⎯
+
+
+ Test Files  4 failed (4)
+      Tests  27 failed | 107 passed (134)
+   Start at  03:02:55
+   Duration  19.42s (transform 762ms, setup 0ms, import 1.02s, tests 19.81s, environment 0ms)
+

@@ -1,0 +1,154 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ❯ |node| packages/cli/test/action-patch.test.ts (11 tests | 1 failed) 69ms
+     ✓ runs on a schedule, by hand, and when a PR is closed, with no permission at the top 1ms
+     ✓ gives the validation job contents: read only and the PR job contents and pull-requests: write and actions: read only 1ms
+     ✓ runs a check job first, which reads only, and patch unless it answers work=false (docs/bench/lb2b-next1/definitions.md) 1ms
+     ✓ runs the merged job only for a merged PR from a ludion/ branch, with pull-requests: write only and no checkout (LEXP X6) 0ms
+     ✓ turns setup-node's npm cache off in every job 1ms
+     ✓ pins every action by a full commit SHA 0ms
+     ✓ mode patch: no step names the token or a secret, and the checkout leaves no credential 1ms
+     ✓ mode pull-request: one step holds the token, and it runs only the bundled CLI's deliver open 1ms
+     ✓ mode check: one step holds the token, runs action/check.sh, reads no artifact, and uploads what it saw as ludion-seen 1ms
+     ✓ mode merged: no checkout, and one step holds the token and runs only the bundled CLI's deliver merged (LEXP X6) 1ms
+     × refuses another event, another branch, a runner that is not GitHub-hosted, and an OIDC token in mode patch 61ms
+ ❯ |node| packages/cli/test/exposure.test.ts (15 tests | 4 failed) 99ms
+     ✓ posts one comment whose first line is the record as JSON and whose table gives the exposure hours; a second call posts nothing 17ms
+     × records nothing for a PR that is not a merged Ludion fix into the default branch 8ms
+     ✓ a failing API call throws; another bot's or a person's marker comment does not count as the record 1ms
+     ✓ an image move with no newer security release is recorded as not counted; a body time later than the merge is not computed 1ms
+     × a body time that has the form of a time but is no date is recorded as unknown, and the merge is still recorded (R252 N3) 1ms
+     ✓ the earliest run of the row that lists the fix; a run whose valid record does not list it ends the row 3ms
+     ✓ a run with no record, an expired one, a failed list or an invalid one is passed over, and the row goes on 25ms
+     × found_at is the earliest record time of the row, not the record of the lowest run id, when an older run was re-run later (R252 N4) 4ms
+     × stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7) 1ms
+     ✓ reads a deflated zip with a data descriptor, as upload-artifact writes it, and asks the redirect without the token 2ms
+     ✓ another advisory of the same package, or another package, does not match; no record lists it: null 2ms
+     ✓ keeps the limit of runs, and does not read runs of another event or branch, or later than this run 29ms
+     ✓ images: a security release the fix lists, or, for a move with none, the same candidate 3ms
+     ✓ throws when the runs cannot be read (no actions: read), so the caller keeps the receipt's found_at 0ms
+     ✓ names the run that saw the fix first, or says why it is this run's lookup 1ms
+ ✓ |node| packages/cli/test/check.test.ts (48 tests) 836ms
+ ✓ |node| packages/cli/test/deliver.test.ts (63 tests) 20101ms
+     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  446ms
+     ✓ gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5)  1000ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  541ms
+     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  456ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  575ms
+     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  413ms
+     ✓ keeps a file's executable mode from the base (a checkout from a file system without modes)  321ms
+     ✓ headers out of Git's order or beyond it, even with the base as Git's parent  608ms
+     ✓ an npm fix that npm 12.2.1 writes with other entries' flags changed is opened (review 6538813186, B1)  530ms
+     ✓ forged transitive npm fixes (review 6518582507, B1 and N-a)  850ms
+     ✓ a lockfile whose npm 6 tree installs another tarball, a lockfileVersion changed, and a base with npm-shrinkwrap.json (review of aa5d75b, B1)  982ms
+     ✓ npm: a moved or added entry must declare what the registry lists (review of 7d25696, B1 (A))  1609ms
+     ✓ npm: a moved entry's forged optional or peer dependency is refused too (review of 6521445720 and 1e6f705, N1)  449ms
+     ✓ an applied fix with no bundle, and a bundle with no applied fix  364ms
+     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  459ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  545ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  551ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  875ms
+     ✓ PHP: the digest must be the one Docker Hub gives for the tag  454ms
+     ✓ Node.js: the digest must be the one Docker Hub gives for the node tag  457ms
+     ✓ Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to  1272ms
+     ✓ PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  581ms
+     ✓ Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  584ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > action/start.sh refuses the scheduled modes outside their place > refuses another event, another branch, a runner that is not GitHub-hosted, and an OIDC token in mode patch
+AssertionError: {"MODE":"merged","EVENT":"pull_request","RUNNER_ENVIRONMENT":"self-hosted"}: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ packages/cli/test/action-patch.test.ts:159:45
+    157|     ] as const) {
+    158|       const r = start(env);
+    159|       expect(r.status, JSON.stringify(env)).toBe(1);
+       |                                             ^
+    160|       expect(r.stdout).toContain(why);
+    161|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > records nothing for a PR that is not a merged Ludion fix into the default branch
+RangeError: Invalid time value
+ ❯ recordMerge packages/cli/src/security/deliver.ts:1187:85
+    1185|   }
+    1186|   const record: MergeRecord = {
+    1187|     schema: 1, pr: options.pr, branch: p.head.ref, merged_at: new Date…
+       |                                                                                     ^
+    1188|     fix_published_at: bodyTime(body, "Fix published"), found_at: bodyT…
+    1189|   };
+ ❯ packages/cli/test/exposure.test.ts:82:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > a body time that has the form of a time but is no date is recorded as unknown, and the merge is still recorded (R252 N3)
+RangeError: Invalid time value
+ ❯ bodyTime packages/cli/src/security/deliver.ts:1151:50
+    1149|   const line = body.split("\n").find(l => l.startsWith(`| ${row} | `));
+    1150|   const m = line ? /^\| [^|]+ \| `([^`]*)`/.exec(line) : null;
+    1151|   return m && TIME.test(m[1]!) ? new Date(m[1]!).toISOString() : null;
+       |                                                  ^
+    1152| }
+    1153| function hours(from: string | null, to: string | null, what: string): …
+ ❯ recordMerge packages/cli/src/security/deliver.ts:1188:66
+ ❯ packages/cli/test/exposure.test.ts:109:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > found_at is the earliest record time of the row, not the record of the lowest run id, when an older run was re-run later (R252 N4)
+AssertionError: expected { Object (at, run, ...) } to deeply equal { Object (at, run, ...) }
+
+- Expected
++ Received
+
+  {
+-   "at": "2026-10-30T12:05:00.000Z",
++   "at": "2026-10-31T06:05:00.000Z",
+    "ended": false,
+-   "run": 2,
++   "run": 1,
+  }
+
+ ❯ packages/cli/test/exposure.test.ts:175:39
+    173|     ];
+    174|     const r = await walk(runs);
+    175|     expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(sta…
+       |                                       ^
+    176|     expect(r.read).toBe(3);
+    177|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7)
+AssertionError: expected undefined to be 300000 // Object.is equality
+
+- Expected:
+300000
+
++ Received:
+undefined
+
+ ❯ packages/cli/test/exposure.test.ts:179:26
+    177|   });
+    178|   it("stops the walk once it has taken longer than its limit, so the c…
+    179|     expect(SEEN_WALK_MS).toBe(5 * 60_000);
+       |                          ^
+    180|     let clock = T0;
+    181|     const ticks: number[] = [];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  2 failed | 2 passed (4)
+      Tests  5 failed | 132 passed (137)
+   Start at  06:23:21
+   Duration  20.53s (transform 804ms, setup 0ms, import 1.08s, tests 21.10s, environment 0ms)
+

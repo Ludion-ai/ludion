@@ -218,6 +218,10 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
     expect(refused.deliveries).toMatchObject([{ outcome: "opened" }]);
     expect(String(gh2.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: earlier runs' records were not used: ");
     expect(String(gh2.opened[0]!.body)).toContain("HTTP 403");
+    // No record lists the fix: the lookup stays, and the row keeps both clocks' times (definitions.md, section 8).
+    const p4 = project(), fix4 = applied(p4.work), gh4 = github(p4.origin);
+    await open(checkout(p4.origin), artifact(p4.work, fix4.receipt, [`refs/heads/${BRANCH}`], p4.base), p4.base, p4.origin, gh4, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh4.fetchFn, [{ id: 42, started: "2026-10-30T00:55:00Z", record: seenAt("2026-10-30T00:55:00Z", []) }]), now: () => Date.parse("2026-10-30T01:10:00Z") });
+    expect(String(gh4.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: no record of this workflow's runs lists this fix; `1` records read; this run: GitHub's start `2026-10-30T00:55:00.000Z`, GitHub's answer had no Date header that is a date, this runner's clock `2026-10-30T01:10:00.000Z`) |");
     // Every record that lists the fix is later than this run's lookup: the lookup stays (R252 N2).
     const p3 = project(), fix3 = applied(p3.work), gh3 = github(p3.origin);
     const later: StandInRun[] = [

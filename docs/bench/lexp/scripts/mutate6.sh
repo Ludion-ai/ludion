@@ -8,6 +8,8 @@ mkdir -p /w/logs
 : > /w/logs/mutate6.log
 m() {
   local name=$1 file=$2 from=$3 to=$4
+  # ONLY=<name>: that mutation alone.
+  if [ -n "${ONLY:-}" ] && [ "$ONLY" != "$name" ]; then return; fi
   bash /src/docs/bench/lexp/scripts/sync.sh >/dev/null
   cd /w/repo
   local n

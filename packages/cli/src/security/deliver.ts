@@ -106,8 +106,8 @@ export type CheckedFix = {
  * found_at is the receipt's (this run's lookup). read: how many valid records were read. ended: a record that does not
  * list the fix ended the row (otherwise the records ran out, and an earlier run may have seen it). why: the walk was
  * not done. earlier: the receipt's lookup is earlier than every record that lists the fix. stop: the walk stopped, while
- * the row had not ended, at a run whose times do not agree (definitions.md, section 7). started: GitHub's start of
- * `run`, beside `at`, which is that run's runner's clock. clock: this run's times by GitHub and by the runner (section 8).
+ * the row had not ended, at a run whose times do not agree (definitions.md, section 7). started: GitHub's start of the
+ * run that saw the fix first, beside at, which is by its runner's clock. clock: this run's times by GitHub and by the runner (section 8).
  */
 export type Seen = { at: string; run: number | null; started?: string; read: number; ended: boolean; why?: string; earlier?: boolean; stop?: ClockStop; clock?: WalkClock };
 /** When the walk was done: GitHub's start of this run, the Date of the answer that gives it (or null) and this runner's clock. */

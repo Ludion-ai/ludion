@@ -182,7 +182,7 @@ describe("the Node.js image policy", () => {
       const both = mkdtempSync(join(tmpdir(), "ludion-node-init-"));
       writeFileSync(join(both, "Dockerfile"), SOURCE);
       writeFileSync(join(both, "package-lock.json"), JSON.stringify({ name: "a", lockfileVersion: 3, packages: { "": { name: "a" } } }));
-      await expect(securityCli("init", ["--dir", both])).rejects.toThrow("--ecosystem php|node|npm|composer|maven");
+      await expect(securityCli("init", ["--dir", both])).rejects.toThrow("--ecosystem php|node|npm|composer.");
       expect(await securityCli("init", ["--dir", both, "--ecosystem", "node"])).toBe(0);
       expect(JSON.parse(readFileSync(join(both, "ludion.security.json"), "utf8")).ecosystem).toBe("node");
     } finally { log.mockRestore(); }

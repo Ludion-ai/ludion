@@ -29,14 +29,15 @@
       "PowerShell(git push --force-with-lease *)",
       "PowerShell(gh repo delete *)",
       "PowerShell(Invoke-Expression *)",
-      "PowerShell(iex *)"
+      "PowerShell(iex *)",
+      "Monitor"
     ]
   },
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash|PowerShell",
-        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs\"" }]
+        "matcher": "Bash|PowerShell|Edit|Write|NotebookEdit",
+        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs\"", "onFailure": "block" }]
       }
     ]
   }

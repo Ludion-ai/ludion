@@ -12,53 +12,92 @@ The first review of this PR (on head a4810e6) found three places where this reco
 - No test guarded the re-reading of a script reached again (N8).
 - Many forms the check cannot follow were in neither the known-miss table nor this record.
 
-This version fixes the first two and lists the third.
+The second review (on head 24002b7) found that the way the npm commands were then chosen, by the `ignore-scripts` option, left out `npm uninstall` and its aliases. Five mutations of the check were also not caught by any probe. This version fixes those, and the non-blocking points below.
 
 ## What changed
 
 Only tools/records/test/bench-socket.test.ts. No file under docs/bench/ needed a change: the real tree passes the stronger check as it is.
 
 - **The command.**
-  - **Which npm commands.** The check covers the npm commands that install packages, and so run their install scripts. To fix that set, npm 11.19.1 (the npm in the node:24 image) was read: every command whose options include `ignore-scripts`. It leaves out the commands that run only the project's own scripts (run, test, start, stop, restart, pack, publish, version), which are the same class as the `npm run build` the mistake record names, and it leaves out find-dupes, which is a dry run. That leaves ci, install, install-test, install-ci-test, rebuild, update, dedupe, link, prune and `audit fix`.
-  - **Aliases.** Every alias and typo npm 11.19.1 accepts for these: `ci`, `clean-install`, `ic`, `install-clean`, `isntall-clean`, `install`, `i`, `in`, `ins`, `inst`, `insta`, `instal`, `isnt`, `isnta`, `isntal`, `isntall`, `add`, `install-test`, `it`, `install-ci-test`, `cit`, `clean-install-test`, `sit`, `rebuild`, `rb`, `update`, `u`, `up`, `upgrade`, `udpate`, `dedupe`, `ddp`, `link`, `ln`, `prune`. `npm audit` alone is a report and is not matched; only `npm audit … fix` is.
-  - **The ignore-scripts flags.** `--ignore-scripts false`, `=false`, `=0` and `--no-ignore-scripts` leave scripts on. The last flag wins over an earlier one and over `npm_config_ignore_scripts`.
-  - **How npm can be written.** Quotes are ignored (`npm "ci"`). npm can be given by its path (`/usr/local/bin/npm`), by a variable that holds it (`NPM=npm; $NPM ci`, `NPM=/usr/bin/npm`), or by a variable's default (`${NPM:-npm}`). A path counts only in a bin/ folder, so `dir=/e/npm` is not npm.
+  - **Which npm commands.** The check covers npm's commands that change node_modules, and so can run install scripts. They were chosen from what each command does in npm 11.19.1 (the npm in the node:24 image), by reading lib/commands/:
+    - the commands that call Arborist's `reify`, `dedupe`, `prune` or `rebuild`: ci, install, link, uninstall, update, dedupe, prune and rebuild, with install-test and install-ci-test, which run through install and ci;
+    - and `npm audit fix`, which calls `arb.audit({ fix })`.
+
+    The first choice in this PR, "every command whose options include `ignore-scripts`", left out uninstall: its options do not list `ignore-scripts`, but it reifies. Run in Docker with no network, on two packages made for the test, `npm uninstall b`, `rm`, `r`, `un`, `remove` and `unlink` each ran the other package's postinstall. `npm uninstall b --ignore-scripts` did not run it.
+
+    Left out on purpose:
+    - the commands that run only the project's own scripts: run, test, start, stop, restart, pack, publish and version. They are the same class as the `npm run build` the mistake record names.
+    - find-dupes, which is a dry run.
+    - `npm audit` without fix, which is a report.
+  - **Aliases.** Every alias and typo npm 11.19.1 accepts for these: `ci`, `clean-install`, `ic`, `install-clean`, `isntall-clean`, `install`, `i`, `in`, `ins`, `inst`, `insta`, `instal`, `isnt`, `isnta`, `isntal`, `isntall`, `add`, `install-test`, `it`, `install-ci-test`, `cit`, `clean-install-test`, `sit`, `rebuild`, `rb`, `update`, `u`, `up`, `upgrade`, `udpate`, `dedupe`, `ddp`, `link`, `ln`, `prune`, `uninstall`, `unlink`, `remove`, `rm`, `r`, `un`. Words between `audit` and `fix` are allowed (`npm audit --json fix`).
+  - **The ignore-scripts flags.**
+    - `--ignore-scripts false`, `=false`, `=0` and `--no-ignore-scripts` leave scripts on.
+    - The last flag wins over an earlier one and over `npm_config_ignore_scripts`.
+    - npm reads no flags after `--`, so `npm ci -- --ignore-scripts` leaves scripts on. In the same Docker test it ran the postinstall.
+  - **How npm can be written.**
+    - Quotes are ignored (`npm "ci"`).
+    - npm can be given by its path (`/usr/local/bin/npm`), by a variable that holds it (`NPM=npm; $NPM ci`, `NPM=/usr/bin/npm`, `NPM=$(command -v npm)`), or by a variable's default (`${NPM:-npm}`). A path counts only in a bin/ folder, so `dir=/e/npm` is not npm.
+    - `NPM=$(command -v npm)` was named in the code's comment from the first version but was not read until this version, because a value stopped at its first space.
+    - A newline ends a command, as `;` does.
   - **Package runners.** `npm create` and `npm init <initializer>` count, as `npm exec` already did.
 - **JavaScript.**
-  - **What is read.** In .mjs, .cjs, .js, .ts, .mts and .cts files, every string is read as a command (`execSync("npm ci")`, `spawnSync("sh", ["-c", "npx tsx x.ts"])`), and so is a program with its argument list (`execFileSync("npm", ["clean-install"])`). `\n` in a string is a newline.
-  - **Only printed strings.** A string counts as only printed when it is the first argument of `console.*`, `process.stdout.write`, `process.stderr.write` or an `Error`. So `sh.stdin.write("npm ci\n")` and `runAndlog("npm ci")` are read as commands.
+  - **What is read.** In .mjs, .cjs, .js, .ts, .mts and .cts files, every string is read as a command (`execSync("npm ci")`, `spawnSync("sh", ["-c", "npx tsx x.ts"])`). So is a program with its argument list (`execFileSync("npm", ["clean-install"])`). `\n` in a string is a newline, so `sh.stdin.write("echo start\nnpm ci\n")` is two commands.
+  - **Only printed strings.** A string counts as only printed when it is the first argument of `console.*`, `process.stdout.write`, `process.stderr.write` or an `Error`. So `sh.stdin.write("npm ci\n")` and `runAndlog("npm ci")` are read as commands. A template string's `${…}` parts are always read, because they run even when the template is printed (`` console.log(`out: ${execSync("npm ci")}`) ``).
   - **Docker clients.** A script whose strings run the docker CLI (`execSync("docker ps")`) counts as a docker client.
 - **The socket.**
   - **What gives it.** A line gives the socket when it names `docker.sock` (as before), the Windows pipe `docker_engine`, or `DOCKER_HOST`. It also does when it bind-mounts `/`, `/var`, `/run` or `/var/run` (`-v`, `--volume`, `--mount source=`/`src=`).
-  - **Variables.** A variable makes every line that uses it a socket line when a file sets it to such text (`SOCK=/var/run/docker.sock` then `-v "$SOCK:$SOCK"`), to a bash array of such text (`args=(-v …docker.sock…)` then `"${args[@]}"`), or to one of those folders (`SOCK_DIR=/var/run`).
+  - **Variables.** A variable makes every line that uses it a socket line when a file sets it to such text, or to one of those folders. The assignment can take these forms:
+    - `SOCK=/var/run/docker.sock`
+    - `SOCK_DIR=$(dirname /var/run/docker.sock)`
+    - `SOCK_DIR=/var/run`
+    - a bash array, which may hold `$(…)`: `args=(-v "$(pwd)/x:/x" -v …docker.sock…)`
+    - `args+=(…)`
+    - `args[1]=…`
   - **Variables passed on.** Such a variable is passed to the scripts a socket line runs, with that line's arguments. So `DOCKER_ARGS="-v /var/run/docker.sock:…" sh …/run.sh full` follows run.sh's `docker run ${DOCKER_ARGS:-} … sh "/scripts/$script.sh"` into full.sh. An exported variable is passed to every script the file runs.
-- **Scripts followed.** .sh, .bash, .mjs, .cjs, .js, .ts, .mts, .cts and .ps1 (.bash, .ts, .mts and .cts are new; Node 24 runs `node x.ts` directly). A script reached again with other mounts, variables or arguments is read again (R248's N8). A must-find probe now fails if that is undone.
+- **Scripts followed.** .sh, .bash, .mjs, .cjs, .js, .ts, .mts, .cts and .ps1. .bash, .ts, .mts and .cts are new; Node 24 runs `node x.ts` directly. .bash is read as shell (its comments are skipped), and .mts and .cts as JavaScript.
+- **Reading a script again.** A script reached again with other mounts, variables or arguments is read again (R248's N8). Three must-find probes now fail if any part of that is undone: the arguments, the variables or the mounts.
 - **Options before run or exec.** An option before `run` or `exec` (`docker --a run`, `npm --yes exec`) is matched as `-[\w-]+`, so it matches only one way. Before, each option matched two ways, and the time doubled with every added option.
 
 ## The tables and the counts
 
 The test has three tables of small made-up trees:
 
-- **Must find:** 96 forms. A form counts as found when a finding names the expected file and line.
-- **Must pass:** 32 forms. Nothing may be found.
-- **Known miss:** 19 forms the check should find but does not. Each is asserted to be not found, so that a later fix shows up as a change in the test.
+- **Must find:** 115 forms. A form counts as found when a finding names the expected file and line.
+- **Must pass:** 33 forms. Nothing may be found.
+- **Known miss:** 20 forms the check should find but does not. Each is asserted to be not found, so that a later fix shows up as a change in the test.
 
-The 96 must-find forms are R248's P and Q probes, its R2 and R3 mutations, the npm commands and aliases above, and the forms the first review of this PR named. They are grouped in six parts:
+The 115 must-find forms are R248's P and Q probes, its R2 and R3 mutations, the npm commands and aliases above, and the forms the two reviews of this PR named. They are grouped in six parts:
 
-- 62 command forms: 6 flag forms, 35 aliases, `npm link ../pkg`, 3 forms of `npm audit fix`, P6, 3 forms of P7, 3 forms of P8, npm by its path and 9 package runners.
-- 8 JavaScript forms, P16 and P17 among them.
+- 71 command forms:
+  - 6 flag forms and `--` before `--ignore-scripts`
+  - 41 aliases
+  - `npm link ../pkg`
+  - 4 forms of `npm audit fix`
+  - P6, 4 forms of P7 and 3 forms of P8
+  - npm by its path
+  - 9 package runners
+- 10 JavaScript forms, P16 and P17 among them.
 - 2 commands started on the socket line itself (R2, R3).
-- 4 kinds of script the socket container runs (.ts, .mts, .cts, .bash).
-- 19 ways of giving the socket: Q0 in 4 forms, Q1 in 5, Q2 in 2, Q3 in 4 (the path, the mount, a bash array, the socket's folder), Q4, and Q6 in 3.
-- 1 launcher reached twice with other arguments (N8).
+- 6 kinds of script the socket container runs: .ts, .mts, .cts and .bash, and an argument list in .mts and in .cts.
+- 23 ways of giving the socket: Q0 in 4 forms, Q1 in 5, Q2 in 2, Q3 in 8, Q4, and Q6 in 3. The 8 forms of Q3 are the path, the mount, a bash array, a bash array holding `$(pwd)`, `+=`, an array element, the socket's folder, and the folder from `$(dirname …)`.
+- 3 for reading a script again (N8): with other arguments, other variables or other mounts.
 
-The tables were written first and run against the check before it was changed: commit de7962e against main's check, then commit ac4825f against a4810e6. The check was changed in b3c7e39 and then f099148. Each earlier row was counted again with the final tables: that check, with the final tables appended.
+Each time, the tables were written first and run against the check before it was changed:
+
+| Tables committed in | Run against the check at | Check changed in |
+|---|---|---|
+| de7962e | main b803f2b | b3c7e39 |
+| ac4825f | a4810e6 | f099148 |
+| 20c0c8f | 24002b7 | d637f72 |
+
+Each earlier row below was counted again with the final tables: that check, with the final tables appended.
 
 | Check | Must find | Must pass | Known misses (not found) |
 |---|---|---|---|
-| main b803f2b | **25 / 96** (commands 19/62, JavaScript 0/8, socket-line commands 2/2, script kinds 0/4, ways of giving the socket 4/19, N8 0/1) | 32 / 32 | 19 / 19 |
-| a4810e6, the head the first review read | **80 / 96** (commands 54/62, JavaScript 6/8, socket-line commands 2/2, script kinds 0/4, ways of giving the socket 17/19, N8 1/1) | 32 / 32 | 19 / 19 |
-| this branch (f099148) | **96 / 96** | 32 / 32 | 19 / 19 |
+| main b803f2b | **25 / 115** (commands 19/71, JavaScript 0/10, socket-line commands 2/2, script kinds 0/6, ways of giving the socket 4/23, N8 0/3) | 33 / 33 | 20 / 20 |
+| a4810e6, the head the first review read | **82 / 115** (54/71, 6/10, 2/2, 0/6, 17/23, 3/3) | 33 / 33 | 20 / 20 |
+| 24002b7, the head the second review read | **101 / 115** (63/71, 8/10, 2/2, 6/6, 19/23, 3/3) | 33 / 33 | 20 / 20 |
+| this branch (d637f72) | **115 / 115** | 33 / 33 | 20 / 20 |
 
 The review of PR #248's own probes, counted the same way. Its ids are kept in the test's table: P3 is `npm clean-install`, P4 `npm install-ci-test`, P5 `npm i`.
 
@@ -69,7 +108,7 @@ The review of PR #248's own probes, counted the same way. Its ids are kept in th
 | Q6, DOCKER_ARGS with the socket in a README code block | 0 / 1 | 1 / 1 |
 | Q5, the socket given only on a command line outside the repository | 0 / 1 | 0 / 1 (known miss) |
 
-The 19 known misses, each a tree in the test's known-miss table:
+The 20 known misses, each a tree in the test's known-miss table:
 
 1. Q5: a launcher that takes `DOCKER_ARGS`, when the socket was passed only on a command line typed outside the repository. No file says the socket is given.
 2. A socket path set in a file that another script sources (`. ./env.sh`). Variables are read one file at a time.
@@ -79,36 +118,44 @@ The 19 known misses, each a tree in the test's known-miss table:
 6. `docker exec c sh /scripts/e2e.sh`, for the same reason.
 7. `--volumes-from` a container that has the socket, for the same reason.
 8. A compose file whose service mounts the socket under `volumes:` and runs `command: sh -c "npm ci"`. A service's other keys are not tied to its volumes.
-9. A script with no extension (`sh /scripts/e2e2`). Only files with a script extension are followed.
-10. `node /usr/local/lib/node_modules/npm/bin/npm-cli.js ci`. npm's own script is not read as npm.
-11. `node "$(command -v npm)" ci`. A command substitution is a separate segment.
-12. The whole command in a variable on the socket line (`INSTALL="npm ci"`, then `sh -c "cd /w && $INSTALL"`).
-13. A JavaScript argument list over several lines (`spawnSync("npm", [` with `"ci",` on the next line). Lines are read one at a time.
-14. A JavaScript argument list joined into a string (`["npm", "ci"].join(" ")`).
-15. npm in a JavaScript variable (`const npm = "npm"; spawnSync(npm, ["ci"])`).
-16. npm in a template string's variable (`` execSync(`${npm} ci`) ``).
-17. `--privileged`. It gives the host's devices, not the socket, and is not looked at.
-18. The rootless socket's folder (`-v /run/user/1000:/run/user/1000`). Only `/`, `/var`, `/run` and `/var/run` count as the socket's folder.
-19. `DOCKER_HOST` inside an `--env-file`. Env files are not read.
+9. A script with no extension (`sh /scripts/e2e2`).
+10. A Python script (`python3 /scripts/e2e.py`; node:24 has python3 and perl). As with 9, only files ending in .sh, .bash, .mjs, .cjs, .js, .ts, .mts, .cts or .ps1 are followed.
+11. `node /usr/local/lib/node_modules/npm/bin/npm-cli.js ci`. npm's own script is not read as npm.
+12. `node "$(command -v npm)" ci`. A command substitution is a separate segment.
+13. The whole command in a variable on the socket line (`INSTALL="npm ci"`, then `sh -c "cd /w && $INSTALL"`).
+14. A JavaScript argument list over several lines (`spawnSync("npm", [` with `"ci",` on the next line). Lines are read one at a time.
+15. A JavaScript argument list joined into a string (`["npm", "ci"].join(" ")`).
+16. npm in a JavaScript variable (`const npm = "npm"; spawnSync(npm, ["ci"])`).
+17. npm in a template string's variable (`` execSync(`${npm} ci`) ``).
+18. `--privileged`. It gives the host's devices, not the socket, and is not looked at.
+19. The rootless socket's folder (`-v /run/user/1000:/run/user/1000`). Only `/`, `/var`, `/run` and `/var/run` count as the socket's folder.
+20. `DOCKER_HOST` inside an `--env-file`. Env files are not read.
 
-The first review tried 41 forms of its own. It named 7 of them in blocking point 3 and more in point 4, and every named form is in a table here: as must-find where the check now finds it (a bash array, a socket folder in a variable, .ts, .mts and .bash scripts), and as a known miss otherwise. The forms it tried but did not name are not measured here.
+The first review tried 41 forms of its own. It named 7 of them in blocking point 3 and more in point 4, and every named form is in a table here: as must-find where the check now finds it (a bash array, a socket folder in a variable, .ts, .mts and .bash scripts), and as a known miss otherwise. The forms it tried but did not name are not measured here. The second review's named forms are all in a table too: npm uninstall and its 5 aliases, 4 bash forms, the printed template, the later line of a shell's input, a Python script, and `--` before `--ignore-scripts`.
 
-Mutations of the test's code, each applied to the copy in the volume, run against bench-socket.test.ts, and undone. All 10 were caught:
+Mutations of the test's code, each applied to the copy in the volume, run against bench-socket.test.ts, and undone. At f099148, 10 of 10 were caught. At d637f72, 15 of 15 were caught, the 5 the second review found uncaught among them:
 
-| Mutation | Probes that failed |
+| Mutation (at d637f72) | Probes that failed |
 |---|---|
-| the seen key is the path only (R248's N8 undone) | 1 (N8) |
-| `link` and `ln` out of the install list | 3 |
-| `prune` out | 1 |
-| `u` out | 1 |
-| `audit … fix` not matched | 3 |
-| a socket folder in a variable not counted | 1 |
-| a bash array not read as a value | 1 |
-| the earlier "only printed" rule (any name ending in `log`, any `.write`) | 2 |
-| `\n` in a JavaScript string read as `n` | 1 |
-| .bash, .ts, .mts and .cts not followed | 4 |
+| the seen key is the path only (R248's N8 undone) | 3 (N8 ×3) |
+| the seen key without the arguments | 1 |
+| the seen key without the variables | 1 |
+| the seen key without the mounts | 1 |
+| uninstall and its aliases out of the install list | 6 |
+| no word allowed between `audit` and `fix` | 1 |
+| isShell without .bash | 1 (must pass: a comment in a .bash script) |
+| isJs without .mts and .cts | 2 |
+| flags after `--` read | 1 |
+| a newline does not end a command | 1 |
+| a template's `${…}` parts not read | 1 |
+| a bash array cannot hold `$(…)` | 1 |
+| no `+=` assignment | 1 |
+| no `NAME[i]=` assignment | 1 |
+| no `$(…)` value | 2 (`$(command -v npm)`, `$(dirname …)`) |
 
-Mutations of the real tree, each applied to the copy in the volume, run against the check, and undone. All 8 were caught, and the control was not:
+At f099148: the seen key the path only, `link` and `ln` out, `prune` out, `u` out, `audit … fix` not matched, a socket folder in a variable not counted, a bash array not read, the earlier "only printed" rule, `\n` read as `n`, and .bash/.ts/.mts/.cts not followed.
+
+Mutations of the real tree, each applied to the copy in the volume, run against the check, and undone. All were caught, and the control was not:
 
 | Mutation | Finding |
 |---|---|
@@ -120,17 +167,21 @@ Mutations of the real tree, each applied to the copy in the volume, run against 
 | M5 as C0, with `-v /var/run:/var/run` | docs/bench/2026-10-31-lnode/scripts/e2e.sh:12 |
 | M6 as C0, with `-v /:/host` | docs/bench/2026-10-31-lnode/scripts/e2e.sh:12 |
 | M7 LV3's README: a code block running `DOCKER_ARGS="-v /var/run/docker.sock:…" sh …/run.sh full` | docs/bench/2026-10-30-lv3-osv-publisher/scripts/full.sh:8 |
-| M8 LV3's e2e.sh: `npm audit fix` (run at f099148; M1-M7 ran at b3c7e39) | docs/bench/2026-10-30-lv3-osv-publisher/scripts/e2e.sh:9 |
+| M8 LV3's e2e.sh: `npm audit fix` | docs/bench/2026-10-30-lv3-osv-publisher/scripts/e2e.sh:9 |
+| M9 LV3's e2e.sh: `npm uninstall lodash` | docs/bench/2026-10-30-lv3-osv-publisher/scripts/e2e.sh:9 |
+
+M1-M7 ran at b3c7e39, M8 at f099148 and M9 at d637f72.
 
 ## Other checks (all in Docker)
 
 The image was node:24, pinned by digest (sha256:e7add2a4…). The tree was copied into the volume ludion-lsock2-w, with `--memory 4g` and no socket. `npm ci --ignore-scripts` ran once with the network; everything else ran with `--network none`.
 
-At f099148:
+At d637f72:
 
-- tools/records/test/: 2 files, 166 tests passed.
+- tools/records/test/: 2 files, 187 tests passed.
 - `npm run typecheck`: exit 0. `npm run build`: exit 0.
-- `npm test -- --maxWorkers=2`: 43 files passed, 1646 tests passed, 25 skipped.
+- `npm test -- --maxWorkers=2`: 43 files passed, 1667 tests passed, 25 skipped.
+- The new assignment pattern on long inputs that do not match grows quadratically, with no exponential backtracking. ` a=($(` repeated 1000, 2000, 4000 and 8000 times took 2, 7, 29 and 123 ms. ` a[` took 1, 5, 18 and 75 ms.
 
 No e2e was run, and no container was given the socket.
 
@@ -149,10 +200,20 @@ Why 35 differs from 42 is unknown. This lane did not count the session records a
 The record is not rewritten (CLAUDE.md, How we work). After this change, "follows every container started with the socket" and "an `npm ci`, `npm install` or similar" are still stronger than the check in these cases:
 
 - **Outside the repository.** Containers started by scripts outside the repository, such as the 5 runs above, are not seen.
-- **The 19 known misses above.** Each is a tree in the test that the check does not find. 4 to 9 are containers started with the socket, or scripts they run, that the check cannot follow. 10 to 16 are installs written in a form the check does not read. 1 to 3 and 17 to 19 are ways of giving the socket, or the host, that the check does not see.
+- **The 20 known misses above.** Each is a tree in the test that the check does not find:
+  - 4 to 10 are containers started with the socket, or scripts they run, that the check cannot follow.
+  - 11 to 17 are installs written in a form the check does not read.
+  - 1 to 3 and 18 to 20 are ways of giving the socket, or the host, that the check does not see.
 - **A writable mount of the worktree.** It is not looked at. A container started that way can also reach the host. It is outside the forms this lane was given.
 - **The project's own scripts.** pack, publish, version and the run family (`npm run build` among them, the mistake record's "Not fixed here") are not checked.
 
-The check also errs the safe way in some forms, which is not counted here. It finds `npm ci` as the text of `grep -q "npm ci" log`, in the body of `cat <<'EOF'`, and in a JavaScript `const msg = "npm ci failed"`. It also finds an `npm ci` that follows `export npm_config_ignore_scripts=true` on an earlier line. And benchFiles follows symbolic links under docs/bench/, as on main.
+## Not changed, and why
+
+- **False alarms.** The check errs the safe way in some forms, and these are not counted here. Each finds a command where none runs, and none is in the real tree, which passes. They are left as they are, because narrowing them would risk missing a real install. The forms:
+  - `npm ci` as the text of `grep -q "npm ci" log`, in the body of `cat <<'EOF'`, and in a JavaScript `const msg = "npm ci failed"`.
+  - An `npm ci` that follows `export npm_config_ignore_scripts=true` on an earlier line.
+  - Since the aliases were added, an alias as a later word of any npm command: `npm run link`, `npm run prune`, `npm test -- -t u`, `npm view lodash ln`, and `npm audit --json > fix.json`.
+  - A variable set to `/` used for another folder (`prefix=/` then `-v "${prefix}opt/data:/data"`), which makes its line a socket line.
+- **Symbolic links.** benchFiles follows symbolic links under docs/bench/, as on main. git holds no symbolic link under docs/bench/ (0 entries of mode 120000). A new one would have to be committed and so would show in a PR's diff. Changing how the tree is read is not part of measuring the check's recall.
 
 The check is measured only against the tables above. A form in none of the tables has not been measured.

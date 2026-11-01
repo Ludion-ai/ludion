@@ -21,10 +21,25 @@ export const waterPages: { path: string; moments: number }[] = [
   { path: "/ja/start/", moments: 20 },
 ];
 
-/** The water times a page is measured at, in ms since the water started, ascending. */
-export function waterMoments(path: string, _colorScheme: "light" | "dark"): number[] {
+// Water times, in ms since the water started, where a dark box reached a lower value than in the page's steady moments:
+// the lowest seen over a sweep of the water's time (docs/decisions/2026-11-02-le2e-water-sampling.md, docs/bench/le2e/).
+// No light box needed one. They hold for the site that was measured; `e2e/water-full.spec.ts` measures them again.
+const LOWEST_DARK_MOMENTS: Record<string, number[]> = {
+  "/": [97300, 121000],
+  "/start/": [41200],
+  "/ja/": [32878, 64812],
+  "/ja/start/": [54400],
+};
+
+/** The page's moments, one step apart, in ms since the water started. */
+export function steadyMoments(path: string): number[] {
   const { moments } = waterPages.find((p) => p.path === path)!;
   return Array.from({ length: moments }, (_, k) => FIRST_MS + MOMENT_STEP_MS * (k + 1));
+}
+
+/** The water times a page is measured at, in ms since the water started, ascending. */
+export function waterMoments(path: string, colorScheme: "light" | "dark"): number[] {
+  return colorScheme === "dark" ? [...steadyMoments(path), ...LOWEST_DARK_MOMENTS[path]!] : steadyMoments(path);
 }
 
 export interface Target {

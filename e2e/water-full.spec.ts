@@ -6,7 +6,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "@playwright/test";
 import { PNG } from "pngjs";
-import { boxContrast, clipAround, FIRST_MS, HIDE_TEXT, MOMENT_STEP_MS, SCREEN, targets, thresholdOf, waterMoments, waterPages } from "./water-contrast.ts";
+import { boxContrast, clipAround, FIRST_MS, HIDE_TEXT, MOMENT_STEP_MS, SCREEN, steadyMoments, targets, thresholdOf, waterMoments, waterPages } from "./water-contrast.ts";
 
 const out = process.env.WATER_FULL_OUT;
 const arm = process.env.WATER_FULL_ARM ?? "paused";
@@ -38,7 +38,7 @@ function observeWater() {
 for (const { path } of waterPages) {
   for (const colorScheme of ["light", "dark"] as const) {
     const slug = `${path.replace(/\//g, "_")}${colorScheme}`;
-    const list = times ? (times[slug] ?? []) : waterMoments(path, colorScheme);
+    const list = times ? (times[slug] ?? []) : arm === "running" ? steadyMoments(path) : waterMoments(path, colorScheme);
     test(`every moment of the water (${path}, ${colorScheme})`, async ({ browser }) => {
       test.skip(list.length === 0, "No water times asked for on this page.");
       test.setTimeout(600_000);

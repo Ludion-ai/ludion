@@ -4,7 +4,7 @@ Measurement and prototype only; no product behavior changes. Definitions: docs/b
 
 ## The answer: partial (部分的)
 
-npm has no way to do this, and doing it inside npm's own resolver works: no example failed, all 40 moved versions were the oldest by an independent check, and real npm 12.2.1 accepted all 13 lockfiles. But 10 of the 23 counted examples stop, because nothing is left in range once today's advisories and deprecations are excluded. How many of those 10 would also have stopped on what was known at T is not known.
+npm has no way to do this, and doing it inside npm's own resolver works: no example failed, all 40 moved versions were the oldest by a separate check, and real npm 12.2.1 accepted all 13 lockfiles. But 10 of the 23 counted examples stop, because nothing is left in range once today's advisories and deprecations are excluded. How many of those 10 would also have stopped on what was known at T is not known.
 
 | Counted examples: 23 (one more has no base) | Count |
 |---|---|
@@ -79,7 +79,7 @@ Two kinds, for instance:
 
 Two limits on reading this:
 
-- **Hindsight.** Advisories and deprecations are today's, not T's, and the advisory endpoint gives no dates. So some of these advisories were not known at T, and how many is not known. The true figure at T lies between the two ends below.
+- **Hindsight.** Advisories and deprecations are today's, not T's, and the advisory endpoint gives no dates. So some of these advisories were not known at T, and how many is not known. The figure at T is not measured. 13 and 23, below, are the two ends that were run, not proven bounds. 23 is a ceiling only because 23 examples are counted. 13 is not a floor: with fewer exclusions an example can also stop, because an older version brings other requirements, and today's exclusions need not contain T's, since an advisory can be withdrawn or a deprecation removed after T.
 - **Not all hindsight.** A fix published today that needs `uuid@^9.0.1` would stop today. A rule with nothing allowed in range has no next version to take. The plan's risk table says to take the next oldest, which does not cover this case.
 
 ## The ends of the range, and the alternative
@@ -114,5 +114,5 @@ All 20 versions were published within 13.3 minutes of V, before or after it. So 
 
 ## What it needs next
 
-1. Advisories dated as of T, to place the true figure between 13 and 23. The backtests' OSV export has the dates, and this lane's limit on the network did not allow OSV.
+1. Advisories dated as of T, to run the rule on the advisories known at T. The figure at T is not measured, and 13 is not a lower bound on it. The backtests' OSV export has the dates, and this lane's limit on the network did not allow OSV.
 2. The owner's decision on a range with nothing allowed in it. The rule as worded stops the fix, and the exposure goes on. The alternatives would be to allow an excluded version under some condition, or to notify and leave the fix to a person. Stops of this kind also count against C3.

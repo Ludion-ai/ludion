@@ -47,4 +47,4 @@ The correction counts a stop only when it makes npm's run fail, and keeps the ot
 
 ## Why the diagnostic arms exist
 
-They were added after the result, and they do not change the answer. Every stop in run 2 comes from the exclusion filters, and the filters use today's advisories and deprecations. The advisory endpoint gives no dates, so what was known at T cannot be separated. The arms bracket it: with no advisory filter, and with neither filter.
+They were added after the result, and they do not change the answer. Every stop in run 2 comes from the exclusion filters, and the filters use today's advisories and deprecations. The advisory endpoint gives no dates, so what was known at T cannot be separated. The arms run with no advisory filter and with neither filter, and they do not bracket the figure at T. 13 and 23 are the two ends that were run, not proven bounds: 23 is a ceiling only because 23 examples are counted, and with fewer exclusions an example can also stop, because an older version brings other requirements.

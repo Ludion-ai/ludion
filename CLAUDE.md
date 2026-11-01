@@ -8,7 +8,7 @@ Why: a fix that nobody hears about is never applied. The fix for CVE-2024-4577 (
 
 What Ludion is, is set by this section, the live site (ludion.ai, apps/site) and the owner's deck ("SECURITY PATCH AUTOPILOT"). docs/design.md is the plan for building it; where the plan differs (its roadmap puts a judge of other tools' PRs first), this section wins until the owner redoes the design. docs/status.md says what is built today and what is missing.
 
-**No release until complete** (owner, 2026-10-29 18:21 JST: 「まだ完全じゃないならリリースはしない」). Until Ludion does what this section says, for everything it claims to support, through all four gates, nothing is released: no npm release, no GitHub Action release and no announcement, a comments-only preview included. What "complete" means in measurable terms is fixed with the owner; until then docs/status.md keeps the working list of what is missing. Automatic merge also needs (a) and (b) under Product.
+**No release until complete** (owner, 2026-10-29 18:21 JST: 「まだ完全じゃないならリリースはしない」). Until Ludion does what this section says, for everything it claims to support, through all four gates, nothing is released: no npm release, no GitHub Action release and no announcement, a comments-only preview included. What "complete" means in measurable terms is fixed with the owner (docs/decisions/2026-11-01-definition-of-complete.md); docs/status.md keeps the working list of what is missing. Automatic merge also needs (a) and (b) under Product.
 
 ## How we work
 

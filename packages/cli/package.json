@@ -1,7 +1,7 @@
 {
   "name": "ludion-ai",
   "version": "0.3.0-preview.1",
-  "description": "One security-update workflow for PHP Docker, npm, Composer and Maven. Source preview with offline application validation.",
+  "description": "One security-update workflow for PHP Docker, npm and Composer, with a read-only scan of Maven. Source preview with offline application validation.",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {

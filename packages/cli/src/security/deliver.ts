@@ -14,7 +14,7 @@ import semver from "semver";
 import { comparableVersion } from "./osv.ts";
 import { compare, dockerHubTag, imageReason, phpImage } from "./php.ts";
 import { nodeImage } from "./node.ts";
-import { CONFIG, rootPath } from "./project.ts";
+import { CONFIG, MAVEN_REFUSAL, rootPath } from "./project.ts";
 
 /**
  * The scheduled workflow's two jobs (action.yml, modes patch and pull-request; docs/bench/2026-10-30-lb-design).
@@ -144,7 +144,8 @@ function policyAt(top: string, prefix: string, base: string): { ecosystem: Ecosy
     return { ecosystem: config.ecosystem === "node" ? "node" : "php", dockerfile: config.dockerfile as string, allowed: [dockerfile] };
   }
   const ecosystem = config.ecosystem;
-  if (ecosystem !== "npm" && ecosystem !== "composer" && ecosystem !== "maven") refuse("the project's policy names no supported ecosystem.");
+  if (ecosystem === "maven") refuse(MAVEN_REFUSAL);
+  if (ecosystem !== "npm" && ecosystem !== "composer") refuse("the project's policy names no supported ecosystem.");
   return { ecosystem, dockerfile: null, allowed: [...MANIFESTS[ecosystem]] };
 }
 

@@ -126,7 +126,7 @@ export async function checkProject(dir: string, deps: Deps = {}): Promise<CheckA
   }
   const outside = outsideOf(root, ecosystem, dockerfile);
   const undecided = (reason: string): CheckAnswer => ({ ...head, ecosystem, outside, decided: false, reason });
-  if (ecosystem === "maven") return undecided("a Maven scan resolves the dependency graph in Docker, which the check does not run; patch runs every time.");
+  if (ecosystem === "maven") return undecided("the policy names maven, which patch refuses (Maven is outside what Ludion fixes); patch runs every time, and its job fails with that reason.");
   let report: ProjectScan;
   try { report = await scan(root, ecosystem); } catch (error) { return undecided(`ludion scan failed: ${message(error)}`); }
   const check = report.checks.length === 1 && report.checks[0]!.ecosystem === ecosystem ? report.checks[0]! : undefined;

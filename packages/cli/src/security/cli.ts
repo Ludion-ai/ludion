@@ -6,7 +6,7 @@ import { patchProject } from "./patch.ts";
 import { patchDependencies } from "./dependency-patch.ts";
 import { detectEcosystems, DEFAULT_IMAGES, textFile, type Ecosystem } from "./inventory.ts";
 import { found, scanProject, securityMove } from "./scan.ts";
-import { CONFIG, DEFAULT_CONFIG, DEFAULT_NODE_CONFIG, readConfig, regularFile, rootPath } from "./project.ts";
+import { CONFIG, DEFAULT_CONFIG, DEFAULT_NODE_CONFIG, MAVEN_REFUSAL, readConfig, regularFile, rootPath } from "./project.ts";
 import { namesNodeImage } from "./node.ts";
 import type { Scan } from "./php.ts";
 import { useProject } from "../../../sandbox/src/docker.ts";
@@ -40,8 +40,9 @@ export async function securityCli(command: string, args: string[]): Promise<numb
   const { values } = parseArgs({ args, options: { dir: { type: "string", default: "." }, ecosystem: { type: "string" }, json: { type: "boolean" }, apply: { type: "boolean" }, interval: { type: "string", default: "900" } } });
   if (values.apply && !["patch", "watch"].includes(command)) throw new Error("--apply is only valid with patch or watch.");
   if (isReadOnlyCliName(values.ecosystem) && command !== "scan") throw new Error(readOnlyRefusal(values.ecosystem));
+  if (values.ecosystem === "maven" && command !== "scan") throw new Error(MAVEN_REFUSAL);
   if (values.ecosystem && !["init", "scan"].includes(command)) throw new Error("--ecosystem selects init/scan only; patch/watch use the saved project policy.");
-  if (values.ecosystem && !["auto", "php", "node", "npm", "composer", "maven"].includes(values.ecosystem) && !isReadOnlyCliName(values.ecosystem)) throw new Error("Supported ecosystems: php, node, npm, composer, maven, python, go, rust (scan only), auto.");
+  if (values.ecosystem && !["auto", "php", "node", "npm", "composer", "maven"].includes(values.ecosystem) && !isReadOnlyCliName(values.ecosystem)) throw new Error("Supported ecosystems: php, node, npm, composer, auto; scan only: maven, python, go, rust.");
   const root = rootPath(values.dir!);
   // docker is never taken from a PATH folder inside the project (packages/sandbox/src/docker.ts, findDocker).
   useProject(root);
@@ -51,7 +52,8 @@ export async function securityCli(command: string, args: string[]): Promise<numb
     if (existsSync(join(root, "Dockerfile")) && /\bphp:/.test(textFile(root, "Dockerfile"))) choices.push("php");
     if (existsSync(join(root, "Dockerfile")) && namesNodeImage(textFile(root, "Dockerfile"))) choices.push("node");
     const selected = values.ecosystem && values.ecosystem !== "auto" ? values.ecosystem : choices.length === 1 ? choices[0]! : undefined;
-    if (!selected) throw new Error("Choose the update policy with --ecosystem php|node|npm|composer|maven. A multi-ecosystem project can be scanned together; each patch policy chooses its dependency manager.");
+    if (!selected) throw new Error("Choose the update policy with --ecosystem php|node|npm|composer. A multi-ecosystem project can be scanned together; each patch policy chooses its dependency manager.");
+    if (selected === "maven") throw new Error(MAVEN_REFUSAL);
     let config: unknown = selected === "node" ? DEFAULT_NODE_CONFIG : DEFAULT_CONFIG;
     if (selected === "php" || selected === "node") regularFile(root, "Dockerfile");
     else {
@@ -114,7 +116,11 @@ export async function securityCli(command: string, args: string[]): Promise<numb
   process.once("SIGINT", stop); process.once("SIGTERM", stop);
   try {
     while (!abort.signal.aborted) {
-      try { await patch(abort.signal); } catch (error) { console.error(`ludion: ${error instanceof Error ? error.message : String(error)}`); }
+      try { await patch(abort.signal); } catch (error) {
+        // A Maven policy would only be refused again, every round: stop and say so.
+        if (error instanceof Error && error.message === MAVEN_REFUSAL) throw error;
+        console.error(`ludion: ${error instanceof Error ? error.message : String(error)}`);
+      }
       await delay(interval * 1000, undefined, { signal: abort.signal }).catch(error => { if (!abort.signal.aborted) throw error; });
     }
   } finally { process.off("SIGINT", stop); process.off("SIGTERM", stop); }

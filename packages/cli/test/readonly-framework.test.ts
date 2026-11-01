@@ -358,7 +358,7 @@ describe("the CLI keeps read-only ecosystems out of update policies", () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
     expect(await securityCli("scan", ["--dir", project({}), "--ecosystem", "go"])).toBe(2);
     expect(errors[0]).toMatch(/^Go: unavailable — No go inventory found/);
-    await expect(securityCli("scan", ["--dir", project({}), "--ecosystem", "ruby"])).rejects.toThrow("Supported ecosystems: php, node, npm, composer, maven, python, go, rust (scan only), auto.");
+    await expect(securityCli("scan", ["--dir", project({}), "--ecosystem", "ruby"])).rejects.toThrow("Supported ecosystems: php, node, npm, composer, auto; scan only: maven, python, go, rust.");
   });
   it("prints a read-only check like the others, plus what Ludion does not do", async () => {
     const result = await osv({ "django@3.2.0": ["GHSA-aaaa-bbbb-cccc"] }, { "GHSA-aaaa-bbbb-cccc": record("GHSA-aaaa-bbbb-cccc") }).scanReadOnly(pypi([django, requests], ["Unpinned requirement: flask>=2\u001b[2J"]));

@@ -1,0 +1,22 @@
+2026-11-01T00:14:14Z
+== examples/npm-security --changed-at 2020-01-01T00:00:00Z
+decided	npm	high
+key	due	npm:lodash	-	slot 1 of 12 hours since 2026-10-31T00:35:16.342Z
+exit 0
+== examples/php-security --changed-at 2020-01-01T00:00:00Z
+decided	php	-
+key	quiet	php	2026-11-07T00:00:00.000Z	slot 20 of 12 hours since 2026-10-22T00:00:00.000Z; next due 2026-11-07T00:00:00.000Z
+exit 0
+== examples/node-security --changed-at 2020-01-01T00:00:00Z
+decided	node	-
+key	quiet	node	2026-11-06T00:00:00.000Z	slot 22 of 12 hours since 2026-10-21T00:00:00.000Z; next due 2026-11-06T00:00:00.000Z
+exit 0
+== examples/composer-security --changed-at 2020-01-01T00:00:00Z
+decided	composer	-
+key	due	composer:symfony/http-foundation	-	a fact the anchor needs could not be read, so it is due
+exit 0
+"id": "GHSA-3rg7-wf37-54rm"
+"id": "GHSA-mrqx-rp3w-jpjp"
+"id": "GHSA-r925-mgvr-h9cc"
+"id": "PKSA-365x-2zjk-pt47"
+"id": "PKSA-b35n-565h-rs4q"

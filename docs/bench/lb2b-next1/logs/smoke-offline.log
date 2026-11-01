@@ -1,0 +1,9 @@
+== examples/npm-security (no network)
+undecided	the npm check failed: fetch failed
+exit 2
+== examples/php-security (no network)
+undecided	the php check failed: fetch failed
+exit 2
+== help
+  ludion check [--dir <path>] [--changed-at <time>] [--keys-only] [--json]
+      The scheduled workflow's first job (action.yml, mode check; preview, not released). Before Docker,

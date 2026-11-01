@@ -1,0 +1,15 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ✓ |node| tools/records/test/bench-socket.test.ts (5 tests) 30ms
+ ✓ |node| apps/site/test/privacy-hosts.test.ts (6 tests) 5ms
+ ✓ |node| tools/records/test/records.test.ts (14 tests) 29ms
+ ✓ |node| packages/cli/test/action-patch.test.ts (9 tests) 50ms
+ ✓ |node| packages/cli/test/osv-note.test.ts (6 tests) 5ms
+ ✓ |node| packages/cli/test/check.test.ts (37 tests) 432ms
+
+ Test Files  6 passed (6)
+      Tests  77 passed (77)
+   Start at  00:15:49
+   Duration  1.83s (transform 767ms, setup 0ms, import 2.74s, tests 551ms, environment 0ms)
+

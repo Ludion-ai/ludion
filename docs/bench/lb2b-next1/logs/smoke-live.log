@@ -1,0 +1,39 @@
+2026-11-01T00:13:42Z
+== examples/npm-security
+decided	npm	high
+key	due	npm:lodash	-	slot 0 of 12 hours since 2026-11-01T00:00:00.000Z
+exit 0
+== examples/php-security
+decided	php	-
+key	due	php	-	slot 0 of 12 hours since 2026-11-01T00:00:00.000Z
+exit 0
+== examples/node-security
+decided	node	-
+key	due	node	-	slot 0 of 12 hours since 2026-11-01T00:00:00.000Z
+exit 0
+== examples/composer-security
+decided	composer	-
+key	due	composer:symfony/http-foundation	-	a fact the anchor needs could not be read, so it is due
+exit 0
+== examples/maven-security
+undecided	a Maven scan resolves the dependency graph in Docker, which the check does not run; patch runs every time.
+exit 2
+== examples/npm-security --json
+{
+  "schema": 1,
+  "checked_at": "2026-11-01T00:13:52.898Z",
+  "ecosystem": "npm",
+  "outside": [],
+  "decided": true,
+  "urgency": "high",
+  "keys": [
+    {
+      "key": "npm:lodash",
+      "state": "due",
+      "not_before": "2026-04-01T18:18:42.717Z",
+      "anchor": "2026-11-01T00:00:00.000Z",
+      "next_due": null,
+      "why": "slot 0 of 12 hours since 2026-11-01T00:00:00.000Z"
+    }
+  ]
+}

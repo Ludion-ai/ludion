@@ -149,7 +149,7 @@ describe("namesNodeImage reads FROM as BuildKit does, so a hidden one is a check
   });
 });
 
-const LIMIT_DOCKERFILE_MS = 50, LIMIT_LOCK_MS = 1000;
+const LIMIT_DOCKERFILE_MS = 50, LIMIT_LOCK_MS = 1000, LIMIT_LOCK_INPUTS_MS = 4000;
 /**
  * Calls fn under a limit Node's VM enforces, as in time-cap-composer-name.test.ts, so an expression that backtracks fails
  * the test at the limit and does not hang it. A busy machine can pause one try, so it gets three; backtracking fails all
@@ -249,11 +249,21 @@ describe("lockKey: a key's length, and its time", () => {
     ["lockExtraneous, one extraneous key of 4 MiB", oneLongFolder, () => lockExtraneous(oneLongFolder)],
     ["lockEntries, 1,000 extraneous keys of 4,096 characters", manyExtraneous, () => lockEntries(manyExtraneous)],
     ["lockExtraneous, 1,000 extraneous keys of 4,096 characters", manyExtraneous, () => lockExtraneous(manyExtraneous)],
-    ["packageLockInputs, 1,000 extraneous keys of 4,096 characters", manyExtraneous, () => packageLockInputs({ before: manyExtraneous, after: manyExtraneous }, { before: "{}", after: "{}" })],
     ["lockEntries, 1,000 install paths of about 4,096 characters", manyInstalled, () => lockEntries(manyInstalled)],
+    // 1,000 keys under the limit, read 10 times: the old expression took 2.3 s here, and this one 0.1 s.
+    ["lockKey, 10 times over 1,000 extraneous keys of 4,096 characters", manyExtraneous, () => {
+      const keys = Object.keys(readLock(manyExtraneous));
+      for (let round = 0; round < 10; round++) for (const key of keys) lockKey(key, { extraneous: true });
+    }],
   ])("gate-reader-linear: %s", (_name, lock, read) => {
     expect(lock.length).toBeLessThanOrEqual(MIB4);
     answersWithin(LIMIT_LOCK_MS, read);
+  }, 30_000);
+  // Everything the judge reads from a lock change: each lock is parsed and read over and over, so this has its own limit.
+  // The old expression took 9.5 s here and this one 0.6 to 0.7 s, in the same container; GitHub's runner took over 1 s.
+  it("gate-reader-linear: packageLockInputs, 1,000 extraneous keys of 4,096 characters", () => {
+    expect(manyExtraneous.length).toBeLessThanOrEqual(MIB4);
+    answersWithin(LIMIT_LOCK_INPUTS_MS, () => packageLockInputs({ before: manyExtraneous, after: manyExtraneous }, { before: "{}", after: "{}" }));
   }, 30_000);
 });
 

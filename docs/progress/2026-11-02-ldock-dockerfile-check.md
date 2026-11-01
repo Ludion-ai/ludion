@@ -7,7 +7,7 @@
 - packages/cli/src/security/php.ts: `officialImage` reads through `instructions` (BuildKit's order) and `reachesOutside`, in place of the expressions over the whole file. Messages and their order are as before, with one new message for a carriage return, U+2028 or U+2029 inside a line.
 - packages/cli/src/security/node.ts: `namesNodeImage` reads the same whitespace, leaves comments out and joins continuations.
 - packages/cli/src/security/judge.ts: `lockKey` refuses a key over 4,096 characters without repeating it; `LOCK_PATH` is an expression with one way to match any key, and the same answers.
-- packages/cli/test/dockerfile-check.test.ts (new, 122 tests). README.md and docs/status.md are not changed: "offline" in README.md's line 175 and docs/status.md's line 18 now matches what the check holds, and the check only refuses more.
+- packages/cli/test/dockerfile-check.test.ts (new, 123 tests). README.md and docs/status.md are not changed: "offline" in README.md's line 175 and docs/status.md's line 18 now matches what the check holds, and the check only refuses more.
 
 ## Red, then green (Docker, `--network none`, `--memory 4g`, Node 24.22.2)
 
@@ -21,8 +21,8 @@ The same test file on main's php.ts, node.ts and judge.ts, then on this PR's:
 | `dockerfile-check-across-lines` | 4 / 11 | 0 / 11 |
 | `dockerfile-check-from-on-the-next-line` | 1 / 1 | 0 / 1 |
 | `dockerfile-check-names-node` | 6 / 9 | 0 / 9 |
-| `gate-reader-linear` | 12 / 39 | 0 / 39 |
-| the file | 51 / 122 | 0 / 122 |
+| `gate-reader-linear` | 13 / 40 | 0 / 40 |
+| the file | 52 / 123 | 0 / 123 |
 
 A test that passes on the old code is a form it already refused, kept so the new reader cannot lose it; across-lines also fails on the old code where it refused with another message. Forms refused, for each of the two images: 45, plus FROM alone (one test of 3 cases). Of the audit's eight forms, each fails on the old code.
 
@@ -59,7 +59,11 @@ The old-took row by reason: 1,246,289 for a carriage return or separator inside 
 | `lockEntries`, one key of 4,096 characters | 0.92 ms | 0.48 ms |
 | `lockEntries`, one key in a 4 MiB lock | not run | 0.8 ms |
 
-`gate-reader-linear` holds these under limits Node's VM enforces: 50 ms for each of phpImage, nodeImage and namesNodeImage on 32 inputs of up to 64 KiB, and 1 s on a 4 MiB lock. A length limit alone was not enough: `packageLockInputs` on 1,000 extraneous keys of 4,096 characters, each under the limit, went over 1 s in all 3 tries with the old expression, and passes with the new. Measured and not changed: `packageLockInputs` on 1,000 valid install paths of about 4,096 characters (4 MiB), each with one dependency, took 3,971 and 3,867 ms. That the time is in `resolveFrom` is read from the code, not profiled.
+`gate-reader-linear` holds these under limits Node's VM enforces: 50 ms for each of phpImage, nodeImage and namesNodeImage on 32 inputs of up to 64 KiB, 1 s for the readers of a 4 MiB lock, and 4 s for `packageLockInputs`.
+
+A length limit alone was not enough, as 1,000 extraneous keys of 4,096 characters are each under it. In the same container, the old expression against the new: `packageLockInputs` 9,526 and 9,456 ms against 728 and 556 ms; `lockKey` on those keys 10 times over 2,342 and 2,313 ms against 112 and 104 ms; `lockEntries` 471 and 479 ms against 31 and 33 ms. The test first held `packageLockInputs` to 1 s, which GitHub's runner went over in all 3 tries (`Over 1000 ms in each of 3 tries.`) with the new expression. That limit was this lane's own, and that call reads each lock many times over, so it has 4 s now, between the two times, and the lock readers keep 1 s, with `lockKey` added at 1 s because `lockEntries` alone does not tell the two apart.
+
+Measured and not changed: `packageLockInputs` on 1,000 valid install paths of about 4,096 characters (4 MiB), each with one dependency, took 3,971 and 3,867 ms. That the time is in `resolveFrom` is read from the code, not profiled.
 
 ## npm corpus
 

@@ -151,6 +151,9 @@ describe("action/start.sh refuses the scheduled modes outside their place", () =
       [{ MODE: "nope", EVENT: "schedule" }, "mode must be judge, comment, patch, pull-request, check or merged."],
       [{ MODE: "merged", EVENT: "schedule" }, "mode merged runs on pull_request, not schedule."],
       [{ MODE: "merged", EVENT: "pull_request_target" }, "mode merged runs on pull_request, not pull_request_target."],
+      // The merged job holds pull-requests: write, so it too runs only on a fresh GitHub-hosted machine (R252 B1).
+      [{ MODE: "merged", EVENT: "pull_request", RUNNER_ENVIRONMENT: "self-hosted" }, "mode merged runs only on GitHub-hosted runners (a fresh machine per job), not on self-hosted."],
+      [{ MODE: "merged", EVENT: "pull_request" }, "mode merged runs only on GitHub-hosted runners (a fresh machine per job), not on an unknown runner."],
     ] as const) {
       const r = start(env);
       expect(r.status, JSON.stringify(env)).toBe(1);
@@ -159,7 +162,7 @@ describe("action/start.sh refuses the scheduled modes outside their place", () =
     const ok = start({ MODE: "pull-request", EVENT: "workflow_dispatch", REF: "refs/heads/main", DEFAULT_BRANCH: "main", RUNNER_ENVIRONMENT: "github-hosted" });
     expect(ok.stdout + ok.stderr).toBe("");
     expect(ok.status).toBe(0);
-    const merged = start({ MODE: "merged", EVENT: "pull_request" });
+    const merged = start({ MODE: "merged", EVENT: "pull_request", RUNNER_ENVIRONMENT: "github-hosted" });
     expect(merged.stdout + merged.stderr).toBe("");
     expect(merged.status).toBe(0);
   });

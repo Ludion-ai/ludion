@@ -2,7 +2,7 @@
 // (X1, X2), and the PR's found_at is the first run, of an unbroken row of the workflow's runs, whose check saw the fix
 // (X4). GitHub's API and the artifact download are stand-ins; no test reaches the network.
 import { describe, expect, it } from "vitest";
-import { firstSeen, pullRequestBody, recordMerge, type CheckedArtifact, type CheckedFix } from "../src/security/deliver.ts";
+import { firstSeen, pullRequestBody, recordMerge, SEEN_WALK_MS, unzipEntry, type CheckedArtifact, type CheckedFix } from "../src/security/deliver.ts";
 import { seenAt, withRuns, zip, type StandInRun } from "./runs.ts";
 
 const H = 3_600_000;
@@ -74,6 +74,8 @@ describe("the merge of Ludion's PR is recorded on it (X1, X2)", () => {
       [{ base: { ref: "release" } }, "not the default branch"],
       [{ body: BODY.replace("<!-- ludion-fix -->\n", "") }, "Ludion's marker"],
       [{ merged_at: "yesterday" }, "merged_at"],
+      // The form of a time, but no date (R252 N3).
+      [{ merged_at: "2026-13-45T00:00:00Z" }, "merged_at"],
       [{ merge_commit_sha: "nope" }, "merge commit"],
     ] as const) {
       const gh = github(pr(over));
@@ -99,6 +101,17 @@ describe("the merge of Ludion's PR is recorded on it (X1, X2)", () => {
     const gh2 = github(pr({ body: pullRequestBody(ARTIFACT, late) }));
     expect((await merge(gh2)).outcome).toBe("recorded");
     expect(gh2.posted[0]).toMatch(/Found → merged \| not computed: /);
+  });
+  it("a body time that has the form of a time but is no date is recorded as unknown, and the merge is still recorded (R252 N3)", async () => {
+    const body = BODY.replaceAll(`\`${LODASH.found_at}\``, "`2026-13-45T00:00:00Z`");
+    expect(body).toContain("| Found | `2026-13-45T00:00:00Z`");
+    const gh = github(pr({ body }));
+    const r = await merge(gh);
+    expect(r.outcome).toBe("recorded");
+    expect(r.record).toMatchObject({ merged_at: "2026-10-31T09:00:00.000Z", found_at: null, fix_published_at: LODASH.fix_published_at, applied_at: LODASH.applied_at });
+    expect(gh.posted).toHaveLength(1);
+    expect(gh.posted[0]).toContain("| Found | unknown |");
+    expect(gh.posted[0]).toContain("| Found → merged | unknown |");
   });
 });
 
@@ -140,11 +153,37 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
       // A small, valid entry in a zip over 1 MiB, and an entry whose size the central directory misstates.
       { bytes: zip("seen.json", JSON.stringify(seenAt(started(13), OTHER)), { pad: 1024 * 1024 }) },
       { bytes: zip("seen.json", JSON.stringify(seenAt(started(14), OTHER)), { lie: 1 }) },
+      // A deflated zip far under 1 MiB whose valid record, padded with spaces, inflates past 1 MiB (R252 N1).
+      { bytes: zip("seen.json", JSON.stringify(seenAt(started(15), OTHER)) + " ".repeat(1024 * 1024), { deflate: true }) },
       SAW,
     ]);
     const r = await walk(runs);
     expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(1)) + 5 * 60_000), run: 1, ended: false });
     expect(r.read).toBe(2);
+    const padded = runs[14]!.bytes!;
+    expect(padded.length).toBeLessThan(64 * 1024);
+    expect(JSON.parse(String(unzipEntry(padded, "seen.json", 2 * 1024 * 1024))).kind).toBe("ludion-seen");
+  });
+  it("found_at is the earliest record time of the row, not the record of the lowest run id, when an older run was re-run later (R252 N4)", async () => {
+    // Run 1 was re-run after runs 2 and 3: GitHub keeps its id and moves its start, so its record is the latest.
+    const runs: StandInRun[] = [
+      { id: 1, started: started(5), record: seenAt(started(5), SAW) },
+      { id: 2, started: started(2), record: seenAt(started(2), SAW) },
+      { id: 3, started: started(3), record: seenAt(started(3), SAW) },
+    ];
+    const r = await walk(runs);
+    expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(2)) + 5 * 60_000), run: 2, ended: false });
+    expect(r.read).toBe(3);
+  });
+  it("stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7)", async () => {
+    expect(SEEN_WALK_MS).toBe(5 * 60_000);
+    let clock = T0;
+    const ticks: number[] = [];
+    const now = () => { ticks.push(clock); return (clock += 40_000); };
+    const runs = row(Array.from({ length: 130 }, () => SAW));
+    await expect(firstSeen({ repo: "o/r", runId: 130, defaultBranch: "main", ecosystem: "npm", api: "https://api.github.invalid", token: "t0ken", fetchFn: withRuns(nowhere, runs), now }, [LODASH])).rejects.toThrow("the walk took longer than 5 minutes");
+    // It stopped within the first runs, not after reading all 100.
+    expect(ticks.length).toBeLessThan(15);
   });
   it("reads a deflated zip with a data descriptor, as upload-artifact writes it, and asks the redirect without the token", async () => {
     const blobAuth: string[] = [], asked: string[] = [];

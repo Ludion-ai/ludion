@@ -218,6 +218,15 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
     expect(refused.deliveries).toMatchObject([{ outcome: "opened" }]);
     expect(String(gh2.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: earlier runs' records were not read: ");
     expect(String(gh2.opened[0]!.body)).toContain("HTTP 403");
+    // Every record that lists the fix is later than this run's lookup: the lookup stays (R252 N2).
+    const p3 = project(), fix3 = applied(p3.work), gh3 = github(p3.origin);
+    const later: StandInRun[] = [
+      { id: 41, started: "2026-10-30T02:00:00Z", record: seenAt("2026-10-30T02:00:00Z", saw) },
+      { id: 42, started: "2026-10-30T03:00:00Z", record: seenAt("2026-10-30T03:00:00Z", saw) },
+    ];
+    const kept = await open(checkout(p3.origin), artifact(p3.work, fix3.receipt, [`refs/heads/${BRANCH}`], p3.base), p3.base, p3.origin, gh3, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh3.fetchFn, later) });
+    expect(kept.deliveries).toMatchObject([{ outcome: "opened" }]);
+    expect(String(gh3.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup, earlier than the record of every run that lists this fix; `2` records read) |");
   });
   it("does not open a fix again whose PR was closed, nor move a branch that holds another change", async () => {
     const { work, origin, base } = project(), fix = applied(work);

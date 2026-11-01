@@ -42,6 +42,17 @@ A second fresh-context review (PR comment 6554998194) found the fixes above righ
 | mutations, each alone (Q6, Q9 from the review; G1 to G6 for the fixes) | 3ea4bb9 | 8: 8 caught |
 | typecheck, build, `npm test`, tools/records' test | 3ea4bb9 | exit 0, exit 0, 1938 passed, 25 skipped; 14 passed |
 
+## After an audit of GitHub's clocks
+
+An audit reported that on 2026-11-01 GitHub's API gave some stored times (PRs' `created_at`, runs' `run_started_at`) an hour later than the Date header of the same answer, and that this lane compared those times with the runner's clock as one clock. While run times were an hour later, every record would have been passed over in silence (the PR's Found row: "`0` records read"), and a `merged_at` an hour later would have been recorded once as the end. Whether `merged_at` was later too, and why, were not checked here. Now: the walk is not done when GitHub's start of this run is later than the runner's clock or than the Date of its answer; at a run whose times do not agree it stops, and the Found row says at which run and by how many minutes; a `merged_at` later than the Date of its answer or than the job's clock is recorded with `merged_at_doubt`, and no hours end at it; every merge record keeps `recorded_at` and `answer_date`. Detail: docs/bench/lexp/definitions.md, section 7, and docs/bench/lexp/README.md.
+
+| Run | Head | Result |
+|---|---|---|
+| the four files with the new tests, before the fix | 18d940c, and 369d533 with e623489's deliver.ts | 9 failed, 138 passed (147), both |
+| the same, with the fix | 2a6afdd | 147 passed |
+| mutations, each alone (H1 to H15) | 369d533 | 15: 15 caught |
+| typecheck, build, `npm test`, tools/records' test | 369d533 | exit 0, exit 0, 1946 passed, 25 skipped; 14 passed |
+
 ## Not done
 
 - No run on GitHub (no release commit). Whether GitHub starts the merged job when a person merges a PR opened with the workflow's token is not tested.

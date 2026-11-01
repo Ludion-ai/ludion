@@ -43,9 +43,12 @@ const SOCKET = /docker\.sock|docker_engine|DOCKER_HOST|(?:-v|--volume)(?:\s+|=)[
 // An option is `-[\w-]+` (which takes `--x` too), so each option matches only one way.
 const STARTS_CONTAINER = /(?<![\w./-])docker(?:\s+-[\w-]+(?:=\S+)?)*\s+(?:run|create|build|buildx|compose)(?![\w-])/;
 
-/** Shell assignments in a text: `NAME=value`, `NAME="value"`, `NAME=(a bash array)`, `export NAME=value`. */
+/**
+ * Shell assignments in a text: `NAME=value`, `NAME="value"`, `NAME=$(command)`, `NAME=(a bash array)` (which may hold
+ * `$(…)`), `NAME+=(…)`, `NAME[1]=value`, `export NAME=value`.
+ */
 function* assignments(text: string): Generator<{ name: string; value: string; exported: boolean }> {
-  for (const m of text.matchAll(/(?:^|[\s;&|(`])(export\s+)?([A-Za-z_]\w*)=("[^"]*"|'[^']*'|\([^)]*\)|[^\s;&|)`]*)/gm)) yield { name: m[2] ?? "", value: (m[3] ?? "").replace(/^["'(]|["')]$/g, ""), exported: !!m[1] };
+  for (const m of text.matchAll(/(?:^|[\s;&|(`])(export\s+)?([A-Za-z_]\w*)(?:\[[^\]]*\])?\+?=("[^"]*"|'[^']*'|\((?:[^()]|\$\([^)]*\))*\)|\$\([^)]*\)|[^\s;&|)`]*)/gm)) yield { name: m[2] ?? "", value: (m[3] ?? "").replace(/^["'(]|["')]$/g, ""), exported: !!m[1] };
 }
 
 /** A folder the socket is in, as a variable's whole value (`SOCK_DIR=/var/run`). */
@@ -69,11 +72,14 @@ const isSocket = (text: string, vars: Set<string>) => SOCKET.test(text) || usesV
 const program = (names: string) => `(?<![\\w.-])(?:[\\w.~-]*\\/)*(?:${names})(?:\\.cmd|\\.exe)?(?![\\w.-])`;
 const RUNNERS = "npx|bunx|pnpx|pnpm|yarn|npm|bun";
 /**
- * npm's commands that install packages and so run their install scripts, with every alias and typo npm accepts: in npm
- * 11.19.1, the commands whose options include ignore-scripts, except those that run only the project's own scripts (run,
- * test, start, stop, restart, pack, publish, version) and find-dupes, a dry run. `npm audit fix` is matched apart.
+ * npm's commands that change node_modules and so can run install scripts, with every alias and typo npm accepts: in npm
+ * 11.19.1, the commands in lib/commands/ that call Arborist's reify, dedupe, prune or rebuild (ci, install, link,
+ * uninstall, update, dedupe, prune, rebuild, and install-test and install-ci-test through install and ci), and audit with
+ * fix (`npm audit fix`, matched apart). uninstall has no ignore-scripts option but reifies, so it runs the other packages'
+ * install scripts too. Commands that run only the project's own scripts (run, test, start, stop, restart, pack, publish,
+ * version) are not in this list.
  */
-const INSTALLS = "ci|clean-install|ic|install-clean|isntall-clean|install|i|in|ins|inst|insta|instal|isnt|isnta|isntal|isntall|add|install-test|it|install-ci-test|cit|clean-install-test|sit|rebuild|rb|update|u|up|upgrade|udpate|dedupe|ddp|link|ln|prune";
+const INSTALLS = "ci|clean-install|ic|install-clean|isntall-clean|install|i|in|ins|inst|insta|instal|isnt|isnta|isntal|isntall|add|install-test|it|install-ci-test|cit|clean-install-test|sit|rebuild|rb|update|u|up|upgrade|udpate|dedupe|ddp|link|ln|prune|uninstall|unlink|remove|rm|r|un";
 const INSTALL = new RegExp(`${program("npm")}(?:\\s+\\S+)*?\\s+(${INSTALLS}|audit(?:\\s+\\S+)*?\\s+fix)(?![\\w-])`);
 const RUNNER = new RegExp([
   program("npx|bunx|pnpx|pnpm|yarn"),
@@ -116,12 +122,15 @@ function shellForbidden(text: string, tools: Map<string, string>): string[] {
   // A variable's default (`${NPM:-npm}`) and a variable holding a package manager (`$NPM`) are read as the name they give.
   let t = text.replace(/\$\{\w+:?[-=]([^}]*)\}/g, "$1");
   for (const [name, tool] of tools) t = t.replace(new RegExp(`\\$\\{${name}\\}|\\$${name}(?!\\w)`, "g"), tool);
-  for (const seg of t.split(/;|&&|\|\||\||\$\(|`/)) {
+  // A newline ends a command too (a string written to a shell's input: `"echo start\nnpm ci\n"`).
+  for (const seg of t.split(/;|&&|\|\||\||\$\(|`|\n/)) {
     // Quotes do not change a command's words (`npm "ci"`, `sh -c "npm ci"`).
     const s = seg.replace(/["']/g, "").trim();
     if (/^(?:echo|printf|:)(?:\s|$)/.test(s)) continue;
     const install = INSTALL.exec(s);
-    if (install && scriptsOn(s.split(/\s+/))) out.push(`npm ${install[1]} with install scripts`);
+    // npm reads no flags after `--` (`npm ci -- --ignore-scripts` runs the scripts).
+    const words = s.split(/\s+/), at = words.findIndex(w => /(?:^|\/)npm(?:\.cmd|\.exe)?$/.test(w)), end = words.indexOf("--", at + 1);
+    if (install && scriptsOn(end >= 0 ? words.slice(0, end) : words)) out.push(`npm ${install[1]} with install scripts`);
     const runner = RUNNER.exec(s);
     if (runner) out.push(runner[0].replace(/\s+/g, " "));
   }
@@ -129,8 +138,8 @@ function shellForbidden(text: string, tools: Map<string, string>): string[] {
 }
 
 /** The string literals in a line of JavaScript, each with the text before it. */
-function* strings(text: string): Generator<{ value: string; before: string }> {
-  for (const m of text.matchAll(/"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g)) yield { value: (m[1] ?? m[2] ?? m[3] ?? "").replace(/\\(.)/g, (_, c: string) => c === "n" ? "\n" : c === "t" ? "\t" : c), before: text.slice(0, m.index) };
+function* strings(text: string): Generator<{ value: string; before: string; template: boolean }> {
+  for (const m of text.matchAll(/"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g)) yield { value: (m[1] ?? m[2] ?? m[3] ?? "").replace(/\\(.)/g, (_, c: string) => c === "n" ? "\n" : c === "t" ? "\t" : c), before: text.slice(0, m.index), template: m[3] !== undefined };
 }
 
 /** The commands in a line that would run dependency code: an npm install with its scripts on, or a package runner. */
@@ -140,7 +149,12 @@ function forbidden(path: string, text: string, tools: Map<string, string>): stri
   // A command in a string (`execSync("npm ci")`, `spawnSync("sh", ["-c", "npx tsx"])`), except one only printed.
   // Only console output, the process's own stdout and stderr, and an Error's message count as printed: a shell's stdin
   // (`sh.stdin.write("npm ci\n")`) or a helper whose name ends in log (`runAndlog("npm ci")`) can run it.
-  for (const s of strings(text)) if (!/(?:\bconsole\.\w+|\bprocess\.std(?:out|err)\.write|\bError)\(\s*$/.test(s.before)) out.push(...shellForbidden(s.value, new Map()));
+  for (const s of strings(text)) {
+    if (!/(?:\bconsole\.\w+|\bprocess\.std(?:out|err)\.write|\bError)\(\s*$/.test(s.before)) out.push(...shellForbidden(s.value, new Map()));
+    // A template string's `${…}` parts are code that runs, even when the template is only printed
+    // (`console.log(`out: ${execSync("npm ci")}`)`).
+    if (s.template) for (const e of s.value.matchAll(/\$\{([^}]*)\}/g)) out.push(...forbidden(path, e[1] ?? "", tools));
+  }
   // A program and its argument list (`execFileSync("npm", ["ci", "--no-audit"])`), read as one command.
   for (const m of text.matchAll(new RegExp(`(["'\`])((?:[\\w.~-]*/)*(?:${RUNNERS}))\\1\\s*,\\s*\\[([^\\]]*)\\]`, "g"))) out.push(...shellForbidden([m[2] ?? "", ...[...strings(m[3] ?? "")].map(s => s.value)].join(" "), new Map()));
   for (const m of text.matchAll(/["'`](npx|pnpm|yarn|bunx|pnpx)["'`]/g)) out.push(m[1] ?? "");
@@ -385,6 +399,7 @@ describe("bench-socket recall", () => {
     ["P7 npm in a variable", e2e("NPM=npm; $NPM ci"), AT_E2E],
     ["P7 a path in a variable", e2e("NPM=/usr/bin/npm\n\"${NPM}\" clean-install"), `${D}/e2e.sh:3`],
     ["P7 a variable's default", e2e("${NPM:-npm} ci"), AT_E2E],
+    ["P7 npm from command -v", e2e("NPM=$(command -v npm)\n\"$NPM\" ci"), `${D}/e2e.sh:3`],
     ["P8 npm \"ci\"", e2e("npm \"ci\""), AT_E2E],
     ["P8 \"npm\" ci", e2e("\"npm\" ci"), AT_E2E],
     ["P8 'npm' 'install'", e2e("'npm' 'install'"), AT_E2E],

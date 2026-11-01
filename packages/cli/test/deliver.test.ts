@@ -205,9 +205,9 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
       { id: 42, started: "2026-10-30T00:55:00Z", record: seenAt("2026-10-30T00:55:00Z", saw) },
     ];
     const gh = github(origin), asked: string[] = [];
-    const first = await open(checkout(origin), out, base, origin, gh, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh.fetchFn, runs, { asked }) });
+    const first = await open(checkout(origin), out, base, origin, gh, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh.fetchFn, runs, { asked }), now: () => Date.parse("2026-10-30T01:10:00Z") });
     expect(first.deliveries).toMatchObject([{ outcome: "opened" }]);
-    expect(String(gh.opened[0]!.body)).toContain("| Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `3` records read) |");
+    expect(String(gh.opened[0]!.body)).toContain("| Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, which GitHub says started at `2026-10-29T00:00:00.000Z`, the first of an unbroken row of this workflow's runs whose record lists this fix; `3` records read; this run: GitHub's start `2026-10-30T00:55:00.000Z`, GitHub's answer had no Date header that is a date, this runner's clock `2026-10-30T01:10:00.000Z`) |");
     // The next run: the PR exists, so the runs are not read again.
     asked.length = 0;
     expect((await open(checkout(origin), out, base, origin, gh, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh.fetchFn, runs, { asked }) })).deliveries).toMatchObject([{ outcome: "open_pr_exists" }]);
@@ -224,9 +224,9 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
       { id: 41, started: "2026-10-30T02:00:00Z", record: seenAt("2026-10-30T02:00:00Z", saw) },
       { id: 42, started: "2026-10-30T03:00:00Z", record: seenAt("2026-10-30T03:00:00Z", saw) },
     ];
-    const kept = await open(checkout(p3.origin), artifact(p3.work, fix3.receipt, [`refs/heads/${BRANCH}`], p3.base), p3.base, p3.origin, gh3, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh3.fetchFn, later) });
+    const kept = await open(checkout(p3.origin), artifact(p3.work, fix3.receipt, [`refs/heads/${BRANCH}`], p3.base), p3.base, p3.origin, gh3, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh3.fetchFn, later), now: () => Date.parse("2026-10-30T03:10:00Z") });
     expect(kept.deliveries).toMatchObject([{ outcome: "opened" }]);
-    expect(String(gh3.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup, earlier than the record of every run that lists this fix; `2` records read) |");
+    expect(String(gh3.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup, earlier than the record of every run that lists this fix; `2` records read; this run: GitHub's start `2026-10-30T03:00:00.000Z`, GitHub's answer had no Date header that is a date, this runner's clock `2026-10-30T03:10:00.000Z`) |");
   });
   it("says in the Found row, and does not stay silent, when GitHub's times and the runner's do not agree (X7)", async () => {
     const saw = [{ key: "npm:lodash", advisories: ["CVE-2021-23337"] }];
@@ -241,6 +241,7 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
     expect(r.deliveries).toMatchObject([{ outcome: "opened" }]);
     const body = String(gh.opened[0]!.body);
     expect(body).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: earlier runs' records were not used: GitHub's start of this run is 60.0 minutes later than this runner's clock");
+    expect(body).toContain("GitHub's start 2026-10-30T01:55:00.000Z, this runner's clock 2026-10-30T00:55:00.000Z.) |");
     expect(body).not.toContain("no record of this workflow's runs lists this fix");
     // This run's times agree, and an earlier run's do not: the walk stops there and says so.
     const earlier: StandInRun[] = [
@@ -250,7 +251,7 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
     ];
     const p2 = project(), fix2 = applied(p2.work), gh2 = github(p2.origin);
     await open(checkout(p2.origin), artifact(p2.work, fix2.receipt, [`refs/heads/${BRANCH}`], p2.base), p2.base, p2.origin, gh2, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh2.fetchFn, earlier), now: () => Date.parse("2026-10-30T01:10:00Z") });
-    expect(String(gh2.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (the check of run `42`, the first of an unbroken row of this workflow's runs whose record lists this fix; `1` records read; the records read end there, so an earlier run may have seen it first; the walk stopped at run `41`, whose times do not agree: its record's time is `60.0` minutes before GitHub's start of that run, so the runs before it were not read) |");
+    expect(String(gh2.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (the check of run `42`, which GitHub says started at `2026-10-30T00:55:00.000Z`, the first of an unbroken row of this workflow's runs whose record lists this fix; `1` records read; the records read end there, so an earlier run may have seen it first; the walk stopped at run `41`, whose times do not agree: its record's time `2026-10-29T00:00:00.000Z` is `60.0` minutes before GitHub's start of that run `2026-10-29T01:00:00.000Z`, so the runs before it were not read; this run: GitHub's start `2026-10-30T00:55:00.000Z`, GitHub's answer had no Date header that is a date, this runner's clock `2026-10-30T01:10:00.000Z`) |");
   });
   it("does not open a fix again whose PR was closed, nor move a branch that holds another change", async () => {
     const { work, origin, base } = project(), fix = applied(work);

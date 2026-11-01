@@ -184,7 +184,7 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
 
   it("the earliest run of the row that lists the fix; a run whose valid record does not list it ends the row", async () => {
     const r = await walk(row([SAW, OTHER, SAW, SAW, SAW]));
-    expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(3)) + 5 * 60_000), run: 3, ended: true });
+    expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(3)) + 5 * 60_000), run: 3, started: started(3), ended: true });
     expect(r.read).toBe(4);
   });
   it("a run with no record, an expired one, a failed list or an invalid one is passed over, and the row goes on", async () => {
@@ -213,7 +213,7 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
       SAW,
     ]);
     const r = await walk(runs);
-    expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(1)) + 5 * 60_000), run: 1, ended: false });
+    expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(1)) + 5 * 60_000), run: 1, started: started(1), ended: false });
     expect(r.read).toBe(2);
     const padded = runs[14]!.bytes!;
     expect(padded.length).toBeLessThan(64 * 1024);
@@ -227,7 +227,7 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
       { id: 3, started: started(3), record: seenAt(started(3), SAW) },
     ];
     const r = await walk(runs);
-    expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(2)) + 5 * 60_000), run: 2, ended: false });
+    expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(2)) + 5 * 60_000), run: 2, started: started(2), ended: false });
     expect(r.read).toBe(3);
   });
   it("stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7)", async () => {
@@ -271,14 +271,14 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
   it("another advisory of the same package, or another package, does not match; no record lists it: null", async () => {
     // An earlier run saw lodash with another advisory only: it does not list this fix, so it ends the row.
     const other = await walk(row([[{ key: "npm:lodash", advisories: ["GHSA-29mw-wpgm-hmr9"] }], SAW]));
-    expect(other.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(2)) + 5 * 60_000), run: 2, ended: true });
+    expect(other.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(2)) + 5 * 60_000), run: 2, started: started(2), ended: true });
     expect((await walk(row([SAW, OTHER]))).seen.get(LODASH.branch)).toBeNull();
   });
   it("keeps the limit of runs, and does not read runs of another event or branch, or later than this run", async () => {
     const many = row(Array.from({ length: 130 }, () => SAW));
     const capped = await walk(many);
     expect(capped.read).toBe(100);
-    expect(capped.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(31)) + 5 * 60_000), run: 31, ended: false });
+    expect(capped.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(31)) + 5 * 60_000), run: 31, started: started(31), ended: false });
     // A limit below one page of 100 runs.
     const ten = await walk(many, [LODASH], { limit: 10 });
     expect(ten.read).toBe(10);
@@ -326,6 +326,8 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
     // GitHub's run times an hour later than the PR job's clock: this run seems to start after the job that runs in it.
     const runs = row([SAW, SAW]);
     await expect(walk(runs, [LODASH], { now: Date.parse(started(2)) - H })).rejects.toThrow("GitHub's start of this run is 60.0 minutes later than this runner's clock");
+    // Both clocks' times are kept, not only the difference (definitions.md, section 8).
+    await expect(walk(runs, [LODASH], { now: Date.parse(started(2)) - H })).rejects.toThrow(`GitHub's start ${started(2)}, this runner's clock ${iso(Date.parse(started(2)) - H)}.`);
     // A second after it, the walk is done.
     expect((await walk(runs, [LODASH], { now: Date.parse(started(2)) + 1000 })).seen.get(LODASH.branch)).toMatchObject({ run: 1 });
   });
@@ -333,8 +335,9 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
     const runs = row([SAW, SAW]);
     await expect(walk(runs, [LODASH], { date: http(Date.parse(started(2)) - 51 * 60_000) })).rejects.toThrow("GitHub's start of this run is 51.0 minutes later than the Date of GitHub's answer that gives it");
     await expect(walk(runs, [LODASH], { date: http(Date.parse(started(2)) - 1000) })).rejects.toThrow("GitHub's start of this run is 1 second later than the Date");
+    await expect(walk(runs, [LODASH], { date: http(Date.parse(started(2)) - 51 * 60_000) })).rejects.toThrow(`GitHub's start ${started(2)}, that Date ${iso(Date.parse(started(2)) - 51 * 60_000)}, this runner's clock ${iso(LATER)}.`);
     // The same second as the Date: this run's start is not later, but its artifact, uploaded 10 minutes into it, is.
-    expect((await walk(runs, [LODASH], { date: http(Date.parse(started(2))) })).stopped).toEqual({ run: 2, kind: "ahead", ms: 10 * 60_000, branches: [LODASH.branch] });
+    expect((await walk(runs, [LODASH], { date: http(Date.parse(started(2))) })).stopped).toEqual({ run: 2, kind: "ahead", ms: 10 * 60_000, github: iso(Date.parse(started(2)) + 10 * 60_000), other: started(2), branches: [LODASH.branch] });
     // An answer dated later, or a Date that is no date (not compared): the walk is done.
     for (const date of [http(Date.parse(started(2)) + H), "yesterday"]) {
       expect((await walk(runs, [LODASH], { date })).seen.get(LODASH.branch), date).toMatchObject({ run: 1 });
@@ -344,14 +347,14 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
     // Run 2's start, as GitHub gives it, is an hour after its record's time: GitHub's clock and the runner's differ there.
     const early = row([SAW, { started: iso(Date.parse(started(2)) + H), record: { ...seenAt(started(2), SAW), checked_at: iso(Date.parse(started(2))) } }, SAW]);
     const r = await walk(early);
-    expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(3)) + 5 * 60_000), run: 3, ended: false });
+    expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(3)) + 5 * 60_000), run: 3, started: started(3), ended: false });
     expect(r.read).toBe(1);
-    expect(r.stopped).toEqual({ run: 2, kind: "early", ms: H, branches: [LODASH.branch] });
+    expect(r.stopped).toEqual({ run: 2, kind: "early", ms: H, github: iso(Date.parse(started(2)) + H), other: started(2), branches: [LODASH.branch] });
     // Run 2's record is an hour after GitHub's upload time of its artifact.
     const late = row([SAW, { record: { ...seenAt(started(2), OTHER), checked_at: iso(Date.parse(started(2)) + 10 * 60_000 + H) } }, SAW]);
     const l = await walk(late);
-    expect(l.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(3)) + 5 * 60_000), run: 3, ended: false });
-    expect(l.stopped).toEqual({ run: 2, kind: "late", ms: H, branches: [LODASH.branch] });
+    expect(l.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(3)) + 5 * 60_000), run: 3, started: started(3), ended: false });
+    expect(l.stopped).toEqual({ run: 2, kind: "late", ms: H, github: iso(Date.parse(started(2)) + 10 * 60_000), other: iso(Date.parse(started(2)) + 10 * 60_000 + H), branches: [LODASH.branch] });
     // No record of the row lists the fix before the stop: still said.
     const none = await walk(row([SAW, { started: iso(Date.parse(started(2)) + H), record: { ...seenAt(started(2), SAW), checked_at: iso(Date.parse(started(2))) } }, null]));
     expect(none.seen.get(LODASH.branch)).toBeNull();
@@ -363,28 +366,35 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
     const artifact = row([SAW, { record: seenAt(started(2), SAW), created: iso(date + 51 * 60_000) }, SAW]);
     const a = await walk(artifact, [LODASH], { date: http(date) });
     expect(a.seen.get(LODASH.branch)).toMatchObject({ run: 3, ended: false });
-    expect(a.stopped).toEqual({ run: 2, kind: "ahead", ms: 51 * 60_000, branches: [LODASH.branch] });
+    expect(a.stopped).toEqual({ run: 2, kind: "ahead", ms: 51 * 60_000, github: iso(date + 51 * 60_000), other: iso(date), branches: [LODASH.branch] });
     // Run 2's start is 51 minutes after the Date of the list that gives it (and its record lies inside its run).
     const start = row([SAW, { started: iso(date + 51 * 60_000), record: seenAt(iso(date + 51 * 60_000), SAW) }, SAW]);
     const s = await walk(start, [LODASH], { date: http(date) });
-    expect(s.stopped).toEqual({ run: 2, kind: "ahead", ms: 51 * 60_000, branches: [LODASH.branch] });
+    expect(s.stopped).toEqual({ run: 2, kind: "ahead", ms: 51 * 60_000, github: iso(date + 51 * 60_000), other: iso(date), branches: [LODASH.branch] });
     // Without a Date header the same run is read.
     expect((await walk(artifact)).stopped).toBeNull();
   });
   it("a row that has ended before such a run is not stopped by it, and times that agree stop nothing (X7)", async () => {
     const shifted = { started: iso(Date.parse(started(2)) + H), record: { ...seenAt(started(2), SAW), checked_at: iso(Date.parse(started(2))) } };
     const ended = await walk(row([SAW, shifted, OTHER, SAW]));
-    expect(ended.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(4)) + 5 * 60_000), run: 4, ended: true });
+    expect(ended.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(4)) + 5 * 60_000), run: 4, started: started(4), ended: true });
     expect(ended.stopped).toBeNull();
     // Two fixes: lodash's row ends at run 3, minimist's is still open when the walk stops at run 2, so only it says so.
     const MINIMIST: CheckedFix = { ...LODASH, package: "minimist", branch: "ludion/npm/minimist-1.2.6", changes: [{ name: "minimist", from: "1.2.5", to: "1.2.6", advisories: ["GHSA-xvch-5gv4-984h"] }] };
     const two = await walk(row([SAW, shifted, OTHER, [...SAW, ...OTHER]]), [LODASH, MINIMIST]);
     expect(two.seen.get(LODASH.branch)).toMatchObject({ run: 4, ended: true });
     expect(two.seen.get(MINIMIST.branch)).toMatchObject({ run: 3, ended: false });
-    expect(two.stopped).toEqual({ run: 2, kind: "early", ms: H, branches: [MINIMIST.branch] });
+    expect(two.stopped).toEqual({ run: 2, kind: "early", ms: H, github: iso(Date.parse(started(2)) + H), other: started(2), branches: [MINIMIST.branch] });
     const fine = await walk(row([SAW, SAW, SAW]), [LODASH], { date: http(LATER) });
     expect(fine.stopped).toBeNull();
-    expect(fine.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(1)) + 5 * 60_000), run: 1, ended: false });
+    expect(fine.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(1)) + 5 * 60_000), run: 1, started: started(1), ended: false });
+  });
+  it("gives this run's times by GitHub and by the runner, with the Date of the answer or none, when they agree and when an earlier run's do not (section 8)", async () => {
+    const shifted = { started: iso(Date.parse(started(2)) + H), record: { ...seenAt(started(2), SAW), checked_at: iso(Date.parse(started(2))) } };
+    for (const runs of [row([SAW, SAW, SAW]), row([SAW, shifted, SAW])]) {
+      expect((await walk(runs)).clock).toEqual({ run_started_at: started(3), answer_date: null, runner: iso(LATER) });
+      expect((await walk(runs, [LODASH], { date: http(LATER) })).clock).toEqual({ run_started_at: started(3), answer_date: iso(LATER), runner: iso(LATER) });
+    }
   });
 });
 
@@ -401,14 +411,26 @@ describe("the PR body's Found row (X4, X5)", () => {
     expect(failed).not.toContain("| `x`");
   });
   it("says where the walk stopped at a run whose times do not agree, which times and by how much (X7)", () => {
-    const stop = (kind: "early" | "late" | "ahead", ms: number) => ({ run: 40, kind, ms });
+    const stop = (kind: "early" | "late" | "ahead", ms: number) => ({ run: 40, kind, ms, github: "2026-10-28T09:00:00.000Z", other: "2026-10-28T08:00:00.000Z" });
     const found = pullRequestBody(ARTIFACT, { ...LODASH, found_at: "2026-10-29T00:05:00.000Z", seen: { at: "2026-10-29T00:05:00.000Z", run: 41, read: 1, ended: false, stop: stop("early", H) } });
-    expect(found).toContain("| Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `1` records read; the records read end there, so an earlier run may have seen it first; the walk stopped at run `40`, whose times do not agree: its record's time is `60.0` minutes before GitHub's start of that run, so the runs before it were not read) |");
+    expect(found).toContain("| Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `1` records read; the records read end there, so an earlier run may have seen it first; the walk stopped at run `40`, whose times do not agree: its record's time `2026-10-28T08:00:00.000Z` is `60.0` minutes before GitHub's start of that run `2026-10-28T09:00:00.000Z`, so the runs before it were not read) |");
     const none = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 0, ended: false, stop: stop("late", 90_000) } });
-    expect(none).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: no record read lists this fix; `0` records read; the walk stopped at run `40`, whose times do not agree: its record's time is `1.5` minutes after GitHub's upload time of its record, so the runs before it were not read) |");
+    expect(none).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: no record read lists this fix; `0` records read; the walk stopped at run `40`, whose times do not agree: its record's time `2026-10-28T08:00:00.000Z` is `1.5` minutes after GitHub's upload time of its record `2026-10-28T09:00:00.000Z`, so the runs before it were not read) |");
     const earlier = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 2, ended: false, earlier: true, stop: stop("ahead", 51 * 60_000) } });
-    expect(earlier).toContain("(this run's lookup, earlier than the record of every run that lists this fix; `2` records read; the walk stopped at run `40`, whose times do not agree: GitHub's time for that run is `51.0` minutes later than the Date of GitHub's answer that gives it, so the runs before it were not read) |");
+    expect(earlier).toContain("(this run's lookup, earlier than the record of every run that lists this fix; `2` records read; the walk stopped at run `40`, whose times do not agree: GitHub's time for that run `2026-10-28T09:00:00.000Z` is `51.0` minutes later than the Date `2026-10-28T08:00:00.000Z` of GitHub's answer that gives it, so the runs before it were not read) |");
     const seconds = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 0, ended: false, stop: stop("ahead", 1000) } });
-    expect(seconds).toContain("GitHub's time for that run is `1` second later than the Date");
+    expect(seconds).toContain("GitHub's time for that run `2026-10-28T09:00:00.000Z` is `1` second later than the Date");
+  });
+  it("keeps GitHub's time and the runner's: the run that saw the fix, and this run, whatever the row says (section 8)", () => {
+    const clock = { run_started_at: "2026-10-30T00:55:00.000Z", answer_date: "2026-10-30T01:09:58.000Z", runner: "2026-10-30T01:10:00.000Z" };
+    const THIS = "this run: GitHub's start `2026-10-30T00:55:00.000Z`, the Date of GitHub's answer `2026-10-30T01:09:58.000Z`, this runner's clock `2026-10-30T01:10:00.000Z`";
+    const seen = pullRequestBody(ARTIFACT, { ...LODASH, found_at: "2026-10-29T00:05:00.000Z", seen: { at: "2026-10-29T00:05:00.000Z", run: 41, started: "2026-10-29T00:00:00.000Z", read: 7, ended: true, clock } });
+    expect(seen).toContain(`| Found | \`2026-10-29T00:05:00.000Z\` (the check of run \`41\`, which GitHub says started at \`2026-10-29T00:00:00.000Z\`, the first of an unbroken row of this workflow's runs whose record lists this fix; \`7\` records read; ${THIS}) |`);
+    const none = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 3, ended: true, clock } });
+    expect(none).toContain(`| Found | \`2026-10-30T01:00:00.000Z\` (this run's lookup: no record of this workflow's runs lists this fix; \`3\` records read; ${THIS}) |`);
+    const earlier = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 2, ended: true, earlier: true, clock } });
+    expect(earlier).toContain(`(this run's lookup, earlier than the record of every run that lists this fix; \`2\` records read; ${THIS}) |`);
+    const undated = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 3, ended: true, clock: { ...clock, answer_date: null } } });
+    expect(undated).toContain("this run: GitHub's start `2026-10-30T00:55:00.000Z`, GitHub's answer had no Date header that is a date, this runner's clock `2026-10-30T01:10:00.000Z`) |");
   });
 });

@@ -3,8 +3,8 @@
 // whose wait cannot have ended (t*, a lower bound of the judge's wait_until) waits, and a fix that is not new is due only
 // in the 12-hour slots that double from the last time anything about it changed. It reads no earlier run's record. A
 // fact it cannot read never quiets a fix: the wait falls to the table's shortest and the fix is due.
-import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import semver from "semver";
 import { detectEcosystems, textFile, type Ecosystem } from "./inventory.ts";
@@ -36,6 +36,11 @@ export type CheckKey = {
   /** quiet: the start of the next slot in which it is due. */
   next_due: string | null;
   why: string;
+  /** A dependency key: the advisory IDs of its findings, for the record of what this run saw (seenRecord). */
+  advisories?: string[];
+  /** An image key: the newer security releases the scan lists, and the candidate version. */
+  releases?: string[];
+  candidate?: string;
 };
 export type CheckAnswer = { schema: 1; checked_at: string; ecosystem: string | null; outside: string[] } &
   ({ decided: true; urgency: Urgency | "unknown" | null; keys: CheckKey[] } | { decided: false; reason: string });
@@ -145,7 +150,8 @@ export async function checkProject(dir: string, deps: Deps = {}): Promise<CheckA
     if (result.wait_until !== undefined && until === null) return undecided("the image check's wait_until is not a time.");
     // The end of each newer security release's day, and of the candidate's day when the scan gives its wait (wait_until − 72h).
     const times = [changedAt, ...result.security_releases.map(r => dayEnd(r.date)), ...(until === null ? [] : [until - 72 * HOUR])];
-    return { ...head, ecosystem, outside, decided: true, urgency: null, keys: [decide(ecosystem, until, times, now, result.status === "wait" ? "a move with no newer security release" : "")] };
+    const key = decide(ecosystem, until, times, now, result.status === "wait" ? "a move with no newer security release" : "");
+    return { ...head, ecosystem, outside, decided: true, urgency: null, keys: [{ ...key, releases: result.security_releases.map(r => r.version), candidate: result.candidate.version }] };
   }
 
   const result = check.result as DependencyScan;
@@ -182,7 +188,7 @@ export async function checkProject(dir: string, deps: Deps = {}): Promise<CheckA
     }
     const newest = releases ? (ecosystem === "npm" ? time(releases.modified) : Math.max(...[...releases.published.values()].map(t => time(t) ?? NaN))) : null;
     const times = [changedAt, ...own.map(f => records.get(f.advisory.id)?.modified ?? null), newest !== null && Number.isFinite(newest) ? newest : null];
-    keys.push(decide(`${ecosystem}:${clean(name)}`, notBefore, times, now, why));
+    keys.push({ ...decide(`${ecosystem}:${clean(name)}`, notBefore, times, now, why), advisories: [...new Set(own.map(f => f.advisory.id))].sort() });
   }
   return { ...head, ecosystem, outside, decided: true, urgency, keys };
 }
@@ -198,10 +204,29 @@ export function checkLines(answer: CheckAnswer): string[] {
   ];
 }
 
-/** `ludion check [--dir <path>] [--changed-at <time>] [--keys-only] [--json]`. Exit 0 with an answer, 2 when undecided. */
+/**
+ * What this run saw, for a later PR job's found_at (docs/bench/lexp/definitions.md, section 3): per key, the advisory
+ * IDs of its findings, or an image's newer security releases and candidate. Null when the check did not decide, or when
+ * the commit is not a full SHA. It is written after the answer and never read by the check.
+ */
+export function seenRecord(answer: CheckAnswer, commit: string | null) {
+  if (!answer.decided || (commit !== null && !/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(commit))) return null;
+  return {
+    schema: 1 as const, kind: "ludion-seen" as const, checked_at: answer.checked_at, commit, ecosystem: answer.ecosystem,
+    keys: answer.keys.map(k => k.releases ? { key: k.key, releases: k.releases, candidate: k.candidate } : { key: k.key, advisories: k.advisories ?? [] }),
+  };
+}
+
+/** `ludion check [--dir <path>] [--changed-at <time>] [--keys-only] [--seen <file> --commit <sha>] [--json]`. Exit 0 with an answer, 2 when undecided. */
 export async function checkCli(args: string[]): Promise<number> {
-  const { values } = parseArgs({ args, options: { dir: { type: "string", default: "." }, "changed-at": { type: "string" }, "keys-only": { type: "boolean" }, json: { type: "boolean" } } });
+  const { values } = parseArgs({ args, options: { dir: { type: "string", default: "." }, "changed-at": { type: "string" }, "keys-only": { type: "boolean" }, seen: { type: "string" }, commit: { type: "string" }, json: { type: "boolean" } } });
   const answer = await checkProject(values.dir!, { changedAt: values["changed-at"] ?? null, keysOnly: !!values["keys-only"] });
   console.log(values.json ? JSON.stringify(answer, null, 2) : checkLines(answer).join("\n"));
+  // The record never changes the answer: a record that cannot be written is said on stderr, and the exit code stays.
+  const record = values.seen && !values["keys-only"] ? seenRecord(answer, values.commit ?? null) : null;
+  if (record) {
+    try { mkdirSync(dirname(values.seen!), { recursive: true }); writeFileSync(values.seen!, `${JSON.stringify(record)}\n`); }
+    catch (error) { console.error(`The record of what this run saw was not written: ${message(error)}`); }
+  }
   return answer.decided ? 0 : 2;
 }

@@ -51,7 +51,7 @@ export function withRuns(fetchFn: typeof fetch, runs: StandInRun[], options: { r
       options.blobAuth?.push(new Headers(init?.headers).get("authorization") ?? "");
       const run = runs.find(r => artifactId(r) === Number(url.pathname.split("/").pop()));
       if (!run) return new Response("missing", { status: 404 });
-      return new Response(run.bytes ?? zip("seen.json", JSON.stringify(run.record)), { status: 200 });
+      return new Response(new Uint8Array(run.bytes ?? zip("seen.json", JSON.stringify(run.record))), { status: 200 });
     }
     const path = url.pathname, prefix = `/repos/${repo}/actions/`;
     if (!path.startsWith(prefix)) return fetchFn(input, init);

@@ -4,6 +4,7 @@ import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wr
 import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
 import { isDeepStrictEqual, parseArgs } from "node:util";
+import { inflateRawSync } from "node:zlib";
 import { publicArchiveUrl } from "./acquisition.ts";
 import { fixBranchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
@@ -74,7 +75,18 @@ export type CheckedFix = {
    * of its 72-hour wait, from the receipt's scan. Absent for every other fix.
    */
   waited_until?: string;
+  /** An image move: the newer security releases the receipt's scan lists (none for a move to the line's newest release). */
+  releases?: string[];
+  /** Set by the PR job: where found_at comes from (docs/bench/lexp/definitions.md, section 3). Absent: the receipt's. */
+  seen?: Seen;
 };
+/**
+ * found_at's source. run: the run whose check saw the fix first, in an unbroken row of the workflow's runs; null when
+ * found_at is the receipt's (this run's lookup). read: how many valid records were read. ended: a record that does not
+ * list the fix ended the row (otherwise the records ran out, and an earlier run may have seen it). why: the walk was
+ * not done. earlier: the receipt's lookup is earlier than every record that lists the fix.
+ */
+export type Seen = { at: string; run: number | null; read: number; ended: boolean; why?: string; earlier?: boolean };
 export type CheckedArtifact = { id: string | null; ecosystem: Ecosystem | null; base: string; fixes: CheckedFix[]; notApplied: Record<string, number> };
 export type Delivery = { package: string; branch: string; outcome: "opened" | "open_pr_exists" | "closed_pr_exists" | "branch_differs" | "failed"; pr?: number; url?: string; reason?: string };
 
@@ -176,6 +188,7 @@ function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, pre
       message: `${subject}\n\n${imageReason(label, to, releases)}\n\nLudion receipt ${id}: the project's test passed on ${base.slice(0, 12)} and on this change, offline in Docker.\nSource Dockerfile only; production was not changed.\n`,
       files: [{ path: policy.allowed[0]!, after_hash: text(r.dockerfile_after, HEX64, "dockerfile_after") }],
       fix_published_at: timeOrNull(r.fix_published_at, "fix_published_at"), found_at: time(r.found_at, "found_at"), applied_at: time(r.applied_at, "applied_at"), verdict: null,
+      releases,
     };
     if (!releases.length) {
       // Such a move waits 72 hours and has no advisory, so no exposure-time start (the decision's items 6 and 7).
@@ -644,6 +657,18 @@ const PUBLISHED: Record<Ecosystem, string> = {
   node: "nodejs.org's release day of the first newer security release of the line, at 00:00 UTC",
 };
 
+/** The body's Found row: the time, and which run saw the fix first, or why it is this run's lookup (LEXP). */
+function foundRow(fix: CheckedFix): string {
+  const code = (v: string) => `\`${v}\``, s = fix.seen, at = code(fix.found_at);
+  if (!s) return `| Found | ${at} (this run's lookup; an earlier run may have seen it first) |`;
+  // Our own message, never text from GitHub or the artifact; still kept out of the table's and Markdown's syntax.
+  if (s.why !== undefined) return `| Found | ${at} (this run's lookup: earlier runs' records were not read: ${plain(s.why).replace(/[|`*_<>[\]@#~\\]/g, " ").slice(0, 300)}) |`;
+  const read = `${code(String(s.read))} records read`;
+  if (s.earlier) return `| Found | ${at} (this run's lookup, earlier than the record of every run that lists this fix; ${read}) |`;
+  if (s.run === null) return `| Found | ${at} (this run's lookup: no record of this workflow's runs lists this fix; ${read}) |`;
+  return `| Found | ${at} (the check of run ${code(String(s.run))}, the first of an unbroken row of this workflow's runs whose record lists this fix; ${read}${s.ended ? "" : "; the records read end there, so an earlier run may have seen it first"}) |`;
+}
+
 /** The PR's body, from checked fields only. Every value is in a code span; no free text from the artifact is used. */
 export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): string {
   const ecosystem = artifact.ecosystem!, code = (v: string) => `\`${v}\``;
@@ -667,7 +692,7 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
     newest
       ? "| Fix published | none (no advisory; this move is not counted in exposure time) |"
       : `| Fix published | ${fix.fix_published_at ? code(fix.fix_published_at) : "unknown"} (${PUBLISHED[ecosystem]}) |`,
-    `| Found | ${code(fix.found_at)} (this run's lookup; an earlier run may have seen it first) |`,
+    foundRow(fix),
     `| Branch made | ${code(fix.applied_at)} |`,
     `| Receipt | ${code(artifact.id!)} (in this run's ludion-fixes artifact) |`,
     "",
@@ -705,6 +730,165 @@ async function call(api: Api, method: string, path: string, body?: unknown): Pro
   return { status: response.status, json };
 }
 const segments = (branch: string) => branch.split("/").map(encodeURIComponent).join("/");
+/** The repository and the API's address, checked before any request. */
+function apiOf(options: { repo: string; api: string; token: string; fetchFn?: typeof fetch }): Api {
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(options.repo)) throw new Error("--repo must be owner/name.");
+  if (!/^https:\/\/[A-Za-z0-9.-]+(?::\d+)?(\/[A-Za-z0-9._/-]*)?$/.test(options.api) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(options.api)) throw new Error("--api must be an https URL.");
+  return { url: options.api.replace(/\/$/, ""), token: options.token, fetchFn: options.fetchFn ?? fetch };
+}
+const errorText = (error: unknown) => plain(error instanceof Error ? error.message : String(error)).slice(0, 300);
+
+// found_at from the first run that saw the fix (docs/bench/lexp/definitions.md, section 3). Each run's check job uploads
+// what it saw as the artifact ludion-seen; the PR job walks back through the workflow's runs and reads those records as
+// untrusted data. The walk only measures: it decides no wait, no gate and no PR.
+export const SEEN_ARTIFACT = "ludion-seen";
+/** At most this many runs are read back, and a record (zipped or not) is at most this many bytes. */
+export const SEEN_RUNS = 100, SEEN_BYTES = 1024 * 1024;
+const SEEN_KEY = /^(?:php|node|(?:npm|composer|maven):[A-Za-z0-9@._/:~?-]{1,214})$/;
+type SeenRecord = { checked_at: string; keys: { key: string; advisories: string[]; releases: string[]; candidate: string | null }[] };
+
+/** At most `max` bytes of a response's body; null when it has more. */
+async function boundedBytes(response: Response, max: number): Promise<Buffer | null> {
+  if (Number(response.headers.get("content-length") ?? "0") > max) { await response.body?.cancel(); return null; }
+  const reader = response.body?.getReader();
+  if (!reader) return Buffer.alloc(0);
+  const parts: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.length;
+    if (total > max) { await reader.cancel(); return null; }
+    parts.push(value);
+  }
+  return Buffer.concat(parts);
+}
+
+/** One entry of a zip, read from its central directory (upload-artifact puts sizes in a data descriptor); stored or deflated only. */
+export function unzipEntry(bytes: Buffer, name: string, max: number): Buffer | null {
+  let end = -1;
+  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 22 - 0xffff); i--) if (bytes.readUInt32LE(i) === 0x06054b50) { end = i; break; }
+  if (end < 0) return null;
+  const count = bytes.readUInt16LE(end + 10), size = bytes.readUInt32LE(end + 12), start = bytes.readUInt32LE(end + 16);
+  if (start + size > end) return null;
+  for (let at = start, n = 0; n < count; n++) {
+    if (at + 46 > end || bytes.readUInt32LE(at) !== 0x02014b50) return null;
+    const method = bytes.readUInt16LE(at + 10), packed = bytes.readUInt32LE(at + 20), length = bytes.readUInt32LE(at + 24), offset = bytes.readUInt32LE(at + 42);
+    const nameLength = bytes.readUInt16LE(at + 28), entry = bytes.subarray(at + 46, at + 46 + nameLength).toString("utf8");
+    at += 46 + nameLength + bytes.readUInt16LE(at + 30) + bytes.readUInt16LE(at + 32);
+    if (entry !== name) continue;
+    if (length > max || offset + 30 > bytes.length || bytes.readUInt32LE(offset) !== 0x04034b50) return null;
+    const data = offset + 30 + bytes.readUInt16LE(offset + 26) + bytes.readUInt16LE(offset + 28);
+    if (data + packed > bytes.length) return null;
+    const body = bytes.subarray(data, data + packed);
+    try {
+      const out = method === 0 ? body : method === 8 ? inflateRawSync(body, { maxOutputLength: max }) : null;
+      return out && out.length === length ? Buffer.from(out) : null;
+    } catch { return null; }
+  }
+  return null;
+}
+
+/** A record as the check job writes it, every value checked; null when it is not one, or its time is outside its run. */
+function seenRecordOf(bytes: Buffer, started: number, uploaded: number, ecosystem: Ecosystem): SeenRecord | null {
+  const entry = unzipEntry(bytes, "seen.json", SEEN_BYTES);
+  if (!entry) return null;
+  try {
+    const r = object(JSON.parse(entry.toString("utf8")), "The record");
+    if (r.schema !== 1 || r.kind !== "ludion-seen" || r.ecosystem !== ecosystem) return null;
+    const checked = time(r.checked_at, "checked_at"), at = Date.parse(checked);
+    if (!(at >= started && at <= uploaded)) return null;
+    if (r.commit !== null) text(r.commit, SHA, "commit");
+    const keys = list(r.keys, 0, 500, "keys").map(k => {
+      const item = object(k, "A key");
+      return {
+        key: text(item.key, SEEN_KEY, "A key"),
+        advisories: item.advisories === undefined ? [] : list(item.advisories, 0, 100, "advisories").map(a => text(a, ADVISORY, "An advisory")),
+        releases: item.releases === undefined ? [] : list(item.releases, 0, 100, "releases").map(v => text(v, VERSION, "A release")),
+        candidate: item.candidate === undefined || item.candidate === null ? null : text(item.candidate, VERSION, "A candidate"),
+      };
+    });
+    return { checked_at: new Date(at).toISOString(), keys };
+  } catch { return null; }
+}
+
+/** The run's ludion-seen record, or null: none, expired, not readable or not valid (the walk passes over such a run). */
+async function seenOfRun(api: Api, repo: string, run: { id: number; started: number }, ecosystem: Ecosystem): Promise<SeenRecord | null> {
+  try {
+    const listed = await call(api, "GET", `/repos/${repo}/actions/runs/${run.id}/artifacts?${new URLSearchParams({ name: SEEN_ARTIFACT, per_page: "100" })}`);
+    const items = (listed.json as { artifacts?: unknown } | null)?.artifacts;
+    if (listed.status !== 200 || !Array.isArray(items)) return null;
+    const live = (items as { id?: unknown; name?: unknown; expired?: unknown; created_at?: unknown }[])
+      .filter(a => a?.name === SEEN_ARTIFACT && a.expired === false && Number.isSafeInteger(a.id) && typeof a.created_at === "string" && Number.isFinite(Date.parse(a.created_at)))
+      .sort((a, b) => Date.parse(b.created_at as string) - Date.parse(a.created_at as string));
+    if (!live.length) return null;
+    // GitHub answers with a redirect to the zip's address, which is asked without the token.
+    const first = await api.fetchFn(`${api.url}/repos/${repo}/actions/artifacts/${live[0]!.id}/zip`, {
+      headers: { authorization: `Bearer ${api.token}`, accept: "application/vnd.github+json", "x-github-api-version": "2022-11-28" }, redirect: "manual", signal: AbortSignal.timeout(30_000),
+    });
+    const location = first.headers.get("location");
+    await first.body?.cancel();
+    if (![301, 302, 303, 307, 308].includes(first.status) || !location || !/^https:\/\/[^/?#\s]+\//.test(location)) return null;
+    const zip = await api.fetchFn(location, { redirect: "error", signal: AbortSignal.timeout(30_000) });
+    if (zip.status !== 200) { await zip.body?.cancel(); return null; }
+    const bytes = await boundedBytes(zip, SEEN_BYTES);
+    return bytes ? seenRecordOf(bytes, run.started, Date.parse(live[0]!.created_at as string), ecosystem) : null;
+  } catch { return null; }
+}
+
+/** Whether a record lists this fix: same package and a shared advisory; for an image, a shared security release, or the same candidate. */
+function listsFix(record: SeenRecord, ecosystem: Ecosystem, fix: CheckedFix): boolean {
+  if (isImage(ecosystem)) {
+    const key = record.keys.find(k => k.key === ecosystem);
+    if (!key) return false;
+    return fix.releases?.length ? key.releases.some(v => fix.releases!.includes(v)) : key.candidate === fix.changes[0]!.to;
+  }
+  const key = record.keys.find(k => k.key === `${ecosystem}:${fix.package}`), ids = new Set(fix.changes.flatMap(c => c.advisories));
+  return !!key && key.advisories.some(a => ids.has(a));
+}
+
+/**
+ * For each fix (by branch), the first run that saw it: from this run back, newest first, through the workflow's runs on
+ * the default branch started by schedule or workflow_dispatch (at most `limit`), a valid record that lists the fix moves
+ * it to that run, one that does not ends the row, and a run with no valid record is passed over. Null: no record lists
+ * it. Throws when this run or the workflow's runs cannot be read; the caller then keeps the receipt's found_at.
+ */
+export async function firstSeen(options: { repo: string; runId: number; defaultBranch: string; ecosystem: Ecosystem; api: string; token: string; fetchFn?: typeof fetch; limit?: number }, fixes: CheckedFix[]): Promise<{ read: number; seen: Map<string, { at: string; run: number; ended: boolean } | null> }> {
+  const api = apiOf(options), limit = options.limit ?? SEEN_RUNS;
+  if (!Number.isSafeInteger(options.runId) || options.runId <= 0) throw new Error("this run's id is not a number.");
+  const own = await call(api, "GET", `/repos/${options.repo}/actions/runs/${options.runId}`);
+  const workflow = (own.json as { workflow_id?: unknown } | null)?.workflow_id;
+  if (own.status !== 200 || !Number.isSafeInteger(workflow)) throw new Error(`GitHub did not give this run (HTTP ${own.status}).`);
+  const runs: { id: number; started: number }[] = [];
+  for (let page = 1; runs.length < limit && page <= 10; page++) {
+    const query = new URLSearchParams({ branch: options.defaultBranch, per_page: "100", page: String(page) });
+    const listed = await call(api, "GET", `/repos/${options.repo}/actions/workflows/${workflow}/runs?${query}`);
+    const items = (listed.json as { workflow_runs?: unknown } | null)?.workflow_runs;
+    if (listed.status !== 200 || !Array.isArray(items)) throw new Error(`GitHub did not list this workflow's runs (HTTP ${listed.status}).`);
+    for (const r of items as { id?: unknown; event?: unknown; head_branch?: unknown; run_started_at?: unknown }[]) {
+      const started = typeof r?.run_started_at === "string" ? Date.parse(r.run_started_at) : NaN;
+      if (!Number.isSafeInteger(r?.id) || (r.id as number) > options.runId || !["schedule", "workflow_dispatch"].includes(r.event as string) || r.head_branch !== options.defaultBranch || !Number.isFinite(started)) continue;
+      if (!runs.some(seen => seen.id === r.id)) runs.push({ id: r.id as number, started });
+    }
+    if (items.length < 100) break;
+  }
+  runs.sort((a, b) => b.id - a.id).splice(limit);
+  const state = new Map(fixes.map(f => [f.branch, { found: null as { at: string; run: number } | null, ended: false }]));
+  let read = 0;
+  for (const run of runs) {
+    if ([...state.values()].every(s => s.ended)) break;
+    const record = await seenOfRun(api, options.repo, run, options.ecosystem);
+    if (!record) continue;
+    read++;
+    for (const fix of fixes) {
+      const s = state.get(fix.branch)!;
+      if (s.ended) continue;
+      if (listsFix(record, options.ecosystem, fix)) s.found = { at: record.checked_at, run: run.id };
+      else s.ended = true;
+    }
+  }
+  return { read, seen: new Map(fixes.map(f => { const s = state.get(f.branch)!; return [f.branch, s.found ? { ...s.found, ended: s.ended } : null]; })) };
+}
 
 /**
  * `git push` of one commit to a new branch, never forced, to the repository's own URL. The token reaches Git through
@@ -854,10 +1038,8 @@ async function imageAgain(top: string, prefix: string, fix: CheckedFix, reposito
  * The PR job: checks the artifact, then for each fix, unless a PR from its branch exists, pushes the branch (never moving
  * one that exists at another commit) and opens one PR into the default branch. A fix that fails stops no other.
  */
-export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; npmManifest?: (name: string, version: string) => Promise<Record<string, unknown> | null>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; nodeDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
-  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(options.repo)) throw new Error("--repo must be owner/name.");
-  if (!/^https:\/\/[A-Za-z0-9.-]+(?::\d+)?(\/[A-Za-z0-9._/-]*)?$/.test(options.api) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(options.api)) throw new Error("--api must be an https URL.");
-  const api: Api = { url: options.api.replace(/\/$/, ""), token: options.token, fetchFn: options.fetchFn ?? fetch };
+export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; runId?: number; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; npmManifest?: (name: string, version: string) => Promise<Record<string, unknown> | null>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; nodeDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
+  const api = apiOf(options);
   // Before the artifact is read: the run must be on the repository's default branch, where PRs go.
   const repository = await call(api, "GET", `/repos/${options.repo}`);
   const defaultBranch = (repository.json as { default_branch?: unknown } | null)?.default_branch;
@@ -866,6 +1048,11 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
   const checked = checkArtifact(options.dir, options.artifact, options.base);
   const { top, prefix } = workTree(rootPath(options.dir)), owner = options.repo.split("/")[0]!, push = options.push ?? pushBranch;
   const deliveries: Delivery[] = [];
+  // found_at's walk, once per run and only when a PR is about to be opened; a walk that fails stops no fix.
+  let walked: Promise<Awaited<ReturnType<typeof firstSeen>> | { why: string }> | null = null;
+  const walk = () => walked ??= options.runId === undefined
+    ? Promise.resolve({ why: "this run's id was not given." })
+    : firstSeen({ repo: options.repo, runId: options.runId, defaultBranch, ecosystem: checked.ecosystem!, api: options.api, token: options.token, fetchFn: options.fetchFn }, checked.fixes).catch(error => ({ why: errorText(error) }));
   for (const fix of checked.fixes) {
     const done = (d: Omit<Delivery, "package" | "branch">) => deliveries.push({ package: fix.package, branch: fix.branch, ...d });
     try {
@@ -923,6 +1110,14 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
         if (problem) throw new Error(`Not pushed: ${problem}`);
       }
       if (!remoteSha) push(top, options.remote, fix.commit, fix.branch, options.token);
+      const w = await walk();
+      if ("why" in w) fix.seen = { at: fix.found_at, run: null, read: 0, ended: false, why: w.why };
+      else {
+        const s = w.seen.get(fix.branch) ?? null;
+        if (!s) fix.seen = { at: fix.found_at, run: null, read: w.read, ended: true };
+        else if (Date.parse(s.at) <= Date.parse(fix.found_at)) { fix.seen = { at: s.at, run: s.run, read: w.read, ended: s.ended }; fix.found_at = s.at; }
+        else fix.seen = { at: fix.found_at, run: null, read: w.read, ended: s.ended, earlier: true };
+      }
       const created = await call(api, "POST", `/repos/${options.repo}/pulls`, { title: fix.subject, head: fix.branch, base: defaultBranch, body: pullRequestBody(checked, fix), maintainer_can_modify: false });
       const pr = created.json as { number?: unknown; html_url?: unknown } | null;
       if (created.status !== 201 || typeof pr?.number !== "number") throw new Error(`GitHub did not open the PR (HTTP ${created.status}${typeof (created.json as { message?: unknown } | null)?.message === "string" ? `: ${plain((created.json as { message: string }).message).slice(0, 200)}` : ""}). The branch ${fix.branch} is on GitHub; the next run opens the PR from it while the default branch has not moved.`);
@@ -944,20 +1139,106 @@ export function closedWarnings(deliveries: Delivery[]): string[] {
   return deliveries.filter(d => d.outcome === "closed_pr_exists").map(d => `::warning::${escape(`Ludion: the fix of ${d.package} (branch ${d.branch}) is still not on the default branch, and its PR #${d.pr} was closed, so Ludion does not open it again. Reopen #${d.pr} or apply the fix yourself.`)}`);
 }
 
-/** `ludion deliver pack|open`: the scheduled workflow's two steps (action.yml). */
+// The end of exposure time (docs/bench/lexp/definitions.md, sections 1 and 2): the merge of the PR Ludion opened for a
+// fix, recorded on that PR by the template's merged job, which holds pull-requests: write only and checks out nothing.
+export type MergeRecord = { schema: 1; pr: number; branch: string; merged_at: string; merge_commit_sha: string; fix_published_at: string | null; found_at: string | null; applied_at: string | null };
+const MERGED_MARK = "<!-- ludion-merged", BOT = "github-actions[bot]";
+
+/** A time in the code span of one row of the PR body Ludion wrote (pullRequestBody), or null. */
+function bodyTime(body: string, row: string): string | null {
+  const line = body.split("\n").find(l => l.startsWith(`| ${row} | `));
+  const m = line ? /^\| [^|]+ \| `([^`]*)`/.exec(line) : null;
+  return m && TIME.test(m[1]!) ? new Date(m[1]!).toISOString() : null;
+}
+function hours(from: string | null, to: string | null, what: string): string {
+  if (from === null || to === null) return "unknown";
+  const ms = Date.parse(to) - Date.parse(from);
+  return ms < 0 ? `not computed: ${what}` : `\`${(ms / 3_600_000).toFixed(1)}\` hours`;
+}
+
+/** Records the merge of PR `pr`, once, when it is a merged Ludion fix into the default branch; says why otherwise. */
+export async function recordMerge(options: { repo: string; pr: number; api: string; token: string; fetchFn?: typeof fetch }): Promise<{ outcome: "recorded" | "already_recorded" | "not_recorded"; reason?: string; record?: MergeRecord; comment?: string }> {
+  const api = apiOf(options);
+  if (!Number.isSafeInteger(options.pr) || options.pr <= 0) throw new Error("--pr must be a PR number.");
+  const repository = await call(api, "GET", `/repos/${options.repo}`);
+  const defaultBranch = (repository.json as { default_branch?: unknown } | null)?.default_branch;
+  if (repository.status !== 200 || typeof defaultBranch !== "string") throw new Error(`GitHub did not give the repository's default branch (HTTP ${repository.status}).`);
+  const pulled = await call(api, "GET", `/repos/${options.repo}/pulls/${options.pr}`);
+  if (pulled.status !== 200 || !isObject(pulled.json)) throw new Error(`GitHub did not give PR #${options.pr} (HTTP ${pulled.status}).`);
+  const p = pulled.json as { merged?: unknown; merged_at?: unknown; merge_commit_sha?: unknown; body?: unknown; user?: { login?: unknown }; head?: { ref?: unknown; repo?: { full_name?: unknown } | null }; base?: { ref?: unknown } };
+  const no = (reason: string) => ({ outcome: "not_recorded" as const, reason: `PR #${options.pr}: ${reason}` });
+  const body = typeof p.body === "string" ? p.body.replace(/\r\n/g, "\n") : "";
+  if (p.merged !== true) return no("the PR is not merged.");
+  if (typeof p.merged_at !== "string" || !TIME.test(p.merged_at)) return no("its merged_at is not a time.");
+  if (typeof p.merge_commit_sha !== "string" || !SHA.test(p.merge_commit_sha)) return no("its merge commit is not a full SHA.");
+  if (p.user?.login !== BOT) return no(`the PR was not opened by ${BOT}.`);
+  if (p.head?.repo?.full_name !== options.repo) return no("its head is in another repository.");
+  if (typeof p.head?.ref !== "string" || !/^ludion\/[A-Za-z0-9._/-]+$/.test(p.head.ref)) return no("its head is not a Ludion branch.");
+  if (p.base?.ref !== defaultBranch) return no("its base is not the default branch.");
+  if (!body.startsWith("<!-- ludion-fix -->\n")) return no("its body does not start with Ludion's marker.");
+  for (let page = 1; page <= 10; page++) {
+    const listed = await call(api, "GET", `/repos/${options.repo}/issues/${options.pr}/comments?${new URLSearchParams({ per_page: "100", page: String(page) })}`);
+    if (listed.status !== 200 || !Array.isArray(listed.json)) throw new Error(`GitHub did not list PR #${options.pr}'s comments (HTTP ${listed.status}).`);
+    const comments = listed.json as { user?: { login?: unknown }; body?: unknown }[];
+    if (comments.some(c => c?.user?.login === BOT && typeof c.body === "string" && c.body.startsWith(MERGED_MARK))) return { outcome: "already_recorded" };
+    if (comments.length < 100) break;
+  }
+  const record: MergeRecord = {
+    schema: 1, pr: options.pr, branch: p.head.ref, merged_at: new Date(p.merged_at).toISOString(), merge_commit_sha: p.merge_commit_sha,
+    fix_published_at: bodyTime(body, "Fix published"), found_at: bodyTime(body, "Found"), applied_at: bodyTime(body, "Branch made"),
+  };
+  const notCounted = body.split("\n").some(l => l.startsWith("| Fix published | none ("));
+  const code = (v: string | null) => v === null ? "unknown" : `\`${v}\``;
+  const branchName = /^[A-Za-z0-9._/-]{1,200}$/.test(defaultBranch) ? code(defaultBranch) : "branch";
+  const comment = [
+    `${MERGED_MARK} ${JSON.stringify(record)} -->`,
+    `**Ludion: merge recorded.** This PR, which Ludion opened for one fix, was merged into the default ${branchName}. The merge is the end of the fix's exposure time: the fix is now in the project's configuration on its default branch. It is not deployed by this, and when production gets it is not recorded.`,
+    "",
+    "| | |",
+    "|---|---|",
+    `| Fix published | ${notCounted ? "none (no advisory; this move is not counted in exposure time)" : code(record.fix_published_at)} |`,
+    `| Found | ${code(record.found_at)} |`,
+    `| Branch made | ${code(record.applied_at)} |`,
+    `| Merged | ${code(record.merged_at)} (GitHub's merged_at), merge commit ${code(record.merge_commit_sha.slice(0, 12))} |`,
+    `| Exposure time (published → merged) | ${notCounted ? "not counted" : hours(record.fix_published_at, record.merged_at, "the publication time is later than the merge")} |`,
+    `| Published → found | ${notCounted ? "not counted" : hours(record.fix_published_at, record.found_at, "the publication time is later than the found time")} |`,
+    `| Found → merged | ${hours(record.found_at, record.merged_at, "the found time is later than the merge")} |`,
+    "",
+    "The publication, found and branch times are this PR's body as Ludion's PR job wrote it, checked for form only: anyone who can edit this PR could have changed them. The merge time and the merge commit are GitHub's.",
+    "",
+  ].join("\n");
+  const posted = await call(api, "POST", `/repos/${options.repo}/issues/${options.pr}/comments`, { body: comment });
+  if (posted.status !== 201) throw new Error(`GitHub did not post the record on PR #${options.pr} (HTTP ${posted.status}).`);
+  return { outcome: "recorded", record, comment };
+}
+
+/** `ludion deliver pack|open|merged`: the scheduled workflow's steps (action.yml). */
 export async function deliverCli(args: string[], env: NodeJS.ProcessEnv = process.env): Promise<number> {
   const [step, ...rest] = args;
-  const { values } = parseArgs({ args: rest, options: { dir: { type: "string", default: "." }, result: { type: "string" }, out: { type: "string" }, artifact: { type: "string" }, base: { type: "string" }, repo: { type: "string" }, ref: { type: "string" }, api: { type: "string" }, remote: { type: "string" }, json: { type: "boolean" } } });
+  const { values } = parseArgs({ args: rest, options: { dir: { type: "string", default: "." }, result: { type: "string" }, out: { type: "string" }, artifact: { type: "string" }, base: { type: "string" }, repo: { type: "string" }, ref: { type: "string" }, api: { type: "string" }, remote: { type: "string" }, "run-id": { type: "string" }, pr: { type: "string" }, json: { type: "boolean" } } });
+  const number = (value: string | undefined, what: string) => {
+    if (value === undefined) return undefined;
+    if (!/^[1-9]\d{0,15}$/.test(value)) throw new Error(`${what} must be a number.`);
+    return Number(value);
+  };
+  if (step === "merged") {
+    const token = env.GH_TOKEN;
+    if (!values.repo || !values.pr || !values.api || !token) throw new Error("deliver merged needs --repo, --pr, --api and GH_TOKEN.");
+    const result = await recordMerge({ repo: values.repo, pr: number(values.pr, "--pr")!, api: values.api, token });
+    if (values.json) console.log(JSON.stringify(result.record ? { outcome: result.outcome, record: result.record } : { outcome: result.outcome, reason: result.reason ?? null }, null, 2));
+    else console.log(result.outcome === "recorded" ? `Recorded the merge of PR #${values.pr} at ${result.record!.merged_at} (the end of its fix's exposure time).` : result.outcome === "already_recorded" ? `PR #${values.pr}'s merge is already recorded.` : `Not recorded: ${result.reason}`);
+    return 0;
+  }
   if (step === "pack") {
     if (!values.result || !values.out) throw new Error("deliver pack needs --result <patch --json output> and --out <folder>.");
     const { fixes } = packFixes(values.dir!, values.result, values.out);
     console.log(`Packed ${fixes} applied fix${fixes === 1 ? "" : "es"} into ${values.out}.`);
     return 0;
   }
-  if (step !== "open") throw new Error("Usage: ludion deliver pack|open (the scheduled workflow's steps; see action.yml).");
+  if (step !== "open") throw new Error("Usage: ludion deliver pack|open|merged (the scheduled workflow's steps; see action.yml).");
   const token = env.GH_TOKEN;
   if (!values.artifact || !values.base || !values.repo || !values.ref || !values.api || !values.remote || !token) throw new Error("deliver open needs --artifact, --base, --repo, --ref, --api, --remote and GH_TOKEN.");
-  const { checked, deliveries } = await openFixes({ dir: values.dir!, artifact: values.artifact, base: values.base, repo: values.repo, ref: values.ref, api: values.api, remote: values.remote, token });
+  const { checked, deliveries } = await openFixes({ dir: values.dir!, artifact: values.artifact, base: values.base, repo: values.repo, ref: values.ref, api: values.api, remote: values.remote, token, runId: number(values["run-id"], "--run-id") });
   if (values.json) console.log(JSON.stringify({ base: checked.base, receipt: checked.id, not_applied: checked.notApplied, deliveries }, null, 2));
   else {
     console.log(`Receipt ${checked.id ?? "none"} on ${checked.base.slice(0, 12)}: ${checked.fixes.length} applied fix${checked.fixes.length === 1 ? "" : "es"}${Object.keys(checked.notApplied).length ? `; not applied: ${Object.entries(checked.notApplied).map(([k, n]) => `${n} ${k}`).join(", ")}` : ""}.`);

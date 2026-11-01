@@ -12,18 +12,23 @@
 #                  data and posts it as one comment per PR, updated by each new judgement. It runs nothing from the
 #                  PR or the artifact.
 #
-# Ludion's own fixes, one PR per fix: three modes, for three jobs of one scheduled workflow (action/patch-workflow.yml;
-# docs/bench/2026-10-30-lb-design, docs/bench/lb2b-next1/definitions.md):
+# Ludion's own fixes, one PR per fix: four modes, for four jobs of one workflow (action/patch-workflow.yml;
+# docs/bench/2026-10-30-lb-design, docs/bench/lb2b-next1/definitions.md, docs/bench/lexp/definitions.md):
 #   mode: check         first, with `contents: read` and `pull-requests: read`. Runs no dependency code and reads no
 #                       earlier run's artifact: `ludion check` on the run's commit (the saved policy's ecosystem only)
-#                       and the open Ludion PRs decide whether patch has anything to do (output `work`).
+#                       and the open Ludion PRs decide whether patch has anything to do (output `work`). What it saw is
+#                       uploaded as the ludion-seen artifact, for a later PR job's found_at.
 #   mode: patch         on schedule or workflow_dispatch, with `contents: read` only and no token. Checks out the run's
 #                       commit without credentials, runs `ludion patch --apply` (candidates are built and tested only
 #                       in Docker) and uploads the receipt and a bundle of the fix branches as the ludion-fixes artifact.
 #   mode: pull-request  after mode patch, with `contents: write` and `pull-requests: write`. Runs no dependency code:
 #                       checks the artifact as untrusted data (each branch one commit on the run's commit, changing only
 #                       the files the plan may change), then pushes each fix to its own branch, never forced, and opens
-#                       one PR per fix unless a PR from that branch exists.
+#                       one PR per fix unless a PR from that branch exists. With `actions: read`, it reads earlier runs'
+#                       ludion-seen records as untrusted data, to give each PR the first run that saw its fix.
+#   mode: merged        on pull_request (closed), with `pull-requests: write` only. Checks out nothing: when the PR is a
+#                       merged Ludion fix into the default branch, posts one comment on it that records the merge time,
+#                       the end of the fix's exposure time.
 #
 # Pin this action by a release commit's full SHA. Only a release commit carries the bundled judge
 # (packages/cli/dist/cli.js and action/dist/record.js, built by action/build.ts); any other commit stops with an error.
@@ -36,7 +41,7 @@ branding:
 
 inputs:
   mode:
-    description: "judge (the read-only job, on pull_request), comment (the job that posts, on workflow_run), check (the job before patch that decides whether there is anything to do), patch (the read-only job that validates fixes, on schedule) or pull-request (the job that opens their PRs, after patch)."
+    description: "judge (the read-only job, on pull_request), comment (the job that posts, on workflow_run), check (the job before patch that decides whether there is anything to do), patch (the read-only job that validates fixes, on schedule), pull-request (the job that opens their PRs, after patch) or merged (the job that records the merge of one of those PRs, on pull_request)."
     required: true
   judge-workflow:
     description: "mode comment: the path of the workflow that runs mode judge. Only that workflow's runs are posted."
@@ -73,7 +78,7 @@ runs:
         DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
       run: bash "$GITHUB_ACTION_PATH/action/start.sh"
 
-    # modes judge, patch and pull-request
+    # every mode but comment
 
     - name: Check that this commit of the action carries the bundled judge
       id: bundle
@@ -192,6 +197,18 @@ runs:
         DIR: ${{ inputs.dir }}
       run: bash "$GITHUB_ACTION_PATH/action/check.sh"
 
+    # What this run's check saw, for a later PR job's found_at (docs/bench/lexp/definitions.md, section 3). The upload
+    # uses the runner's own artifact token: the job's token gets no actions permission, and this job reads no record.
+    - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      if: ${{ inputs.mode == 'check' && !cancelled() && steps.check.outputs.seen == 'true' }}
+      with:
+        name: ludion-seen
+        path: ${{ runner.temp }}/ludion/seen
+        if-no-files-found: error
+        # A re-run of the job replaces the record instead of failing on the name.
+        overwrite: true
+        retention-days: 90
+
     # No token here: only the checkout above used the job's read-only token, to fetch, and left no credential on disk.
     - name: Validate each fix and commit it on its own branch
       id: patch
@@ -239,4 +256,19 @@ runs:
         ARTIFACT: ${{ runner.temp }}/ludion/fixes
       run: |
         node "$CLI" deliver open --dir "$PROJECT" --artifact "$ARTIFACT" --base "$GITHUB_SHA" --repo "$GITHUB_REPOSITORY" \
-          --ref "$GITHUB_REF" --api "$GITHUB_API_URL" --remote "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" | tee -a "$GITHUB_STEP_SUMMARY"
+          --ref "$GITHUB_REF" --api "$GITHUB_API_URL" --remote "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" \
+          --run-id "$GITHUB_RUN_ID" | tee -a "$GITHUB_STEP_SUMMARY"
+
+    # mode merged
+
+    # Runs only the bundled CLI: reads the PR through the API and, for a merged Ludion fix into the default branch, posts
+    # one comment that records the merge (docs/bench/lexp/definitions.md, section 2). Nothing is checked out or run from it.
+    - name: Record the merge of Ludion's PR, the end of its fix's exposure time
+      if: ${{ inputs.mode == 'merged' && steps.bundle.outcome == 'success' }}
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+        CLI: ${{ github.action_path }}/packages/cli/dist/cli.js
+        PR: ${{ github.event.pull_request.number }}
+      run: node "$CLI" deliver merged --repo "$GITHUB_REPOSITORY" --pr "$PR" --api "$GITHUB_API_URL" | tee -a "$GITHUB_STEP_SUMMARY"

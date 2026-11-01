@@ -61,8 +61,18 @@ case "$MODE" in
     fi
     node -e 'if (Number(process.versions.node.split(".")[0]) < 22) { console.error(`::error::Ludion needs Node 22 or later; this runner has ${process.versions.node}.`); process.exit(1); }'
     ;;
+  merged)
+    # The template's merged job (action/patch-workflow.yml), when a PR is closed: it reads the PR through the API and
+    # posts one comment; nothing from the PR is checked out or run (docs/bench/lexp/definitions.md, section 2).
+    if [ "$EVENT" != "pull_request" ]; then
+      echo "::error::mode merged runs on pull_request, not ${EVENT}."
+      exit 1
+    fi
+    need node
+    node -e 'if (Number(process.versions.node.split(".")[0]) < 22) { console.error(`::error::Ludion needs Node 22 or later; this runner has ${process.versions.node}.`); process.exit(1); }'
+    ;;
   *)
-    echo "::error::mode must be judge, comment, patch, pull-request or check."
+    echo "::error::mode must be judge, comment, patch, pull-request, check or merged."
     exit 1
     ;;
 esac

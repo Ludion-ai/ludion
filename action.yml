@@ -12,8 +12,11 @@
 #                  data and posts it as one comment per PR, updated by each new judgement. It runs nothing from the
 #                  PR or the artifact.
 #
-# Ludion's own fixes, one PR per fix: two modes, for two jobs of one scheduled workflow (action/patch-workflow.yml;
-# docs/bench/2026-10-30-lb-design):
+# Ludion's own fixes, one PR per fix: three modes, for three jobs of one scheduled workflow (action/patch-workflow.yml;
+# docs/bench/2026-10-30-lb-design, docs/bench/lb2b-next1/definitions.md):
+#   mode: check         first, with `contents: read` and `pull-requests: read`. Runs no dependency code and reads no
+#                       earlier run's artifact: `ludion check` on the run's commit (the saved policy's ecosystem only)
+#                       and the open Ludion PRs decide whether patch has anything to do (output `work`).
 #   mode: patch         on schedule or workflow_dispatch, with `contents: read` only and no token. Checks out the run's
 #                       commit without credentials, runs `ludion patch --apply` (candidates are built and tested only
 #                       in Docker) and uploads the receipt and a bundle of the fix branches as the ludion-fixes artifact.
@@ -33,14 +36,14 @@ branding:
 
 inputs:
   mode:
-    description: "judge (the read-only job, on pull_request), comment (the job that posts, on workflow_run), patch (the read-only job that validates fixes, on schedule) or pull-request (the job that opens their PRs, after patch)."
+    description: "judge (the read-only job, on pull_request), comment (the job that posts, on workflow_run), check (the job before patch that decides whether there is anything to do), patch (the read-only job that validates fixes, on schedule) or pull-request (the job that opens their PRs, after patch)."
     required: true
   judge-workflow:
     description: "mode comment: the path of the workflow that runs mode judge. Only that workflow's runs are posted."
     required: false
     default: .github/workflows/ludion-judge.yml
   dir:
-    description: "modes patch and pull-request: the project's folder in the repository, with its ludion.security.json."
+    description: "modes check, patch and pull-request: the project's folder in the repository, with its ludion.security.json."
     required: false
     default: "."
 
@@ -48,6 +51,9 @@ outputs:
   packed:
     description: "mode patch: true when the ludion-fixes artifact holds at least one applied fix."
     value: ${{ steps.patch.outputs.packed }}
+  work:
+    description: "mode check: false when this run has nothing for patch to do (action/check.sh); otherwise true."
+    value: ${{ steps.check.outputs.work }}
 
 runs:
   using: composite
@@ -160,16 +166,31 @@ runs:
         CONCLUSION: ${{ github.event.workflow_run.conclusion }}
       run: bash "$GITHUB_ACTION_PATH/action/comment.sh"
 
-    # modes patch and pull-request
+    # modes check, patch and pull-request
 
     # The run's own commit, with no credential left in .git/config. The fixes are commits on it.
     - name: Check out the run's commit
-      if: ${{ inputs.mode == 'patch' || inputs.mode == 'pull-request' }}
+      if: ${{ inputs.mode == 'patch' || inputs.mode == 'pull-request' || inputs.mode == 'check' }}
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         ref: ${{ github.sha }}
         persist-credentials: false
         fetch-depth: 1
+
+    # mode check: runs only the bundled CLI (no dependency code, no Docker), gh, git, tar and awk, and reads no earlier
+    # run's artifact (the job has no actions permission). The token reads the open PRs, the compare API and their heads.
+    - name: Decide, before Docker, whether this run has anything to do
+      id: check
+      if: ${{ inputs.mode == 'check' && steps.bundle.outcome == 'success' }}
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPO: ${{ github.repository }}
+        CLI: ${{ github.action_path }}/packages/cli/dist/cli.js
+        PROJECT: ${{ github.workspace }}/${{ inputs.dir }}
+        DIR: ${{ inputs.dir }}
+      run: bash "$GITHUB_ACTION_PATH/action/check.sh"
 
     # No token here: only the checkout above used the job's read-only token, to fetch, and left no credential on disk.
     - name: Validate each fix and commit it on its own branch

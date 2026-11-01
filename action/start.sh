@@ -29,8 +29,8 @@ case "$MODE" in
     fi
     need gh jq unzip
     ;;
-  patch|pull-request)
-    # The scheduled workflow's two jobs (action/patch-workflow.yml): on a schedule or by hand, on the default branch.
+  patch|pull-request|check)
+    # The scheduled workflow's jobs (action/patch-workflow.yml): on a schedule or by hand, on the default branch.
     # A scheduled run is always on the default branch; a dispatched one names its branch.
     if [ "$EVENT" != "schedule" ] && [ "$EVENT" != "workflow_dispatch" ]; then
       echo "::error::mode ${MODE} runs on schedule or workflow_dispatch, not ${EVENT}."
@@ -53,13 +53,16 @@ case "$MODE" in
         exit 1
       fi
       need node git docker jq
+    elif [ "$MODE" = "check" ]; then
+      # check runs before Docker: the bundled CLI, gh for the open PRs and their heads, tar, awk.
+      need node git gh tar awk
     else
       need node git
     fi
     node -e 'if (Number(process.versions.node.split(".")[0]) < 22) { console.error(`::error::Ludion needs Node 22 or later; this runner has ${process.versions.node}.`); process.exit(1); }'
     ;;
   *)
-    echo "::error::mode must be judge, comment, patch or pull-request."
+    echo "::error::mode must be judge, comment, patch, pull-request or check."
     exit 1
     ;;
 esac

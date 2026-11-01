@@ -8,7 +8,7 @@ import { firstPublish, npmReleases, type Provenance } from "./time-cap.ts";
 
 type Fetch = typeof fetch;
 
-async function boundedJson(fetchFn: Fetch, url: string, init: RequestInit = {}, maxBytes = 64 * 1024 * 1024): Promise<any> {
+export async function boundedJson(fetchFn: Fetch, url: string, init: RequestInit = {}, maxBytes = 64 * 1024 * 1024): Promise<any> {
   const res = await fetchFn(url, { redirect: "error", signal: AbortSignal.timeout(30_000), ...init, headers: { accept: "application/json", "user-agent": "Ludion-Judge", ...(init.headers ?? {}) } });
   if (!res.ok) { await res.body?.cancel().catch(() => {}); throw Object.assign(new Error(`${new URL(url).hostname} answered HTTP ${res.status}.`), { status: res.status }); }
   return JSON.parse((await boundedBody(res, new URL(url).hostname, maxBytes)).toString("utf8"));

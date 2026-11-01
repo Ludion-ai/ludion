@@ -40,7 +40,7 @@ function depScan(findings: Finding[], plan: { name: string; from: string; to: st
 const report = (checks: ProjectScan["checks"]): ProjectScan => ({ schema: 1, checked_at: iso(NOW), status: "attention_required", checks, unsupported: [] });
 
 /** Stand-ins for OSV records, KEV, EPSS, the npm registry and Packagist; every other URL fails the test. */
-function web(over: { records?: Record<string, unknown>; kev?: string[] | null; epss?: Record<string, number> | null; npm?: Record<string, unknown>; packagist?: Record<string, unknown> } = {}) {
+function web(over: { records?: Record<string, unknown>; kev?: readonly string[] | null; epss?: Record<string, number> | null; npm?: Record<string, unknown>; packagist?: Record<string, unknown> } = {}) {
   const asked: string[] = [];
   const fetchFn = (async (input: string | URL | Request) => {
     const url = String(input instanceof Request ? input.url : input);
@@ -54,8 +54,8 @@ function web(over: { records?: Record<string, unknown>; kev?: string[] | null; e
     if (url === KEV) return over.kev === null ? json({}, 503) : json({ vulnerabilities: (over.kev ?? []).map(cveID => ({ cveID })) });
     if (url === EPSS_LIST) {
       if (over.epss === null) return new Response("", { status: 503 });
-      const rows = Object.entries(over.epss ?? { "CVE-1999-0001": 0.001 }).map(([cve, s]) => `${cve},${s},0.5`).join("\n");
-      return new Response(gzipSync(`#model_version:v1,score_date:2026-10-31T00:00:00Z\ncve,epss,percentile\nCVE-1999-0001,0.001,0.1\n${rows}\n`));
+      const rows = Object.entries(over.epss ?? {}).map(([cve, s]) => `${cve},${s},0.5`);
+      return new Response(gzipSync(["#model_version:v1,score_date:2026-10-31T00:00:00Z", "cve,epss,percentile", "CVE-1999-0001,0.001,0.1", ...rows, ""].join("\n")));
     }
     if (url.startsWith("https://registry.npmjs.org/")) {
       const doc = over.npm?.[decodeURIComponent(url.slice("https://registry.npmjs.org/".length))];
@@ -102,7 +102,7 @@ describe("the policy's ecosystem only (T1, T2)", () => {
     const root = npmProject({ "composer.lock": "{}", "composer.json": "{}" });
     const { answer, scanned } = await run(root, report([{ ecosystem: "npm", result: depScan([], []) }]), web());
     expect(scanned).toEqual(["npm"]);
-    expect(answer).toMatchObject({ decided: true, keys: [], outside: ["composer (composer.lock)"] });
+    expect(answer).toMatchObject({ decided: true, keys: [], outside: ["composer"] });
   });
   it("scans the policy's Dockerfile only for an image policy", async () => {
     const root = project({ "ludion.security.json": PHP_POLICY, Dockerfile: "FROM php:8.4.26-cli\n", "package-lock.json": "{}" });
@@ -353,6 +353,11 @@ describe.skipIf(process.platform === "win32")("action/check.sh (T8)", () => {
   it("a PR from another author or branch does not cover", () => {
     expect(sh(["decided\tnpm\tnormal", "key\tdue\tnpm:lodash\t-\tdue"], { pulls: `7 ${HEAD} o/r someone ludion/npm/x\n`, head: ["decided\tnpm\t-"] }).work).toBe("work=true");
     expect(sh(["decided\tnpm\tnormal", "key\tdue\tnpm:lodash\t-\tdue"], { pulls: `7 ${HEAD} o/r github-actions[bot] feature\n`, head: ["decided\tnpm\t-"] }).work).toBe("work=true");
+  });
+  it("a PR whose head ludion check cannot decide on does not cover, even when it exits 0", () => {
+    const r = sh(["decided\tnpm\tnormal", "key\tdue\tnpm:lodash\t-\tdue"], { pulls: PR, head: ["undecided\tthe npm scan is incomplete"] });
+    expect(r.work).toBe("work=true");
+    expect(r.stdout).toContain("PR #7: ludion check could not decide on its head; not counted.");
   });
   it("work=true when the CLI is undecided or fails, or when gh fails", () => {
     expect(sh(["undecided\ta maven policy"], { mainStatus: 2 }).work).toBe("work=true");

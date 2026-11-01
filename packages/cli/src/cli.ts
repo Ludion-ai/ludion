@@ -4,6 +4,7 @@
 import { securityCli } from "./security/cli.ts";
 import { judgeCli } from "./security/judge-cli.ts";
 import { deliverCli } from "./security/deliver.ts";
+import { checkCli } from "./security/check.ts";
 
 const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (source preview).
 
@@ -37,6 +38,11 @@ const HELP = `ludion: security updates for PHP Docker, npm, Composer and Maven (
       released). pack writes the receipt and a Git bundle of the applied fixes' branches. open checks
       that artifact as untrusted data, then pushes each fix to its own branch and opens one PR per
       fix, unless a PR from that branch exists (GH_TOKEN). Nothing is merged.
+  ludion check [--dir <path>] [--changed-at <time>] [--keys-only] [--json]
+      The scheduled workflow's first job (action.yml, mode check; preview, not released). Before Docker,
+      for each fix of the saved policy's ecosystem only: waits (its wait cannot have ended), due, or quiet
+      (not new, and this 12-hour slot does not double from its last change). --changed-at is the commit's
+      time. Reads no earlier run's record. Exit 0 with an answer; 2 when it cannot decide (patch runs).
 `;
 
 async function main(argv: string[]): Promise<number> {
@@ -44,6 +50,7 @@ async function main(argv: string[]): Promise<number> {
   if (command && ["init", "scan", "patch", "watch"].includes(command)) return securityCli(command, rest);
   if (command === "judge") return judgeCli(rest);
   if (command === "deliver") return deliverCli(rest);
+  if (command === "check") return checkCli(rest);
   if (command === "sync" || command === "teach") {
     console.error(`ludion ${command} ended on 2026-10-28 with the lesson data it used. Ludion is now a security-update tool; run ludion help.`);
     return 2;

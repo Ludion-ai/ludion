@@ -73,7 +73,7 @@ A key that no open Ludion PR fixes and that does not wait (no t*, or t* not late
 In packages/cli/test, run in Docker (node:24 pinned by digest, a clone in the volume ludion-lb2bn1-w, `npm ci --ignore-scripts` with the network, everything after it with `--network none`, no Docker socket, `--memory 4g`). Fetch, KEV, EPSS, OSV, the registry and `gh` are stand-ins; no test reaches the network.
 
 - T1 (audit, item 2): an npm policy with `FROM node:22-alpine` in the folder's Dockerfile and a lodash finding fixed by an open Ludion PR → `work=false`; the node image is not scanned.
-- T2: an npm policy with a composer.lock that has a finding → `work=false` when the npm side has nothing, and the summary names composer.lock as not checked.
+- T2: an npm policy with a composer.lock that has a finding → `work=false` when the npm side has nothing, and the summary names composer as not checked.
 - T3: npm t*: normal urgency, the fix published 10 hours ago → waits (t* = publish + 72 h); exploited (KEV) → due at 12 h; KEV unreadable → 12 h; a later version published earlier than the smallest fixed (backport) → P is the earlier time; a KEV entry on another package's finding makes this one's wait 12 h too.
 - T4: t* is never later than the judge's wait_until for the same change (judge() on the facts the stand-ins give, for normal, high, exploited, an extended wait and a stricter project wait).
 - T5: an image `wait` → waits until `wait_until`; after it → due; a non-security move whose wait has ended is a key (the prototype's exit-0 case).

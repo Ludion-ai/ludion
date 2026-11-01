@@ -126,7 +126,11 @@ export function renderTimeCap(cap: TimeCap): string[] {
 }
 
 /** What a registry says about one package's releases. */
-export type Releases = { created: string | null; published: Map<string, string>; requires: Map<string, string[]> };
+export type Releases = {
+  created: string | null; published: Map<string, string>; requires: Map<string, string[]>;
+  /** npm: the registry document's `time.modified` (a publish, a deprecation or an unpublish moves it); read by `ludion check`. */
+  modified?: string | null;
+};
 
 async function boundedJson(fetchFn: typeof fetch, url: string, maxBytes: number): Promise<any> {
   const res = await fetchFn(url, { redirect: "error", signal: AbortSignal.timeout(30_000), headers: { accept: "application/json", "user-agent": "Ludion-Security-Preview" } });
@@ -165,7 +169,7 @@ export async function npmReleases(name: string, fetchFn: typeof fetch = fetch): 
   const published = new Map<string, string>(), requires = new Map<string, string[]>();
   for (const [version, at] of Object.entries(doc.time)) if (version !== "created" && version !== "modified" && typeof at === "string") published.set(version, at);
   for (const [version, manifest] of Object.entries<any>(doc.versions)) requires.set(version, Object.keys({ ...manifest?.dependencies, ...manifest?.optionalDependencies }).sort());
-  return { created: firstPublish(doc.time), published, requires };
+  return { created: firstPublish(doc.time), published, requires, modified: typeof doc.time.modified === "string" ? doc.time.modified : null };
 }
 
 const COMPOSER_NAME = /^[a-z0-9]([_.-]?[a-z0-9]+)*\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/;

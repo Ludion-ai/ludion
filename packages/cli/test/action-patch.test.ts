@@ -42,7 +42,7 @@ describe("the template users copy", () => {
     expect(TEMPLATE).not.toMatch(/secrets\./);
   });
   it("runs a check job first, which reads only, and patch unless it answers work=false (docs/bench/lb2b-next1/definitions.md)", () => {
-    const jobs = TEMPLATE.split("\n").filter(l => /^  [a-z-]+:$/.test(l)).map(l => l.trim());
+    const jobs = TEMPLATE.slice(TEMPLATE.indexOf("\njobs:\n")).split("\n").filter(l => /^  [a-z-]+:$/.test(l)).map(l => l.trim());
     expect(jobs).toEqual(["check:", "patch:", "pull-request:"]);
     expect(section(TEMPLATE.slice(TEMPLATE.indexOf("\n  check:")), /^    permissions:$/)).toEqual(["contents: read", "pull-requests: read"]);
     const check = section(TEMPLATE, /^  check:$/);

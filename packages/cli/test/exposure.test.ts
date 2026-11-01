@@ -32,14 +32,20 @@ describe("the merge of Ludion's PR is recorded on it (X1, X2)", () => {
     number: 5, state: "closed", merged: true, merged_at: MERGED_AT, merge_commit_sha: MERGE, body: BODY, user: { login: "github-actions[bot]" },
     head: { ref: LODASH.branch, repo: { full_name: "o/r" } }, base: { ref: "main" }, ...over,
   });
-  function github(p: Record<string, unknown>, comments: { user: { login: string }; body: string }[] = [], options: { failPull?: boolean } = {}) {
+  // GitHub's answers are dated 2 minutes after the merge, and the merged job reads the PR a minute after that.
+  const ANSWERED = new Date(Date.parse(MERGED_AT) + 2 * 60_000).toUTCString(), RAN = Date.parse(MERGED_AT) + 3 * 60_000;
+  function github(p: Record<string, unknown>, comments: { user: { login: string }; body: string }[] = [], options: { failPull?: boolean; date?: string | null } = {}) {
     const posted: string[] = [], calls: string[] = [];
+    const date = options.date === undefined ? ANSWERED : options.date;
     const fetchFn = (async (input: string | URL | Request, init?: RequestInit) => {
       const u = new URL(String(input)), method = init?.method ?? "GET";
       calls.push(`${method} ${u.pathname}${u.search}`);
       expect(new Headers(init?.headers).get("authorization")).toBe("Bearer t0ken");
       if (u.pathname === "/repos/o/r") return reply(200, { default_branch: "main" });
-      if (u.pathname === "/repos/o/r/pulls/5") return options.failPull ? reply(502, { message: "Bad Gateway" }) : reply(200, p);
+      if (u.pathname === "/repos/o/r/pulls/5") {
+        if (options.failPull) return reply(502, { message: "Bad Gateway" });
+        return new Response(JSON.stringify(p), { status: 200, headers: { "content-type": "application/json", ...(date === null ? {} : { date }) } });
+      }
       if (u.pathname === "/repos/o/r/issues/5/comments" && method === "GET") return reply(200, u.searchParams.get("page") === "1" ? comments : []);
       if (u.pathname === "/repos/o/r/issues/5/comments" && method === "POST") {
         const body = String(JSON.parse(String(init?.body)).body);
@@ -51,7 +57,7 @@ describe("the merge of Ludion's PR is recorded on it (X1, X2)", () => {
     }) as typeof fetch;
     return { fetchFn, posted, calls };
   }
-  const merge = (gh: ReturnType<typeof github>) => recordMerge({ repo: "o/r", pr: 5, api: "https://api.github.invalid", token: "t0ken", fetchFn: gh.fetchFn });
+  const merge = (gh: ReturnType<typeof github>, ran = RAN) => recordMerge({ repo: "o/r", pr: 5, api: "https://api.github.invalid", token: "t0ken", fetchFn: gh.fetchFn, now: () => ran });
 
   it("posts one comment whose first line is the record as JSON and whose table gives the exposure hours; a second call posts nothing", async () => {
     const gh = github(pr());
@@ -64,8 +70,10 @@ describe("the merge of Ludion's PR is recorded on it (X1, X2)", () => {
     expect(JSON.parse(json![1]!)).toEqual({
       schema: 1, pr: 5, branch: LODASH.branch, merged_at: "2026-10-31T09:00:00.000Z", merge_commit_sha: MERGE,
       fix_published_at: LODASH.fix_published_at, found_at: LODASH.found_at, applied_at: LODASH.applied_at,
+      recorded_at: "2026-10-31T09:03:00.000Z", answer_date: "2026-10-31T09:02:00.000Z", merged_at_doubt: null,
     });
     const text = rest.join("\n");
+    expect(text).toContain("| Recorded | `2026-10-31T09:03:00.000Z` (this job's clock), `0.1` hours after GitHub's merged_at; GitHub's answer was dated `2026-10-31T09:02:00.000Z` |");
     const exposure = ((Date.parse(MERGED_AT) - Date.parse(LODASH.fix_published_at!)) / H).toFixed(1);
     for (const part of ["`2026-10-31T09:00:00.000Z`", "`dddddddddddd`", `\`${exposure}\` hours`, `\`${((Date.parse(MERGED_AT) - Date.parse(LODASH.found_at)) / H).toFixed(1)}\` hours`, "not deployed", "checked for form only"]) expect(text).toContain(part);
     expect(text).not.toMatch(/@\w/);
@@ -129,6 +137,32 @@ describe("the merge of Ludion's PR is recorded on it (X1, X2)", () => {
     const short = github(pr({ body: BODY.replaceAll(`\`${LODASH.found_at}\``, "`2026-10-30T01:00:00.5Z`") }));
     expect((await merge(short)).record).toMatchObject({ found_at: "2026-10-30T01:00:00.500Z" });
   });
+  it("a merged_at later than the Date of GitHub's own answer, or than this job's clock, is recorded with its doubt, and no hours end at it (X7)", async () => {
+    // GitHub's answer is dated 08:09, 51 minutes before the merge it gives.
+    const ahead = github(pr(), [], { date: new Date(Date.parse(MERGED_AT) - 51 * 60_000).toUTCString() });
+    const r = await merge(ahead);
+    expect(r.outcome).toBe("recorded");
+    expect(r.record).toMatchObject({ merged_at: "2026-10-31T09:00:00.000Z", answer_date: "2026-10-31T08:09:00.000Z", recorded_at: "2026-10-31T09:03:00.000Z", merged_at_doubt: "GitHub's merged_at is 51.0 minutes later than the Date of GitHub's answer that gives it" });
+    expect(ahead.posted).toHaveLength(1);
+    const text = ahead.posted[0]!;
+    expect(text.split("\n")[0]).toContain("\"merged_at_doubt\":\"GitHub's merged_at is 51.0 minutes later");
+    expect(text).toContain("| Exposure time (published → merged) | not computed: GitHub's merged_at is 51.0 minutes later than the Date of GitHub's answer that gives it |");
+    expect(text).toContain("| Found → merged | not computed: GitHub's merged_at is 51.0 minutes later than the Date of GitHub's answer that gives it |");
+    expect(text).toContain("GitHub's merged_at is not used as the end");
+    // The hours that do not end at the merge are still computed.
+    expect(text).toMatch(/\| Published → found \| `[\d.]+` hours \|/);
+    // No Date header; this job's clock is an hour before the merge GitHub gives.
+    const late = github(pr(), [], { date: null });
+    expect((await merge(late, Date.parse(MERGED_AT) - H)).record).toMatchObject({ answer_date: null, recorded_at: "2026-10-31T08:00:00.000Z", merged_at_doubt: "GitHub's merged_at is 60.0 minutes later than this job's clock" });
+    expect(late.posted[0]).toContain("| Exposure time (published → merged) | not computed: GitHub's merged_at is 60.0 minutes later than this job's clock |");
+    // A Date header that is no date is not compared; the runner's clock still is.
+    expect((await merge(github(pr(), [], { date: "yesterday" }))).record).toMatchObject({ answer_date: null, merged_at_doubt: null });
+    // The Date header is in whole seconds: the same second is no doubt, one second later is.
+    expect((await merge(github(pr(), [], { date: new Date(Date.parse(MERGED_AT)).toUTCString() }))).record?.merged_at_doubt).toBeNull();
+    expect((await merge(github(pr(), [], { date: new Date(Date.parse(MERGED_AT) - 1000).toUTCString() }))).record?.merged_at_doubt).toBe("GitHub's merged_at is 1 second later than the Date of GitHub's answer that gives it");
+    // The job's clock a second after the merge: no doubt.
+    expect((await merge(github(pr()), Date.parse(MERGED_AT) + 1000)).record?.merged_at_doubt).toBeNull();
+  });
 });
 
 describe("found_at is the first run of the row whose check saw the fix (X4, X5)", () => {
@@ -143,8 +177,10 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
     if (Array.isArray(r)) return { ...base, record: seenAt(base.started, r) };
     return { ...base, ...r };
   });
-  const walk = (runs: StandInRun[], fixes = [LODASH], over: { runId?: number; asked?: string[]; blobAuth?: string[]; refuse?: number; limit?: number } = {}) =>
-    firstSeen({ repo: "o/r", runId: over.runId ?? runs.length, defaultBranch: "main", ecosystem: "npm", api: "https://api.github.invalid", token: "t0ken", fetchFn: withRuns(nowhere, runs, over), limit: over.limit }, fixes);
+  // The PR job's clock: after every stand-in run's start, unless a test says otherwise (X7).
+  const LATER = Date.parse("2027-06-01T00:00:00Z");
+  const walk = (runs: StandInRun[], fixes = [LODASH], over: { runId?: number; asked?: string[]; blobAuth?: string[]; refuse?: number; limit?: number; now?: number; date?: string } = {}) =>
+    firstSeen({ repo: "o/r", runId: over.runId ?? runs.length, defaultBranch: "main", ecosystem: "npm", api: "https://api.github.invalid", token: "t0ken", fetchFn: withRuns(nowhere, runs, over), limit: over.limit, now: () => over.now ?? LATER }, fixes);
 
   it("the earliest run of the row that lists the fix; a run whose valid record does not list it ends the row", async () => {
     const r = await walk(row([SAW, OTHER, SAW, SAW, SAW]));
@@ -159,8 +195,9 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
       { record: seenAt(started(3), OTHER), expired: true },
       { failArtifacts: true },
       bad(5, { ecosystem: "composer" }),
-      bad(6, { checked_at: iso(Date.parse(started(6)) - H) }),
-      bad(7, { checked_at: iso(Date.parse(started(7)) + 11 * 60_000) }),
+      // A time outside its run stops the walk (X7, below); these two are not valid at all.
+      bad(6, { checked_at: "not a time" }),
+      bad(7, { kind: "ludion-other" }),
       bad(8, { keys: [{ key: "npm:minimist", advisories: ["GHSA-<b>"] }] }),
       bad(9, { schema: 2 }),
       { bytes: Buffer.from("not a zip") },
@@ -195,17 +232,18 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
   });
   it("stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7)", async () => {
     expect(SEEN_WALK_MS).toBe(5 * 60_000);
-    let clock = T0;
+    const runs = row(Array.from({ length: 130 }, () => SAW));
+    // The PR job's clock starts after its own run's start (X7).
+    let clock = Date.parse(started(130)) + H;
     const ticks: number[] = [];
     const now = () => { ticks.push(clock); return (clock += 40_000); };
-    const runs = row(Array.from({ length: 130 }, () => SAW));
     await expect(firstSeen({ repo: "o/r", runId: 130, defaultBranch: "main", ecosystem: "npm", api: "https://api.github.invalid", token: "t0ken", fetchFn: withRuns(nowhere, runs), now }, [LODASH])).rejects.toThrow("the walk took longer than 5 minutes");
     // It stopped within the first runs, not after reading all 100.
     expect(ticks.length).toBeLessThan(15);
   });
   it("the walk's limit holds while the runs are listed, before any record is read (R252b N10)", async () => {
     // 250 runs of another event: every page is listed and none is kept, so only the check before each page can stop it.
-    let clock = T0, pages = 0;
+    let clock = Date.parse(started(250)) + H, pages = 0;
     const listing = withRuns(nowhere, Array.from({ length: 250 }, (_, i) => ({ id: i + 1, started: started(i + 1), event: "push" })));
     const fetchFn = (async (input: string | URL | Request, init?: RequestInit) => {
       if (new URL(String(input)).pathname.endsWith("/workflows/9/runs")) { pages++; clock += 3 * 60_000; }
@@ -281,6 +319,67 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
   it("throws when the runs cannot be read (no actions: read), so the caller keeps the receipt's found_at", async () => {
     await expect(walk(row([SAW, SAW]), [LODASH], { refuse: 403 })).rejects.toThrow("HTTP 403");
   });
+
+  // X7 (definitions.md, section 7): GitHub's times compared with the runner's clock and with the Date of the same answer.
+  const http = (ms: number) => new Date(ms).toUTCString();
+  it("does not walk when GitHub's start of this run is later than the runner's clock, and says by how much (X7)", async () => {
+    // GitHub's run times an hour later than the PR job's clock: this run seems to start after the job that runs in it.
+    const runs = row([SAW, SAW]);
+    await expect(walk(runs, [LODASH], { now: Date.parse(started(2)) - H })).rejects.toThrow("GitHub's start of this run is 60.0 minutes later than this runner's clock");
+    // A second after it, the walk is done.
+    expect((await walk(runs, [LODASH], { now: Date.parse(started(2)) + 1000 })).seen.get(LODASH.branch)).toMatchObject({ run: 1 });
+  });
+  it("does not walk when GitHub's start of this run is later than the Date of GitHub's answer that gives it (X7)", async () => {
+    const runs = row([SAW, SAW]);
+    await expect(walk(runs, [LODASH], { date: http(Date.parse(started(2)) - 51 * 60_000) })).rejects.toThrow("GitHub's start of this run is 51.0 minutes later than the Date of GitHub's answer that gives it");
+    await expect(walk(runs, [LODASH], { date: http(Date.parse(started(2)) - 1000) })).rejects.toThrow("GitHub's start of this run is 1 second later than the Date");
+    // The same second as the Date: this run's start is not later, but its artifact, uploaded 10 minutes into it, is.
+    expect((await walk(runs, [LODASH], { date: http(Date.parse(started(2))) })).stopped).toEqual({ run: 2, kind: "ahead", ms: 10 * 60_000, branches: [LODASH.branch] });
+    // An answer dated later, or a Date that is no date (not compared): the walk is done.
+    for (const date of [http(Date.parse(started(2)) + H), "yesterday"]) {
+      expect((await walk(runs, [LODASH], { date })).seen.get(LODASH.branch), date).toMatchObject({ run: 1 });
+    }
+  });
+  it("stops at a run whose record's time is outside GitHub's times for it, and says which run and by how much (X7)", async () => {
+    // Run 2's start, as GitHub gives it, is an hour after its record's time: GitHub's clock and the runner's differ there.
+    const early = row([SAW, { started: iso(Date.parse(started(2)) + H), record: { ...seenAt(started(2), SAW), checked_at: iso(Date.parse(started(2))) } }, SAW]);
+    const r = await walk(early);
+    expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(3)) + 5 * 60_000), run: 3, ended: false });
+    expect(r.read).toBe(1);
+    expect(r.stopped).toEqual({ run: 2, kind: "early", ms: H, branches: [LODASH.branch] });
+    // Run 2's record is an hour after GitHub's upload time of its artifact.
+    const late = row([SAW, { record: { ...seenAt(started(2), OTHER), checked_at: iso(Date.parse(started(2)) + 10 * 60_000 + H) } }, SAW]);
+    const l = await walk(late);
+    expect(l.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(3)) + 5 * 60_000), run: 3, ended: false });
+    expect(l.stopped).toEqual({ run: 2, kind: "late", ms: H, branches: [LODASH.branch] });
+    // No record of the row lists the fix before the stop: still said.
+    const none = await walk(row([SAW, { started: iso(Date.parse(started(2)) + H), record: { ...seenAt(started(2), SAW), checked_at: iso(Date.parse(started(2))) } }, null]));
+    expect(none.seen.get(LODASH.branch)).toBeNull();
+    expect(none.stopped).toMatchObject({ run: 2, kind: "early", branches: [LODASH.branch] });
+  });
+  it("stops at a run whose start or artifact GitHub dates later than its own answer (X7)", async () => {
+    // Answers dated 20 minutes after this run's start; run 2's artifact is created 51 minutes after that.
+    const date = Date.parse(started(3)) + 20 * 60_000;
+    const artifact = row([SAW, { record: seenAt(started(2), SAW), created: iso(date + 51 * 60_000) }, SAW]);
+    const a = await walk(artifact, [LODASH], { date: http(date) });
+    expect(a.seen.get(LODASH.branch)).toMatchObject({ run: 3, ended: false });
+    expect(a.stopped).toEqual({ run: 2, kind: "ahead", ms: 51 * 60_000, branches: [LODASH.branch] });
+    // Run 2's start is 51 minutes after the Date of the list that gives it (and its record lies inside its run).
+    const start = row([SAW, { started: iso(date + 51 * 60_000), record: seenAt(iso(date + 51 * 60_000), SAW) }, SAW]);
+    const s = await walk(start, [LODASH], { date: http(date) });
+    expect(s.stopped).toEqual({ run: 2, kind: "ahead", ms: 51 * 60_000, branches: [LODASH.branch] });
+    // Without a Date header the same run is read.
+    expect((await walk(artifact)).stopped).toBeNull();
+  });
+  it("a row that has ended before such a run is not stopped by it, and times that agree stop nothing (X7)", async () => {
+    const shifted = { started: iso(Date.parse(started(2)) + H), record: { ...seenAt(started(2), SAW), checked_at: iso(Date.parse(started(2))) } };
+    const ended = await walk(row([SAW, shifted, OTHER, SAW]));
+    expect(ended.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(4)) + 5 * 60_000), run: 4, ended: true });
+    expect(ended.stopped).toBeNull();
+    const fine = await walk(row([SAW, SAW, SAW]), [LODASH], { date: http(LATER) });
+    expect(fine.stopped).toBeNull();
+    expect(fine.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(1)) + 5 * 60_000), run: 1, ended: false });
+  });
 });
 
 describe("the PR body's Found row (X4, X5)", () => {
@@ -294,5 +393,16 @@ describe("the PR body's Found row (X4, X5)", () => {
     const failed = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 0, ended: false, why: "GitHub did not list this workflow's runs (HTTP 403) | `x`" } });
     expect(failed).toContain("(this run's lookup: earlier runs' records were not used: GitHub did not list this workflow's runs (HTTP 403)");
     expect(failed).not.toContain("| `x`");
+  });
+  it("says where the walk stopped at a run whose times do not agree, which times and by how much (X7)", () => {
+    const stop = (kind: "early" | "late" | "ahead", ms: number) => ({ run: 40, kind, ms });
+    const found = pullRequestBody(ARTIFACT, { ...LODASH, found_at: "2026-10-29T00:05:00.000Z", seen: { at: "2026-10-29T00:05:00.000Z", run: 41, read: 1, ended: false, stop: stop("early", H) } });
+    expect(found).toContain("| Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `1` records read; the records read end there, so an earlier run may have seen it first; the walk stopped at run `40`, whose times do not agree: its record's time is `60.0` minutes before GitHub's start of that run, so the runs before it were not read) |");
+    const none = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 0, ended: false, stop: stop("late", 90_000) } });
+    expect(none).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: no record read lists this fix; `0` records read; the walk stopped at run `40`, whose times do not agree: its record's time is `1.5` minutes after GitHub's upload time of its record, so the runs before it were not read) |");
+    const earlier = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 2, ended: false, earlier: true, stop: stop("ahead", 51 * 60_000) } });
+    expect(earlier).toContain("(this run's lookup, earlier than the record of every run that lists this fix; `2` records read; the walk stopped at run `40`, whose times do not agree: GitHub's time for that run is `51.0` minutes later than the Date of GitHub's answer that gives it, so the runs before it were not read) |");
+    const seconds = pullRequestBody(ARTIFACT, { ...LODASH, seen: { at: LODASH.found_at, run: null, read: 0, ended: false, stop: stop("ahead", 1000) } });
+    expect(seconds).toContain("GitHub's time for that run is `1` second later than the Date");
   });
 });

@@ -46,8 +46,10 @@ export const SEEN_COMMIT = "e".repeat(40);
 export const seenAt = (started: string, keys: unknown[], ecosystem = "npm") =>
   ({ schema: 1, kind: "ludion-seen", checked_at: new Date(Date.parse(started) + 5 * 60_000).toISOString(), commit: SEEN_COMMIT, ecosystem, keys });
 
-export function withRuns(fetchFn: typeof fetch, runs: StandInRun[], options: { repo?: string; refuse?: number; asked?: string[]; blobAuth?: string[] } = {}): typeof fetch {
-  const repo = options.repo ?? "o/r", reply = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+/** date: the Date header of every API answer (an HTTP date, as GitHub sends it); absent: no Date header. */
+export function withRuns(fetchFn: typeof fetch, runs: StandInRun[], options: { repo?: string; refuse?: number; asked?: string[]; blobAuth?: string[]; date?: string } = {}): typeof fetch {
+  const repo = options.repo ?? "o/r", dated: Record<string, string> = options.date === undefined ? {} : { date: options.date };
+  const reply = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", ...dated } });
   const artifactId = (run: StandInRun) => 1000 + run.id;
   return (async (input: string | URL | Request, init?: RequestInit) => {
     const url = new URL(String(input)), method = init?.method ?? "GET";

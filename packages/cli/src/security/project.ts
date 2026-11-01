@@ -9,6 +9,14 @@ export type Config = { schema: 1; ecosystem?: "php" | "node"; dockerfile: string
 export type DependencyConfig = { schema: 1; ecosystem: "npm" | "composer" | "maven"; image?: string; test: string[]; timeout_seconds: number };
 export const DEFAULT_CONFIG: Config = { schema: 1, dockerfile: "Dockerfile", test: ["php", "tests/smoke.php"], timeout_seconds: 120 };
 export const DEFAULT_NODE_CONFIG: Config = { schema: 1, ecosystem: "node", dockerfile: "Dockerfile", test: ["node", "tests/smoke.js"], timeout_seconds: 120 };
+/**
+ * Maven is out of what Ludion fixes; its read-only scan stays (the owner, 2026-11-01, docs/decisions/2026-11-01-definition-of-complete.md).
+ * readConfig still reads a Maven policy, because scan takes its tool image from it. Whatever would fix refuses it.
+ */
+export const MAVEN_REFUSAL = "maven is read-only: Maven is outside what Ludion fixes, so init, patch and watch do not accept it. ludion scan still reports its known advisories, and no update is made.";
+export function refuseMavenPolicy(config: Config | DependencyConfig): void {
+  if (config.ecosystem === "maven") throw new Error(MAVEN_REFUSAL);
+}
 
 export function rootPath(dir: string): string {
   const root = resolve(dir);

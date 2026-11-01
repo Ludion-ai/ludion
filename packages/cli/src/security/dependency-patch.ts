@@ -7,7 +7,7 @@ import { runContainer, runDockerImageCommand, type Tool } from "../../../sandbox
 import { changedManifest, DEFAULT_IMAGES, inventory, jsonFile, MANIFESTS, mavenGraph, packageEntry, parsePom, textFile, type Change, type Ecosystem, type Inventory } from "./inventory.ts";
 import { comparableVersion, OsvClient, type DependencyScan, type Finding } from "./osv.ts";
 import { hash } from "./php.ts";
-import { CONFIG, privateState, readConfig, rootPath, snapshot } from "./project.ts";
+import { CONFIG, privateState, readConfig, refuseMavenPolicy, rootPath, snapshot } from "./project.ts";
 import { branchTip, fixBranch, fixBranchName, gitBase, skippedReason } from "./branch.ts";
 import { dependencyFixPublished } from "./exposure.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
@@ -298,6 +298,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
   active();
   const root = rootPath(dir), config = readConfig(root);
   if ("dockerfile" in config) throw new Error("A dependency ecosystem configuration is required.");
+  refuseMavenPolicy(config);
   const configText = textFile(root, CONFIG), originalTree = snapshot(root);
   if (JSON.stringify(readConfig(root)) !== JSON.stringify(config)) throw new Error("Update policy changed before scanning.");
   const ecosystem = config.ecosystem, client = deps.client ?? new OsvClient();

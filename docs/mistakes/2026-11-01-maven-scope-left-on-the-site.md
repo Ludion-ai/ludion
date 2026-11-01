@@ -1,0 +1,7 @@
+# 2026-11-01 — The README and the site kept saying Ludion fixes Maven after the owner took it out of scope
+
+- **What happened.** The owner took Maven out of what Ludion fixes on 2026-11-01 at 13:09 JST (docs/decisions/2026-11-01-definition-of-complete.md). `ludion patch` kept accepting a Maven policy, and README.md, packages/cli/README.md and the site (apps/site/src/strings/en.ts and ja.ts, /llms.txt) kept listing Maven among the ecosystems Ludion updates. docs/status.md said so in its scope table, but the lane that fixes it had not started when that gap was pointed out later the same day. The sentences were true of the code, and were no longer what Ludion is to do.
+- **Why.** The scope decision changed the records only. Nothing connects what `patch` accepts to what the public pages say, so a narrowed scope leaves the pages as they are until someone remembers them, and no check fails meanwhile.
+- **What changed.** `patch`, `watch`, `init` and the PR job refuse Maven with the reason, and the scan stays (docs/progress/2026-11-01-lmvn.md). The READMEs, the site and the CLI's help say so.
+- **Check:** `packages/cli/test/maven-read-only.test.ts` — each command that would fix refuses Maven before any Docker, OSV or registry work, the scan still reaches its Maven check, and both READMEs have Maven's row as read-only and none of their earlier sentences.
+- **Check:** `apps/site/test/knowledge.test.ts` — a new site string that names Maven fails until it is added to the test's list, and each string about the scope says read-only, in English and in Japanese.

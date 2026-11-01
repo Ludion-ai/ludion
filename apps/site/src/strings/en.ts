@@ -2,7 +2,7 @@
 export const en = {
   "site": {
     "name": "Ludion",
-    "description": "One workflow for security updates across PHP Docker, npm, Composer and Maven. Find relevant fixes, validate the application, and commit each fix to its own Git branch with a recorded result."
+    "description": "One workflow for security updates across PHP Docker, npm and Composer, with a read-only scan of Maven. Find relevant fixes, validate the application, and commit each fix to its own Git branch with a recorded result."
   },
   "nav": {
     "label": "Main",
@@ -17,11 +17,11 @@ export const en = {
       "Keep building.",
       "Keep your stack moving."
     ],
-    "sub": "Find security fixes across PHP, JavaScript, TypeScript and Java. Validate the change, update the project, and see what still needs attention.",
+    "sub": "Find security fixes across PHP, JavaScript and TypeScript. Validate the change, update the project, and see what still needs attention.",
     "start": "Try the preview",
     "seeItWork": "See the workflow",
     "scroll": "Follow the update",
-    "coverage": "Source preview · PHP Docker, npm package-lock, Composer and standalone Maven. Source updates are validated locally; production deployment stays with your release process.",
+    "coverage": "Source preview · PHP Docker, npm package-lock and Composer. Standalone Maven is scanned only, with no updates. Source updates are validated locally; production deployment stays with your release process.",
     "example": "Illustrated workflow. Run the preview to produce your own results.",
     "scene": {
       "caption": "Your stack → relevant advisories → application checks → recorded updates.",
@@ -56,7 +56,7 @@ export const en = {
           "detail": "An unsupported manifest, unresolved model or untrusted acquisition path needs review. It remains visible instead of being silently skipped."
         }
       ],
-      "note": "Read installed versions from npm and Composer lockfiles, or resolve a standalone Maven dependency graph. PHP runtime releases use the configured Dockerfile. Dependency advisories come from OSV."
+      "note": "Read installed versions from npm and Composer lockfiles, or, in a read-only scan, resolve a standalone Maven dependency graph. PHP runtime releases use the configured Dockerfile. Dependency advisories come from OSV."
     },
     "verify": {
       "title": "Check every update.",
@@ -80,7 +80,7 @@ export const en = {
       "bar": "patch.workflow",
       "stagesLabel": "Update stages",
       "install": "1 · Resolve",
-      "installDetail": "Acquire dependencies separately from application testing. npm blocks URL/Git/file dependencies; Composer archives are checked at each redirect; Maven uses public Central.",
+      "installDetail": "Acquire dependencies separately from application testing. npm blocks URL/Git/file dependencies; Composer archives are checked at each redirect.",
       "run": "2 · Validate",
       "runDetail": "Run the original and updated application tests in Docker with no network, a read-only source/root, a non-root user and fixed scratch/resource limits. Check the resulting inventory again.",
       "apply": "3 · Apply",
@@ -148,7 +148,7 @@ export const en = {
       {
         "name": "Java / Maven",
         "detect": "Resolved graph + OSV",
-        "apply": "POM + dependency constraints",
+        "apply": "Read-only scan; no updates",
         "scope": "Standalone POM; public Maven Central. Parents, profiles, modules and extensions need review."
       }
     ],
@@ -156,7 +156,7 @@ export const en = {
   },
   "start": {
     "title": "Try the multi-stack preview | Ludion",
-    "description": "Check PHP Docker, npm, Composer and Maven security updates. Choose an update policy and application test before committing fixes to Git branches.",
+    "description": "Check PHP Docker, npm and Composer security updates, and scan Maven read-only. Choose an update policy and application test before committing fixes to Git branches.",
     "heading": "One workflow. More of your stack.",
     "intro": "Scan the project, choose an ecosystem policy, then validate its security update against your application.",
     "copy": "Copy",
@@ -177,7 +177,7 @@ export const en = {
         { "title": "Apply", "detail": "One Git branch per fix" }
       ]
     },
-    "coverage": "PHP Docker · npm · Composer · Maven. An unavailable database or unsupported inventory stays visible. Production is not automatically redeployed.",
+    "coverage": "PHP Docker · npm · Composer. Maven is scanned only, with no updates. An unavailable database or unsupported inventory stays visible. Production is not automatically redeployed.",
     "reference": "From discovery to a validated update",
     "source": {
       "summary": "1 · Build the source preview",
@@ -188,10 +188,10 @@ export const en = {
     "init": {
       "summary": "2 · Choose the ecosystem and test",
       "note": "Required before validation",
-      "choose": "Choose php, npm, composer or maven. A project may scan several ecosystems together; its saved patch policy selects one manager at a time.",
+      "choose": "Choose php, npm or composer. Maven is scanned only, so init refuses it. A project may scan several ecosystems together; its saved patch policy selects one manager at a time.",
       "copy": "Copy init command",
       "edit": "Edit ludion.security.json to select an official tool image matching your application and its real offline test command. npm acquisition uses npm 12.2.1; its Node tool image must support that version.",
-      "tests": "Tests must run with a read-only project and write only to supported scratch areas. Maven's online model excludes custom build/plugin configuration; those plugins must already be available for offline tests or validation will stop."
+      "tests": "Tests must run with a read-only project and write only to supported scratch areas."
     },
     "apply": {
       "summary": "3 · Validate, then apply",
@@ -202,8 +202,8 @@ export const en = {
       "copyApply": "Copy apply command",
       "branchesBefore": "--apply does not change your files or your current branch. Each fix becomes one commit on its own new branch, ",
       "branchesAfter": ", and nothing is pushed. Fixes that pass only together are not applied. A fix whose branch already exists is not applied again. An OSV malicious-package record (MAL-) on any installed package stops every fix in the run.",
-      "needs": "--apply needs git installed outside the project, and a Git repository whose files are exactly those of its last commit. Uncommitted, untracked or ignored files (other than node_modules and .env files, and for npm, Composer and Maven a top-level vendor or target), Git LFS, submodules or Git configuration that names hooks make it refuse; run without --apply to validate only.",
-      "review": "Review .ludion/security/ for the receipt. npm/Composer may adjust dependency constraints within the same major and regenerate the lockfile. Maven can add dependencyManagement constraints for vulnerable transitives. Major-version fixes and unresolved cases require review. Merge a branch, then deploy through your normal process."
+      "needs": "--apply needs git installed outside the project, and a Git repository whose files are exactly those of its last commit. Uncommitted, untracked or ignored files (other than node_modules and .env files, and for npm and Composer a top-level vendor or target), Git LFS, submodules or Git configuration that names hooks make it refuse; run without --apply to validate only.",
+      "review": "Review .ludion/security/ for the receipt. npm/Composer may adjust dependency constraints within the same major and regenerate the lockfile. Major-version fixes and unresolved cases require review. Merge a branch, then deploy through your normal process."
     },
     "watch": {
       "summary": "4 · Keep checking automatically",

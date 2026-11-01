@@ -17,11 +17,11 @@ export function sitemap({ site, builtAt }: { site: string; builtAt: string }): s
 export function llmsTxt(site: string): string {
  return `# Ludion
 
-> One workflow for security updates across PHP Docker, npm, Composer and Maven.
+> One workflow for security updates across PHP Docker, npm and Composer, with a read-only scan of Maven.
 
 Source preview: detect known advisories, acquire dependencies separately, test old/new application images offline, recheck the candidate and apply only under --apply policy.
 
-Coverage: exact single-stage official PHP Docker images; public npm package-lock v2/v3; Composer lockfiles with supported pinned public ZIP archives; standalone Maven resolved dependency graphs via public Central. Parents/profiles/modules/extensions, custom registries, major upgrades and unsupported offline builds require review. Yarn/pnpm discovery is partial. Python, Go, Rust, Gradle, live server inventory and automatic production deployment are unsupported. A missing update is not evidence that a project is secure. Package coordinates are sent to OSV; application source is not uploaded to Ludion.
+Coverage: exact single-stage official PHP Docker images; public npm package-lock v2/v3; Composer lockfiles with supported pinned public ZIP archives. Read-only scan, with no updates: standalone Maven resolved dependency graphs via public Central. Parents/profiles/modules/extensions, custom registries, major upgrades and unsupported offline builds require review. Yarn/pnpm discovery is partial. Python, Go, Rust, Gradle, live server inventory and automatic production deployment are unsupported. A missing update is not evidence that a project is secure. Package coordinates are sent to OSV; application source is not uploaded to Ludion.
 
 - [Try the source preview](${site}/start/): init, scan, patch and watch.
 

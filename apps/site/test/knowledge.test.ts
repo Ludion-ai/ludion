@@ -127,6 +127,24 @@ describe("Japanese copy", () => {
       }
     });
   });
+  // Maven is out of what Ludion fixes, and its read-only scan stays (docs/decisions/2026-11-01-definition-of-complete.md).
+  // A new string that names Maven fails here until someone adds it, having read what it says.
+  it("names Maven only where it says read-only, or what the scan does", () => {
+    const naming = all.filter(([, a, b]) => /maven/i.test(a) || /maven/i.test(b)).map(([path]) => path);
+    expect(naming.sort()).toEqual([
+      "home.coverage", "home.guard.note", "home.supported[3].name", "home.supported[3].scope", "site.description",
+      "start.coverage", "start.description", "start.init.choose", "start.privacy.requests", "start.scan.wiring",
+    ]);
+    for (const path of ["home.coverage", "home.guard.note", "site.description", "start.coverage", "start.description", "start.init.choose"]) {
+      const [, a, b] = all.find(([p]) => p === path)!;
+      expect(a, path).toMatch(/read-only|scanned only/);
+      expect(b, path).toMatch(/読むだけ|スキャンだけ/);
+    }
+    expect(en.home.supported[3]!.apply).toBe("Read-only scan; no updates");
+    expect(ja.home.supported[3]!.apply).toBe("読むだけのスキャン。更新はしません");
+    expect(en.home.sub).not.toMatch(/\bJava\b/);
+    expect(ja.home.sub).not.toMatch(/\bJava\b/);
+  });
   it("says nothing the product is not, or has not done", () => {
     const text = all.map(([, , b]) => b).join("\n");
     for (const banned of [/Capability Compiler/i, /判定して/, /コメントを返/, /関門/, /ゲートを通/, /自動(で)?マージ/, /保証します/, /安全です/, /認証済み/]) {

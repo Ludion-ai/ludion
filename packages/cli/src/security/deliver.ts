@@ -106,15 +106,19 @@ export type CheckedFix = {
  * found_at is the receipt's (this run's lookup). read: how many valid records were read. ended: a record that does not
  * list the fix ended the row (otherwise the records ran out, and an earlier run may have seen it). why: the walk was
  * not done. earlier: the receipt's lookup is earlier than every record that lists the fix. stop: the walk stopped, while
- * the row had not ended, at a run whose times do not agree (definitions.md, section 7).
+ * the row had not ended, at a run whose times do not agree (definitions.md, section 7). started: GitHub's start of
+ * `run`, beside `at`, which is that run's runner's clock. clock: this run's times by GitHub and by the runner (section 8).
  */
-export type Seen = { at: string; run: number | null; read: number; ended: boolean; why?: string; earlier?: boolean; stop?: ClockStop };
+export type Seen = { at: string; run: number | null; started?: string; read: number; ended: boolean; why?: string; earlier?: boolean; stop?: ClockStop; clock?: WalkClock };
+/** When the walk was done: GitHub's start of this run, the Date of the answer that gives it (or null) and this runner's clock. */
+export type WalkClock = { run_started_at: string; answer_date: string | null; runner: string };
 /**
  * A run at which the walk stopped because its times do not agree, and by how many milliseconds. early: its record's
  * time is before GitHub's start of the run; late: after GitHub's upload time of its artifact; ahead: GitHub's start of
- * the run, or upload time of its artifact, is later than the Date of GitHub's answer that gives it.
+ * the run, or upload time of its artifact, is later than the Date of GitHub's answer that gives it. github: that time of
+ * GitHub's; other: what it was compared with, the record's time or the Date (definitions.md, section 8).
  */
-export type ClockStop = { run: number; kind: "early" | "late" | "ahead"; ms: number };
+export type ClockStop = { run: number; kind: "early" | "late" | "ahead"; ms: number; github: string; other: string };
 export type CheckedArtifact = { id: string | null; ecosystem: Ecosystem | null; base: string; fixes: CheckedFix[]; notApplied: Record<string, number> };
 export type Delivery = { package: string; branch: string; outcome: "opened" | "open_pr_exists" | "closed_pr_exists" | "branch_differs" | "failed"; pr?: number; url?: string; reason?: string };
 
@@ -692,14 +696,16 @@ function foundRow(fix: CheckedFix): string {
   // Our own message, never text from GitHub or the artifact; still kept out of the table's and Markdown's syntax.
   if (s.why !== undefined) return `| Found | ${at} (this run's lookup: earlier runs' records were not used: ${plain(s.why).replace(/[|`*_<>[\]@#~\\]/g, " ").slice(0, 300)}) |`;
   const read = `${code(String(s.read))} records read`;
-  // Only numbers come from GitHub or the record here, each formatted by span().
+  // Only numbers come from GitHub or the record here: each difference formatted by span(), each time written by
+  // toISOString() from its parsed number (firstSeen).
   const stop = !s.stop ? "" : `; the walk stopped at run ${code(String(s.stop.run))}, whose times do not agree: ${s.stop.kind === "early"
-    ? `its record's time is ${span(s.stop.ms, code)} before GitHub's start of that run`
-    : s.stop.kind === "late" ? `its record's time is ${span(s.stop.ms, code)} after GitHub's upload time of its record`
-    : `GitHub's time for that run is ${span(s.stop.ms, code)} later than the Date of GitHub's answer that gives it`}, so the runs before it were not read`;
-  if (s.earlier) return `| Found | ${at} (this run's lookup, earlier than the record of every run that lists this fix; ${read}${stop}) |`;
-  if (s.run === null) return `| Found | ${at} (this run's lookup: ${s.stop ? "no record read lists this fix" : "no record of this workflow's runs lists this fix"}; ${read}${stop}) |`;
-  return `| Found | ${at} (the check of run ${code(String(s.run))}, the first of an unbroken row of this workflow's runs whose record lists this fix; ${read}${s.ended ? "" : "; the records read end there, so an earlier run may have seen it first"}${stop}) |`;
+    ? `its record's time ${code(s.stop.other)} is ${span(s.stop.ms, code)} before GitHub's start of that run ${code(s.stop.github)}`
+    : s.stop.kind === "late" ? `its record's time ${code(s.stop.other)} is ${span(s.stop.ms, code)} after GitHub's upload time of its record ${code(s.stop.github)}`
+    : `GitHub's time for that run ${code(s.stop.github)} is ${span(s.stop.ms, code)} later than the Date ${code(s.stop.other)} of GitHub's answer that gives it`}, so the runs before it were not read`;
+  const clock = !s.clock ? "" : `; this run: GitHub's start ${code(s.clock.run_started_at)}, ${s.clock.answer_date === null ? "GitHub's answer had no Date header that is a date" : `the Date of GitHub's answer ${code(s.clock.answer_date)}`}, this runner's clock ${code(s.clock.runner)}`;
+  if (s.earlier) return `| Found | ${at} (this run's lookup, earlier than the record of every run that lists this fix; ${read}${stop}${clock}) |`;
+  if (s.run === null) return `| Found | ${at} (this run's lookup: ${s.stop ? "no record read lists this fix" : "no record of this workflow's runs lists this fix"}; ${read}${stop}${clock}) |`;
+  return `| Found | ${at} (the check of run ${code(String(s.run))}${s.started ? `, which GitHub says started at ${code(s.started)}` : ""}, the first of an unbroken row of this workflow's runs whose record lists this fix; ${read}${s.ended ? "" : "; the records read end there, so an earlier run may have seen it first"}${stop}${clock}) |`;
 }
 
 /** The PR's body, from checked fields only. Every value is in a code span; no free text from the artifact is used. */
@@ -849,8 +855,8 @@ function seenRecordOf(bytes: Buffer, started: number, uploaded: number, ecosyste
       };
     });
     // No margin: GitHub's start of the run is before its check job's own time, and the upload after it.
-    if (at < started) return { kind: "early", ms: started - at };
-    if (at > uploaded) return { kind: "late", ms: at - uploaded };
+    if (at < started) return { kind: "early", ms: started - at, github: new Date(started).toISOString(), other: new Date(at).toISOString() };
+    if (at > uploaded) return { kind: "late", ms: at - uploaded, github: new Date(uploaded).toISOString(), other: new Date(at).toISOString() };
     return { checked_at: new Date(at).toISOString(), keys };
   } catch { return null; }
 }
@@ -863,7 +869,7 @@ function seenRecordOf(bytes: Buffer, started: number, uploaded: number, ecosyste
 async function seenOfRun(api: Api, repo: string, run: { id: number; started: number; dated: number | null }, ecosystem: Ecosystem): Promise<SeenRecord | ClockStop | null> {
   // GitHub's start of the run later than the answer that gives it: GitHub's clock does not agree with itself.
   const startAhead = pastAnswer(run.started, run.dated);
-  if (startAhead) return { run: run.id, kind: "ahead", ms: startAhead };
+  if (startAhead) return { run: run.id, kind: "ahead", ms: startAhead, github: new Date(run.started).toISOString(), other: new Date(run.dated!).toISOString() };
   try {
     const listed = await call(api, "GET", `/repos/${repo}/actions/runs/${run.id}/artifacts?${new URLSearchParams({ name: SEEN_ARTIFACT, per_page: "100" })}`);
     const items = (listed.json as { artifacts?: unknown } | null)?.artifacts;
@@ -873,7 +879,7 @@ async function seenOfRun(api: Api, repo: string, run: { id: number; started: num
       .sort((a, b) => Date.parse(b.created_at as string) - Date.parse(a.created_at as string));
     if (!live.length) return null;
     const uploadAhead = pastAnswer(Date.parse(live[0]!.created_at as string), listed.date);
-    if (uploadAhead) return { run: run.id, kind: "ahead", ms: uploadAhead };
+    if (uploadAhead) return { run: run.id, kind: "ahead", ms: uploadAhead, github: new Date(Date.parse(live[0]!.created_at as string)).toISOString(), other: new Date(listed.date!).toISOString() };
     // GitHub answers with a redirect to the zip's address, which is asked without the token.
     const first = await api.fetchFn(`${api.url}/repos/${repo}/actions/artifacts/${live[0]!.id}/zip`, {
       headers: { authorization: `Bearer ${api.token}`, accept: "application/vnd.github+json", "x-github-api-version": "2022-11-28" }, redirect: "manual", signal: AbortSignal.timeout(30_000),
@@ -907,9 +913,9 @@ function listsFix(record: SeenRecord, ecosystem: Ecosystem, fix: CheckedFix): bo
  * it. Throws when this run or the workflow's runs cannot be read, when GitHub's start of this run does not agree with
  * this runner's clock or with the Date of its answer, or when the walk takes longer than SEEN_WALK_MS; the caller then
  * keeps the receipt's found_at. stopped: the run whose times do not agree, at which the walk stopped, and the fixes
- * whose row had not ended there (definitions.md, section 7).
+ * whose row had not ended there (definitions.md, section 7). clock: this run's times, by GitHub and by the runner (section 8).
  */
-export async function firstSeen(options: { repo: string; runId: number; defaultBranch: string; ecosystem: Ecosystem; api: string; token: string; fetchFn?: typeof fetch; limit?: number; now?: () => number }, fixes: CheckedFix[]): Promise<{ read: number; seen: Map<string, { at: string; run: number; ended: boolean } | null>; stopped: (ClockStop & { branches: string[] }) | null }> {
+export async function firstSeen(options: { repo: string; runId: number; defaultBranch: string; ecosystem: Ecosystem; api: string; token: string; fetchFn?: typeof fetch; limit?: number; now?: () => number }, fixes: CheckedFix[]): Promise<{ read: number; seen: Map<string, { at: string; run: number; started: string; ended: boolean } | null>; stopped: (ClockStop & { branches: string[] }) | null; clock: WalkClock }> {
   const api = apiOf(options), limit = options.limit ?? SEEN_RUNS, now = options.now ?? Date.now, until = now() + SEEN_WALK_MS;
   // Before each request: the PR job opens the PR after the walk, within the job's own time limit.
   const inTime = () => { if (now() > until) throw new Error(`the walk took longer than ${SEEN_WALK_MS / 60_000} minutes.`); };
@@ -921,9 +927,9 @@ export async function firstSeen(options: { repo: string; runId: number; defaultB
   // it, means GitHub's times and the runner's (the records' checked_at) are not one clock now: nothing is compared.
   const ownAt = typeof ownStart === "string" && TIME.test(ownStart) && isDate(ownStart) ? Date.parse(ownStart) : NaN;
   if (!Number.isFinite(ownAt)) throw new Error("GitHub gave no start time of this run.");
-  const clock = now();
-  if (ownAt > clock) throw new Error(`GitHub's start of this run is ${span(ownAt - clock)} later than this runner's clock (GitHub's clock and the runner's do not agree).`);
-  if (pastAnswer(ownAt, own.date)) throw new Error(`GitHub's start of this run is ${span(pastAnswer(ownAt, own.date))} later than the Date of GitHub's answer that gives it.`);
+  const clock = now(), times: WalkClock = { run_started_at: new Date(ownAt).toISOString(), answer_date: own.date === null ? null : new Date(own.date).toISOString(), runner: new Date(clock).toISOString() };
+  if (ownAt > clock) throw new Error(`GitHub's start of this run is ${span(ownAt - clock)} later than this runner's clock (GitHub's clock and the runner's do not agree): GitHub's start ${times.run_started_at}, this runner's clock ${times.runner}.`);
+  if (pastAnswer(ownAt, own.date)) throw new Error(`GitHub's start of this run is ${span(pastAnswer(ownAt, own.date))} later than the Date of GitHub's answer that gives it: GitHub's start ${times.run_started_at}, that Date ${times.answer_date}, this runner's clock ${times.runner}.`);
   const runs: { id: number; started: number; dated: number | null }[] = [];
   for (let page = 1; runs.length < limit && page <= 10; page++) {
     inTime();
@@ -939,7 +945,7 @@ export async function firstSeen(options: { repo: string; runId: number; defaultB
     if (items.length < 100) break;
   }
   runs.sort((a, b) => b.id - a.id).splice(limit);
-  const state = new Map(fixes.map(f => [f.branch, { found: null as { at: string; run: number } | null, ended: false }]));
+  const state = new Map(fixes.map(f => [f.branch, { found: null as { at: string; run: number; started: string } | null, ended: false }]));
   let read = 0, stopped: (ClockStop & { branches: string[] }) | null = null;
   for (const run of runs) {
     if ([...state.values()].every(s => s.ended)) break;
@@ -955,11 +961,11 @@ export async function firstSeen(options: { repo: string; runId: number; defaultB
       if (s.ended) continue;
       // The earliest record time of the row (definitions.md, section 3), not the lowest run id's: a re-run of an older
       // run keeps its id and moves its start and its record later (R252 N4).
-      if (listsFix(record, options.ecosystem, fix)) { if (!s.found || Date.parse(record.checked_at) < Date.parse(s.found.at)) s.found = { at: record.checked_at, run: run.id }; }
+      if (listsFix(record, options.ecosystem, fix)) { if (!s.found || Date.parse(record.checked_at) < Date.parse(s.found.at)) s.found = { at: record.checked_at, run: run.id, started: new Date(run.started).toISOString() }; }
       else s.ended = true;
     }
   }
-  return { read, seen: new Map(fixes.map(f => { const s = state.get(f.branch)!; return [f.branch, s.found ? { ...s.found, ended: s.ended } : null]; })), stopped };
+  return { read, seen: new Map(fixes.map(f => { const s = state.get(f.branch)!; return [f.branch, s.found ? { ...s.found, ended: s.ended } : null]; })), stopped, clock: times };
 }
 
 /**
@@ -1187,10 +1193,10 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
       else {
         const s = w.seen.get(fix.branch) ?? null;
         // The walk stopped at a run whose times do not agree while this fix's row was open (definitions.md, section 7).
-        const stop: { stop?: ClockStop } = w.stopped?.branches.includes(fix.branch) ? { stop: { run: w.stopped.run, kind: w.stopped.kind, ms: w.stopped.ms } } : {};
-        if (!s) fix.seen = { at: fix.found_at, run: null, read: w.read, ended: !stop.stop, ...stop };
-        else if (Date.parse(s.at) <= Date.parse(fix.found_at)) { fix.seen = { at: s.at, run: s.run, read: w.read, ended: s.ended, ...stop }; fix.found_at = s.at; }
-        else fix.seen = { at: fix.found_at, run: null, read: w.read, ended: s.ended, earlier: true, ...stop };
+        const stop: { stop?: ClockStop } = w.stopped?.branches.includes(fix.branch) ? { stop: { run: w.stopped.run, kind: w.stopped.kind, ms: w.stopped.ms, github: w.stopped.github, other: w.stopped.other } } : {};
+        if (!s) fix.seen = { at: fix.found_at, run: null, read: w.read, ended: !stop.stop, clock: w.clock, ...stop };
+        else if (Date.parse(s.at) <= Date.parse(fix.found_at)) { fix.seen = { at: s.at, run: s.run, started: s.started, read: w.read, ended: s.ended, clock: w.clock, ...stop }; fix.found_at = s.at; }
+        else fix.seen = { at: fix.found_at, run: null, read: w.read, ended: s.ended, earlier: true, clock: w.clock, ...stop };
       }
       const created = await call(api, "POST", `/repos/${options.repo}/pulls`, { title: fix.subject, head: fix.branch, base: defaultBranch, body: pullRequestBody(checked, fix), maintainer_can_modify: false });
       const pr = created.json as { number?: unknown; html_url?: unknown } | null;

@@ -1,0 +1,136 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ❯ |node| packages/cli/test/check.test.ts (0 test)
+ ❯ |node| packages/cli/test/action-patch.test.ts (9 tests | 5 failed) 31ms
+     ✓ runs on a schedule or by hand only, with no permission at the top 1ms
+     ✓ gives the validation job contents: read only and the PR job contents and pull-requests: write only 1ms
+     × runs a check job first, which reads only, and patch unless it answers work=false (docs/bench/lb2b-next1/definitions.md) 4ms
+     × turns setup-node's npm cache off in every job 1ms
+     × pins every action by a full commit SHA 1ms
+     ✓ mode patch: no step names the token or a secret, and the checkout leaves no credential 0ms
+     ✓ mode pull-request: one step holds the token, and it runs only the bundled CLI's deliver open 1ms
+     × mode check: one step holds the token, runs action/check.sh, and reads no artifact 1ms
+     × refuses another event, another branch, a runner that is not GitHub-hosted, and an OIDC token in mode patch 21ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| packages/cli/test/check.test.ts [ packages/cli/test/check.test.ts ]
+Error: Cannot find module '../src/security/check.ts' imported from /w/repo/packages/cli/test/check.test.ts
+ ❯ packages/cli/test/check.test.ts:11:1
+      9| import { gzipSync } from "node:zlib";
+     10| import { describe, expect, it } from "vitest";
+     11| import { checkProject, checkLines, slot, SLOT_HOURS, type CheckAnswer …
+       | ^
+     12| import { judge, WAIT_HOURS, type Change, type FixedAdvisory, type Vers…
+     13| import { EPSS_LIST } from "../src/security/npm-facts.ts";
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > the template users copy > runs a check job first, which reads only, and patch unless it answers work=false (docs/bench/lb2b-next1/definitions.md)
+AssertionError: expected [ 'schedule:', 'patch:', …(1) ] to deeply equal [ 'check:', 'patch:', 'pull-request:' ]
+
+- Expected
++ Received
+
+  [
+-   "check:",
++   "schedule:",
+    "patch:",
+    "pull-request:",
+  ]
+
+ ❯ packages/cli/test/action-patch.test.ts:46:18
+     44|   it("runs a check job first, which reads only, and patch unless it an…
+     45|     const jobs = TEMPLATE.split("\n").filter(l => /^  [a-z-]+:$/.test(…
+     46|     expect(jobs).toEqual(["check:", "patch:", "pull-request:"]);
+       |                  ^
+     47|     expect(section(TEMPLATE.slice(TEMPLATE.indexOf("\n  check:")), /^ …
+     48|     const check = section(TEMPLATE, /^  check:$/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > the template users copy > turns setup-node's npm cache off in every job
+Error: no /^  check:$/
+ ❯ section packages/cli/test/action-patch.test.ts:19:21
+     17| function section(yaml: string, header: RegExp): string[] {
+     18|   const lines = yaml.split("\n"), at = lines.findIndex(l => header.tes…
+     19|   if (at < 0) throw new Error(`no ${header}`);
+       |                     ^
+     20|   const indent = lines[at]!.search(/\S/), body: string[] = [];
+     21|   for (const line of lines.slice(at + 1)) { if (line.trim() && line.se…
+ ❯ packages/cli/test/action-patch.test.ts:57:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > the template users copy > pins every action by a full commit SHA
+AssertionError: expected 4 to be 6 // Object.is equality
+
+- Expected
++ Received
+
+- 6
++ 4
+
+ ❯ packages/cli/test/action-patch.test.ts:63:25
+     61|   it("pins every action by a full commit SHA", () => {
+     62|     const uses = TEMPLATE.split("\n").filter(l => /^\s+(- )?uses:/.tes…
+     63|     expect(uses.length).toBe(6);
+       |                         ^
+     64|     for (const line of uses) expect(line).toMatch(/uses: [A-Za-z0-9-]+…
+     65|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > action.yml's steps for each mode > mode check: one step holds the token, runs action/check.sh, and reads no artifact
+AssertionError: expected [ …(2) ] to deeply equal [ …(4) ]
+
+- Expected
++ Received
+
+  [
+    "name: Check the mode, the event and the tools",
+    "name: Check that this commit of the action carries the bundled judge",
+-   "name: Check out the run's commit",
+-   "name: Decide, before Docker, whether this run has anything to do",
+  ]
+
+ ❯ packages/cli/test/action-patch.test.ts:97:45
+     95|   it("mode check: one step holds the token, runs action/check.sh, and …
+     96|     const mine = forMode("check");
+     97|     expect(mine.map(s => s.split("\n")[0])).toEqual([
+       |                                             ^
+     98|       "name: Check the mode, the event and the tools", "name: Check th…
+     99|       "name: Check out the run's commit", "name: Decide, before Docker…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |node| packages/cli/test/action-patch.test.ts > action/start.sh refuses the scheduled modes outside their place > refuses another event, another branch, a runner that is not GitHub-hosted, and an OIDC token in mode patch
+AssertionError: expected '::error::mode must be judge, comment,…' to contain 'mode check runs on schedule or workfl…'
+
+- Expected
++ Received
+
+- mode check runs on schedule or workflow_dispatch, not pull_request.
++ ::error::mode must be judge, comment, patch or pull-request.
++
+
+ ❯ packages/cli/test/action-patch.test.ts:129:24
+    127|       const r = start(env);
+    128|       expect(r.status, JSON.stringify(env)).toBe(1);
+    129|       expect(r.stdout).toContain(why);
+       |                        ^
+    130|     }
+    131|     const ok = start({ MODE: "pull-request", EVENT: "workflow_dispatch…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  5 failed | 4 passed (9)
+   Start at  00:02:17
+   Duration  177ms (transform 70ms, setup 0ms, import 44ms, tests 31ms, environment 0ms)
+

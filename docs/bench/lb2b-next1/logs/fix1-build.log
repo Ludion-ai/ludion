@@ -1,0 +1,43 @@
+
+> build
+> npm run build --workspaces --if-present
+
+
+> ludion-ai@0.3.0-preview.1 build
+> node build.ts
+
+Wrote dist/cli.js
+
+> @ludion/site@0.0.0 build
+> astro build
+
+▶ Astro collects anonymous usage data.
+  This information helps us improve Astro.
+  Run "astro telemetry disable" to opt-out.
+  https://astro.build/telemetry
+
+01:16:28 [types] Generated 147ms
+01:16:28 [build] output: "static"
+01:16:28 [build] mode: "static"
+01:16:28 [build] directory: /w/repo/apps/site/dist/
+01:16:28 [build] Collecting build info...
+01:16:28 [build] ✓ Completed in 165ms.
+01:16:28 [build] Building static entrypoints...
+01:16:28 [vite] ✓ built in 199ms
+01:16:29 [vite] ✓ built in 126ms
+01:16:29 [build] Rearranging server assets...
+
+ generating static routes 
+01:16:29   ├─ /404.html (+12ms) 
+01:16:29   ├─ /build.json (+2ms) 
+01:16:29   ├─ /ja/start/index.html (+4ms) 
+01:16:29   ├─ /ja/index.html (+5ms) 
+01:16:29   ├─ /llms.txt (+2ms) 
+01:16:29   ├─ /sitemap.xml (+2ms) 
+01:16:29   ├─ /start/index.html (+3ms) 
+01:16:29   ├─ /index.html (+3ms) 
+01:16:29 ✓ Completed in 46ms.
+
+01:16:29 [build] ✓ Completed in 398ms.
+01:16:29 [build] 5 page(s) built in 564ms
+01:16:29 [build] Complete!

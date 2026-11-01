@@ -2,16 +2,21 @@
 # docs/bench/2026-10-30-lb-design). It needs ludion.security.json in the project's folder (`ludion init`) and the
 # repository setting "Allow GitHub Actions to create and approve pull requests".
 #
-# Two jobs (CLAUDE.md, "Ludion must not become the attack path"):
+# Three jobs (CLAUDE.md, "Ludion must not become the attack path"):
+#   check          runs no dependency code and no Docker, and reads no earlier run's artifact: it decides whether patch
+#                  has anything to do (docs/bench/lb2b-next1/definitions.md). Only the policy's ecosystem is looked at.
+#                  A fix whose wait cannot have ended, one an open Ludion PR already fixes, and one that is not new
+#                  outside the 12-hour slots that double from its last change do not start patch.
 #   patch          runs candidate code, only in Docker, so it holds no write permission and no secret.
 #   pull-request   writes (branches and PRs), so it runs no dependency code; it checks patch's artifact as untrusted data.
 #
 # The schedule can come hours late or not at all (on 2026-10-29 GitHub's hourly schedule did not fire for five hours in
 # Ludion-ai/ludion-shadow), so it runs every 6 hours, off the hour; run it by hand with workflow_dispatch.
 # Nothing is merged. PRs opened with the workflow's token start no CI; start it before merging. A fix that fails, waits
-# or is stopped makes the patch job fail on every run until that changes; its reasons are in the ludion-fixes artifact.
+# or is stopped makes the patch job fail on each run in which check lets patch run, until that changes; its reasons are
+# in the ludion-fixes artifact.
 #
-# Both jobs need GitHub-hosted runners (a fresh machine per job); the action refuses a self-hosted one.
+# Every job needs GitHub-hosted runners (a fresh machine per job); the action refuses a self-hosted one.
 # Pin Ludion by a release commit's full SHA. No release exists yet: the SHA below is a placeholder.
 name: ludion
 
@@ -27,7 +32,30 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      work: ${{ steps.ludion.outputs.work }}
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          # No npm cache: it would be restored in the job that writes and saved by the job that runs candidate code.
+          package-manager-cache: false
+      - id: ludion
+        uses: Ludion-ai/ludion@0000000000000000000000000000000000000000 # a release commit's SHA; none exists yet
+        with:
+          mode: check
+          dir: .
+
   patch:
+    needs: check
+    # Also when check failed: only a proven work=false skips patch.
+    if: ${{ !cancelled() && needs.check.outputs.work != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:

@@ -376,6 +376,12 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
     const ended = await walk(row([SAW, shifted, OTHER, SAW]));
     expect(ended.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(4)) + 5 * 60_000), run: 4, ended: true });
     expect(ended.stopped).toBeNull();
+    // Two fixes: lodash's row ends at run 3, minimist's is still open when the walk stops at run 2, so only it says so.
+    const MINIMIST: CheckedFix = { ...LODASH, package: "minimist", branch: "ludion/npm/minimist-1.2.6", changes: [{ name: "minimist", from: "1.2.5", to: "1.2.6", advisories: ["GHSA-xvch-5gv4-984h"] }] };
+    const two = await walk(row([SAW, shifted, OTHER, [...SAW, ...OTHER]]), [LODASH, MINIMIST]);
+    expect(two.seen.get(LODASH.branch)).toMatchObject({ run: 4, ended: true });
+    expect(two.seen.get(MINIMIST.branch)).toMatchObject({ run: 3, ended: false });
+    expect(two.stopped).toEqual({ run: 2, kind: "early", ms: H, branches: [MINIMIST.branch] });
     const fine = await walk(row([SAW, SAW, SAW]), [LODASH], { date: http(LATER) });
     expect(fine.stopped).toBeNull();
     expect(fine.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(1)) + 5 * 60_000), run: 1, ended: false });

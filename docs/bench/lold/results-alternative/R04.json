@@ -1,0 +1,14 @@
+{
+  "id": "R04",
+  "name": "react-server-dom-webpack",
+  "from": "19.1.1",
+  "v": "19.1.2",
+  "t": "2025-12-03T19:07:39.000Z",
+  "before": "2025-11-30T19:07:39.000Z",
+  "outcome": "built",
+  "moved_non_v": 3,
+  "youngest_age_at_t_hours": 1509.5,
+  "duplicate_names": 1,
+  "new_ls_problems": 0,
+  "failures": []
+}

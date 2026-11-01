@@ -1,0 +1,234 @@
+{
+  "id": "R10",
+  "name": "psitransfer",
+  "from": "2.3.0",
+  "v": "2.3.1",
+  "advisory": "GHSA-xphh-5v4r-r3rx",
+  "why": "first eligible rows, one per package",
+  "vulnerable": "<2.3.1",
+  "started_at": "2026-11-01T16:40:40.173Z",
+  "base_before": "2025-06-04T12:19:25.634Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 201,
+    "duplicate_names": 12,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/psitransfer@2.3.0"
+    ]
+  },
+  "t": "2025-12-30T19:25:04.000Z",
+  "v_published": "2025-12-29T12:12:36.109Z",
+  "picks": [
+    {
+      "req": "psitransfer@2.3.1",
+      "picked": "2.3.1",
+      "is_v": true
+    },
+    {
+      "req": "axios@^1.13.2",
+      "picked": "1.13.2",
+      "reused_base": false,
+      "published": "2025-11-04T20:01:20.058Z",
+      "counts": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 17,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "proxy-from-env@^1.1.0",
+      "picked": "1.1.0",
+      "reused_base": true,
+      "published": "2020-03-04T03:35:19.815Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "form-data@^4.0.4",
+      "picked": "4.0.4",
+      "reused_base": false,
+      "published": "2025-07-17T04:54:11.284Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "follow-redirects@^1.15.6",
+      "picked": "1.15.9",
+      "reused_base": true,
+      "published": "2024-09-06T08:56:34.070Z",
+      "counts": {
+        "in_range": 9,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "asynckit@^0.4.0",
+      "picked": "0.4.0",
+      "reused_base": true,
+      "published": "2016-06-14T18:29:05.418Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "combined-stream@^1.0.8",
+      "picked": "1.0.8",
+      "reused_base": true,
+      "published": "2019-05-12T17:49:45.337Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "es-set-tostringtag@^2.1.0",
+      "picked": "2.1.0",
+      "reused_base": true,
+      "published": "2025-01-02T04:44:14.435Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "delayed-stream@~1.0.0",
+      "picked": "1.0.0",
+      "reused_base": true,
+      "published": "2015-04-30T22:10:29.726Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 21,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 7,
+    "youngest_age": {
+      "hours": 129.4,
+      "version": "axios@1.21.0",
+      "published": "2026-10-27T07:18:54.313Z"
+    },
+    "published_after_t": 5,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 12,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 3,
+    "youngest_age": {
+      "hours": 1047.1,
+      "version": "form-data@4.0.5",
+      "published": "2025-11-17T04:16:07.493Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 12,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/axios",
+      "name": "axios",
+      "from": "1.9.0",
+      "to": "1.13.2",
+      "published": "2025-11-04T20:01:20.058Z",
+      "age_at_t_hours": 1343.4,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^1.13.2"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/form-data",
+      "name": "form-data",
+      "from": "4.0.2",
+      "to": "4.0.4",
+      "published": "2025-07-17T04:54:11.284Z",
+      "age_at_t_hours": 3998.5,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^4.0.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    }
+  ],
+  "moved_non_v": 2,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 12,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 1343.4,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 7,
+  "differing_paths_vs_normal_at_t": 2,
+  "checks_on_normal_at_t_fail": 3,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 6.448
+}

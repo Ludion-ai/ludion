@@ -1,0 +1,147 @@
+{
+  "id": "R15",
+  "name": "@node-saml/node-saml",
+  "from": "5.0.1",
+  "v": "5.1.0",
+  "advisory": "GHSA-m837-g268-mmv7",
+  "why": "first eligible rows, one per package",
+  "vulnerable": "<=5.0.1",
+  "started_at": "2026-11-01T16:37:38.725Z",
+  "base_before": "2025-03-14T17:59:41.389Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 22,
+    "duplicate_names": 2,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/@node-saml/node-saml@5.0.1"
+    ]
+  },
+  "t": "2025-07-25T14:08:50.000Z",
+  "v_published": "2025-07-21T23:28:29.433Z",
+  "picks": [
+    {
+      "req": "@node-saml/node-saml@5.1.0",
+      "picked": "5.1.0",
+      "is_v": true
+    },
+    {
+      "req": "@xmldom/is-dom-node@^1.0.1",
+      "picked": "1.0.1",
+      "reused_base": true,
+      "published": "2023-10-09T20:54:00.718Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "xml-crypto@^6.1.2",
+      "picked": "6.1.2",
+      "reused_base": false,
+      "published": "2025-04-24T18:06:21.759Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "xpath@^0.0.33",
+      "picked": "0.0.33",
+      "reused_base": true,
+      "published": "2023-07-14T11:27:08.392Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 6,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 2,
+    "youngest_age": {
+      "hours": 434.3,
+      "version": "xml-crypto@6.4.0",
+      "published": "2026-10-14T14:21:16.076Z"
+    },
+    "published_after_t": 2,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 2,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 1,
+    "youngest_age": {
+      "hours": 2204,
+      "version": "xml-crypto@6.1.2",
+      "published": "2025-04-24T18:06:21.759Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 2,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/xml-crypto",
+      "name": "xml-crypto",
+      "from": "6.0.1",
+      "to": "6.1.2",
+      "published": "2025-04-24T18:06:21.759Z",
+      "age_at_t_hours": 2204,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^6.1.2"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    }
+  ],
+  "moved_non_v": 1,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 2,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 2204,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 2,
+  "differing_paths_vs_normal_at_t": 0,
+  "checks_on_normal_at_t_fail": 0,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 3.492
+}

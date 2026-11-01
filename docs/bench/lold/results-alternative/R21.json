@@ -1,0 +1,14 @@
+{
+  "id": "R21",
+  "name": "next-auth",
+  "from": "4.24.11",
+  "v": "4.24.12",
+  "t": "2025-10-29T10:43:57.000Z",
+  "before": "2025-10-26T10:43:57.000Z",
+  "outcome": "built",
+  "moved_non_v": 0,
+  "youngest_age_at_t_hours": null,
+  "duplicate_names": 0,
+  "new_ls_problems": 0,
+  "failures": []
+}

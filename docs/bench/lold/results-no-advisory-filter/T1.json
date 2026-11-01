@@ -1,0 +1,147 @@
+{
+  "id": "T1",
+  "name": "braces",
+  "from": "3.0.2",
+  "v": "3.0.3",
+  "advisory": "GHSA-grv7-fg5c-xmjg",
+  "why": "a transitive fix, written by hand",
+  "vulnerable": "<3.0.3",
+  "started_at": "2026-11-01T16:38:40.987Z",
+  "base_before": "2024-01-01T00:00:00Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 6,
+    "duplicate_names": 0,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/braces@3.0.2"
+    ]
+  },
+  "t": "2024-05-21T09:59:11.390Z",
+  "v_published": "2024-05-21T08:59:11.390Z",
+  "picks": [
+    {
+      "req": "braces@3.0.3",
+      "picked": "3.0.3",
+      "is_v": true
+    },
+    {
+      "req": "fill-range@^7.1.1",
+      "picked": "7.1.1",
+      "reused_base": false,
+      "published": "2024-05-21T08:45:51.224Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "to-regex-range@^5.0.1",
+      "picked": "5.0.1",
+      "reused_base": true,
+      "published": "2019-04-07T06:04:37.030Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "is-number@^7.0.0",
+      "picked": "7.0.0",
+      "reused_base": true,
+      "published": "2018-07-04T15:08:58.238Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 0,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 1,
+    "youngest_age": {
+      "hours": 21463.9,
+      "version": "fill-range@7.1.1",
+      "published": "2024-05-21T08:45:51.224Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 0,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 1,
+    "youngest_age": {
+      "hours": 1.2,
+      "version": "fill-range@7.1.1",
+      "published": "2024-05-21T08:45:51.224Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 0,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/fill-range",
+      "name": "fill-range",
+      "from": "7.0.1",
+      "to": "7.1.1",
+      "published": "2024-05-21T08:45:51.224Z",
+      "age_at_t_hours": 1.2,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^7.1.1"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    }
+  ],
+  "moved_non_v": 1,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 0,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 1.2,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 0,
+  "differing_paths_vs_normal_at_t": 0,
+  "checks_on_normal_at_t_fail": 0,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 2.906
+}

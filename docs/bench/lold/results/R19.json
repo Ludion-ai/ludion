@@ -1,0 +1,248 @@
+{
+  "id": "R19",
+  "name": "pbkdf2",
+  "from": "3.1.2",
+  "v": "3.1.3",
+  "advisory": "GHSA-h7cp-r72f-jxh6",
+  "why": "first eligible rows, one per package",
+  "vulnerable": ">=3.0.10 <=3.1.2",
+  "started_at": "2026-11-01T16:32:34.068Z",
+  "base_before": "2021-04-09T14:46:00.111Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 13,
+    "duplicate_names": 0,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/pbkdf2@3.1.2"
+    ]
+  },
+  "t": "2025-06-23T22:41:50.000Z",
+  "v_published": "2025-06-20T20:37:58.779Z",
+  "picks": [
+    {
+      "req": "pbkdf2@3.1.3",
+      "picked": "3.1.3",
+      "is_v": true
+    },
+    {
+      "req": "create-hash@~1.1.3",
+      "picked": "1.1.3",
+      "reused_base": false,
+      "published": "2017-05-11T13:10:18.358Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "to-buffer@^1.2.0",
+      "picked": "1.2.0",
+      "reused_base": false,
+      "published": "2025-06-17T22:28:11.124Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "ripemd160@=2.0.1",
+      "picked": "2.0.1",
+      "reused_base": false,
+      "published": "2016-06-22T13:25:58.036Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "isarray@^2.0.5",
+      "picked": "2.0.5",
+      "reused_base": false,
+      "published": "2019-07-08T13:21:22.377Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "hash-base@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": false,
+      "published": "2016-04-07T06:46:43.395Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 1,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 30,
+    "youngest_age": {
+      "hours": 1050.7,
+      "version": "which-typed-array@1.1.24",
+      "published": "2026-09-18T21:52:31.799Z"
+    },
+    "published_after_t": 5,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 3,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 30,
+    "youngest_age": {
+      "hours": 88.4,
+      "version": "to-buffer@1.2.1",
+      "published": "2025-06-20T06:15:25.734Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 3,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/isarray",
+      "name": "isarray",
+      "from": null,
+      "to": "2.0.5",
+      "published": "2019-07-08T13:21:22.377Z",
+      "age_at_t_hours": 52257.3,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^2.0.5"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/pbkdf2/node_modules/create-hash",
+      "name": "create-hash",
+      "from": null,
+      "to": "1.1.3",
+      "published": "2017-05-11T13:10:18.358Z",
+      "age_at_t_hours": 71169.5,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "~1.1.3"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/pbkdf2/node_modules/hash-base",
+      "name": "hash-base",
+      "from": null,
+      "to": "2.0.0",
+      "published": "2016-04-07T06:46:43.395Z",
+      "age_at_t_hours": 80751.9,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^2.0.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/pbkdf2/node_modules/ripemd160",
+      "name": "ripemd160",
+      "from": null,
+      "to": "2.0.1",
+      "published": "2016-06-22T13:25:58.036Z",
+      "age_at_t_hours": 78921.3,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "=2.0.1",
+        "^2.0.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/to-buffer",
+      "name": "to-buffer",
+      "from": null,
+      "to": "1.2.0",
+      "published": "2025-06-17T22:28:11.124Z",
+      "age_at_t_hours": 144.2,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^1.2.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    }
+  ],
+  "moved_non_v": 5,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 3,
+  "duplicates_new_vs_base": [
+    "create-hash: 1.1.3, 1.2.0",
+    "hash-base: 2.0.0, 3.1.0",
+    "ripemd160: 2.0.1, 2.0.2"
+  ],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 144.2,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 27,
+  "differing_paths_vs_normal_at_t": 27,
+  "checks_on_normal_at_t_fail": 5,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 8.193
+}

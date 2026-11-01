@@ -1,0 +1,220 @@
+{
+  "id": "R14",
+  "name": "@finos/git-proxy",
+  "from": "1.19.1",
+  "v": "1.19.2",
+  "advisory": "GHSA-v98g-8rqx-g93g",
+  "why": "first eligible rows, one per package",
+  "vulnerable": "<=1.19.1",
+  "started_at": "2026-11-01T16:37:31.907Z",
+  "base_before": "2025-07-11T14:10:40.831Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 399,
+    "duplicate_names": 22,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/@finos/git-proxy@1.19.1"
+    ]
+  },
+  "t": "2025-07-30T16:40:40.000Z",
+  "v_published": "2025-07-30T15:20:11.050Z",
+  "picks": [
+    {
+      "req": "@finos/git-proxy@1.19.2",
+      "picked": "1.19.2",
+      "is_v": true
+    },
+    {
+      "req": "@esbuild/win32-x64@0.25.6",
+      "picked": "0.25.6",
+      "reused_base": false,
+      "published": "2025-07-07T16:58:30.837Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/darwin-x64@^0.25.6",
+      "picked": "0.25.6",
+      "reused_base": false,
+      "published": "2025-07-07T16:58:55.105Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/linux-x64@0.25.6",
+      "picked": "0.25.6",
+      "reused_base": false,
+      "published": "2025-07-07T16:59:21.121Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/darwin-arm64@^0.25.6",
+      "picked": "0.25.6",
+      "reused_base": false,
+      "published": "2025-07-07T16:58:55.400Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 8,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 4,
+    "youngest_age": {
+      "hours": 8753,
+      "version": "@esbuild/darwin-arm64@0.25.12",
+      "published": "2025-11-01T23:35:24.340Z"
+    },
+    "published_after_t": 2,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 22,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 4,
+    "youngest_age": {
+      "hours": 261.3,
+      "version": "@esbuild/darwin-arm64@0.25.8",
+      "published": "2025-07-19T19:22:31.122Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 22,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/@esbuild/darwin-arm64",
+      "name": "@esbuild/darwin-arm64",
+      "from": "0.18.20",
+      "to": "0.25.6",
+      "published": "2025-07-07T16:58:55.400Z",
+      "age_at_t_hours": 551.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^0.25.6"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    },
+    {
+      "path": "node_modules/@esbuild/darwin-x64",
+      "name": "@esbuild/darwin-x64",
+      "from": "0.23.1",
+      "to": "0.25.6",
+      "published": "2025-07-07T16:58:55.105Z",
+      "age_at_t_hours": 551.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^0.25.6"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    },
+    {
+      "path": "node_modules/@esbuild/linux-x64",
+      "name": "@esbuild/linux-x64",
+      "from": "0.23.0",
+      "to": "0.25.6",
+      "published": "2025-07-07T16:59:21.121Z",
+      "age_at_t_hours": 551.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "0.25.6"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    },
+    {
+      "path": "node_modules/@esbuild/win32-x64",
+      "name": "@esbuild/win32-x64",
+      "from": "0.23.0",
+      "to": "0.25.6",
+      "published": "2025-07-07T16:58:30.837Z",
+      "age_at_t_hours": 551.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "0.25.6"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    }
+  ],
+  "moved_non_v": 4,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 22,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 551.7,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 2,
+  "differing_paths_vs_normal_at_t": 2,
+  "checks_on_normal_at_t_fail": 2,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 6.817
+}

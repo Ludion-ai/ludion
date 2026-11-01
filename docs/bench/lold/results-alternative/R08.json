@@ -1,0 +1,12 @@
+{
+  "id": "R08",
+  "name": "@intlify/core",
+  "from": "9.14.4",
+  "v": "9.14.5",
+  "t": "2025-07-16T19:32:48.000Z",
+  "before": "2025-07-13T19:32:48.000Z",
+  "outcome": "failed",
+  "reason": "npm error code ETARGET\nnpm error notarget No matching version found for @intlify/core-base@9.14.5 with a date before 7/13/2025, 7:32:48 PM.\nnpm error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.\nnpm error A complete log of this run can be found in: /vol/cache/_logs/2026-11-01T16_34_20_153Z-debug-0.log\n",
+  "peer_conflict": false,
+  "etarget": true
+}

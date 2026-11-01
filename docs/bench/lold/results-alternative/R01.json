@@ -1,0 +1,12 @@
+{
+  "id": "R01",
+  "name": "react-server-dom-turbopack",
+  "from": "19.2.1",
+  "v": "19.2.2",
+  "t": "2025-12-11T22:36:08.000Z",
+  "before": "2025-12-08T22:36:08.000Z",
+  "outcome": "failed",
+  "reason": "npm warn Found: react-dom@undefined\nnpm warn node_modules/react-dom\nnpm warn\nnpm warn Could not resolve dependency:\nnpm warn peer react-dom@\"^19.2.2\" from react-server-dom-turbopack@19.2.2\nnpm warn node_modules/react-server-dom-turbopack\nnpm warn   react-server-dom-turbopack@\"19.2.2\" from the root project\nnpm error code ETARGET\nnpm error notarget No matching version found for react@^19.2.2 with a date before 12/8/2025, 10:36:08 PM.\nnpm error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.\nnpm error A complete log of this run can be found in: /vol/cache/_logs/2026-11-01T16_33_56_996Z-debug-0.log\n",
+  "peer_conflict": false,
+  "etarget": true
+}

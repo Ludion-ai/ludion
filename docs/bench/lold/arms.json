@@ -1,0 +1,1555 @@
+{
+  "main": {
+    "built": 13,
+    "stopped_no_allowed": 10,
+    "failed": 0,
+    "no_base": 1,
+    "built_with_a_move": 11
+  },
+  "alternative": {
+    "built": 17,
+    "stopped_no_allowed": 0,
+    "failed": 6,
+    "no_base": 1,
+    "built_with_a_move": 15
+  },
+  "no_advisory_filter": {
+    "built": 20,
+    "stopped_no_allowed": 3,
+    "failed": 0,
+    "no_base": 1,
+    "built_with_a_move": 18
+  },
+  "no_advisory_no_deprecation_filter": {
+    "built": 23,
+    "stopped_no_allowed": 0,
+    "failed": 0,
+    "no_base": 1,
+    "built_with_a_move": 21
+  },
+  "young_at_t": [
+    {
+      "id": "R01",
+      "version": "react@19.2.2",
+      "published": "2025-12-11T20:02:00.544Z",
+      "v_published": "2025-12-11T20:02:16.204Z",
+      "age_at_t_hours": 2.6,
+      "minutes_from_v": 0,
+      "ranges": [
+        "^19.2.2",
+        "^19.2.2"
+      ]
+    },
+    {
+      "id": "R01",
+      "version": "react-dom@19.2.2",
+      "published": "2025-12-11T20:02:08.367Z",
+      "v_published": "2025-12-11T20:02:16.204Z",
+      "age_at_t_hours": 2.6,
+      "minutes_from_v": 0,
+      "ranges": [
+        "^19.2.2"
+      ]
+    },
+    {
+      "id": "R03",
+      "version": "@next/env@15.5.7",
+      "published": "2025-12-03T15:26:12.822Z",
+      "v_published": "2025-12-03T15:26:07.201Z",
+      "age_at_t_hours": 3.7,
+      "minutes_from_v": 0,
+      "ranges": [
+        "15.5.7"
+      ]
+    },
+    {
+      "id": "R03",
+      "version": "@next/swc-darwin-arm64@15.5.7",
+      "published": "2025-12-03T15:24:28.388Z",
+      "v_published": "2025-12-03T15:26:07.201Z",
+      "age_at_t_hours": 3.7,
+      "minutes_from_v": -2,
+      "ranges": [
+        "15.5.7"
+      ]
+    },
+    {
+      "id": "R03",
+      "version": "@next/swc-darwin-x64@15.5.7",
+      "published": "2025-12-03T15:24:28.836Z",
+      "v_published": "2025-12-03T15:26:07.201Z",
+      "age_at_t_hours": 3.7,
+      "minutes_from_v": -2,
+      "ranges": [
+        "15.5.7"
+      ]
+    },
+    {
+      "id": "R03",
+      "version": "@next/swc-linux-arm64-gnu@15.5.7",
+      "published": "2025-12-03T15:24:41.883Z",
+      "v_published": "2025-12-03T15:26:07.201Z",
+      "age_at_t_hours": 3.7,
+      "minutes_from_v": -1,
+      "ranges": [
+        "15.5.7"
+      ]
+    },
+    {
+      "id": "R03",
+      "version": "@next/swc-linux-arm64-musl@15.5.7",
+      "published": "2025-12-03T15:24:42.572Z",
+      "v_published": "2025-12-03T15:26:07.201Z",
+      "age_at_t_hours": 3.7,
+      "minutes_from_v": -1,
+      "ranges": [
+        "15.5.7"
+      ]
+    },
+    {
+      "id": "R03",
+      "version": "@next/swc-linux-x64-gnu@15.5.7",
+      "published": "2025-12-03T15:24:58.096Z",
+      "v_published": "2025-12-03T15:26:07.201Z",
+      "age_at_t_hours": 3.7,
+      "minutes_from_v": -1,
+      "ranges": [
+        "15.5.7"
+      ]
+    },
+    {
+      "id": "R03",
+      "version": "@next/swc-linux-x64-musl@15.5.7",
+      "published": "2025-12-03T15:24:58.926Z",
+      "v_published": "2025-12-03T15:26:07.201Z",
+      "age_at_t_hours": 3.7,
+      "minutes_from_v": -1,
+      "ranges": [
+        "15.5.7"
+      ]
+    },
+    {
+      "id": "R03",
+      "version": "@next/swc-win32-arm64-msvc@15.5.7",
+      "published": "2025-12-03T15:25:09.744Z",
+      "v_published": "2025-12-03T15:26:07.201Z",
+      "age_at_t_hours": 3.7,
+      "minutes_from_v": -1,
+      "ranges": [
+        "15.5.7"
+      ]
+    },
+    {
+      "id": "R03",
+      "version": "@next/swc-win32-x64-msvc@15.5.7",
+      "published": "2025-12-03T15:25:13.908Z",
+      "v_published": "2025-12-03T15:26:07.201Z",
+      "age_at_t_hours": 3.7,
+      "minutes_from_v": -1,
+      "ranges": [
+        "15.5.7"
+      ]
+    },
+    {
+      "id": "T1",
+      "version": "fill-range@7.1.1",
+      "published": "2024-05-21T08:45:51.224Z",
+      "v_published": "2024-05-21T08:59:11.390Z",
+      "age_at_t_hours": 1.2,
+      "minutes_from_v": -13,
+      "ranges": [
+        "^7.1.1"
+      ]
+    }
+  ],
+  "stops": [
+    {
+      "id": "R02",
+      "package": "@react-native-community/cli-server-api 19.1.1 -> 19.1.2",
+      "requirements": 1,
+      "by": [
+        {
+          "req": "launch-editor@^2.9.1",
+          "in_range": 11,
+          "after_t": 6,
+          "advisory": 5,
+          "deprecated": 0,
+          "withdrawn": 0
+        }
+      ]
+    },
+    {
+      "id": "R05",
+      "package": "@angular/platform-server 20.2.4 -> 20.3.0",
+      "requirements": 3,
+      "by": [
+        {
+          "req": "@angular/common@20.3.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@angular/compiler@20.3.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@angular/core@20.3.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        }
+      ]
+    },
+    {
+      "id": "R06",
+      "package": "@sentry/nextjs 8.48.0 -> 8.49.0",
+      "requirements": 13,
+      "by": [
+        {
+          "req": "next@^13.2.0 || ^14.0 || ^15.0.0-rc.0",
+          "in_range": 171,
+          "after_t": 85,
+          "advisory": 7,
+          "deprecated": 79,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "in_range": 3,
+          "after_t": 0,
+          "advisory": 3,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "in_range": 3,
+          "after_t": 0,
+          "advisory": 0,
+          "deprecated": 3,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-pg@0.49.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql2@0.44.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql@0.44.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-knex@0.43.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-tedious@0.17.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mongoose@0.45.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "in_range": 32,
+          "after_t": 0,
+          "advisory": 32,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/core@1.29.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/core@1.30.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.22",
+          "in_range": 12,
+          "after_t": 0,
+          "advisory": 0,
+          "deprecated": 12,
+          "withdrawn": 0
+        }
+      ]
+    },
+    {
+      "id": "R08",
+      "package": "@intlify/core 9.14.4 -> 9.14.5",
+      "requirements": 2,
+      "by": [
+        {
+          "req": "@intlify/shared@9.14.5",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@intlify/core-base@9.14.5",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        }
+      ]
+    },
+    {
+      "id": "R09",
+      "package": "snowflake-sdk 2.0.1 -> 2.0.2",
+      "requirements": 3,
+      "by": [
+        {
+          "req": "@smithy/config-resolver@^4.0.0",
+          "in_range": 61,
+          "after_t": 59,
+          "advisory": 2,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "fast-xml-parser@4.4.1",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "uuid@^9.0.1",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 0,
+          "deprecated": 1,
+          "withdrawn": 0
+        }
+      ]
+    },
+    {
+      "id": "R10",
+      "package": "psitransfer 2.3.0 -> 2.3.1",
+      "requirements": 1,
+      "by": [
+        {
+          "req": "axios@^1.13.2",
+          "in_range": 18,
+          "after_t": 17,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        }
+      ]
+    },
+    {
+      "id": "R11",
+      "package": "@sentry/nestjs 8.48.0 -> 8.49.0",
+      "requirements": 14,
+      "by": [
+        {
+          "req": "@nestjs/common@^8.0.0 || ^9.0.0 || ^10.0.0",
+          "in_range": 124,
+          "after_t": 7,
+          "advisory": 117,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@nestjs/core@^8.0.0 || ^9.0.0 || ^10.0.0",
+          "in_range": 124,
+          "after_t": 7,
+          "advisory": 117,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql2@0.44.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mysql@0.44.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.29.0",
+          "in_range": 3,
+          "after_t": 0,
+          "advisory": 0,
+          "deprecated": 3,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-knex@0.43.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/core@^1.29.0",
+          "in_range": 3,
+          "after_t": 0,
+          "advisory": 3,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-pg@0.49.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-tedious@0.17.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/instrumentation-mongoose@0.45.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/core@^1.8.0",
+          "in_range": 32,
+          "after_t": 0,
+          "advisory": 32,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/core@1.29.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/core@1.30.0",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@opentelemetry/sdk-trace-base@^1.22",
+          "in_range": 12,
+          "after_t": 0,
+          "advisory": 0,
+          "deprecated": 12,
+          "withdrawn": 0
+        }
+      ]
+    },
+    {
+      "id": "R16",
+      "package": "mcp-server-kubernetes 2.9.7 -> 2.9.8",
+      "requirements": 1,
+      "by": [
+        {
+          "req": "js-yaml@4.1.1",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        }
+      ]
+    },
+    {
+      "id": "R20",
+      "package": "glob 11.0.3 -> 11.1.0",
+      "requirements": 1,
+      "by": [
+        {
+          "req": "minimatch@^10.1.1",
+          "in_range": 10,
+          "after_t": 9,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        }
+      ]
+    },
+    {
+      "id": "R22",
+      "package": "@vitest/browser 3.0.3 -> 3.0.4",
+      "requirements": 3,
+      "by": [
+        {
+          "req": "vitest@3.0.4",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@vitest/mocker@3.0.4",
+          "in_range": 1,
+          "after_t": 0,
+          "advisory": 1,
+          "deprecated": 0,
+          "withdrawn": 0
+        },
+        {
+          "req": "@babel/runtime@^7.12.5",
+          "in_range": 89,
+          "after_t": 14,
+          "advisory": 75,
+          "deprecated": 0,
+          "withdrawn": 0
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "C1",
+      "package": "lodash 4.17.20 -> 4.17.21",
+      "main": {
+        "outcome": "built",
+        "moved": 0,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 0,
+        "youngest_at_t": null,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 0,
+        "all_oldest": true,
+        "youngest_at_t": null,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 0,
+        "all_oldest": true,
+        "youngest_at_t": null,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 0,
+        "normal_moved": 0,
+        "normal_young": null,
+        "normal_at_t_moved": 0,
+        "dup": 0,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R01",
+      "package": "react-server-dom-turbopack 19.2.1 -> 19.2.2",
+      "main": {
+        "outcome": "built",
+        "moved": 2,
+        "youngest_at_t": 2.6
+      },
+      "alternative": {
+        "outcome": "failed",
+        "moved": null,
+        "youngest_at_t": null,
+        "peer_conflict": false,
+        "etarget": true,
+        "failures": [
+          "npm warn Found: react-dom@undefined\nnpm warn node_modules/react-dom\nnpm warn\nnpm warn Could not resolve dependency:\nnpm warn peer react-dom@\"^19.2.2\" from react-server-dom-turbopack@19.2.2\nnpm warn node_modules/react-server-dom-turbopack\nnpm warn   react-server-dom-turbopack@\"19.2.2\" from the root p"
+        ]
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 2,
+        "all_oldest": true,
+        "youngest_at_t": 2.6,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 2,
+        "all_oldest": true,
+        "youngest_at_t": 2.6,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 3,
+        "normal_moved": 3,
+        "normal_young": 431.8,
+        "normal_at_t_moved": 2,
+        "dup": 0,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R02",
+      "package": "@react-native-community/cli-server-api 19.1.1 -> 19.1.2",
+      "main": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "failed",
+        "moved": null,
+        "youngest_at_t": null,
+        "peer_conflict": false,
+        "etarget": true,
+        "failures": [
+          "npm error code ETARGET\nnpm error notarget No matching version found for @react-native-community/cli-tools@19.1.2 with a date before 11/2/2025, 9:56:39 PM.\nnpm error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.\nnpm error A complete log of"
+        ]
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 0,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 0,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 2,
+        "differ_vs_normal": 5,
+        "normal_moved": 6,
+        "normal_young": 637.4,
+        "normal_at_t_moved": 3,
+        "dup": 7,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R03",
+      "package": "next 15.5.6 -> 15.5.7",
+      "main": {
+        "outcome": "built",
+        "moved": 9,
+        "youngest_at_t": 3.7
+      },
+      "alternative": {
+        "outcome": "failed",
+        "moved": null,
+        "youngest_at_t": null,
+        "peer_conflict": false,
+        "etarget": true,
+        "failures": [
+          "npm error code ETARGET\nnpm error notarget No matching version found for @next/env@15.5.7 with a date before 11/30/2025, 7:07:11 PM.\nnpm error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.\nnpm error A complete log of this run can be found "
+        ]
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 9,
+        "all_oldest": true,
+        "youngest_at_t": 3.7,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 9,
+        "all_oldest": true,
+        "youngest_at_t": 3.7,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 0,
+        "normal_moved": 9,
+        "normal_young": 7993.2,
+        "normal_at_t_moved": 9,
+        "dup": 0,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R04",
+      "package": "react-server-dom-webpack 19.1.1 -> 19.1.2",
+      "main": {
+        "outcome": "built",
+        "moved": 3,
+        "youngest_at_t": 1509.5
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 3,
+        "youngest_at_t": 1509.5,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 3,
+        "all_oldest": true,
+        "youngest_at_t": 1509.5,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 3,
+        "all_oldest": true,
+        "youngest_at_t": 1509.5,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 2,
+        "differ_vs_normal": 3,
+        "normal_moved": 3,
+        "normal_young": 431.8,
+        "normal_at_t_moved": 3,
+        "dup": 1,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R05",
+      "package": "@angular/platform-server 20.2.4 -> 20.3.0",
+      "main": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "failed",
+        "moved": null,
+        "youngest_at_t": null,
+        "peer_conflict": false,
+        "etarget": true,
+        "failures": [
+          "npm warn Found: @angular/platform-browser@undefined\nnpm warn node_modules/@angular/platform-browser\nnpm warn\nnpm warn Could not resolve dependency:\nnpm warn peer @angular/platform-browser@\"20.3.0\" from @angular/platform-server@20.3.0\nnpm warn node_modules/@angular/platform-server\nnpm warn   @angular"
+        ]
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 4,
+        "all_oldest": true,
+        "youngest_at_t": 6.9,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 4,
+        "all_oldest": true,
+        "youngest_at_t": 6.9,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 1,
+        "normal_moved": 5,
+        "normal_young": 44.3,
+        "normal_at_t_moved": 4,
+        "dup": 0,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R06",
+      "package": "@sentry/nextjs 8.48.0 -> 8.49.0",
+      "main": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 14,
+        "youngest_at_t": 323,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "all_oldest": null,
+        "youngest_at_t": null,
+        "stops": [
+          "@opentelemetry/sdk-trace-base@^1.29.0 {\"in_range\":3,\"no_time\":0,\"after_t\":0,\"withdrawn\":0,\"deprecated\":3,\"advisory\":0}",
+          "@opentelemetry/sdk-trace-base@^1.22 {\"in_range\":12,\"no_time\":0,\"after_t\":0,\"withdrawn\":0,\"deprecated\":12,\"advisory\":0}"
+        ],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 10,
+        "all_oldest": true,
+        "youngest_at_t": 323,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 5,
+        "differ_vs_normal": 18,
+        "normal_moved": 28,
+        "normal_young": 91.8,
+        "normal_at_t_moved": 15,
+        "dup": 16,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R07",
+      "package": "@portkey-ai/gateway 1.13.0 -> 1.14.0",
+      "main": {
+        "outcome": "built",
+        "moved": 11,
+        "youngest_at_t": 1672.7
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 11,
+        "youngest_at_t": 995.6,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 11,
+        "all_oldest": true,
+        "youngest_at_t": 1672.7,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 11,
+        "all_oldest": true,
+        "youngest_at_t": 1672.7,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 4,
+        "differ_vs_normal": 7,
+        "normal_moved": 9,
+        "normal_young": 3606.4,
+        "normal_at_t_moved": 11,
+        "dup": 1,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R08",
+      "package": "@intlify/core 9.14.4 -> 9.14.5",
+      "main": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "failed",
+        "moved": null,
+        "youngest_at_t": null,
+        "peer_conflict": false,
+        "etarget": true,
+        "failures": [
+          "npm error code ETARGET\nnpm error notarget No matching version found for @intlify/core-base@9.14.5 with a date before 7/13/2025, 7:32:48 PM.\nnpm error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.\nnpm error A complete log of this run can b"
+        ]
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 3,
+        "all_oldest": true,
+        "youngest_at_t": 14,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 3,
+        "all_oldest": true,
+        "youngest_at_t": 14,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 1,
+        "normal_moved": 4,
+        "normal_young": 770.5,
+        "normal_at_t_moved": 3,
+        "dup": 0,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R09",
+      "package": "snowflake-sdk 2.0.1 -> 2.0.2",
+      "main": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 89,
+        "youngest_at_t": 118.7,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "all_oldest": null,
+        "youngest_at_t": null,
+        "stops": [
+          "uuid@^9.0.1 {\"in_range\":1,\"no_time\":0,\"after_t\":0,\"withdrawn\":0,\"deprecated\":1,\"advisory\":0}"
+        ],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 93,
+        "all_oldest": true,
+        "youngest_at_t": 478.6,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 78,
+        "differ_vs_normal": 131,
+        "normal_moved": 47,
+        "normal_young": 41.5,
+        "normal_at_t_moved": 89,
+        "dup": 20,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R10",
+      "package": "psitransfer 2.3.0 -> 2.3.1",
+      "main": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 3,
+        "youngest_at_t": 1047.1,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 2,
+        "all_oldest": true,
+        "youngest_at_t": 1343.4,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 2,
+        "all_oldest": true,
+        "youngest_at_t": 1343.4,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 2,
+        "differ_vs_normal": 7,
+        "normal_moved": 7,
+        "normal_young": 129.4,
+        "normal_at_t_moved": 3,
+        "dup": 12,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R11",
+      "package": "@sentry/nestjs 8.48.0 -> 8.49.0",
+      "main": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 8,
+        "youngest_at_t": 122.6,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "all_oldest": null,
+        "youngest_at_t": null,
+        "stops": [
+          "@opentelemetry/sdk-trace-base@^1.29.0 {\"in_range\":3,\"no_time\":0,\"after_t\":0,\"withdrawn\":0,\"deprecated\":3,\"advisory\":0}",
+          "@opentelemetry/sdk-trace-base@^1.22 {\"in_range\":12,\"no_time\":0,\"after_t\":0,\"withdrawn\":0,\"deprecated\":12,\"advisory\":0}"
+        ],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 6,
+        "all_oldest": true,
+        "youngest_at_t": 323,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 9,
+        "differ_vs_normal": 28,
+        "normal_moved": 28,
+        "normal_young": 91.9,
+        "normal_at_t_moved": 9,
+        "dup": 4,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R12",
+      "package": "multer 2.0.0 -> 2.0.1",
+      "main": {
+        "outcome": "built",
+        "moved": 2,
+        "youngest_at_t": 56578.8
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 4,
+        "youngest_at_t": 19624.1,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 2,
+        "all_oldest": true,
+        "youngest_at_t": 56578.8,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 2,
+        "all_oldest": true,
+        "youngest_at_t": 56578.8,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 3,
+        "differ_vs_normal": 3,
+        "normal_moved": 4,
+        "normal_young": 31975.6,
+        "normal_at_t_moved": 4,
+        "dup": 0,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R13",
+      "package": "@vitejs/plugin-rsc 0.5.6 -> 0.5.7",
+      "main": {
+        "outcome": "built",
+        "moved": 1,
+        "youngest_at_t": 128.1
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 1,
+        "youngest_at_t": 128.1,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 128.1,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 128.1,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 1,
+        "normal_moved": 1,
+        "normal_young": 1838.7,
+        "normal_at_t_moved": 1,
+        "dup": 0,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R14",
+      "package": "@finos/git-proxy 1.19.1 -> 1.19.2",
+      "main": {
+        "outcome": "built",
+        "moved": 4,
+        "youngest_at_t": 551.7
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 4,
+        "youngest_at_t": 261.3,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 4,
+        "all_oldest": true,
+        "youngest_at_t": 551.7,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 4,
+        "all_oldest": true,
+        "youngest_at_t": 551.7,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 2,
+        "differ_vs_normal": 2,
+        "normal_moved": 4,
+        "normal_young": 8753.1,
+        "normal_at_t_moved": 4,
+        "dup": 22,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R15",
+      "package": "@node-saml/node-saml 5.0.1 -> 5.1.0",
+      "main": {
+        "outcome": "built",
+        "moved": 1,
+        "youngest_at_t": 2204
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 1,
+        "youngest_at_t": 2204,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 2204,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 2204,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 2,
+        "normal_moved": 2,
+        "normal_young": 434.3,
+        "normal_at_t_moved": 1,
+        "dup": 2,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R16",
+      "package": "mcp-server-kubernetes 2.9.7 -> 2.9.8",
+      "main": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 1,
+        "youngest_at_t": 509.4,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 509.4,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 509.4,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 0,
+        "normal_moved": 1,
+        "normal_young": 8497.4,
+        "normal_at_t_moved": 1,
+        "dup": 23,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R17",
+      "package": "@webrecorder/wabac 2.23.10 -> 2.23.11",
+      "main": {
+        "outcome": "built",
+        "moved": 1,
+        "youngest_at_t": 159.4
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 1,
+        "youngest_at_t": 159.4,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 159.4,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 159.4,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 1,
+        "normal_moved": 1,
+        "normal_young": 1392.5,
+        "normal_at_t_moved": 1,
+        "dup": 2,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R18",
+      "package": "azle 0.29.0 -> 0.30.0",
+      "main": {
+        "outcome": "no_base",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "no_base",
+        "moved": null,
+        "youngest_at_t": null,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "no_base",
+        "moved": null,
+        "all_oldest": null,
+        "youngest_at_t": null,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "no_base",
+        "moved": null,
+        "all_oldest": null,
+        "youngest_at_t": null,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": null,
+        "differ_vs_normal": null,
+        "normal_moved": null,
+        "normal_young": null,
+        "normal_at_t_moved": null,
+        "dup": null,
+        "peers": null
+      }
+    },
+    {
+      "id": "R19",
+      "package": "pbkdf2 3.1.2 -> 3.1.3",
+      "main": {
+        "outcome": "built",
+        "moved": 5,
+        "youngest_at_t": 144.2
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 30,
+        "youngest_at_t": 88.4,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 5,
+        "all_oldest": true,
+        "youngest_at_t": 144.2,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 5,
+        "all_oldest": true,
+        "youngest_at_t": 144.2,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 27,
+        "differ_vs_normal": 27,
+        "normal_moved": 30,
+        "normal_young": 1050.8,
+        "normal_at_t_moved": 30,
+        "dup": 3,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R20",
+      "package": "glob 11.0.3 -> 11.1.0",
+      "main": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 1,
+        "youngest_at_t": 474.7,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 474.7,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 474.7,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 5,
+        "normal_moved": 3,
+        "normal_young": 1146.7,
+        "normal_at_t_moved": 1,
+        "dup": 6,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R21",
+      "package": "next-auth 4.24.11 -> 4.24.12",
+      "main": {
+        "outcome": "built",
+        "moved": 0,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 0,
+        "youngest_at_t": null,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 0,
+        "all_oldest": true,
+        "youngest_at_t": null,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 0,
+        "all_oldest": true,
+        "youngest_at_t": null,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 0,
+        "normal_moved": 0,
+        "normal_young": null,
+        "normal_at_t_moved": 0,
+        "dup": 0,
+        "peers": 0
+      }
+    },
+    {
+      "id": "R22",
+      "package": "@vitest/browser 3.0.3 -> 3.0.4",
+      "main": {
+        "outcome": "stopped_no_allowed",
+        "moved": null,
+        "youngest_at_t": null
+      },
+      "alternative": {
+        "outcome": "built",
+        "moved": 38,
+        "youngest_at_t": 80.2,
+        "peer_conflict": false,
+        "etarget": false,
+        "failures": []
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 10,
+        "all_oldest": true,
+        "youngest_at_t": 291.1,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 10,
+        "all_oldest": true,
+        "youngest_at_t": 291.1,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 29,
+        "differ_vs_normal": 135,
+        "normal_moved": 122,
+        "normal_young": 8.9,
+        "normal_at_t_moved": 37,
+        "dup": 3,
+        "peers": 0
+      }
+    },
+    {
+      "id": "T1",
+      "package": "braces 3.0.2 -> 3.0.3",
+      "main": {
+        "outcome": "built",
+        "moved": 1,
+        "youngest_at_t": 1.2
+      },
+      "alternative": {
+        "outcome": "failed",
+        "moved": null,
+        "youngest_at_t": null,
+        "peer_conflict": false,
+        "etarget": true,
+        "failures": [
+          "npm error code ETARGET\nnpm error notarget No matching version found for fill-range@^7.1.1 with a date before 5/18/2024, 9:59:11 AM.\nnpm error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.\nnpm error A complete log of this run can be found "
+        ]
+      },
+      "no_advisory_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 1.2,
+        "stops": [],
+        "failures": []
+      },
+      "no_advisory_no_deprecation_filter": {
+        "outcome": "built",
+        "moved": 1,
+        "all_oldest": true,
+        "youngest_at_t": 1.2,
+        "stops": [],
+        "failures": [],
+        "differ_vs_normal_at_t": 0,
+        "differ_vs_normal": 0,
+        "normal_moved": 1,
+        "normal_young": 21463.9,
+        "normal_at_t_moved": 1,
+        "dup": 0,
+        "peers": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "R18",
+  "name": "azle",
+  "from": "0.29.0",
+  "v": "0.30.0",
+  "advisory": "GHSA-xc76-5pf9-mx8m",
+  "why": "first eligible rows, one per package",
+  "vulnerable": ">=0.27.0 <0.30.0",
+  "started_at": "2026-11-01T16:37:49.721Z",
+  "base_before": "2025-03-07T17:25:25.506Z",
+  "outcome": "no_base",
+  "reason": "npm error code EALLOWGIT\nnpm error Fetching packages of type \"git\" have been disabled\nnpm error Refusing to fetch \"wasmedge_quickjs@github:demergent-labs/wasmedge-quickjs#3b3b0ee91248ccf9cd954ffafbac7e024648af92\"\nnpm error A complete log of this run can be found in: /vol/cache/_logs/2026-11-01T16_37_49_846Z-debug-0.log\n"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "R05",
+  "name": "@angular/platform-server",
+  "from": "20.2.4",
+  "v": "20.3.0",
+  "t": "2025-09-10T21:56:01.000Z",
+  "before": "2025-09-07T21:56:01.000Z",
+  "outcome": "failed",
+  "reason": "npm warn Found: @angular/platform-browser@undefined\nnpm warn node_modules/@angular/platform-browser\nnpm warn\nnpm warn Could not resolve dependency:\nnpm warn peer @angular/platform-browser@\"20.3.0\" from @angular/platform-server@20.3.0\nnpm warn node_modules/@angular/platform-server\nnpm warn   @angular/platform-server@\"20.3.0\" from the root project\nnpm error code ETARGET\nnpm error notarget No matching version found for @angular/common@20.3.0 with a date before 9/7/2025, 9:56:01 PM.\nnpm error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.\nnpm error A complete log of this run can be found in: /vol/cache/_logs/2026-11-01T16_34_07_129Z-debug-0.log\n",
+  "peer_conflict": false,
+  "etarget": true
+}

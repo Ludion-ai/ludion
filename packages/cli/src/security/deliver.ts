@@ -48,6 +48,14 @@ const SHA = /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/;
 const HEX64 = /^[0-9a-f]{64}$/;
 const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
+/**
+ * A TIME that is a date: it reads back the same. Date.parse rolls a day past the month's end, or the hour 24, over to
+ * another date (2026-02-30 is read as 2026-03-02), and gives NaN for a month over 12 (R252 N3, R252b N9).
+ */
+const isDate = (t: string) => {
+  const ms = Date.parse(t);
+  return Number.isFinite(ms) && new Date(ms).toISOString() === t.replace(/(?:\.(\d{1,3}))?Z$/, (_, f?: string) => `.${(f ?? "").padEnd(3, "0")}Z`);
+};
 const NAME = /^@?[A-Za-z0-9][A-Za-z0-9._~/:-]{0,213}$/;
 const VERSION = /^[A-Za-z0-9][A-Za-z0-9.+_~-]{0,99}$/;
 /**
@@ -662,7 +670,7 @@ function foundRow(fix: CheckedFix): string {
   const code = (v: string) => `\`${v}\``, s = fix.seen, at = code(fix.found_at);
   if (!s) return `| Found | ${at} (this run's lookup; an earlier run may have seen it first) |`;
   // Our own message, never text from GitHub or the artifact; still kept out of the table's and Markdown's syntax.
-  if (s.why !== undefined) return `| Found | ${at} (this run's lookup: earlier runs' records were not read: ${plain(s.why).replace(/[|`*_<>[\]@#~\\]/g, " ").slice(0, 300)}) |`;
+  if (s.why !== undefined) return `| Found | ${at} (this run's lookup: earlier runs' records were not used: ${plain(s.why).replace(/[|`*_<>[\]@#~\\]/g, " ").slice(0, 300)}) |`;
   const read = `${code(String(s.read))} records read`;
   if (s.earlier) return `| Found | ${at} (this run's lookup, earlier than the record of every run that lists this fix; ${read}) |`;
   if (s.run === null) return `| Found | ${at} (this run's lookup: no record of this workflow's runs lists this fix; ${read}) |`;
@@ -799,7 +807,7 @@ function seenRecordOf(bytes: Buffer, started: number, uploaded: number, ecosyste
     const r = object(JSON.parse(entry.toString("utf8")), "The record");
     if (r.schema !== 1 || r.kind !== "ludion-seen" || r.ecosystem !== ecosystem) return null;
     const checked = time(r.checked_at, "checked_at"), at = Date.parse(checked);
-    if (!(at >= started && at <= uploaded)) return null;
+    if (!isDate(checked) || !(at >= started && at <= uploaded)) return null;
     if (r.commit !== null) text(r.commit, SHA, "commit");
     const keys = list(r.keys, 0, 500, "keys").map(k => {
       const item = object(k, "A key");
@@ -1157,8 +1165,8 @@ const MERGED_MARK = "<!-- ludion-merged", BOT = "github-actions[bot]";
 function bodyTime(body: string, row: string): string | null {
   const line = body.split("\n").find(l => l.startsWith(`| ${row} | `));
   const m = line ? /^\| [^|]+ \| `([^`]*)`/.exec(line) : null;
-  // The form of a time is not enough: 2026-13-45T00:00:00Z has it and is no date (R252 N3).
-  return m && TIME.test(m[1]!) && Number.isFinite(Date.parse(m[1]!)) ? new Date(m[1]!).toISOString() : null;
+  // The form of a time is not enough: 2026-13-45T00:00:00Z and 2026-02-30T00:00:00Z have it and are no date (R252 N3, R252b N9).
+  return m && TIME.test(m[1]!) && isDate(m[1]!) ? new Date(m[1]!).toISOString() : null;
 }
 function hours(from: string | null, to: string | null, what: string): string {
   if (from === null || to === null) return "unknown";
@@ -1179,7 +1187,7 @@ export async function recordMerge(options: { repo: string; pr: number; api: stri
   const no = (reason: string) => ({ outcome: "not_recorded" as const, reason: `PR #${options.pr}: ${reason}` });
   const body = typeof p.body === "string" ? p.body.replace(/\r\n/g, "\n") : "";
   if (p.merged !== true) return no("the PR is not merged.");
-  if (typeof p.merged_at !== "string" || !TIME.test(p.merged_at) || !Number.isFinite(Date.parse(p.merged_at))) return no("its merged_at is not a time.");
+  if (typeof p.merged_at !== "string" || !TIME.test(p.merged_at) || !isDate(p.merged_at)) return no("its merged_at is not a time.");
   if (typeof p.merge_commit_sha !== "string" || !SHA.test(p.merge_commit_sha)) return no("its merge commit is not a full SHA.");
   if (p.user?.login !== BOT) return no(`the PR was not opened by ${BOT}.`);
   if (p.head?.repo?.full_name !== options.repo) return no("its head is in another repository.");

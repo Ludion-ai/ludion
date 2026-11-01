@@ -68,6 +68,12 @@ case "$MODE" in
       echo "::error::mode merged runs on pull_request, not ${EVENT}."
       exit 1
     fi
+    # It holds pull-requests: write, so, like the scheduled jobs, it runs only on a fresh GitHub-hosted machine: on a
+    # self-hosted runner, what an earlier job (mode patch runs candidate code) left there could reach its token.
+    if [ "${RUNNER_ENVIRONMENT:-}" != "github-hosted" ]; then
+      echo "::error::mode ${MODE} runs only on GitHub-hosted runners (a fresh machine per job), not on ${RUNNER_ENVIRONMENT:-an unknown runner}."
+      exit 1
+    fi
     need node
     node -e 'if (Number(process.versions.node.split(".")[0]) < 22) { console.error(`::error::Ludion needs Node 22 or later; this runner has ${process.versions.node}.`); process.exit(1); }'
     ;;

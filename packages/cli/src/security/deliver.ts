@@ -744,6 +744,8 @@ const errorText = (error: unknown) => plain(error instanceof Error ? error.messa
 export const SEEN_ARTIFACT = "ludion-seen";
 /** At most this many runs are read back, and a record (zipped or not) is at most this many bytes. */
 export const SEEN_RUNS = 100, SEEN_BYTES = 1024 * 1024;
+/** The walk asks nothing more once it has taken this long; each request also has its own 30-second limit (R252 N7). */
+export const SEEN_WALK_MS = 5 * 60_000;
 const SEEN_KEY = /^(?:php|node|(?:npm|composer|maven):[A-Za-z0-9@._/:~?-]{1,214})$/;
 type SeenRecord = { checked_at: string; keys: { key: string; advisories: string[]; releases: string[]; candidate: string | null }[] };
 
@@ -851,16 +853,20 @@ function listsFix(record: SeenRecord, ecosystem: Ecosystem, fix: CheckedFix): bo
  * For each fix (by branch), the first run that saw it: from this run back, newest first, through the workflow's runs on
  * the default branch started by schedule or workflow_dispatch (at most `limit`), a valid record that lists the fix moves
  * it to that run, one that does not ends the row, and a run with no valid record is passed over. Null: no record lists
- * it. Throws when this run or the workflow's runs cannot be read; the caller then keeps the receipt's found_at.
+ * it. Throws when this run or the workflow's runs cannot be read, or the walk takes longer than SEEN_WALK_MS; the
+ * caller then keeps the receipt's found_at.
  */
-export async function firstSeen(options: { repo: string; runId: number; defaultBranch: string; ecosystem: Ecosystem; api: string; token: string; fetchFn?: typeof fetch; limit?: number }, fixes: CheckedFix[]): Promise<{ read: number; seen: Map<string, { at: string; run: number; ended: boolean } | null> }> {
-  const api = apiOf(options), limit = options.limit ?? SEEN_RUNS;
+export async function firstSeen(options: { repo: string; runId: number; defaultBranch: string; ecosystem: Ecosystem; api: string; token: string; fetchFn?: typeof fetch; limit?: number; now?: () => number }, fixes: CheckedFix[]): Promise<{ read: number; seen: Map<string, { at: string; run: number; ended: boolean } | null> }> {
+  const api = apiOf(options), limit = options.limit ?? SEEN_RUNS, now = options.now ?? Date.now, until = now() + SEEN_WALK_MS;
+  // Before each request: the PR job opens the PR after the walk, within the job's own time limit.
+  const inTime = () => { if (now() > until) throw new Error(`the walk took longer than ${SEEN_WALK_MS / 60_000} minutes.`); };
   if (!Number.isSafeInteger(options.runId) || options.runId <= 0) throw new Error("this run's id is not a number.");
   const own = await call(api, "GET", `/repos/${options.repo}/actions/runs/${options.runId}`);
   const workflow = (own.json as { workflow_id?: unknown } | null)?.workflow_id;
   if (own.status !== 200 || !Number.isSafeInteger(workflow)) throw new Error(`GitHub did not give this run (HTTP ${own.status}).`);
   const runs: { id: number; started: number }[] = [];
   for (let page = 1; runs.length < limit && page <= 10; page++) {
+    inTime();
     const query = new URLSearchParams({ branch: options.defaultBranch, per_page: "100", page: String(page) });
     const listed = await call(api, "GET", `/repos/${options.repo}/actions/workflows/${workflow}/runs?${query}`);
     const items = (listed.json as { workflow_runs?: unknown } | null)?.workflow_runs;
@@ -877,13 +883,16 @@ export async function firstSeen(options: { repo: string; runId: number; defaultB
   let read = 0;
   for (const run of runs) {
     if ([...state.values()].every(s => s.ended)) break;
+    inTime();
     const record = await seenOfRun(api, options.repo, run, options.ecosystem);
     if (!record) continue;
     read++;
     for (const fix of fixes) {
       const s = state.get(fix.branch)!;
       if (s.ended) continue;
-      if (listsFix(record, options.ecosystem, fix)) s.found = { at: record.checked_at, run: run.id };
+      // The earliest record time of the row (definitions.md, section 3), not the lowest run id's: a re-run of an older
+      // run keeps its id and moves its start and its record later (R252 N4).
+      if (listsFix(record, options.ecosystem, fix)) { if (!s.found || Date.parse(record.checked_at) < Date.parse(s.found.at)) s.found = { at: record.checked_at, run: run.id }; }
       else s.ended = true;
     }
   }
@@ -1148,7 +1157,8 @@ const MERGED_MARK = "<!-- ludion-merged", BOT = "github-actions[bot]";
 function bodyTime(body: string, row: string): string | null {
   const line = body.split("\n").find(l => l.startsWith(`| ${row} | `));
   const m = line ? /^\| [^|]+ \| `([^`]*)`/.exec(line) : null;
-  return m && TIME.test(m[1]!) ? new Date(m[1]!).toISOString() : null;
+  // The form of a time is not enough: 2026-13-45T00:00:00Z has it and is no date (R252 N3).
+  return m && TIME.test(m[1]!) && Number.isFinite(Date.parse(m[1]!)) ? new Date(m[1]!).toISOString() : null;
 }
 function hours(from: string | null, to: string | null, what: string): string {
   if (from === null || to === null) return "unknown";
@@ -1169,7 +1179,7 @@ export async function recordMerge(options: { repo: string; pr: number; api: stri
   const no = (reason: string) => ({ outcome: "not_recorded" as const, reason: `PR #${options.pr}: ${reason}` });
   const body = typeof p.body === "string" ? p.body.replace(/\r\n/g, "\n") : "";
   if (p.merged !== true) return no("the PR is not merged.");
-  if (typeof p.merged_at !== "string" || !TIME.test(p.merged_at)) return no("its merged_at is not a time.");
+  if (typeof p.merged_at !== "string" || !TIME.test(p.merged_at) || !Number.isFinite(Date.parse(p.merged_at))) return no("its merged_at is not a time.");
   if (typeof p.merge_commit_sha !== "string" || !SHA.test(p.merge_commit_sha)) return no("its merge commit is not a full SHA.");
   if (p.user?.login !== BOT) return no(`the PR was not opened by ${BOT}.`);
   if (p.head?.repo?.full_name !== options.repo) return no("its head is in another repository.");

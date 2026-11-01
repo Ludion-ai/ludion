@@ -1,6 +1,6 @@
 # Status
 
-What Ludion does today, what is missing before it is complete, and what waits for the owner. A PR that changes what Ludion does updates this file in the same PR (CLAUDE.md, How we work). Last updated 2026-11-01 (LDONE, the definition of complete; LSCANERR, LSCAN404 and LSCANX; LNODE on 2026-10-31; LI and the site item, LJ2, on 2026-10-30).
+What Ludion does today, what is missing before it is complete, and what waits for the owner. A PR that changes what Ludion does updates this file in the same PR (CLAUDE.md, How we work). Last updated 2026-11-01 (LC0a, where CLAUDE.md says more than the code; LDONE, the definition of complete; LSCANERR, LSCAN404 and LSCANX; LNODE on 2026-10-31; LI and the site item, LJ2, on 2026-10-30).
 
 ## Release
 
@@ -83,6 +83,13 @@ The tables below translate the record's. The "Today" column gives the record's v
 - A project with no tests: what is checked so that it can be said not to break (gate 3) is left open, to be decided with LV0's numbers. Candidates: the build, types, the start, comparing the same page.
 - One folder is fixed for one ecosystem only. Whether to widen that is decided with LR3's numbers.
 
+### Where CLAUDE.md says more than the code (read on main 4aefb22; docs/decisions/2026-11-01-claude-md-catches-up-lc0a.md)
+
+- Gate 3, a patch within the line of an official image: having no test that passes on old still stops it. A PHP or Node.js image policy must name a nonempty test (packages/cli/src/security/project.ts, `readConfig`), and that test must pass on the old image before the new one is built (patch.ts).
+- Gate 3, "it starts": `patch` runs the runtime's version check in the built image and then the project's test (patch.ts); it does not start the project. How gate 3 is to check that it starts is not decided.
+- The Goal's official image, "the newest release of its line that Docker still builds in the project's variant": `imageMove` (php.ts) asks Docker Hub only about the tag of the newest release on the official list; without that tag it stops, and it looks for no older release of the variant.
+- A container that counts as the host: nothing refuses one where agents work. The host guard (.claude/hooks/guard.mjs) does not read a `docker run`'s mounts, and tools/records/test/bench-socket.test.ts catches only installs in the bench scripts. `ludion`'s own containers (packages/sandbox/src/docker.ts) are given neither the socket nor a mount of the work tree.
+
 ### The former working list (until 2026-11-01)
 
 Each item of the list this section held before, with the condition it became, then its text as it was (apart from item 5's, which the definition replaces).
@@ -99,6 +106,6 @@ Each item of the list this section held before, with the condition it became, th
 Decided on 2026-10-29: every changed version counts as production (docs/decisions/2026-10-29-every-change-counts-as-production.md), and EPSS scores are downloaded whole (docs/decisions/2026-10-29-epss-downloaded-whole.md). Decided on 2026-10-30 (the owner, in the Claude chat): the shadow's dev-only row stays as it is; the replay keeps judging it at 168h and (b) is still counted on all four rows (docs/decisions/2026-10-29-shadow-counting.md, unchanged).
 
 1. **What the definition of complete leaves open** (docs/decisions/2026-11-01-definition-of-complete.md; "Missing before complete" above). The lines of C1 and C2 (after LT2; C1's row also names the owner) and C10's line (the owner); the scope apart from Maven, C4's strata, C10's denominator and what gate 3 checks for a project with no tests (after LV0); C9's 60 days (after the design of something that starts the run from outside). The definition also leaves to the owner C9's choice if the run cannot be shown not to stop, and C15's line on the number of cases. Decided on 2026-11-01 at 13:09 JST: Maven is to be taken out of what Ludion fixes, and its read-only check stays.
-2. **Shorter waits for official runtime releases.** The owner's point (2026-10-29): once a fix is public the race is short. Whether a fix from a runtime's own official channel (php.net, the official Docker image) waits less than the table says changes the wait table, so it is the owner's.
+2. **Shorter waits for official runtime releases.** The owner's point (2026-10-29): once a fix is public the race is short. Whether a fix from a runtime's own official channel (php.net, the official Docker image) waits less than the table says changes the wait table, so it is the owner's. Since 2026-11-01 CLAUDE.md answers this for a security release in an official runtime's line and an official image's move across one (docs/decisions/2026-11-01-claude-md-catches-up-lc0a.md); the wait of automatic merge is decided separately.
 3. **Gates and learned models.** The owner, 2026-10-29 18:24 JST: 「ニューラルネットワーク式にやったらいいじゃない？関門は全てアルゴで まぁ設計はまた後で深掘りする」. Taken for now as: improve the way of working like training, each mistake fed back into a rule or a check, and every checkpoint as code (docs/decisions/2026-10-29-way-of-working.md). Whether any of Ludion's gates should use a learned model is for the design deep-dive. A note for it from the Claude chat: a learned score could add a reason to wait or to notify, but should not lift a stop, because a release can be tuned against a model and a receipt has to say why.
 4. **The design.** docs/design.md's roadmap puts the judge first, and its open decision on where to start says 「推奨は判定役から」; the Goal now wins over both, and the owner redoes the design.

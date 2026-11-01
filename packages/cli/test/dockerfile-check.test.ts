@@ -130,7 +130,7 @@ describe("the Dockerfile check takes what it took", () => {
   });
 });
 
-describe("namesNodeImage reads FROM as BuildKit does, so a hidden one is a check that failed, not a skipped one", () => {
+describe("namesNodeImage finds a FROM behind whitespace or a continuation, so it is a check that failed, not a skipped one", () => {
   it.each<[string, string]>([
     ["U+0085 before FROM", "\u0085FROM node:22-alpine\n"],
     ["no-break space before FROM", " FROM node:22-alpine\n"],
@@ -144,8 +144,38 @@ describe("namesNodeImage reads FROM as BuildKit does, so a hidden one is a check
   ])("dockerfile-check-names-node: %s", (_name, text) => {
     expect(namesNodeImage(text)).toBe(true);
   });
-  it.each(["# FROM node:22\n", "FROM php:8.4.26-cli-alpine\nCOPY --chown=node:node . .\n", "RUN echo FROM node\n", "# a \\ \n# FROM node\n"])("does not take %j for one", text => {
+  // BuildKit also splits an instruction from its arguments, and its arguments, at these three (a review of this PR, B1).
+  it.each<[string, string]>([
+    ["a form feed after FROM", "FROM\fnode:22.11.0-alpine\n"],
+    ["a vertical tab after FROM", "FROM\vnode:22.11.0-alpine\n"],
+    ["a carriage return after FROM", "FROM\rnode:22.11.0-alpine\n"],
+    ["a form feed after a flag", "FROM --platform=linux/amd64\fnode:22\n"],
+    ["a vertical tab after a flag", "FROM --platform=linux/amd64\vnode:22\n"],
+    ["a carriage return after a flag", "FROM --platform=linux/amd64\rnode:22\n"],
+    ["a form feed after the image", "FROM node\fAS x\n"],
+    ["a vertical tab after the image", "FROM node\vAS x\n"],
+  ])("dockerfile-check-names-node-separator: %s", (_name, text) => {
+    expect(namesNodeImage(text)).toBe(true);
+  });
+  // What each of these forms does when a policy names node, so finding them gives the check that image reads or refuses.
+  it("dockerfile-check-names-node-separator: nodeImage takes a form feed and a vertical tab after FROM, and refuses a carriage return", () => {
+    expect(nodeImage("FROM\fnode:22.11.0-alpine\n")).toMatchObject({ reference: "node:22.11.0-alpine" });
+    expect(nodeImage("FROM\vnode:22.11.0-alpine\n")).toMatchObject({ reference: "node:22.11.0-alpine" });
+    expect(() => nodeImage("FROM\rnode:22.11.0-alpine\n")).toThrow(SEPARATOR);
+    expect(() => nodeImage("FROM --platform=linux/amd64\fnode:22\n")).toThrow("exact version");
+  });
+  it.each([
+    "# FROM node:22\n", "FROM php:8.4.26-cli-alpine\nCOPY --chown=node:node . .\n", "RUN echo FROM node\n", "# a \\ \n# FROM node\n",
+    "FROM php:8.4.26-cli-alpine\r\nCOPY --chown=node:node . .\r\n", "FROM\fnodejs:22\n", "FROM php:8.4.26-cli-alpine\fAS node\n", "RUN echo FROM\fnode\n", "FROM\nnode:22\n",
+  ])("does not take %j for one", text => {
     expect(namesNodeImage(text)).toBe(false);
+  });
+  // `docker build` reads these forms too (built with scratch), and they are not found, so an unconfigured scan says
+  // nothing about them: docs/mistakes/2026-11-02-dockerfile-check-not-as-buildkit-reads.md says so. A policy that names
+  // node refuses each. When detection reads them, this test goes, and that sentence with it.
+  it.each([`FROM "node:22.11.0-alpine"\n`, `FROM 'node:22.11.0-alpine'\n`, `FROM no"de":22.11.0-alpine\n`, "ARG X=node:22.11.0-alpine\nFROM $X\n", "FROM ${X:-node:22.11.0-alpine}\n"])("dockerfile-check-names-node-gap: does not find %j, and nodeImage refuses it", text => {
+    expect(namesNodeImage(text)).toBe(false);
+    expect(() => nodeImage(text)).toThrow("exact version");
   });
 });
 
@@ -199,6 +229,10 @@ describe("the Dockerfile readers decide 64 KiB in linear time", () => {
     ["FROM and a long image", fill("a", "FROM ")],
     ["FROM and a long flavor", fill("a-", "FROM php:8.4.25-cli-", "!")],
     ["FROM, flags and spaces", fill("--a ", "FROM ", "x")],
+    ["FROM, flags and form feeds", fill("--a\f", "FROM ", "x")],
+    ["FROM, flags and carriage returns", fill("--a\r", "FROM ", "x")],
+    ["FROM and carriage returns", fill("FROM\r")],
+    ["FROM and form feeds", fill("\f", "FROM", "x")],
     ["backslashes and spaces", fill("\\ ")],
     ["a backslash and spaces to the end", fill(" ", `${PHP}\n\\`)],
     ["backticks and spaces", fill("` ")],

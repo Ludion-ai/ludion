@@ -5,9 +5,9 @@
 ## What changed
 
 - packages/cli/src/security/php.ts: `officialImage` reads through `instructions` (BuildKit's order) and `reachesOutside`, in place of the expressions over the whole file. Messages and their order are as before, with one new message for a carriage return, U+2028 or U+2029 inside a line.
-- packages/cli/src/security/node.ts: `namesNodeImage` reads the same whitespace, leaves comments out and joins continuations.
+- packages/cli/src/security/node.ts: `namesNodeImage` takes off a line's left whitespace (U+0085 included), reads a vertical tab, form feed or carriage return as a separator, leaves comments out and joins continuations. It does not find every FROM BuildKit reads: an image in quotes, and one from an ARG or `${X:-...}`, are not found, and `dockerfile-check-names-node-gap` holds that.
 - packages/cli/src/security/judge.ts: `lockKey` refuses a key over 4,096 characters without repeating it; `LOCK_PATH` is an expression with one way to match any key, and the same answers.
-- packages/cli/test/dockerfile-check.test.ts (new, 123 tests). README.md and docs/status.md are not changed: "offline" in README.md's line 175 and docs/status.md's line 18 now matches what the check holds, and the check only refuses more.
+- packages/cli/test/dockerfile-check.test.ts (new, 146 tests). README.md and docs/status.md are not changed: "offline" in README.md's line 175 and docs/status.md's line 18 now matches what the check holds, and the check only refuses more.
 
 ## Red, then green (Docker, `--network none`, `--memory 4g`, Node 24.22.2)
 
@@ -20,15 +20,17 @@ The same test file on main's php.ts, node.ts and judge.ts, then on this PR's:
 | `dockerfile-check-flags-and-directives` | 7 / 13 | 0 / 13 |
 | `dockerfile-check-across-lines` | 4 / 11 | 0 / 11 |
 | `dockerfile-check-from-on-the-next-line` | 1 / 1 | 0 / 1 |
-| `dockerfile-check-names-node` | 6 / 9 | 0 / 9 |
-| `gate-reader-linear` | 13 / 40 | 0 / 40 |
-| the file | 52 / 123 | 0 / 123 |
+| `dockerfile-check-names-node:` | 6 / 9 | 0 / 9 |
+| `dockerfile-check-names-node-separator` | 9 / 9 | 0 / 9 |
+| `dockerfile-check-names-node-gap` | 0 / 5 | 0 / 5 |
+| `gate-reader-linear` | 13 / 44 | 0 / 44 |
+| the file | 61 / 146 | 0 / 146 |
 
 A test that passes on the old code is a form it already refused, kept so the new reader cannot lose it; across-lines also fails on the old code where it refused with another message. Forms refused, for each of the two images: 45, plus FROM alone (one test of 3 cases). Of the audit's eight forms, each fails on the old code.
 
 With this PR: `tsc` exit 0, `npm run build` exit 0, `vitest run --project node` 2,060 passed, 25 skipped (they need Docker; CI runs them), in a container with git and no network.
 
-Mutations of the three files, each run against dockerfile-check.test.ts, security.test.ts and node-image.test.ts: 42 of 42 failed a test. Three were missed at first. `if (comment) continue;` changed nothing, as a comment's first word matches no instruction, so the line was taken out and is not among the 42; the case of RUN's flag, and `namesNodeImage` reading only the joined text, had no test, so one was added for each.
+Mutations of the three files, each run against dockerfile-check.test.ts, security.test.ts and node-image.test.ts: 42 of 42 failed a test. Three were missed at first. `if (comment) continue;` changed nothing, as a comment's first word matches no instruction, so the line was taken out and is not among the 42; the case of RUN's flag, and `namesNodeImage` reading only the joined text, had no test, so one was added for each. After the review's B1, 10 more on `NODE_FROM`'s separators: 9 fail a test. The tenth takes the carriage return out of what may follow the image, and changes nothing, as `$` already matches before one.
 
 ## Nothing refused before is taken now
 
@@ -59,11 +61,15 @@ The old-took row by reason: 1,246,289 for a carriage return or separator inside 
 | `lockEntries`, one key of 4,096 characters | 0.92 ms | 0.48 ms |
 | `lockEntries`, one key in a 4 MiB lock | not run | 0.8 ms |
 
-`gate-reader-linear` holds these under limits Node's VM enforces: 50 ms for each of phpImage, nodeImage and namesNodeImage on 32 inputs of up to 64 KiB, 1 s for the readers of a 4 MiB lock, and 4 s for `packageLockInputs`.
+`gate-reader-linear` holds these under limits Node's VM enforces: 50 ms for each of phpImage, nodeImage and namesNodeImage on 36 inputs of up to 64 KiB, 1 s for the readers of a 4 MiB lock, and 4 s for `packageLockInputs`.
 
 A length limit alone was not enough, as 1,000 extraneous keys of 4,096 characters are each under it. In the same container, the old expression against the new: `packageLockInputs` 9,526 and 9,456 ms against 728 and 556 ms; `lockKey` on those keys 10 times over 2,342 and 2,313 ms against 112 and 104 ms; `lockEntries` 471 and 479 ms against 31 and 33 ms. The test first held `packageLockInputs` to 1 s, which GitHub's runner went over in all 3 tries (`Over 1000 ms in each of 3 tries.`) with the new expression. That limit was this lane's own, and that call reads each lock many times over, so it has 4 s now, between the two times, and the lock readers keep 1 s, with `lockKey` added at 1 s because `lockEntries` alone does not tell the two apart.
 
-Measured and not changed: `packageLockInputs` on 1,000 valid install paths of about 4,096 characters (4 MiB), each with one dependency, took 3,971 and 3,867 ms. That the time is in `resolveFrom` is read from the code, not profiled.
+Measured and not changed: `packageLockInputs` on 1,000 valid install paths of about 4,096 characters (4 MiB), each with one dependency, took 3,971 and 3,867 ms. That the time is in `resolveFrom` is read from the code, not profiled. It is no bound: a review of this PR measured 37,105 ms on one key of about 4,096 characters with 10,000 dependencies, and 35,959 ms on main's code.
+
+## After the first review (B1)
+
+The review found that `namesNodeImage` missed a FROM split from its image by a form feed, vertical tab or carriage return, while the record said an unconfigured scan does not skip a hidden FROM. `NODE_FROM` now reads those as separators, after FROM, after a flag and after the image. Checking that sentence with `docker build --network=none --pull=false --no-cache --output type=cacheonly -`, with `scratch` only: `FROM\fscratch`, `FROM\vscratch`, `FROM\rscratch`, `FROM scratch\fAS x`, `FROM scratch\vAS x`, `FROM "scratch"`, `FROM 'scratch'`, `FROM scr"atch"`, `ARG X=scratch` then `FROM $X`, and `FROM ${X:-scratch}` each exit 0. So the separators alone would not make it true, and the sentences are narrowed too: the record names the quoted and ARG forms as not found. `FROM\r\nnode:22` is also found now, though BuildKit reads FROM alone there and fails: the left-whitespace step takes out the line feed after a carriage return. That gives a check `nodeImage` refuses, for a file that does not build.
 
 ## npm corpus
 

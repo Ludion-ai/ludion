@@ -10,14 +10,16 @@ export const NODE_INDEX_URL = "https://nodejs.org/dist/index.json";
  * A FROM line that names a node image, for init and scan to offer the Node.js policy: after any --flag arguments, with
  * any registry or namespace prefix, by tag, digest or neither. Only the FROM line counts (not `COPY --chown=node:node`).
  * Detecting is not reading: nodeImage accepts only the official image at an exact version, and every other form found
- * here becomes a check that could not be made, never a skipped one.
+ * here becomes a check that could not be made, never a skipped one. A space, tab, vertical tab, form feed or carriage
+ * return separates the words, as in BuildKit.
  */
-export const NODE_FROM = /^[ \t]*FROM[ \t]+(?:--\S+[ \t]+)*(?:\S*\/)?node(?=[:@ \t\r]|$)/im;
+export const NODE_FROM = /^[ \t]*FROM[ \t\v\f\r]+(?:--\S+[ \t\v\f\r]+)*(?:\S*\/)?node(?=[:@ \t\v\f\r]|$)/im;
 /**
- * Whether a Dockerfile names a node image (NODE_FROM), read as BuildKit reads it: without a leading byte-order mark or
- * any line's left whitespace (U+0085 included), and with its comments out and its continuations joined, a backtick's
- * too. The lines are also read as they stand, as a backtick continues only under an escape directive. Finding more here
- * only makes a check that nodeImage then refuses.
+ * Whether a Dockerfile names a node image (NODE_FROM): without a leading byte-order mark or any line's left whitespace
+ * (U+0085 included), and with its comments out and its continuations joined, a backtick's too. The lines are also read
+ * as they stand, as a backtick continues only under an escape directive. Finding more here only makes a check that
+ * nodeImage then reads or refuses. It does not find every FROM BuildKit reads: not an image in quotes, and not one from an
+ * ARG or `${X:-...}`, which are left unfound unless a policy names node (dockerfile-check.test.ts holds these).
  */
 export const namesNodeImage = (dockerfile: string): boolean => {
   const lines = withoutBom(dockerfile).replace(/^[\s\u0085]+/gm, "");

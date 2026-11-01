@@ -15,6 +15,7 @@ import { registryManifest } from "../src/security/npm-facts.ts";
 import { PKSA_ID } from "../src/security/packagist.ts";
 import { snapshot } from "../src/security/project.ts";
 import { commit, git } from "./git.ts";
+import { seenAt, withRuns, type StandInRun } from "./runs.ts";
 
 const ID = "0f1e2d3c-4b5a-4968-8776-655443322110";
 const sha256 = (text: string) => createHash("sha256").update(text).digest("hex");
@@ -193,6 +194,30 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
     expect(again.deliveries).toEqual([{ package: "lodash", branch: BRANCH, outcome: "open_pr_exists", pr: 100 }]);
     expect(gh.opened).toHaveLength(1);
     expect(gh.calls.filter(c => c.startsWith("POST"))).toHaveLength(1);
+  });
+  it("gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5)", async () => {
+    const { work, origin, base } = project(), fix = applied(work);
+    const out = artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base);
+    const saw = [{ key: "npm:lodash", advisories: ["CVE-2021-23337"] }];
+    const runs: StandInRun[] = [
+      { id: 40, started: "2026-10-28T18:00:00Z", record: seenAt("2026-10-28T18:00:00Z", []) },
+      { id: 41, started: "2026-10-29T00:00:00Z", record: seenAt("2026-10-29T00:00:00Z", saw) },
+      { id: 42, started: "2026-10-30T00:55:00Z", record: seenAt("2026-10-30T00:55:00Z", saw) },
+    ];
+    const gh = github(origin), asked: string[] = [];
+    const first = await open(checkout(origin), out, base, origin, gh, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh.fetchFn, runs, { asked }) });
+    expect(first.deliveries).toMatchObject([{ outcome: "opened" }]);
+    expect(String(gh.opened[0]!.body)).toContain("| Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `3` records read) |");
+    // The next run: the PR exists, so the runs are not read again.
+    asked.length = 0;
+    expect((await open(checkout(origin), out, base, origin, gh, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh.fetchFn, runs, { asked }) })).deliveries).toMatchObject([{ outcome: "open_pr_exists" }]);
+    expect(asked).toEqual([]);
+    // A token without actions: read.
+    const p2 = project(), fix2 = applied(p2.work), gh2 = github(p2.origin);
+    const refused = await open(checkout(p2.origin), artifact(p2.work, fix2.receipt, [`refs/heads/${BRANCH}`], p2.base), p2.base, p2.origin, gh2, "refs/heads/main", { runId: 42, fetchFn: withRuns(gh2.fetchFn, runs, { refuse: 403 }) });
+    expect(refused.deliveries).toMatchObject([{ outcome: "opened" }]);
+    expect(String(gh2.opened[0]!.body)).toContain("| Found | `2026-10-30T01:00:00.000Z` (this run's lookup: earlier runs' records were not read: ");
+    expect(String(gh2.opened[0]!.body)).toContain("HTTP 403");
   });
   it("does not open a fix again whose PR was closed, nor move a branch that holds another change", async () => {
     const { work, origin, base } = project(), fix = applied(work);

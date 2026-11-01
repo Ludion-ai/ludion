@@ -72,7 +72,17 @@ In Docker, `--workers=2`, `--cpus 4`, `--memory 4g` (`timing.json`). Each comman
 | `water.spec.ts` alone, wall | 313.2 s | 39.6 s |
 | `water.spec.ts` alone, sum of test seconds | 621.5 s | 74.9 s |
 
-The other specs are unchanged. CI's numbers are in the PR, read from its run.
+The other specs are unchanged.
+
+On CI, read from GitHub's records of the two runs (one run each, on different commits):
+
+| | Before: #257, run 41343379058 | After: this PR at 5961fda, run 41359470122 |
+| --- | --- | --- |
+| `test` job | 837 s | 290 s |
+| `npm run test:e2e` step | 617 s | 105 s |
+| The 8 water tests, sum of what the log prints | 1,056 s (printed to a tenth of a minute) | 92.8 s |
+
+All 64 lines of "Worst contrast" that CI printed at 5961fda, to two decimals, equal the ones Docker printed in `logs/t1b-all.txt`.
 
 ## Does the check still catch things
 
@@ -94,5 +104,5 @@ M5 is the one new assertion. A paused clock adds a way to fail silently, showing
 - **The 6 added moments hold for the site that was measured.** If text moves or the shader changes, they may stop being the lowest, and nothing here notices it. The steady moments still run, and `e2e/water-full.spec.ts` measures again by hand. The old check would have sampled differently, and only by luck of the machine's speed.
 - **The steady moments now span 12 s (6 s on the start pages), where the old ones wandered over about 70 s in Docker, with no fixed span.** Against today's site the added moments cover the difference. Against a changed site this check samples a narrower span than the old one did. From the sweep's data, the same 40 or 20 moments 4.5 s apart would reach the lowest value on 149 of 152 boxes, against B's 141. That was not in the fixed definition and is not done here.
 - **The sweep is a 300 ms grid to 180.1 s (90.1 s on the start pages), plus C's visits.** A lower value could exist between its points or after its end.
-- **Exact equality was shown in this one Docker image.** The values on CI come from the same Chromium build on another machine.
+- **Exact equality of full numbers was shown in this one Docker image.** CI was compared to the two decimals its log prints.
 - A1, A2 and A3 leave out the spec's coverage assertions (one `page.evaluate` and three comparisons), and water-full.spec.ts gained `WATER_FULL_TIMES` and `drawsAtStart` between B2 and C. Neither changes a value's definition.

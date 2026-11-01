@@ -31,6 +31,17 @@ A fresh-context review (PR comment 6554139186) asked for one change before mergi
 | mutations, each alone (R4, R5 from the review; F1 to F6 for the fixes) | 6859fca | 8: 8 caught |
 | typecheck, build, every unit test | 6859fca | exit 0, exit 0, 1936 passed, 25 skipped |
 
+## After the review of 620aeae
+
+A second fresh-context review (PR comment 6554998194) found the fixes above right and asked for main to be merged: docs/status.md conflicted with main 4aefb22, which replaced "Missing before complete" with the conditions C1 to C16. Main was merged (no rebase); its form was kept, and this lane's sentences on the old item 2 went to the end of that item in "The former working list", marked as LEXP's. Then: N9 (a time `Date.parse` rolls over to another date, such as `2026-02-30T00:00:00Z`, is now no date: unknown in the merge record, `merged_at` not recorded, a record not valid); N13 (after the walk's limit the body says the earlier records were not used, not that they were not read); tests for N10 and N11; N12, section 5's count of cases. N14 (CI's test job near its 15-minute limit) is in .github/, which this lane does not change. Detail: docs/bench/lexp/definitions.md, section 6, and docs/bench/lexp/README.md.
+
+| Run | Head | Result |
+|---|---|---|
+| the four files with the new tests, before the fix | ad3acd6 | 5 failed, 134 passed (139) |
+| the same, with the fix | 3ea4bb9 | 139 passed |
+| mutations, each alone (Q6, Q9 from the review; G1 to G6 for the fixes) | 3ea4bb9 | 8: 8 caught |
+| typecheck, build, `npm test`, tools/records' test | 3ea4bb9 | exit 0, exit 0, 1938 passed, 25 skipped; 14 passed |
+
 ## Not done
 
 - No run on GitHub (no release commit). Whether GitHub starts the merged job when a person merges a PR opened with the workflow's token is not tested.

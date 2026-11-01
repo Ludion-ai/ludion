@@ -1,0 +1,25 @@
+caught: M01-scan-auto
+caught: M02-unknown-72h
+caught: M03-no-doubling
+caught: M04-commit-time-ignored
+caught: M05-smallest-only
+caught: M06-kev-other-package-ignored
+caught: M08-unknown-returns-quiet
+caught: M09-image-nonsecurity-no-key
+caught: M10-image-wait-ignored
+caught: M11-keys-only-reads
+caught: M12-pksa-to-osv
+caught: M13-incomplete-decided
+caught: M14-maven-scanned
+caught: M15-error-decided
+caught: M16-sh-undecided-false
+caught: M17-sh-any-author
+caught: M18-sh-any-branch
+caught: M19-sh-gh-fail-false
+caught: M20-sh-no-changed-at
+caught: M21-sh-head-undecided-counted
+caught: M22-wf-patch-always-skips
+caught: M23-wf-check-write
+caught: M24-high-ignored
+caught: M25-epss-ignored
+caught 24 of 24

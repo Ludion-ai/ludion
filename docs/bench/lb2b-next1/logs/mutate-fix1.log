@@ -1,0 +1,11 @@
+caught: R08-behind-never
+caught: R11-no-300-limit
+caught: R09-bad-wait-until
+caught: S01-root-any-moved
+caught: S02-folder-file-ignored
+caught: S03-second-compare-fail-counted
+caught: S04-count-not-number
+caught: S05-previous-name-ignored
+caught: S06-limit-301
+caught: S07-prefix-no-slash
+caught 10 of 10

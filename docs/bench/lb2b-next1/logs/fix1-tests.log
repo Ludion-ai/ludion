@@ -1,0 +1,11 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ✓ |node| packages/cli/test/action-patch.test.ts (9 tests) 48ms
+ ✓ |node| packages/cli/test/check.test.ts (44 tests) 686ms
+
+ Test Files  2 passed (2)
+      Tests  53 passed (53)
+   Start at  01:13:02
+   Duration  1.06s (transform 264ms, setup 0ms, import 332ms, tests 733ms, environment 0ms)
+

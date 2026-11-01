@@ -213,6 +213,9 @@ describe("official images (T5)", () => {
     const old = (await php(image("update_available", "8.4.28", { security_releases: [{ version: "8.4.28", date: "30 Sep 2026", security: true }] }))).answer;
     expect(keyOf(old, "php")).toMatchObject({ state: "quiet", anchor: "2026-10-01T00:00:00.000Z", next_due: iso(Date.parse("2026-10-01T00:00:00Z") + 64 * SLOT_HOURS * H) });
   });
+  it("a wait_until that is not a time is undecided, not a move with no bound", async () => {
+    for (const wait_until of ["soon", ""]) expect((await php(image("update_available", "8.4.28", { wait_until }))).answer, wait_until).toMatchObject({ decided: false, reason: "the image check's wait_until is not a time." });
+  });
   it("no candidate, no key; a node policy reads node's release days", async () => {
     expect((await php(image("no_newer_security_release", null))).answer).toMatchObject({ decided: true, keys: [] });
     const root = project({ "ludion.security.json": NODE_POLICY, Dockerfile: "FROM node:22.22.0-alpine\n" });
@@ -304,20 +307,27 @@ describe("the lines action/check.sh reads", () => {
 // action/check.sh with stand-in node and gh (T8). The stand-ins answer from files the test writes.
 describe.skipIf(process.platform === "win32")("action/check.sh (T8)", () => {
   const script = fileURLToPath(new URL("../../../action/check.sh", import.meta.url));
-  const SHA = "a".repeat(40), HEAD = "b".repeat(40);
-  function sh(main: string[], opts: { mainStatus?: number; pulls?: string; head?: string[]; ghFails?: boolean } = {}) {
+  const SHA = "a".repeat(40), HEAD = "b".repeat(40), BASE = "c".repeat(40);
+  /**
+   * behind: the first compare's behind_by (this commit against the PR head; 0 by default). moved: what the second compare
+   * (the PR's merge base against this commit) lists, as the --jq in check.sh prints it: the count, then each file name;
+   * null makes that compare fail. dir: the action's input `dir`.
+   */
+  function sh(main: string[], opts: { mainStatus?: number; pulls?: string; head?: string[]; ghFails?: boolean; behind?: number; moved?: string[] | null; movedStatus?: number; dir?: string } = {}) {
     const dir = mkdtempSync(join(tmpdir(), "ludion-check-sh-")), bin = join(dir, "bin"), temp = join(dir, "temp");
     mkdirSync(bin); mkdirSync(temp);
     writeFileSync(join(dir, "main.txt"), main.map(l => `${l}\n`).join(""));
     writeFileSync(join(dir, "head.txt"), (opts.head ?? []).map(l => `${l}\n`).join(""));
     writeFileSync(join(dir, "pulls.txt"), opts.pulls ?? "");
+    writeFileSync(join(dir, "moved.txt"), (opts.moved ?? []).map(l => `${l}\n`).join(""));
     writeFileSync(join(dir, "calls"), "");
     // node CLI check --dir <d> [...]: the head's answer when --keys-only, else the commit's.
     writeFileSync(join(bin, "node"), `#!/usr/bin/env bash\necho "node $*" >> "${dir}/calls"\nfor a in "$@"; do [ "$a" = --keys-only ] && { cat "${dir}/head.txt"; exit 0; }; done\ncat "${dir}/main.txt"\nexit ${opts.mainStatus ?? 0}\n`, { mode: 0o755 });
     const gh = opts.ghFails ? `exit 1` : [
       `case "$*" in`,
       `  *pulls\\?state=open*) cat "${dir}/pulls.txt" ;;`,
-      `  *compare/*) echo "0 ${SHA}" ;;`,
+      `  *compare/${SHA}...${HEAD}*) echo "${opts.behind ?? 0} ${opts.behind ? BASE : SHA}" ;;`,
+      `  *compare/${BASE}...${SHA}*) ${opts.moved === null ? "exit 1" : `cat "${dir}/moved.txt"; exit ${opts.movedStatus ?? 0}`} ;;`,
       `  *tarball/*) mkdir -p "${dir}/t/x" && echo '{}' > "${dir}/t/x/ludion.security.json" && tar -czf - -C "${dir}/t" x ;;`,
       `  *) exit 1 ;;`,
       `esac`,
@@ -326,7 +336,7 @@ describe.skipIf(process.platform === "win32")("action/check.sh (T8)", () => {
     writeFileSync(join(bin, "git"), `#!/usr/bin/env bash\necho 2026-10-31T00:00:00Z\n`, { mode: 0o755 });
     const out = join(dir, "out"), summary = join(dir, "summary");
     writeFileSync(out, ""); writeFileSync(summary, "");
-    const r = spawnSync("bash", [script], { encoding: "utf8", env: { PATH: `${bin}:${process.env.PATH}`, GITHUB_OUTPUT: out, GITHUB_STEP_SUMMARY: summary, RUNNER_TEMP: temp, GITHUB_SHA: SHA, GITHUB_ACTION_PATH: fileURLToPath(new URL("../../../", import.meta.url)), GITHUB_WORKSPACE: dir, CLI: "/cli.js", PROJECT: dir, DIR: ".", REPO: "o/r", GH_TOKEN: "x" } });
+    const r = spawnSync("bash", [script], { encoding: "utf8", env: { PATH: `${bin}:${process.env.PATH}`, GITHUB_OUTPUT: out, GITHUB_STEP_SUMMARY: summary, RUNNER_TEMP: temp, GITHUB_SHA: SHA, GITHUB_ACTION_PATH: fileURLToPath(new URL("../../../", import.meta.url)), GITHUB_WORKSPACE: dir, CLI: "/cli.js", PROJECT: dir, DIR: opts.dir ?? ".", REPO: "o/r", GH_TOKEN: "x" } });
     return { status: r.status, stdout: r.stdout + r.stderr, work: readFileSync(out, "utf8").trim(), calls: readFileSync(join(dir, "calls"), "utf8") };
   }
   const PR = `7 ${HEAD} o/r github-actions[bot] ludion/npm/lodash-4.17.21\n`;
@@ -358,6 +368,52 @@ describe.skipIf(process.platform === "win32")("action/check.sh (T8)", () => {
     const r = sh(["decided\tnpm\tnormal", "key\tdue\tnpm:lodash\t-\tdue"], { pulls: PR, head: ["undecided\tthe npm scan is incomplete"] });
     expect(r.work).toBe("work=true");
     expect(r.stdout).toContain("PR #7: ludion check could not decide on its head; not counted.");
+  });
+  describe("a PR opened on an older base: counted only when nothing under the folder moved since its merge base", () => {
+    const due = ["decided\tnpm\tnormal", "key\tdue\tnpm:lodash\t-\tdue"], fixed = ["decided\tnpm\t-"];
+    const stale = "PR #7: app may have changed on aaaaaaaaaaaa since the PR's merge base; not counted.";
+    it("(a) a file under the folder moved: not counted, work=true", () => {
+      const r = sh(due, { pulls: PR, head: fixed, behind: 2, moved: ["2", "README.md", "app/package-lock.json"], dir: "app" });
+      expect(r.work).toBe("work=true");
+      expect(r.stdout).toContain(stale);
+      expect(r.calls).not.toMatch(/tarball/);
+    });
+    it("(a') a file renamed away from under the folder counts as moved under it", () => {
+      const r = sh(due, { pulls: PR, head: fixed, behind: 1, moved: ["1", "lib/package-lock.json", "app/package-lock.json"], dir: "app" });
+      expect(r.work).toBe("work=true");
+      expect(r.stdout).toContain(stale);
+      // The stand-in ignores --jq, so this holds only the filter check.sh passes: each file's old name too.
+      expect(r.calls).toContain(`compare/${BASE}...${SHA} --jq (.files | length), (.files[] | .filename, (.previous_filename // empty))`);
+    });
+    it("(b) files moved only outside the folder (one whose name starts with it, too): counted, work=false", () => {
+      const r = sh(due, { pulls: PR, head: fixed, behind: 3, moved: ["3", "README.md", "docs/app/x.md", "apple/package.json"], dir: "app" });
+      expect(r.work).toBe("work=false");
+      expect(r.stdout).toContain("#7");
+      expect(r.calls).toMatch(/tarball/);
+    });
+    it("(c) 300 files moved, all outside the folder: not counted, work=true", () => {
+      const r = sh(due, { pulls: PR, head: fixed, behind: 1, moved: ["300", ...Array.from({ length: 300 }, (_, i) => `other/${i}.txt`)], dir: "app" });
+      expect(r.work).toBe("work=true");
+      expect(r.stdout).toContain(stale);
+      // 299 files outside the folder still count.
+      expect(sh(due, { pulls: PR, head: fixed, behind: 1, moved: ["299", ...Array.from({ length: 299 }, (_, i) => `other/${i}.txt`)], dir: "app" }).work).toBe("work=false");
+    });
+    it("(d) the folder is the root and any file moved: not counted, work=true; nothing moved: counted", () => {
+      const r = sh(due, { pulls: PR, head: fixed, behind: 1, moved: ["1", "README.md"] });
+      expect(r.work).toBe("work=true");
+      expect(r.stdout).toContain("PR #7: . may have changed on aaaaaaaaaaaa since the PR's merge base; not counted.");
+      expect(sh(due, { pulls: PR, head: fixed, behind: 1, moved: ["0"] }).work).toBe("work=false");
+    });
+    it("(e) the second compare fails, or its count is not a number: not counted, work=true", () => {
+      const r = sh(due, { pulls: PR, head: fixed, behind: 1, moved: null, dir: "app" });
+      expect(r.work).toBe("work=true");
+      expect(r.stdout).toContain("PR #7: GitHub did not list what changed since its merge base; not counted.");
+      // A compare that prints a clean-looking answer and then fails is still a failure.
+      const partial = sh(due, { pulls: PR, head: fixed, behind: 1, moved: ["0"], movedStatus: 1, dir: "app" });
+      expect(partial.work).toBe("work=true");
+      expect(partial.stdout).toContain("PR #7: GitHub did not list what changed since its merge base; not counted.");
+      expect(sh(due, { pulls: PR, head: fixed, behind: 1, moved: ["many"], dir: "app" }).work).toBe("work=true");
+    });
   });
   it("work=true when the CLI is undecided or fails, or when gh fails", () => {
     expect(sh(["undecided\ta maven policy"], { mainStatus: 2 }).work).toBe("work=true");

@@ -39,7 +39,7 @@ The new test and the mutations ran on Node 24.22.2 (node:24-slim); typecheck, bu
 
 | Run | Code | Result |
 |---|---|---|
-| The new test, before the fix | the old expression, no length limit, behind `isComposerName` | 4 failed, 2 passed. Failed: the three timed names ("took over 50 ms in each of 3 tries", 153 to 156 ms each, stopped by the VM's limit) and the 241-character name. Passed: the two comparisons, old against itself. |
+| The new test, before the fix | the old expression, no length limit, behind `isComposerName` | 4 failed, 2 passed. Failed: the three timed names ("took over 50 ms in each of 3 tries", 153 to 156 ms each, stopped by the VM's limit) and the 241-character name. Passed: the two comparisons, the old expression against its own answers. Both versions of the test gave these counts. |
 | The new test, with the fix | this PR | 6 passed. The three timed names took 1 to 3 ms in the test, the limit's wrapper included. |
 | `npm run typecheck` | this PR | exit 0 |
 | `npm run build` | this PR | exit 0 |
@@ -51,11 +51,13 @@ The new test and the mutations ran on Node 24.22.2 (node:24-slim); typecheck, bu
 | Inputs | Compared | Mismatches | Accepted by both |
 |---|---|---|---|
 | Random names, fixed seed 20261102 (mulberry32), each of at most 66 characters, so the old expression stays fast | 200,000 | 0 | 21,865 |
-| Every string of up to 7 characters over `a`, `-`, `_`, `.`, `/` and a line feed | 335,923 | 0 | not counted |
+| Every string of up to 7 characters over `a`, `-`, `_`, `.`, `/` and a line feed | 335,923 | 0 | 106 |
+
+**How they are compared.** The PR's first commit (39f54a2) kept the old expression as code in the test and compared answer by answer: 0 mismatches, here and in CI's `test` job. CodeQL then failed that head, with two new high `js/redos` alerts (15 and 16) on the copy in the test file. The second commit keeps the old expression as a comment and compares with a SHA-256 of its answers on the same fixed inputs, recorded by running the expression in that comment behind `isComposerName`, with no length limit: `97ca3b4c…` on the random names and `11f8c70d…` on the short strings. One different answer changes the digest. CI no longer runs the old expression, and the inputs are fixed, so its answers do not change. Writing the expression in a form CodeQL does not read was not tried: that would leave the same expression in the code and only hide it.
 
 ## Mutations of the code
 
-Each run against the new test and undone: 17 of 17 caught.
+Each run against the new test and undone: 17 of 17 caught, with the same failed-test counts on both versions of the test. The final test also passed 20 of 20 runs in a row.
 
 | Mutation | Failed tests |
 |---|---|

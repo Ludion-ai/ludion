@@ -1,11 +1,17 @@
 // The Composer name check decides in linear time, whatever the name: names reach it from Packagist's metadata
 // (docs/mistakes/2026-11-02-composer-name-regex-backtracking.md).
+import { createHash } from "node:crypto";
 import { runInNewContext } from "node:vm";
 import { describe, expect, it, vi } from "vitest";
 import { isComposerName, packagistReleases } from "../src/security/time-cap.ts";
 
-/** The expression before the fix, to compare the new one with. It takes exponential time: give it short inputs only. */
-const OLD = /^[a-z0-9]([_.-]?[a-z0-9]+)*\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/;
+// The expression before the fix:
+//   /^[a-z0-9]([_.-]?[a-z0-9]+)*\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/
+// It stays out of the code, because kept as code it is itself the exponential expression CodeQL's js/redos reports. The
+// digests below are its answers on these fixed inputs, recorded by running it: to record them again, put it back behind
+// isComposerName with no length limit and run this file.
+const OLD_ON_RANDOM_NAMES = { compared: 200_000, accepted: 21_865, sha256: "97ca3b4ced9d2ab9ee30b4b69c3eeb1c84fe406432c2caf3d501db69d7441798" };
+const OLD_ON_SHORT_STRINGS = { compared: 335_923, accepted: 106, sha256: "11f8c70d2b9dfda3d39bff8f6058f737be9335280f3aa61a689126761f76e8d5" };
 
 const LIMIT_MS = 50;
 
@@ -39,7 +45,7 @@ const ALNUM = ["a", "b", "z", "0", "1", "9"];
 const SEPARATORS = ["-", "_", ".", "--", "---", "-_", "_.", "..", ""];
 const OTHERS = ["A", "Z", "/", "//", " ", "\n", "\r", " ", "!", "@", "é"];
 
-/** One name: mostly well formed, so that both answers are common. Runs stay short, because OLD is exponential in them. */
+/** One name: mostly well formed, so that both answers are common. Runs stay short, because the old expression is exponential in them. */
 function randomName(next: (below: number) => number): string {
   const pick = (from: string[]) => from[next(from.length)]!;
   const run = () => Array.from({ length: 1 + next(4) }, () => pick(ALNUM)).join("");
@@ -54,6 +60,29 @@ function randomName(next: (below: number) => number): string {
     name = name.slice(0, at) + pick(next(2) === 0 ? OTHERS : SEPARATORS) + name.slice(at + keep);
   }
   return name;
+}
+
+function* randomNames(): Generator<string> {
+  const next = random(20261102);
+  for (let i = 0; i < 200_000; i++) yield randomName(next);
+}
+
+function* shortStrings(name = ""): Generator<string> {
+  yield name;
+  if (name.length < 7) for (const c of ["a", "-", "_", ".", "/", "\n"]) yield* shortStrings(name + c);
+}
+
+/** isComposerName's answers in order, one character each: one different answer changes the digest. */
+function answers(names: Iterable<string>): { compared: number; accepted: number; sha256: string } {
+  const hash = createHash("sha256");
+  let compared = 0, accepted = 0;
+  for (const name of names) {
+    const answer = isComposerName(name);
+    hash.update(answer ? "1" : "0");
+    compared++;
+    if (answer) accepted++;
+  }
+  return { compared, accepted, sha256: hash.digest("hex") };
 }
 
 describe("packagistReleases, on a name that makes a backtracking expression explode", () => {
@@ -71,37 +100,16 @@ describe("packagistReleases, on a name that makes a backtracking expression expl
 
 describe("isComposerName", () => {
   it("composer-name-regex-linear: answers as the old expression did on 200,000 random names", () => {
-    const next = random(20261102);
-    const mismatches: string[] = [];
-    let accepted = 0;
-    for (let i = 0; i < 200_000; i++) {
-      const name = randomName(next), answer = isComposerName(name);
-      if (answer !== OLD.test(name)) mismatches.push(name);
-      if (answer) accepted++;
-    }
-    expect(mismatches).toEqual([]);
-    expect(accepted).toBeGreaterThan(20_000);
-    expect(accepted).toBeLessThan(180_000);
+    expect(answers(randomNames())).toEqual(OLD_ON_RANDOM_NAMES);
   }, 60_000);
 
   it("composer-name-regex-linear: answers as the old expression did on every short string", () => {
-    const alphabet = ["a", "-", "_", ".", "/", "\n"];
-    const mismatches: string[] = [];
-    let compared = 0;
-    const walk = (name: string) => {
-      compared++;
-      if (isComposerName(name) !== OLD.test(name)) mismatches.push(name);
-      if (name.length < 7) for (const c of alphabet) walk(name + c);
-    };
-    walk("");
-    expect(mismatches).toEqual([]);
-    expect(compared).toBe(335_923);
+    expect(answers(shortStrings())).toEqual(OLD_ON_SHORT_STRINGS);
   }, 60_000);
 
   it("composer-name-regex-linear: takes a name of up to 240 characters and refuses a longer one", () => {
     const name = (length: number) => `${"a".repeat(100)}/${"b".repeat(length - 101)}`;
     expect(isComposerName(name(240))).toBe(true);
-    expect(OLD.test(name(241))).toBe(true);
     expect(isComposerName(name(241))).toBe(false);
   });
 });

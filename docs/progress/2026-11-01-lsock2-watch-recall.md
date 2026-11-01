@@ -12,14 +12,16 @@ The first review of this PR (on head a4810e6) found three places where this reco
 - No test guarded the re-reading of a script reached again (N8).
 - Many forms the check cannot follow were in neither the known-miss table nor this record.
 
-The second review (on head 24002b7) found that the way the npm commands were then chosen, by the `ignore-scripts` option, left out `npm uninstall` and its aliases. Five mutations of the check were also not caught by any probe. This version fixes those, and the non-blocking points below.
+The second review (on head 24002b7) found that the way the npm commands were then chosen, by the `ignore-scripts` option, left out `npm uninstall` and its aliases. Five mutations of the check were also not caught by any probe. That version fixed those, and the non-blocking points below.
+
+The third review (R249c, on head f6ff08b) found that "every alias and typo npm accepts" was not true: npm also takes unique abbreviations and camelCase forms, and `npm edit` reaches rebuild. This version takes that claim out and adds those forms to the known misses. The check's rules do not change; they are as at d637f72. This check does not try to find every form: stopping every form is left to a later allow-list (LGUARD2), not built here. The third review's non-blocking points are not handled in this PR.
 
 ## What changed
 
 Only tools/records/test/bench-socket.test.ts. No file under docs/bench/ needed a change: the real tree passes the stronger check as it is.
 
 - **The command.**
-  - **Which npm commands.** The check covers npm's commands that change node_modules, and so can run install scripts. They were chosen from what each command does in npm 11.19.1 (the npm in the node:24 image), by reading lib/commands/:
+  - **Which npm commands.** The check covers these of npm's commands that change node_modules, and so can run install scripts. They were chosen from what each command does in npm 11.19.1 (the npm in the node:24 image), by reading lib/commands/:
     - the commands that call Arborist's `reify`, `dedupe`, `prune` or `rebuild`: ci, install, link, uninstall, update, dedupe, prune and rebuild, with install-test and install-ci-test, which run through install and ci;
     - and `npm audit fix`, which calls `arb.audit({ fix })`.
 
@@ -29,7 +31,9 @@ Only tools/records/test/bench-socket.test.ts. No file under docs/bench/ needed a
     - the commands that run only the project's own scripts: run, test, start, stop, restart, pack, publish and version. They are the same class as the `npm run build` the mistake record names.
     - find-dupes, which is a dry run.
     - `npm audit` without fix, which is a report.
-  - **Aliases.** Every alias and typo npm 11.19.1 accepts for these: `ci`, `clean-install`, `ic`, `install-clean`, `isntall-clean`, `install`, `i`, `in`, `ins`, `inst`, `insta`, `instal`, `isnt`, `isnta`, `isntal`, `isntall`, `add`, `install-test`, `it`, `install-ci-test`, `cit`, `clean-install-test`, `sit`, `rebuild`, `rb`, `update`, `u`, `up`, `upgrade`, `udpate`, `dedupe`, `ddp`, `link`, `ln`, `prune`, `uninstall`, `unlink`, `remove`, `rm`, `r`, `un`. Words between `audit` and `fix` are allowed (`npm audit --json fix`).
+
+    Not covered, though it can run install scripts: `npm edit`, which reaches rebuild through `npm.exec('rebuild', [dir])` in lib/commands/edit.js (R249c's reading). It is known misses 28 and 29.
+  - **Aliases.** The check reads these words for those commands, and no others: `ci`, `clean-install`, `ic`, `install-clean`, `isntall-clean`, `install`, `i`, `in`, `ins`, `inst`, `insta`, `instal`, `isnt`, `isnta`, `isntal`, `isntall`, `add`, `install-test`, `it`, `install-ci-test`, `cit`, `clean-install-test`, `sit`, `rebuild`, `rb`, `update`, `u`, `up`, `upgrade`, `udpate`, `dedupe`, `ddp`, `link`, `ln`, `prune`, `uninstall`, `unlink`, `remove`, `rm`, `r`, `un`. Words between `audit` and `fix` are allowed (`npm audit --json fix`). npm accepts more words than these (known misses 21 to 27). What is measured is the fixed tables only: must find 115/115, must pass 33/33, known misses 29/29 not found.
   - **The ignore-scripts flags.**
     - `--ignore-scripts false`, `=false`, `=0` and `--no-ignore-scripts` leave scripts on.
     - The last flag wins over an earlier one and over `npm_config_ignore_scripts`.
@@ -41,7 +45,7 @@ Only tools/records/test/bench-socket.test.ts. No file under docs/bench/ needed a
     - A newline ends a command, as `;` does.
   - **Package runners.** `npm create` and `npm init <initializer>` count, as `npm exec` already did.
 - **JavaScript.**
-  - **What is read.** In .mjs, .cjs, .js, .ts, .mts and .cts files, every string is read as a command (`execSync("npm ci")`, `spawnSync("sh", ["-c", "npx tsx x.ts"])`). So is a program with its argument list (`execFileSync("npm", ["clean-install"])`). `\n` in a string is a newline, so `sh.stdin.write("echo start\nnpm ci\n")` is two commands.
+  - **What is read.** In .mjs, .cjs, .js, .ts, .mts and .cts files, strings are read as commands (`execSync("npm ci")`, `spawnSync("sh", ["-c", "npx tsx x.ts"])`). So is a program with its argument list (`execFileSync("npm", ["clean-install"])`). `\n` in a string is a newline, so `sh.stdin.write("echo start\nnpm ci\n")` is two commands.
   - **Only printed strings.** A string counts as only printed when it is the first argument of `console.*`, `process.stdout.write`, `process.stderr.write` or an `Error`. So `sh.stdin.write("npm ci\n")` and `runAndlog("npm ci")` are read as commands. A template string's `${…}` parts are always read, because they run even when the template is printed (`` console.log(`out: ${execSync("npm ci")}`) ``).
   - **Docker clients.** A script whose strings run the docker CLI (`execSync("docker ps")`) counts as a docker client.
 - **The socket.**
@@ -64,9 +68,9 @@ The test has three tables of small made-up trees:
 
 - **Must find:** 115 forms. A form counts as found when a finding names the expected file and line.
 - **Must pass:** 33 forms. Nothing may be found.
-- **Known miss:** 20 forms the check should find but does not. Each is asserted to be not found, so that a later fix shows up as a change in the test.
+- **Known miss:** 29 forms the check should find but does not. Each is asserted to be not found, so that a later fix shows up as a change in the test.
 
-The 115 must-find forms are R248's P and Q probes, its R2 and R3 mutations, the npm commands and aliases above, and the forms the two reviews of this PR named. They are grouped in six parts:
+The 115 must-find forms are R248's P and Q probes, its R2 and R3 mutations, the npm commands and aliases above, and the forms the first two reviews of this PR named. They are grouped in six parts:
 
 - 71 command forms:
   - 6 flag forms and `--` before `--ignore-scripts`
@@ -90,14 +94,17 @@ Each time, the tables were written first and run against the check before it was
 | ac4825f | a4810e6 | f099148 |
 | 20c0c8f | 24002b7 | d637f72 |
 
-Each earlier row below was counted again with the final tables: that check, with the final tables appended.
+The third review changed no rule of the check, so it has no row here: its forms went into the known-miss table only.
+
+Each earlier row below was counted again with the tables as they stood at f6ff08b (20 known misses): that check, with those tables appended. The 9 known misses added after the third review were not run against the earlier checks.
 
 | Check | Must find | Must pass | Known misses (not found) |
 |---|---|---|---|
 | main b803f2b | **25 / 115** (commands 19/71, JavaScript 0/10, socket-line commands 2/2, script kinds 0/6, ways of giving the socket 4/23, N8 0/3) | 33 / 33 | 20 / 20 |
 | a4810e6, the head the first review read | **82 / 115** (54/71, 6/10, 2/2, 0/6, 17/23, 3/3) | 33 / 33 | 20 / 20 |
 | 24002b7, the head the second review read | **101 / 115** (63/71, 8/10, 2/2, 6/6, 19/23, 3/3) | 33 / 33 | 20 / 20 |
-| this branch (d637f72) | **115 / 115** | 33 / 33 | 20 / 20 |
+| d637f72 and f6ff08b | **115 / 115** | 33 / 33 | 20 / 20 |
+| this branch (the same rules, the table with 9 more known misses) | **115 / 115** | 33 / 33 | 29 / 29 |
 
 The review of PR #248's own probes, counted the same way. Its ids are kept in the test's table: P3 is `npm clean-install`, P4 `npm install-ci-test`, P5 `npm i`.
 
@@ -108,7 +115,7 @@ The review of PR #248's own probes, counted the same way. Its ids are kept in th
 | Q6, DOCKER_ARGS with the socket in a README code block | 0 / 1 | 1 / 1 |
 | Q5, the socket given only on a command line outside the repository | 0 / 1 | 0 / 1 (known miss) |
 
-The 20 known misses, each a tree in the test's known-miss table:
+The 29 known misses, each a tree in the test's known-miss table:
 
 1. Q5: a launcher that takes `DOCKER_ARGS`, when the socket was passed only on a command line typed outside the repository. No file says the socket is given.
 2. A socket path set in a file that another script sources (`. ./env.sh`). Variables are read one file at a time.
@@ -130,8 +137,37 @@ The 20 known misses, each a tree in the test's known-miss table:
 18. `--privileged`. It gives the host's devices, not the socket, and is not looked at.
 19. The rootless socket's folder (`-v /run/user/1000:/run/user/1000`). Only `/`, `/var`, `/run` and `/var/run` count as the socket's folder.
 20. `DOCKER_HOST` inside an `--env-file`. Env files are not read.
+21. A unique abbreviation of uninstall (`npm uninst b`). 21 to 27 are read only as the words in the install list.
+22. A unique abbreviation of rebuild (`npm rebuil`).
+23. A unique abbreviation of dedupe (`npm dedup`).
+24. A unique abbreviation of update (`npm upd`).
+25. A unique abbreviation of audit, before fix (`npm aud fix`).
+26. A camelCase form of clean-install (`npm cleanInstall`).
+27. A camelCase form of install-test (`npm installTest`).
+28. `EDITOR=true npm edit a`. edit is not in the install list.
+29. `EDITOR=true npm ed a`, for the same reason.
 
-The first review tried 41 forms of its own. It named 7 of them in blocking point 3 and more in point 4, and every named form is in a table here: as must-find where the check now finds it (a bash array, a socket folder in a variable, .ts, .mts and .bash scripts), and as a known miss otherwise. The forms it tried but did not name are not measured here. The second review's named forms are all in a table too: npm uninstall and its 5 aliases, 4 bash forms, the printed template, the later line of a shell's input, a Python script, and `--` before `--ignore-scripts`.
+21 to 29 are R249c's result, on node:24 and npm 11.19.1 with no network. This lane did not run them on npm again; it only asserts that the check does not find them. R249c's findings:
+
+- **How npm reads the word.** `deref` in lib/utils/cmd-list.js turns camelCase into dashed words and accepts any abbreviation that is unique, before it looks up the aliases.
+- **What ran.** The forms above, except `npm aud fix`, each ran a dependency's postinstall. `npm installTest` also exited 1, as the project had no test. `npm rebuil` ran with node_modules in place. `npm edit` and `npm ed` did not run it with `--ignore-scripts`.
+- **What did not run.** `npm aud fix` was not run, because audit needs a registry. `deref` gave audit for `aud`, and the check does not find the form.
+
+The 9 trees are examples of these kinds. R249c's `deref` call gave these other words, which are not in the install list either and are not trees in the table:
+
+- ci: `install-cl`, `install-cle`, `install-clea`, `isntall-`, `isntall-c`, `isntall-cl`, `isntall-cle`, `isntall-clea`
+- install-test: `install-t`, `install-te`, `install-tes`
+- install-ci-test: `si`, `install-ci`, `install-ci-`, `install-ci-t`, `install-ci-te`, `install-ci-tes`, `clean-install-`, `clean-install-t`, `clean-install-te`, `clean-install-tes`
+- rebuild: `reb`, `rebu`, `rebui`
+- update: `ud`, `udp`, `udpa`, `udpat`, `upda`, `updat`, `upg`, `upgr`, `upgra`, `upgrad`
+- dedupe: `dd`, `ded`, `dedu`
+- link: `lin`
+- prune: `pru`, `prun`
+- uninstall: `rem`, `remo`, `remov`, `uni`, `unin`, `unins`, `uninsta`, `uninstal`, `unl`, `unli`, `unlin`
+- audit: `audi`
+- camelCase: `installClean`, `isntallClean`, `installCiTest`, `cleanInstallTest`
+
+The first review tried 41 forms of its own. It named 7 of them in blocking point 3 and more in point 4, and every named form is in a table here: as must-find where the check now finds it (a bash array, a socket folder in a variable, .ts, .mts and .bash scripts), and as a known miss otherwise. The forms it tried but did not name are not measured here. The second review's named forms are all in a table too: npm uninstall and its 5 aliases, 4 bash forms, the printed template, the later line of a shell's input, a Python script, and `--` before `--ignore-scripts`. The third review's blocking forms are known misses 21 to 29. The forms it named only in its non-blocking points are not measured here.
 
 Mutations of the test's code, each applied to the copy in the volume, run against bench-socket.test.ts, and undone. At f099148, 10 of 10 were caught. At d637f72, 15 of 15 were caught, the 5 the second review found uncaught among them:
 
@@ -185,6 +221,8 @@ At d637f72:
 
 No e2e was run, and no container was given the socket.
 
+After the third review only the test's comments and known-miss table, and this record, changed. For that version, only tools/records/test/ was run in local Docker: node:24 by tag (node 24.22.2, npm 11.19.1; its digest was not read), a copy of the tree in a volume, `--memory 2g`, no socket, and `--network none` after `npm ci --ignore-scripts`. 2 files, 196 tests passed: must find 115/115, must pass 33/33, known misses 29/29 not found. That run was before this paragraph was written. Typecheck, build and the full suite for that version are the PR's CI.
+
 ## The record's "35 times" and the audit's 42
 
 The mistake record says "Between 2026-10-29 and 2026-10-31 the e2e ran this way 35 times, all but one with the network on". It does not say how it counted. The review of PR #248 could not confirm 35 from the repository, which holds 23 committed e2e logs across the six folders.
@@ -200,9 +238,9 @@ Why 35 differs from 42 is unknown. This lane did not count the session records a
 The record is not rewritten (CLAUDE.md, How we work). After this change, "follows every container started with the socket" and "an `npm ci`, `npm install` or similar" are still stronger than the check in these cases:
 
 - **Outside the repository.** Containers started by scripts outside the repository, such as the 5 runs above, are not seen.
-- **The 20 known misses above.** Each is a tree in the test that the check does not find:
+- **The 29 known misses above.** Each is a tree in the test that the check does not find:
   - 4 to 10 are containers started with the socket, or scripts they run, that the check cannot follow.
-  - 11 to 17 are installs written in a form the check does not read.
+  - 11 to 17 and 21 to 29 are installs written in a form the check does not read.
   - 1 to 3 and 18 to 20 are ways of giving the socket, or the host, that the check does not see.
 - **A writable mount of the worktree.** It is not looked at. A container started that way can also reach the host. It is outside the forms this lane was given.
 - **The project's own scripts.** pack, publish, version and the run family (`npm run build` among them, the mistake record's "Not fixed here") are not checked.

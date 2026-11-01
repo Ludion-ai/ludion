@@ -72,12 +72,14 @@ const isSocket = (text: string, vars: Set<string>) => SOCKET.test(text) || usesV
 const program = (names: string) => `(?<![\\w.-])(?:[\\w.~-]*\\/)*(?:${names})(?:\\.cmd|\\.exe)?(?![\\w.-])`;
 const RUNNERS = "npx|bunx|pnpx|pnpm|yarn|npm|bun";
 /**
- * npm's commands that change node_modules and so can run install scripts, with every alias and typo npm accepts: in npm
- * 11.19.1, the commands in lib/commands/ that call Arborist's reify, dedupe, prune or rebuild (ci, install, link,
- * uninstall, update, dedupe, prune, rebuild, and install-test and install-ci-test through install and ci), and audit with
- * fix (`npm audit fix`, matched apart). uninstall has no ignore-scripts option but reifies, so it runs the other packages'
- * install scripts too. Commands that run only the project's own scripts (run, test, start, stop, restart, pack, publish,
- * version) are not in this list.
+ * The npm command words this check reads as changing node_modules, and so able to run install scripts: in npm 11.19.1, the
+ * commands in lib/commands/ that call Arborist's reify, dedupe, prune or rebuild (ci, install, link, uninstall, update,
+ * dedupe, prune, rebuild, and install-test and install-ci-test through install and ci), by the aliases and typos written
+ * here, and audit with fix (`npm audit fix`, matched apart). uninstall has no ignore-scripts option but reifies, so it runs
+ * the other packages' install scripts too. Commands that run only the project's own scripts (run, test, start, stop,
+ * restart, pack, publish, version) are not in this list.
+ * Measured on the fixed tables below only: must find 115/115, must pass 33/33, known misses 29/29 not found. npm also takes
+ * unique abbreviations and camelCase forms, and `npm edit` calls rebuild: this list does not read those (known misses).
  */
 const INSTALLS = "ci|clean-install|ic|install-clean|isntall-clean|install|i|in|ins|inst|insta|instal|isnt|isnta|isntal|isntall|add|install-test|it|install-ci-test|cit|clean-install-test|sit|rebuild|rb|update|u|up|upgrade|udpate|dedupe|ddp|link|ln|prune|uninstall|unlink|remove|rm|r|un";
 const INSTALL = new RegExp(`${program("npm")}(?:\\s+\\S+)*?\\s+(${INSTALLS}|audit(?:\\s+\\S+)*?\\s+fix)(?![\\w-])`);
@@ -220,8 +222,9 @@ function referenced(path: string, text: string, files: Map<string, string>, mapp
 }
 
 /**
- * Every command under docs/bench/ that would run an npm install with scripts on, or a package runner, where Docker can be
- * reached. `files` maps repository paths to their text. Each finding is `path:line: what`.
+ * The commands under docs/bench/ this check finds that would run an npm install with scripts on, or a package runner, where
+ * Docker can be reached; the known-miss table holds forms it does not find. `files` maps repository paths to their text.
+ * Each finding is `path:line: what`.
  */
 export function socketFindings(files: Map<string, string>): string[] {
   const findings = new Set<string>();
@@ -354,8 +357,8 @@ describe("docs/bench/ and the Docker socket", () => {
 });
 
 // The forms the check must find and the forms it must pass, as small trees. The must-find table holds the review's probes
-// of PR #248 (P1-P17 for the command, Q0-Q6 for the ways of giving the socket, R2-R3 its mutations), every alias of the
-// npm commands in INSTALLS, and the forms the review of PR #249 named. A form this check cannot see is in the known-miss
+// of PR #248 (P1-P17 for the command, Q0-Q6 for the ways of giving the socket, R2-R3 its mutations), the aliases in
+// INSTALLS, and the forms the review of PR #249 named. A form this check is known not to see is in the known-miss
 // table, asserted not found, so that the recall in docs/progress/2026-11-01-lsock2-watch-recall.md counts it and a later
 // fix shows up here. A form in none of the tables has not been measured.
 describe("bench-socket recall", () => {
@@ -605,6 +608,17 @@ describe("bench-socket recall", () => {
     ["--privileged", e2e("npm ci", "--privileged"), "it gives the host's devices, not the socket, and is not looked at"],
     ["the rootless socket's folder", e2e("npm ci", "-v /run/user/1000:/run/user/1000"), "only /, /var, /run and /var/run count as the socket's folder"],
     ["DOCKER_HOST in an --env-file", { ...e2e("npm ci", "--env-file /scripts/docker.env"), "docs/bench/x/scripts/docker.env": "DOCKER_HOST=tcp://host.docker.internal:2375\n" }, "env files are not read"],
+    // The third review of PR #249 (blocking 1), R249c's result on node:24 and npm 11.19.1: words npm resolves to a command,
+    // and npm edit, which calls rebuild. Examples of each kind; the progress record names the other words R249c listed.
+    ["a unique abbreviation: npm uninst", e2e("npm uninst b"), "only the words in INSTALLS are read"],
+    ["a unique abbreviation: npm rebuil", e2e("npm rebuil"), "only the words in INSTALLS are read"],
+    ["a unique abbreviation: npm dedup", e2e("npm dedup"), "only the words in INSTALLS are read"],
+    ["a unique abbreviation: npm upd", e2e("npm upd"), "only the words in INSTALLS are read"],
+    ["a unique abbreviation: npm aud fix", e2e("npm aud fix"), "only the word audit is read before fix"],
+    ["a camelCase form: npm cleanInstall", e2e("npm cleanInstall"), "only the words in INSTALLS are read"],
+    ["a camelCase form: npm installTest", e2e("npm installTest"), "only the words in INSTALLS are read"],
+    ["npm edit, which calls rebuild", e2e("EDITOR=true npm edit a"), "edit is not in INSTALLS"],
+    ["npm ed, which calls rebuild", e2e("EDITOR=true npm ed a"), "edit is not in INSTALLS"],
   ];
 
   it.each(MUST_FIND)("finds %s", (_id, files, where) => {

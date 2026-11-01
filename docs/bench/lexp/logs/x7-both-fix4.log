@@ -1,0 +1,99 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ↓ |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > posts one comment whose first line is the record as JSON and whose table gives the exposure hours; a second call posts nothing
+ ↓ |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > records nothing for a PR that is not a merged Ludion fix into the default branch
+ ↓ |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > a failing API call throws; another bot's or a person's marker comment does not count as the record
+ ↓ |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > an image move with no newer security release is recorded as not counted; a body time later than the merge is not computed
+ ↓ |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > a body time that has the form of a time but is no date is recorded as unknown, and the merge is still recorded (R252 N3, R252b N9)
+ ✓ |node| packages/cli/test/exposure.test.ts > the merge of Ludion's PR is recorded on it (X1, X2) > a merged_at later than the Date of GitHub's own answer, or than this job's clock, is recorded with its doubt, and no hours end at it (X7) 17ms
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > the earliest run of the row that lists the fix; a run whose valid record does not list it ends the row
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > a run with no record, an expired one, a failed list or an invalid one is passed over, and the row goes on
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > found_at is the earliest record time of the row, not the record of the lowest run id, when an older run was re-run later (R252 N4)
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7)
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > the walk's limit holds while the runs are listed, before any record is read (R252b N10)
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > inflates a record with the record's own limit, so a deflated entry cannot allocate more than 1 MiB (R252b N11)
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > reads a deflated zip with a data descriptor, as upload-artifact writes it, and asks the redirect without the token
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > another advisory of the same package, or another package, does not match; no record lists it: null
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > keeps the limit of runs, and does not read runs of another event or branch, or later than this run
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > images: a security release the fix lists, or, for a move with none, the same candidate
+ ↓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > throws when the runs cannot be read (no actions: read), so the caller keeps the receipt's found_at
+ ✓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > does not walk when GitHub's start of this run is later than the runner's clock, and says by how much (X7) 3ms
+ ✓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > does not walk when GitHub's start of this run is later than the Date of GitHub's answer that gives it (X7) 3ms
+ ✓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > stops at a run whose record's time is outside GitHub's times for it, and says which run and by how much (X7) 2ms
+ ✓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > stops at a run whose start or artifact GitHub dates later than its own answer (X7) 2ms
+ ✓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > a row that has ended before such a run is not stopped by it, and times that agree stop nothing (X7) 3ms
+ ✓ |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > gives this run's times by GitHub and by the runner, with the Date of the answer or none, when they agree and when an earlier run's do not (section 8) 2ms
+ ↓ |node| packages/cli/test/exposure.test.ts > the PR body's Found row (X4, X5) > names the run that saw the fix first, or says why it is this run's lookup
+ ✓ |node| packages/cli/test/exposure.test.ts > the PR body's Found row (X4, X5) > says where the walk stopped at a run whose times do not agree, which times and by how much (X7) 0ms
+ ✓ |node| packages/cli/test/exposure.test.ts > the PR body's Found row (X4, X5) > keeps GitHub's time and the runner's: the run that saw the fix, and this run, whatever the row says (section 8) 1ms
+ ↓ |node| packages/cli/test/deliver.test.ts > the validation job packs the applied fixes > writes the receipt and a bundle of exactly the applied fixes' branches, on the base
+ ↓ |node| packages/cli/test/deliver.test.ts > the validation job packs the applied fixes > packs no bundle when nothing was applied, and refuses a branch the receipt does not match
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > pushes the checked commit to its branch and opens one PR; the next run opens none
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5)
+ ✓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > says in the Found row, and does not stay silent, when GitHub's times and the runner's do not agree (X7) 616ms
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > does not open a fix again whose PR was closed, nor move a branch that holds another change
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > deliver open warns, on stderr as a workflow command, about a closed PR's fix, and the run stays green
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > keeps a file's executable mode from the base (a checkout from a file system without modes)
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > opens nothing for a run that is not on the default branch, before reading the artifact
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > pushes with a plain refspec, the token only in Git's environment, and only to a ludion/ branch
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a commit whose parent is not the base
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > two commits on the base, not one
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a parent header after author, which Git does not read as a parent (review 6516135819, N1)
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a merge commit whose first parent is the base and whose second is another commit in the bundle (review 6529858505, N2)
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > headers out of Git's order or beyond it, even with the base as Git's parent
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a commit git fsck finds an error in (a zero-padded date), with every other check passing
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a lockfile padded past its limit (review 6516135819, N4)
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a lockfile that does not move the receipt's package and adds another one (review 6516135819, N2)
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > an npm fix that npm 12.2.1 writes with other entries' flags changed is opened (review 6538813186, B1)
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a transitive npm fix as patch makes it is opened
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > forged transitive npm fixes (review 6518582507, B1 and N-a)
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a lockfile whose npm 6 tree installs another tarball, a lockfileVersion changed, and a base with npm-shrinkwrap.json (review of aa5d75b, B1)
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > reads one version's manifest from the registry, by the package's name only
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > npm: a moved or added entry must declare what the registry lists (review of 7d25696, B1 (A))
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > npm: a moved entry's forged optional or peer dependency is refused too (review of 6521445720 and 1e6f705, N1)
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a file outside the plan, beside the planned ones
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a receipt that lists a file a fix may not change
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a new file, even at a planned path
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a changed file mode
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > an extra branch in the bundle
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a bundle commit other than the receipt's
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > an applied fix with no bundle, and a bundle with no applied fix
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a file whose bytes are not the receipt's
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a package.json that says more than the fix: an install script, another dependency, a looser range
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a branch name that is not the one Ludion gives the receipt's fix
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job refuses an artifact the validation job would not write > a checkout that is not at the base it is given
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job checks what a fix pins against the official registry > PHP: the digest must be the one Docker Hub gives for the tag
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job checks what a fix pins against the official registry > Node.js: the digest must be the one Docker Hub gives for the node tag
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job checks what a fix pins against the official registry > PHP: a move to the line's newest release with no newer security release is pushed and opened
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job checks what a fix pins against the official registry > Node.js: a move to the line's newest release with no newer security release is pushed and opened
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job checks what a fix pins against the official registry > Docker Hub is asked for library/node's tag, with a pull token for library/node only
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job checks what a fix pins against the official registry > Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job checks what a fix pins against the official registry > reads Packagist only for a plain package name, and a hostile name is refused at once
+ ↓ |node| packages/cli/test/deliver.test.ts > the PR job checks what a fix pins against the official registry > a branch with this fix's tree on an older base is left alone
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > PHP: only the Dockerfile ludion.security.json names, with the subject, message and branch patch.ts gives
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > Node.js: only the Dockerfile the node policy names, with the subject, message and branch patch.ts gives
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > PHP: only the FROM image may change, to the official image of a newer release, pinned by digest
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > Node.js: only the FROM image may change, to the official node image of a newer release of the same major, pinned by digest
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > Composer and Maven: the update goes up, and Composer's from is what the base locks; npm: no other package moves
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > npm: an entry the fix does not plan may differ from the base in its flags only (review 6538813186, B1)
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > npm: npm 12.2.1's fixes whose flags alone change (optional, peer) are taken, and an optional peer in range (N1)
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > npm: an optional peer adds nothing, and where the lock has one it is the package its spec names, in range (audit 6541743253, item 1)
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > advisory IDs: only the forms a receipt can hold (OSV's for npm, Packagist and Maven, and Packagist's own)
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > a changed file's size limit: twice the base's file and 1 MiB, at most 50 MiB
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > Maven: pom.xml is exactly what changedManifest makes for the change
+ ↓ |node| packages/cli/test/deliver.test.ts > the policy at the base decides what a fix may change, and what it may say > Composer: composer.lock moves only the planned package, from a pinned archive, and adds no plugin
+
+ Test Files  2 passed (2)
+      Tests  10 passed | 80 skipped (90)
+   Start at  10:39:24
+   Duration  993ms (transform 452ms, setup 0ms, import 584ms, tests 652ms, environment 0ms)
+

@@ -1,0 +1,521 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ✓ |node| packages/cli/test/action-patch.test.ts (11 tests) 92ms
+ ❯ |node| packages/cli/test/exposure.test.ts (26 tests | 13 failed) 149ms
+     ✓ posts one comment whose first line is the record as JSON and whose table gives the exposure hours; a second call posts nothing 16ms
+     ✓ records nothing for a PR that is not a merged Ludion fix into the default branch 3ms
+     ✓ a failing API call throws; another bot's or a person's marker comment does not count as the record 1ms
+     ✓ an image move with no newer security release is recorded as not counted; a body time later than the merge is not computed 1ms
+     ✓ a body time that has the form of a time but is no date is recorded as unknown, and the merge is still recorded (R252 N3, R252b N9) 3ms
+     ✓ a merged_at later than the Date of GitHub's own answer, or than this job's clock, is recorded with its doubt, and no hours end at it (X7) 3ms
+     × the earliest run of the row that lists the fix; a run whose valid record does not list it ends the row 8ms
+     × a run with no record, an expired one, a failed list or an invalid one is passed over, and the row goes on 25ms
+     × found_at is the earliest record time of the row, not the record of the lowest run id, when an older run was re-run later (R252 N4) 3ms
+     ✓ stops the walk once it has taken longer than its limit, so the caller keeps the receipt's found_at (R252 N7) 4ms
+     ✓ the walk's limit holds while the runs are listed, before any record is read (R252b N10) 1ms
+     ✓ inflates a record with the record's own limit, so a deflated entry cannot allocate more than 1 MiB (R252b N11) 1ms
+     ✓ reads a deflated zip with a data descriptor, as upload-artifact writes it, and asks the redirect without the token 2ms
+     × another advisory of the same package, or another package, does not match; no record lists it: null 2ms
+     × keeps the limit of runs, and does not read runs of another event or branch, or later than this run 32ms
+     ✓ images: a security release the fix lists, or, for a move with none, the same candidate 3ms
+     ✓ throws when the runs cannot be read (no actions: read), so the caller keeps the receipt's found_at 0ms
+     × does not walk when GitHub's start of this run is later than the runner's clock, and says by how much (X7) 3ms
+     × does not walk when GitHub's start of this run is later than the Date of GitHub's answer that gives it (X7) 2ms
+     × stops at a run whose record's time is outside GitHub's times for it, and says which run and by how much (X7) 1ms
+     × stops at a run whose start or artifact GitHub dates later than its own answer (X7) 1ms
+     × a row that has ended before such a run is not stopped by it, and times that agree stop nothing (X7) 1ms
+     × gives this run's times by GitHub and by the runner, with the Date of the answer or none, when they agree and when an earlier run's do not (section 8) 1ms
+     ✓ names the run that saw the fix first, or says why it is this run's lookup 0ms
+     × says where the walk stopped at a run whose times do not agree, which times and by how much (X7) 14ms
+     × keeps GitHub's time and the runner's: the run that saw the fix, and this run, whatever the row says (section 8) 15ms
+ ✓ |node| packages/cli/test/check.test.ts (48 tests) 833ms
+ ❯ |node| packages/cli/test/deliver.test.ts (64 tests | 2 failed) 20184ms
+     ✓ writes the receipt and a bundle of exactly the applied fixes' branches, on the base 179ms
+     ✓ packs no bundle when nothing was applied, and refuses a branch the receipt does not match 161ms
+     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  442ms
+     × gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5) 326ms
+     × says in the Found row, and does not stay silent, when GitHub's times and the runner's do not agree (X7) 313ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  566ms
+     ✓ deliver open warns, on stderr as a workflow command, about a closed PR's fix, and the run stays green 263ms
+     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  469ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  585ms
+     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  421ms
+     ✓ keeps a file's executable mode from the base (a checkout from a file system without modes)  325ms
+     ✓ opens nothing for a run that is not on the default branch, before reading the artifact 172ms
+     ✓ pushes with a plain refspec, the token only in Git's environment, and only to a ludion/ branch 1ms
+     ✓ a commit whose parent is not the base 130ms
+     ✓ two commits on the base, not one 164ms
+     ✓ a parent header after author, which Git does not read as a parent (review 6516135819, N1) 154ms
+     ✓ a merge commit whose first parent is the base and whose second is another commit in the bundle (review 6529858505, N2) 177ms
+     ✓ headers out of Git's order or beyond it, even with the base as Git's parent  626ms
+     ✓ a commit git fsck finds an error in (a zero-padded date), with every other check passing 161ms
+     ✓ a lockfile padded past its limit (review 6516135819, N4) 187ms
+     ✓ a lockfile that does not move the receipt's package and adds another one (review 6516135819, N2) 194ms
+     ✓ an npm fix that npm 12.2.1 writes with other entries' flags changed is opened (review 6538813186, B1)  532ms
+     ✓ a transitive npm fix as patch makes it is opened 258ms
+     ✓ forged transitive npm fixes (review 6518582507, B1 and N-a)  865ms
+     ✓ a lockfile whose npm 6 tree installs another tarball, a lockfileVersion changed, and a base with npm-shrinkwrap.json (review of aa5d75b, B1)  985ms
+     ✓ reads one version's manifest from the registry, by the package's name only 1ms
+     ✓ npm: a moved or added entry must declare what the registry lists (review of 7d25696, B1 (A))  1636ms
+     ✓ npm: a moved entry's forged optional or peer dependency is refused too (review of 6521445720 and 1e6f705, N1)  460ms
+     ✓ a file outside the plan, beside the planned ones 163ms
+     ✓ a receipt that lists a file a fix may not change 252ms
+     ✓ a new file, even at a planned path 181ms
+     ✓ a changed file mode 163ms
+     ✓ an extra branch in the bundle  340ms
+     ✓ a bundle commit other than the receipt's 190ms
+     ✓ an applied fix with no bundle, and a bundle with no applied fix  372ms
+     ✓ a file whose bytes are not the receipt's 233ms
+     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  465ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  552ms
+     ✓ a branch name that is not the one Ludion gives the receipt's fix 129ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  569ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  877ms
+     ✓ a checkout that is not at the base it is given 195ms
+     ✓ PHP: the digest must be the one Docker Hub gives for the tag  458ms
+     ✓ Node.js: the digest must be the one Docker Hub gives for the node tag  453ms
+     ✓ PHP: a move to the line's newest release with no newer security release is pushed and opened 238ms
+     ✓ Node.js: a move to the line's newest release with no newer security release is pushed and opened 236ms
+     ✓ Docker Hub is asked for library/node's tag, with a pull token for library/node only 1ms
+     ✓ Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to  1281ms
+     ✓ reads Packagist only for a plain package name, and a hostile name is refused at once 1ms
+     ✓ a branch with this fix's tree on an older base is left alone 292ms
+     ✓ PHP: only the Dockerfile ludion.security.json names, with the subject, message and branch patch.ts gives 258ms
+     ✓ Node.js: only the Dockerfile the node policy names, with the subject, message and branch patch.ts gives 245ms
+     ✓ PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  591ms
+     ✓ Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  596ms
+     ✓ PHP: only the FROM image may change, to the official image of a newer release, pinned by digest 1ms
+     ✓ Node.js: only the FROM image may change, to the official node image of a newer release of the same major, pinned by digest 1ms
+     ✓ Composer and Maven: the update goes up, and Composer's from is what the base locks; npm: no other package moves 39ms
+     ✓ npm: an entry the fix does not plan may differ from the base in its flags only (review 6538813186, B1) 13ms
+     ✓ npm: npm 12.2.1's fixes whose flags alone change (optional, peer) are taken, and an optional peer in range (N1) 8ms
+     ✓ npm: an optional peer adds nothing, and where the lock has one it is the package its spec names, in range (audit 6541743253, item 1) 11ms
+     ✓ advisory IDs: only the forms a receipt can hold (OSV's for npm, Packagist and Maven, and Packagist's own) 0ms
+     ✓ a changed file's size limit: twice the base's file and 1 MiB, at most 50 MiB 0ms
+     ✓ Maven: pom.xml is exactly what changedManifest makes for the change 6ms
+     ✓ Composer: composer.lock moves only the planned package, from a pinned archive, and adds no plugin 13ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 15 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5)
+AssertionError: expected '<!-- ludion-fix -->\n**プレビュー：マージは行わない…' to contain '| Found | `2026-10-29T00:05:00.000Z` …'
+
+- Expected
++ Received
+
+- | Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, which GitHub says started at `2026-10-29T00:00:00.000Z`, the first of an unbroken row of this workflow's runs whose record lists this fix; `3` records read; this run: GitHub's start `2026-10-30T00:55:00.000Z`, GitHub's answer had no Date header that is a date, this runner's clock `2026-10-30T01:10:00.000Z`) |
++ <!-- ludion-fix -->
++ **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
++
++ Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit `008cb72bdbde`. This PR holds that one fix (one commit).
++
++ | | |
++ |---|---|
++ | Package | `lodash` (npm) |
++ | Change | `4.17.20` → `4.17.21` |
++ | Advisories | `GHSA-35jh-r3h4-6jhm`, `CVE-2021-23337` |
++ | Fix published | `2021-02-20T15:42:16.891Z` (registry.npmjs.org's publish time: the latest among the fix's planned versions) |
++ | Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `3` records read) |
++ | Branch made | `2026-10-30T01:05:00.000Z` |
++ | Receipt | `0f1e2d3c-4b5a-4968-8776-655443322110` (in this run's ludion-fixes artifact) |
++
++ The times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.
++
++ **What was checked**
++
++ - By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
++ - This commit changes only `package.json`, `package-lock.json`, Git reads its only parent as the base commit, and `git fsck` finds no error in it. The job that opened this PR, which runs no project code, checked again that package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them (an optional peer adds nothing, and where the lock has one it must be the package its spec names, in range), changes no other entry beyond its flags and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`.
++ - Ludion's judge on the lockfile change, in both jobs: `ready_except_build`. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).
++
++ **Not checked**
++
++ - Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
++ - In package-lock.json, a moved or added entry's `hasShrinkwrap`, `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap). Nor are its flags (`dev`, `optional`, `devOptional`, `peer`), which decide what a production install leaves out. Another entry's flags may differ from the base's, and are not checked against what npm computes from the lock's graph, so a forged lock could have a production install take a package the base locks for development only, or leave a production one out; the judge gives each entry whose flags alone changed gate 2's checks (OSV's malicious-package records, deprecation, withdrawal), not the rest of the gates.
++ - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
++ - Production: nothing is deployed.
++
+
+ ❯ packages/cli/test/deliver.test.ts:210:40
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/15]⎯
+
+ FAIL  |node| packages/cli/test/deliver.test.ts > the PR job opens one PR per fix > says in the Found row, and does not stay silent, when GitHub's times and the runner's do not agree (X7)
+AssertionError: expected '<!-- ludion-fix -->\n**プレビュー：マージは行わない…' to contain 'GitHub\'s start 2026-10-30T01:55:00.0…'
+
+- Expected
++ Received
+
+- GitHub's start 2026-10-30T01:55:00.000Z, this runner's clock 2026-10-30T00:55:00.000Z.) |
++ <!-- ludion-fix -->
++ **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
++
++ Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit `008cb72bdbde`. This PR holds that one fix (one commit).
++
++ | | |
++ |---|---|
++ | Package | `lodash` (npm) |
++ | Change | `4.17.20` → `4.17.21` |
++ | Advisories | `GHSA-35jh-r3h4-6jhm`, `CVE-2021-23337` |
++ | Fix published | `2021-02-20T15:42:16.891Z` (registry.npmjs.org's publish time: the latest among the fix's planned versions) |
++ | Found | `2026-10-30T01:00:00.000Z` (this run's lookup: earlier runs' records were not used: GitHub's start of this run is 60.0 minutes later than this runner's clock (GitHub's clock and the runner's do not agree).) |
++ | Branch made | `2026-10-30T01:05:00.000Z` |
++ | Receipt | `0f1e2d3c-4b5a-4968-8776-655443322110` (in this run's ludion-fixes artifact) |
++
++ The times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.
++
++ **What was checked**
++
++ - By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
++ - This commit changes only `package.json`, `package-lock.json`, Git reads its only parent as the base commit, and `git fsck` finds no error in it. The job that opened this PR, which runs no project code, checked again that package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them (an optional peer adds nothing, and where the lock has one it must be the package its spec names, in range), changes no other entry beyond its flags and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`.
++ - Ludion's judge on the lockfile change, in both jobs: `ready_except_build`. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).
++
++ **Not checked**
++
++ - Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
++ - In package-lock.json, a moved or added entry's `hasShrinkwrap`, `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap). Nor are its flags (`dev`, `optional`, `devOptional`, `peer`), which decide what a production install leaves out. Another entry's flags may differ from the base's, and are not checked against what npm computes from the lock's graph, so a forged lock could have a production install take a package the base locks for development only, or leave a production one out; the judge gives each entry whose flags alone changed gate 2's checks (OSV's malicious-package records, deprecation, withdrawal), not the rest of the gates.
++ - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
++ - Production: nothing is deployed.
++
+
+ ❯ packages/cli/test/deliver.test.ts:244:18
+    242|     const body = String(gh.opened[0]!.body);
+    243|     expect(body).toContain("| Found | `2026-10-30T01:00:00.000Z` (this…
+    244|     expect(body).toContain("GitHub's start 2026-10-30T01:55:00.000Z, t…
+       |                  ^
+    245|     expect(body).not.toContain("no record of this workflow's runs list…
+    246|     // This run's times agree, and an earlier run's do not: the walk s…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > the earliest run of the row that lists the fix; a run whose valid record does not list it ends the row
+AssertionError: expected { Object (at, run, ...) } to deeply equal { Object (at, run, ...) }
+
+- Expected
++ Received
+
+  {
+    "at": "2026-10-30T18:05:00.000Z",
+    "ended": true,
+    "run": 3,
+-   "started": "2026-10-30T18:00:00.000Z",
+  }
+
+ ❯ packages/cli/test/exposure.test.ts:187:39
+    185|   it("the earliest run of the row that lists the fix; a run whose vali…
+    186|     const r = await walk(row([SAW, OTHER, SAW, SAW, SAW]));
+    187|     expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(sta…
+       |                                       ^
+    188|     expect(r.read).toBe(4);
+    189|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > a run with no record, an expired one, a failed list or an invalid one is passed over, and the row goes on
+AssertionError: expected { Object (at, run, ...) } to deeply equal { Object (at, run, ...) }
+
+- Expected
++ Received
+
+  {
+    "at": "2026-10-30T06:05:00.000Z",
+    "ended": false,
+    "run": 1,
+-   "started": "2026-10-30T06:00:00.000Z",
+  }
+
+ ❯ packages/cli/test/exposure.test.ts:216:39
+    214|     ]);
+    215|     const r = await walk(runs);
+    216|     expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(sta…
+       |                                       ^
+    217|     expect(r.read).toBe(2);
+    218|     const padded = runs[14]!.bytes!;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > found_at is the earliest record time of the row, not the record of the lowest run id, when an older run was re-run later (R252 N4)
+AssertionError: expected { Object (at, run, ...) } to deeply equal { Object (at, run, ...) }
+
+- Expected
++ Received
+
+  {
+    "at": "2026-10-30T12:05:00.000Z",
+    "ended": false,
+    "run": 2,
+-   "started": "2026-10-30T12:00:00.000Z",
+  }
+
+ ❯ packages/cli/test/exposure.test.ts:230:39
+    228|     ];
+    229|     const r = await walk(runs);
+    230|     expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(sta…
+       |                                       ^
+    231|     expect(r.read).toBe(3);
+    232|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > another advisory of the same package, or another package, does not match; no record lists it: null
+AssertionError: expected { Object (at, run, ...) } to deeply equal { Object (at, run, ...) }
+
+- Expected
++ Received
+
+  {
+    "at": "2026-10-30T12:05:00.000Z",
+    "ended": true,
+    "run": 2,
+-   "started": "2026-10-30T12:00:00.000Z",
+  }
+
+ ❯ packages/cli/test/exposure.test.ts:274:43
+    272|     // An earlier run saw lodash with another advisory only: it does n…
+    273|     const other = await walk(row([[{ key: "npm:lodash", advisories: ["…
+    274|     expect(other.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse…
+       |                                           ^
+    275|     expect((await walk(row([SAW, OTHER]))).seen.get(LODASH.branch)).to…
+    276|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > keeps the limit of runs, and does not read runs of another event or branch, or later than this run
+AssertionError: expected { Object (at, run, ...) } to deeply equal { Object (at, run, ...) }
+
+- Expected
++ Received
+
+  {
+    "at": "2026-11-06T18:05:00.000Z",
+    "ended": false,
+    "run": 31,
+-   "started": "2026-11-06T18:00:00.000Z",
+  }
+
+ ❯ packages/cli/test/exposure.test.ts:281:44
+    279|     const capped = await walk(many);
+    280|     expect(capped.read).toBe(100);
+    281|     expect(capped.seen.get(LODASH.branch)).toEqual({ at: iso(Date.pars…
+       |                                            ^
+    282|     // A limit below one page of 100 runs.
+    283|     const ten = await walk(many, [LODASH], { limit: 10 });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > does not walk when GitHub's start of this run is later than the runner's clock, and says by how much (X7)
+AssertionError: expected [Function] to throw error including 'GitHub\'s start 2026-10-30T12:00:00.0…' but got 'GitHub\'s start of this run is 60.0 m…'
+
+Expected: "GitHub's start 2026-10-30T12:00:00.000Z, this runner's clock 2026-10-30T11:00:00.000Z."
+Received: "GitHub's start of this run is 60.0 minutes later than this runner's clock (GitHub's clock and the runner's do not agree)."
+
+ ❯ packages/cli/test/exposure.test.ts:330:76
+    328|     await expect(walk(runs, [LODASH], { now: Date.parse(started(2)) - …
+    329|     // Both clocks' times are kept, not only the difference (definitio…
+    330|     await expect(walk(runs, [LODASH], { now: Date.parse(started(2)) - …
+       |                                                                            ^
+    331|     // A second after it, the walk is done.
+    332|     expect((await walk(runs, [LODASH], { now: Date.parse(started(2)) +…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > does not walk when GitHub's start of this run is later than the Date of GitHub's answer that gives it (X7)
+AssertionError: expected [Function] to throw error including 'GitHub\'s start 2026-10-30T12:00:00.0…' but got 'GitHub\'s start of this run is 51.0 m…'
+
+Expected: "GitHub's start 2026-10-30T12:00:00.000Z, that Date 2026-10-30T11:09:00.000Z, this runner's clock 2027-06-01T00:00:00.000Z."
+Received: "GitHub's start of this run is 51.0 minutes later than the Date of GitHub's answer that gives it."
+
+ ❯ packages/cli/test/exposure.test.ts:338:93
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > stops at a run whose record's time is outside GitHub's times for it, and says which run and by how much (X7)
+AssertionError: expected { Object (at, run, ...) } to deeply equal { Object (at, run, ...) }
+
+- Expected
++ Received
+
+  {
+    "at": "2026-10-30T18:05:00.000Z",
+    "ended": false,
+    "run": 3,
+-   "started": "2026-10-30T18:00:00.000Z",
+  }
+
+ ❯ packages/cli/test/exposure.test.ts:350:39
+    348|     const early = row([SAW, { started: iso(Date.parse(started(2)) + H)…
+    349|     const r = await walk(early);
+    350|     expect(r.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(sta…
+       |                                       ^
+    351|     expect(r.read).toBe(1);
+    352|     expect(r.stopped).toEqual({ run: 2, kind: "early", ms: H, github: …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > stops at a run whose start or artifact GitHub dates later than its own answer (X7)
+AssertionError: expected { run: 2, kind: 'ahead', …(2) } to deeply equal { run: 2, kind: 'ahead', …(4) }
+
+- Expected
++ Received
+
+  {
+    "branches": [
+      "ludion/npm/lodash-4.17.21",
+    ],
+-   "github": "2026-10-30T19:11:00.000Z",
+    "kind": "ahead",
+    "ms": 3060000,
+-   "other": "2026-10-30T18:20:00.000Z",
+    "run": 2,
+  }
+
+ ❯ packages/cli/test/exposure.test.ts:369:23
+    367|     const a = await walk(artifact, [LODASH], { date: http(date) });
+    368|     expect(a.seen.get(LODASH.branch)).toMatchObject({ run: 3, ended: f…
+    369|     expect(a.stopped).toEqual({ run: 2, kind: "ahead", ms: 51 * 60_000…
+       |                       ^
+    370|     // Run 2's start is 51 minutes after the Date of the list that giv…
+    371|     const start = row([SAW, { started: iso(date + 51 * 60_000), record…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > a row that has ended before such a run is not stopped by it, and times that agree stop nothing (X7)
+AssertionError: expected { Object (at, run, ...) } to deeply equal { Object (at, run, ...) }
+
+- Expected
++ Received
+
+  {
+    "at": "2026-10-31T00:05:00.000Z",
+    "ended": true,
+    "run": 4,
+-   "started": "2026-10-31T00:00:00.000Z",
+  }
+
+ ❯ packages/cli/test/exposure.test.ts:380:43
+    378|     const shifted = { started: iso(Date.parse(started(2)) + H), record…
+    379|     const ended = await walk(row([SAW, shifted, OTHER, SAW]));
+    380|     expect(ended.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse…
+       |                                           ^
+    381|     expect(ended.stopped).toBeNull();
+    382|     // Two fixes: lodash's row ends at run 3, minimist's is still open…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > found_at is the first run of the row whose check saw the fix (X4, X5) > gives this run's times by GitHub and by the runner, with the Date of the answer or none, when they agree and when an earlier run's do not (section 8)
+AssertionError: expected undefined to deeply equal { …(3) }
+
+- Expected:
+{
+  "answer_date": null,
+  "run_started_at": "2026-10-30T18:00:00.000Z",
+  "runner": "2027-06-01T00:00:00.000Z",
+}
+
++ Received:
+undefined
+
+ ❯ packages/cli/test/exposure.test.ts:395:40
+    393|     const shifted = { started: iso(Date.parse(started(2)) + H), record…
+    394|     for (const runs of [row([SAW, SAW, SAW]), row([SAW, shifted, SAW])…
+    395|       expect((await walk(runs)).clock).toEqual({ run_started_at: start…
+       |                                        ^
+    396|       expect((await walk(runs, [LODASH], { date: http(LATER) })).clock…
+    397|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > the PR body's Found row (X4, X5) > says where the walk stopped at a run whose times do not agree, which times and by how much (X7)
+AssertionError: expected '<!-- ludion-fix -->\n**プレビュー：マージは行わない…' to contain '| Found | `2026-10-29T00:05:00.000Z` …'
+
+- Expected
++ Received
+
+- | Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `1` records read; the records read end there, so an earlier run may have seen it first; the walk stopped at run `40`, whose times do not agree: its record's time `2026-10-28T08:00:00.000Z` is `60.0` minutes before GitHub's start of that run `2026-10-28T09:00:00.000Z`, so the runs before it were not read) |
++ <!-- ludion-fix -->
++ **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
++
++ Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit `cccccccccccc`. This PR holds that one fix (one commit).
++
++ | | |
++ |---|---|
++ | Package | `lodash` (npm) |
++ | Change | `4.17.20` → `4.17.21` |
++ | Advisories | `GHSA-35jh-r3h4-6jhm`, `CVE-2021-23337` |
++ | Fix published | `2021-02-20T15:42:16.891Z` (registry.npmjs.org's publish time: the latest among the fix's planned versions) |
++ | Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `1` records read; the records read end there, so an earlier run may have seen it first; the walk stopped at run `40`, whose times do not agree: its record's time is `60.0` minutes before GitHub's start of that run, so the runs before it were not read) |
++ | Branch made | `2026-10-30T01:05:00.000Z` |
++ | Receipt | `0f1e2d3c-4b5a-4968-8776-655443322110` (in this run's ludion-fixes artifact) |
++
++ The times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.
++
++ **What was checked**
++
++ - By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
++ - This commit changes only `package-lock.json`, Git reads its only parent as the base commit, and `git fsck` finds no error in it. The job that opened this PR, which runs no project code, checked again that package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them (an optional peer adds nothing, and where the lock has one it must be the package its spec names, in range), changes no other entry beyond its flags and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`.
++ - Ludion's judge on the lockfile change, in both jobs: `ready_except_build`. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).
++
++ **Not checked**
++
++ - Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
++ - In package-lock.json, a moved or added entry's `hasShrinkwrap`, `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap). Nor are its flags (`dev`, `optional`, `devOptional`, `peer`), which decide what a production install leaves out. Another entry's flags may differ from the base's, and are not checked against what npm computes from the lock's graph, so a forged lock could have a production install take a package the base locks for development only, or leave a production one out; the judge gives each entry whose flags alone changed gate 2's checks (OSV's malicious-package records, deprecation, withdrawal), not the rest of the gates.
++ - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
++ - Production: nothing is deployed.
++
+
+ ❯ packages/cli/test/exposure.test.ts:416:19
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/15]⎯
+
+ FAIL  |node| packages/cli/test/exposure.test.ts > the PR body's Found row (X4, X5) > keeps GitHub's time and the runner's: the run that saw the fix, and this run, whatever the row says (section 8)
+AssertionError: expected '<!-- ludion-fix -->\n**プレビュー：マージは行わない…' to contain '| Found | `2026-10-29T00:05:00.000Z` …'
+
+- Expected
++ Received
+
+- | Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, which GitHub says started at `2026-10-29T00:00:00.000Z`, the first of an unbroken row of this workflow's runs whose record lists this fix; `7` records read; this run: GitHub's start `2026-10-30T00:55:00.000Z`, the Date of GitHub's answer `2026-10-30T01:09:58.000Z`, this runner's clock `2026-10-30T01:10:00.000Z`) |
++ <!-- ludion-fix -->
++ **プレビュー：マージは行わない。** Preview: Ludion does not merge this PR. Review it as you would any dependency update.
++
++ Ludion's validation job found a published security fix and, by its receipt, validated it on its own against the base commit `cccccccccccc`. This PR holds that one fix (one commit).
++
++ | | |
++ |---|---|
++ | Package | `lodash` (npm) |
++ | Change | `4.17.20` → `4.17.21` |
++ | Advisories | `GHSA-35jh-r3h4-6jhm`, `CVE-2021-23337` |
++ | Fix published | `2021-02-20T15:42:16.891Z` (registry.npmjs.org's publish time: the latest among the fix's planned versions) |
++ | Found | `2026-10-29T00:05:00.000Z` (the check of run `41`, the first of an unbroken row of this workflow's runs whose record lists this fix; `7` records read) |
++ | Branch made | `2026-10-30T01:05:00.000Z` |
++ | Receipt | `0f1e2d3c-4b5a-4968-8776-655443322110` (in this run's ludion-fixes artifact) |
++
++ The times and advisory IDs above are as the validation job recorded them in its receipt; the job that opened this PR checked their form, not their values.
++
++ **What was checked**
++
++ - By the validation job's receipt: the project's own test command passed on the base commit and on this change alone, built and run offline in Docker.
++ - This commit changes only `package-lock.json`, Git reads its only parent as the base commit, and `git fsck` finds no error in it. The job that opened this PR, which runs no project code, checked again that package.json is what Ludion writes for this change, that package-lock.json's `packages` section, which npm 7 and later read, moves this package (under its own name or an npm alias), at each install path where the base locks the version the fix replaces, to the fix's version, adds only packages that those paths (or packages so added) require by what the registry lists for them (an optional peer adds nothing, and where the lock has one it must be the package its spec names, in range), changes no other entry beyond its flags and nothing another package loads, and leaves no requirement unmet that the base meets, that each moved or added entry declares the requirements, os, cpu and libc the registry lists, and that a v2 lock's npm 6 `dependencies` section says the same as `packages`.
++ - Ludion's judge on the lockfile change, in both jobs: `ready_except_build`. It covers parts of gates 1, 2 and 4 and the wait table, not all four gates (docs/status.md in Ludion lists what it does not check).
++
++ **Not checked**
++
++ - Gate 1's OS, SAPI and configuration matching; gate 2's inspection for obfuscated code or new network or process calls; gate 3's check that a changed package loads; the re-query when a wait ends.
++ - In package-lock.json, a moved or added entry's `hasShrinkwrap`, `bin`, `hasInstallScript` and `engines` are not compared with the base or the registry, though npm reads them (npm 7 and later install a package's own shrinkwrap). Nor are its flags (`dev`, `optional`, `devOptional`, `peer`), which decide what a production install leaves out. Another entry's flags may differ from the base's, and are not checked against what npm computes from the lock's graph, so a forged lock could have a production install take a package the base locks for development only, or leave a production one out; the judge gives each entry whose flags alone changed gate 2's checks (OSV's malicious-package records, deprecation, withdrawal), not the rest of the gates.
++ - Your CI: GitHub starts no workflow for a PR opened with the workflow's own token. Start it (for example, close and reopen this PR) before merging.
++ - Production: nothing is deployed.
++
+
+ ❯ packages/cli/test/exposure.test.ts:428:18
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/15]⎯
+
+
+ Test Files  2 failed | 2 passed (4)
+      Tests  15 failed | 134 passed (149)
+   Start at  10:20:39
+   Duration  20.61s (transform 792ms, setup 0ms, import 1.11s, tests 21.26s, environment 0ms)
+

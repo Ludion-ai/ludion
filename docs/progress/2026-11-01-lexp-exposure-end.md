@@ -53,6 +53,17 @@ An audit reported that on 2026-11-01 GitHub's API gave some stored times (PRs' `
 | mutations, each alone (H1 to H15) | 369d533 | 15: 15 caught |
 | typecheck, build, `npm test`, tools/records' test | 369d533 | exit 0, exit 0, 1946 passed, 25 skipped; 14 passed |
 
+## After a rule on clocks
+
+A rule was set: times of different clocks are not compared with no margin, the Date of the same answer is the upper bound, a record keeps GitHub's time and the runner's, and a disagreement is said, not dropped. The merge record already kept both. The Found row now does too (definitions.md, section 8): GitHub's start of the run that saw the fix, this run's times by GitHub and by the runner, and both times of any disagreement. What decides did not change. The comparisons with a runner's clock still have no margin, which the rule's first line asks against: a margin would loosen the bound on a forged `checked_at`, and the difference between the clocks has not been measured. docs/mistakes/2026-11-01-github-clock-shift-not-noticed.md records the mistake.
+
+| Run | Head | Result |
+|---|---|---|
+| the four files with the new tests, before the fix | 67a684d | 15 failed, 134 passed (149) |
+| the same, with the fix | after 113e916 | 149 passed |
+| mutations, each alone (I1 to I19) | 113e916 | 19: 18 caught, I12 survived; a test added, I12 alone: caught |
+| typecheck, build, `npm test`, tools/records' test | with these changes | exit 0, exit 0, 1948 passed, 25 skipped; 14 passed |
+
 ## Not done
 
 - No run on GitHub (no release commit). Whether GitHub starts the merged job when a person merges a PR opened with the workflow's token is not tested.

@@ -51,6 +51,16 @@ After an audit of GitHub's clocks (definitions.md, section 7): the audit reporte
 
 The 19 caught in the first pass were not run again against the stronger tests; the tests only gained assertions and cases. The shell that ran the first pass was stopped by the host for low memory while its container went on; the tally was read from the volume after the container exited (exit 0).
 
+After a rule on clocks (definitions.md, section 8): the merge record kept both clocks' times, but the Found row kept only one clock or a difference. Definitions first (0d936ee), then the tests (67a684d), then the code (113e916). The volume was `ludion-lexp-w4`, removed afterwards. X7's tests hold a shifted and an unshifted time in the same test; `logs/x7-both-fix4.log` is their verbose output.
+
+| Run | Head | Result |
+|---|---|---|
+| the four files with the new tests, before the fix | 67a684d (tests on 1ac44e8's code) | 15 failed, 134 passed (149) (`logs/red-1ac44e8.log`) |
+| the same, with the fix and the test added for I12 | after 113e916 | 149 passed (`logs/green-fix4.log`); typecheck exit 0 |
+| mutations, each alone, exposure.test.ts and deliver.test.ts (scripts/mutate6.sh): I1, I2 a walk not done gives only the difference; I3, I4 this run's times from the wrong clock, or no Date; I5 to I8 a stop's times taken from the other clock; I9 to I14 the times do not reach the fix; I15 to I19 the Found row leaves them out | 113e916 | 19 applied: 18 caught, I12 survived (`logs/mutate6-first.log`). A deliver test was added for that row; I12 alone again: caught (`logs/mutate6-I12.log`). The 18 were not run again; the tests only gained an assertion |
+| typecheck, build, `npm test`, first | with the test for I12 | typecheck exit 0, build exit 0, 1 failed (packages/sandbox/test/guard.test.ts: a comment in deliver.ts had a backticked "run", which its scan reads as a run argument list), 1947 passed, 25 skipped (1973) (`logs/full-fix4-first.log`). Only that comment was reworded |
+| typecheck, build, `npm test`, and tools/records' test, again | with the reworded comment | typecheck exit 0, build exit 0, 45 files, 1948 passed, 25 skipped (1973); records 14 passed (`logs/typecheck-fix4.log`, `logs/build-fix4.log`, `logs/full-fix4.log`, `logs/records-fix4.log`) |
+
 New tests: exposure.test.ts (the merge record, the walk, the Found row), deliver.test.ts (one: the PR gets the first run, and is opened with this run's lookup when the runs cannot be read), check.test.ts (the record, and check.sh's `--seen`), action-patch.test.ts (the template, action.yml and start.sh). The stand-ins are test/runs.ts (workflow runs, artifacts, the redirect to the zip) and stand-ins for the PR and comment API; no test reaches the network.
 
 ## Not done here

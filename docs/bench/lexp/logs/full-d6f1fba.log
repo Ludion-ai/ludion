@@ -1,0 +1,99 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ✓ |node| packages/cli/test/judge-workflow.test.ts (36 tests | 18 skipped) 454ms
+     ✓ names the step that failed even when the judge's modules are missing  306ms
+ ✓ |node| tools/shadow/test/recorder.test.ts (35 tests) 680ms
+ ✓ |node| packages/cli/test/readonly-rust.test.ts (80 tests) 827ms
+     ✓ resolves direct dependencies in linear time, whatever the shape of a hostile lock file  701ms
+ ✓ |node| packages/cli/test/readonly-redos.test.ts (21 tests) 1047ms
+     ✓ parseRequirements: a run of backslash continuations  529ms
+ ✓ |node| tools/backtest/test/delta.test.ts (21 tests) 1292ms
+     ✓ counts runs of several megabytes without overflowing the stack (docs/mistakes/2026-10-30-delta-regex-stack.md)  1047ms
+ ✓ |node| packages/cli/test/readonly-framework.test.ts (56 tests) 268ms
+ ✓ |node| packages/cli/test/readonly-python.test.ts (102 tests) 1336ms
+     ✓ reads a 4 MiB requirements.txt line made of a run of .whl in well under a second  339ms
+     ✓ fails deep or very long input with an ordinary error, never a stack overflow  496ms
+ ✓ |node| packages/cli/test/readonly-go.test.ts (67 tests) 282ms
+ ✓ |node| packages/cli/test/npm-corpus.test.ts (14 tests | 1 skipped) 553ms
+     ✓ N1: every lock with inBundle entries npm 7 to 12 wrote is read by main's reader and this one, and leaves no requirement unmet  306ms
+ ✓ |node| packages/cli/test/node-image.test.ts (71 tests) 1294ms
+     ✓ pins the official node image by digest, probes the built image's node version, and commits only FROM on ludion/node/<version>  326ms
+ ✓ |node| tools/shadow/test/replay.test.ts (61 tests) 1683ms
+     ✓ is final after the window plus 336h: 100 decided versions and no MAL case is met, with no case  607ms
+     ✓ reads the latest poll and OSV read without spreading months of status lines into one call  604ms
+ ✓ |node| packages/cli/test/judge.test.ts (135 tests) 220ms
+ ✓ |node| packages/cli/test/action-patch.test.ts (11 tests) 110ms
+ ✓ |node| packages/cli/test/candidate-judge.test.ts (32 tests) 229ms
+ ✓ |node| packages/cli/test/epss.test.ts (51 tests) 199ms
+ ✓ |node| packages/sandbox/test/docker.test.ts (18 tests) 163ms
+ ✓ |node| packages/cli/test/workspace-manifests.test.ts (23 tests) 168ms
+ ✓ |node| packages/cli/test/scan-exit.test.ts (60 tests) 194ms
+ ✓ |node| packages/cli/test/impact.test.ts (49 tests) 129ms
+ ✓ |node| tools/records/test/records.test.ts (14 tests) 44ms
+ ✓ |node| tools/backtest/test/delta-v1-results.test.ts (3 tests) 97ms
+ ✓ |node| packages/cli/test/action.test.ts (15 tests | 6 skipped) 68ms
+ ✓ |node| packages/cli/test/judge-cli.test.ts (4 tests) 55ms
+ ✓ |node| packages/cli/test/exposure.test.ts (12 tests) 100ms
+ ✓ |node| packages/sandbox/test/guard.test.ts (3 tests) 62ms
+ ✓ |node| packages/cli/test/check.test.ts (48 tests) 2004ms
+ ✓ |node| packages/sandbox/test/safe-fetch.test.ts (32 tests) 59ms
+ ✓ |node| packages/sandbox/test/docker-lookup.test.ts (4 tests) 24ms
+ ✓ |node| tools/records/test/bench-socket.test.ts (5 tests) 44ms
+ ✓ |node| apps/site/test/knowledge.test.ts (12 tests) 24ms
+ ✓ |node| apps/site/test/privacy-hosts.test.ts (6 tests) 6ms
+ ✓ |node| packages/cli/test/security.test.ts (69 tests) 2728ms
+     ✓ validates without changing source by default; commits only FROM on its own branch when explicitly enabled  345ms
+     ✓ leaves an existing branch unchanged and runs no Docker work for it  325ms
+ ✓ |node| tools/backtest/test/archives-v5.test.ts (16 tests) 11ms
+ ✓ |node| packages/cli/test/readonly-registered.test.ts (68 tests) 2693ms
+     ✓ duplicate members count once toward the 1,000  804ms
+     ✓ more than 1,000 literal members are read no further, and say so  1277ms
+ ✓ |node| apps/site/test/build.test.ts (2 tests) 4ms
+ ✓ |node| packages/cli/test/lockfile.test.ts (5 tests) 5ms
+ ✓ |node| packages/cli/test/osv-note.test.ts (6 tests) 6ms
+ ✓ |node| apps/site/test/discovery.test.ts (3 tests) 5ms
+ ✓ |node| packages/cli/test/readonly-framework-cli.test.ts (4 tests) 32ms
+ ✓ |node| packages/cli/test/patch-cli.test.ts (5 tests) 10ms
+ ✓ |worker| apps/worker/test/app.test.ts (6 tests) 153ms
+ ✓ |node| packages/cli/test/branch.test.ts (23 tests) 3335ms
+     ✓ commits only the given files on HEAD, on a new branch, and leaves the working tree and HEAD alone  361ms
+     ✓ compares the validated copy with HEAD, file by file  454ms
+     ✓ refuses a symbolic link inside .git where Git would write, and a reflog the branch already has  450ms
+ ✓ |node| packages/cli/test/dependencies.test.ts (165 tests) 6951ms
+     ✓ stops a fix whose npm candidate adds a vulnerable version, even under an advisory the baseline had  787ms
+     ✓ stops only the fix of a package with a finding that has no supported fix, and reports such findings  507ms
+     ✓ gives two fixes whose names clean alike two branches, and stops one whose name an older-named branch holds  354ms
+ ✓ |node| .claude/hooks/guard.test.ts (422 tests) 10348ms
+ ✓ |node| packages/cli/test/deliver.test.ts (63 tests) 20657ms
+     ✓ writes the receipt and a bundle of exactly the applied fixes' branches, on the base  441ms
+     ✓ packs no bundle when nothing was applied, and refuses a branch the receipt does not match  360ms
+     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  918ms
+     ✓ gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5)  967ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  585ms
+     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  449ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  570ms
+     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  411ms
+     ✓ keeps a file's executable mode from the base (a checkout from a file system without modes)  317ms
+     ✓ headers out of Git's order or beyond it, even with the base as Git's parent  616ms
+     ✓ an npm fix that npm 12.2.1 writes with other entries' flags changed is opened (review 6538813186, B1)  523ms
+     ✓ forged transitive npm fixes (review 6518582507, B1 and N-a)  836ms
+     ✓ a lockfile whose npm 6 tree installs another tarball, a lockfileVersion changed, and a base with npm-shrinkwrap.json (review of aa5d75b, B1)  958ms
+     ✓ npm: a moved or added entry must declare what the registry lists (review of 7d25696, B1 (A))  1573ms
+     ✓ npm: a moved entry's forged optional or peer dependency is refused too (review of 6521445720 and 1e6f705, N1)  431ms
+     ✓ an applied fix with no bundle, and a bundle with no applied fix  357ms
+     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  448ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  529ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  538ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  812ms
+     ✓ PHP: the digest must be the one Docker Hub gives for the tag  444ms
+     ✓ Node.js: the digest must be the one Docker Hub gives for the node tag  435ms
+     ✓ Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to  1233ms
+     ✓ PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  566ms
+     ✓ Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  570ms
+
+ Test Files  45 passed (45)
+      Tests  1933 passed | 25 skipped (1958)
+   Start at  03:12:32
+   Duration  21.40s (transform 5.14s, setup 0ms, import 12.12s, tests 60.65s, environment 4ms)
+

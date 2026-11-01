@@ -3,8 +3,12 @@
 // another address, which must be asked without the token.
 import { crc32, deflateRawSync } from "node:zlib";
 
-/** A zip with one entry, as upload-artifact writes it: deflated or stored, sizes in a data descriptor when asked. */
-export function zip(name: string, data: string | Buffer, options: { deflate?: boolean; descriptor?: boolean } = {}): Buffer {
+/**
+ * A zip with one entry, as upload-artifact writes it: deflated or stored, sizes in a data descriptor when asked. pad:
+ * that many bytes between the entry and the central directory (a large zip with a small entry); lie: added to the
+ * central directory's uncompressed size.
+ */
+export function zip(name: string, data: string | Buffer, options: { deflate?: boolean; descriptor?: boolean; pad?: number; lie?: number } = {}): Buffer {
   const raw = Buffer.from(data), body = options.deflate ? deflateRawSync(raw) : raw, crc = crc32(raw) >>> 0, method = options.deflate ? 8 : 0;
   const file = Buffer.from(name), flags = options.descriptor ? 8 : 0;
   const local = Buffer.alloc(30);
@@ -15,12 +19,13 @@ export function zip(name: string, data: string | Buffer, options: { deflate?: bo
   if (options.descriptor) { descriptor.writeUInt32LE(0x08074b50, 0); descriptor.writeUInt32LE(crc, 4); descriptor.writeUInt32LE(body.length, 8); descriptor.writeUInt32LE(raw.length, 12); }
   const central = Buffer.alloc(46);
   central.writeUInt32LE(0x02014b50, 0); central.writeUInt16LE(20, 4); central.writeUInt16LE(20, 6); central.writeUInt16LE(flags, 8); central.writeUInt16LE(method, 10);
-  central.writeUInt32LE(crc, 16); central.writeUInt32LE(body.length, 20); central.writeUInt32LE(raw.length, 24); central.writeUInt16LE(file.length, 28);
+  central.writeUInt32LE(crc, 16); central.writeUInt32LE(body.length, 20); central.writeUInt32LE(raw.length + (options.lie ?? 0), 24); central.writeUInt16LE(file.length, 28);
   central.writeUInt32LE(0, 42);
-  const start = local.length + file.length + body.length + descriptor.length, size = central.length + file.length;
+  const pad = Buffer.alloc(options.pad ?? 0);
+  const start = local.length + file.length + body.length + descriptor.length + pad.length, size = central.length + file.length;
   const end = Buffer.alloc(22);
   end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(1, 8); end.writeUInt16LE(1, 10); end.writeUInt32LE(size, 12); end.writeUInt32LE(start, 16);
-  return Buffer.concat([local, file, body, descriptor, central, file, end]);
+  return Buffer.concat([local, file, body, descriptor, pad, central, file, end]);
 }
 
 export type StandInRun = {

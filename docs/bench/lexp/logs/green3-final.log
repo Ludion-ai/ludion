@@ -1,0 +1,36 @@
+
+ RUN  v4.1.12 /w/repo
+
+ ✓ |node| packages/cli/test/action-patch.test.ts (11 tests) 77ms
+ ✓ |node| packages/cli/test/exposure.test.ts (12 tests) 71ms
+ ✓ |node| packages/cli/test/check.test.ts (48 tests) 799ms
+ ✓ |node| packages/cli/test/deliver.test.ts (63 tests) 19429ms
+     ✓ pushes the checked commit to its branch and opens one PR; the next run opens none  424ms
+     ✓ gives the PR the first run that saw the fix as Found, and opens it with this run's lookup when the runs cannot be read (LEXP X4, X5)  689ms
+     ✓ does not open a fix again whose PR was closed, nor move a branch that holds another change  533ms
+     ✓ after a PR GitHub would not open, the next run opens it from the branch an earlier run pushed  455ms
+     ✓ opens the PR without pushing when the branch is already at the fix's commit, and a failed push stops only that fix  551ms
+     ✓ runs the judge again on the lockfile, and pushes nothing when it does not say ready_except_build  412ms
+     ✓ keeps a file's executable mode from the base (a checkout from a file system without modes)  310ms
+     ✓ headers out of Git's order or beyond it, even with the base as Git's parent  597ms
+     ✓ an npm fix that npm 12.2.1 writes with other entries' flags changed is opened (review 6538813186, B1)  521ms
+     ✓ forged transitive npm fixes (review 6518582507, B1 and N-a)  823ms
+     ✓ a lockfile whose npm 6 tree installs another tarball, a lockfileVersion changed, and a base with npm-shrinkwrap.json (review of aa5d75b, B1)  953ms
+     ✓ npm: a moved or added entry must declare what the registry lists (review of 7d25696, B1 (A))  1572ms
+     ✓ npm: a moved entry's forged optional or peer dependency is refused too (review of 6521445720 and 1e6f705, N1)  434ms
+     ✓ an applied fix with no bundle, and a bundle with no applied fix  356ms
+     ✓ a subject that is not the receipt's change, an author that is not Ludion, and a message with more in it  579ms
+     ✓ a package.json that says more than the fix: an install script, another dependency, a looser range  519ms
+     ✓ an npm fix applied without the judge's ready_except_build, a fix whose tests did not pass, another base  540ms
+     ✓ text that could become Markdown or a mention, a receipt that is not JSON, and an oversized bundle  826ms
+     ✓ PHP: the digest must be the one Docker Hub gives for the tag  438ms
+     ✓ Node.js: the digest must be the one Docker Hub gives for the node tag  437ms
+     ✓ Composer: each added or moved lock entry must be as Packagist lists it, and OSV must list nothing on the version moved to  1235ms
+     ✓ PHP: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  569ms
+     ✓ Node.js: a move to the line's newest release with no newer security release is checked, and its commit and PR state only facts  589ms
+
+ Test Files  4 passed (4)
+      Tests  134 passed (134)
+   Start at  03:30:10
+   Duration  19.81s (transform 626ms, setup 0ms, import 967ms, tests 20.38s, environment 0ms)
+

@@ -137,6 +137,9 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
       { bytes: Buffer.from("not a zip") },
       { bytes: zip("seen.json", "x".repeat(2 * 1024 * 1024)) },
       { bytes: zip("other.json", JSON.stringify(seenAt(started(12), OTHER))) },
+      // A small, valid entry in a zip over 1 MiB, and an entry whose size the central directory misstates.
+      { bytes: zip("seen.json", JSON.stringify(seenAt(started(13), OTHER)), { pad: 1024 * 1024 }) },
+      { bytes: zip("seen.json", JSON.stringify(seenAt(started(14), OTHER)), { lie: 1 }) },
       SAW,
     ]);
     const r = await walk(runs);
@@ -152,14 +155,20 @@ describe("found_at is the first run of the row whose check saw the fix (X4, X5)"
     expect(asked.filter(a => a.startsWith("GET https://blob.invalid/"))).toHaveLength(3);
   });
   it("another advisory of the same package, or another package, does not match; no record lists it: null", async () => {
-    const r = await walk(row([[{ key: "npm:lodash", advisories: ["GHSA-29mw-wpgm-hmr9"] }], OTHER]));
-    expect(r.seen.get(LODASH.branch)).toBeNull();
+    // An earlier run saw lodash with another advisory only: it does not list this fix, so it ends the row.
+    const other = await walk(row([[{ key: "npm:lodash", advisories: ["GHSA-29mw-wpgm-hmr9"] }], SAW]));
+    expect(other.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(2)) + 5 * 60_000), run: 2, ended: true });
+    expect((await walk(row([SAW, OTHER]))).seen.get(LODASH.branch)).toBeNull();
   });
   it("keeps the limit of runs, and does not read runs of another event or branch, or later than this run", async () => {
     const many = row(Array.from({ length: 130 }, () => SAW));
     const capped = await walk(many);
     expect(capped.read).toBe(100);
     expect(capped.seen.get(LODASH.branch)).toEqual({ at: iso(Date.parse(started(31)) + 5 * 60_000), run: 31, ended: false });
+    // A limit below one page of 100 runs.
+    const ten = await walk(many, [LODASH], { limit: 10 });
+    expect(ten.read).toBe(10);
+    expect(ten.seen.get(LODASH.branch)).toMatchObject({ run: 121, ended: false });
     const asked: string[] = [];
     const runs: StandInRun[] = [
       { id: 1, started: started(1), record: seenAt(started(1), SAW) },

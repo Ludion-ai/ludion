@@ -99,7 +99,7 @@ The registry keeps no date for a deprecation, so the split is a range. K, L and 
 
 **What stays stopped in reading C (10 rows):** 7 by the event rule (the 7 listed in section 1), then taylored@7.0.8 (withdrawn), @auth0/nextjs-auth0@4.11.2 (provenance lost) and duckdb@1.3.4 (install scripts).
 
-**The hypothesis.** The brain's hypothesis was that most stops are 「その版が悪いだけで、同じメジャーの次の版は通る」. In these data it does not hold in reading A: 33 of 44 have no candidate at all, 20 of them because no later version of the major existed by the cutoff, and 13 because today's registry deprecates every one that did.
+**The hypothesis.** The brain's hypothesis was that most stops are 「その版が悪いだけで、同じメジャーの次の版は通る」. In these data it does not hold in reading A: 33 of 44 have no candidate at all, 20 of them because no later version of the major existed by the cutoff, and 13 because every one that did was passed over. For 11 of the 13, today's registry deprecates every one. The other 2 have other reasons: taylored@7.0.8's 4 later versions are not listed, and of @auth0/nextjs-auth0@4.11.2's 2, 4.12.0 is deprecated and 4.12.1 has a new advisory (GHSA-xq8m-7c5p-c2r6).
 
 **Beside the count: main's plan today (next-fix.ts).**
 

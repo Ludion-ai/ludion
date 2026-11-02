@@ -4,12 +4,12 @@
 
 ## What changed
 
-- packages/cli/test/dockerfile-check.test.ts: its first lines and its describe names now say "these shapes". `answersWithin` and the three limits are gone. `gate-reader-scaling-ratio` takes the place of `gate-reader-linear`. `lock-key-many-deps` and `gate-reader-scaling-ratio-control` are new. 182 tests become 191.
+- packages/cli/test/dockerfile-check.test.ts: its first lines and its describe names now say "these shapes". `answersWithin` and the three limits are gone. `gate-reader-scaling-ratio` takes the place of `gate-reader-linear`. `lock-key-many-deps` and `gate-reader-scaling-ratio-control` are new. 182 tests become 195.
 - docs/progress/2026-11-02-ldock-dockerfile-check.md and docs/mistakes/2026-11-02-dockerfile-check-not-as-buildkit-reads.md: the sentences on `gate-reader-linear` say what it held, and point here.
 
 ## The measure
 
-Each point is the median of up to 7 samples of CPU time (`process.cpuUsage`, user and system, of the whole process), taken in turn at n and 4n, after one round thrown away. A sample repeats the call so that the smaller takes at least 4 ms of CPU, the same number of times at both sizes. The line is a ratio under 8; a time that grows with n gives about 4 and with n² about 16.
+Each point is the median of up to 7 samples of CPU time (`process.cpuUsage`, user and system, of the whole process), taken in turn at n and 4n, after one round thrown away. A sample repeats the call so that the smaller takes at least 4 ms of CPU, the same number of times at both sizes. The line is a ratio under 8; a time that grows with n gives about 4 and with n² about 16. A measure at or over the line is taken once more (next section).
 
 - **Dockerfile shapes:** the 41 inputs `gate-reader-linear` had, each at 16 KiB and 64 KiB, for each of `phpImage`, `nodeImage` and `namesNodeImage`: 123 measures. `officialImage` refuses over 64 KiB before reading, so n cannot be larger than 16 KiB; repeating the call is what makes a short sample long enough. No shape was taken out.
 - **Lock shapes:** the 8 inputs `gate-reader-linear` had, each grown by what grows on it, plus 3 grown by the number of keys: one key from 1 MiB to 4 MiB (3), 1,000 keys from 1,024 characters to 4,096 (5), and 250 keys of 4,096 characters to 1,000 (3). `lockKey` is now timed alone, over all the keys of a lock; it was 10 rounds plus reading the lock before. A key's length and the number of keys need separate rows: on the old expression only the first gave a high ratio (below).
@@ -27,6 +27,50 @@ Decided before the measures below of this rule were taken, and not moved after t
 - It does not hold for the tests that want a ratio at or over the line: the control's n² and the two `lock-key-many-deps` "from 8 up to 32". A sample that a guard stops is not measured again either: it fails at once.
 - A failure says the ratios of both measures, the shape, and how many measures were taken again in the file so far. The log's `measured again:` lists each one with its ratios, the ones that then passed included, so chance failures can be counted later.
 - The rule stands only if a real n² fails both measures: the n² loop at php.ts:108 in a copy, one run each with no limit and in the 3 limited containers.
+
+This was committed as c924f59 at 16:45 JST on 2026-11-02, and the first of the runs below began at 16:46. Runs of `vitest run --project node --maxWorkers=2 packages/cli/test/dockerfile-check.test.ts`, with `-t "gate-reader-scaling-ratio|lock-key-many-deps"` (62 tests) unless a row says otherwise, Node 24.22.2, `--network none --memory 2g`, that commit's test file.
+
+**A real n² fails both measures.** The loop of n²/32 reads at php.ts:108, in a copy, not committed. One run each. In each, all 41 failures are on `phpImage`, and the log's `measured again:` lists 41 pairs. Both measures were over the line on every pair: **0 of 164 second measures came under it (95% upper bound 1.8%, reading the 164 as independent, which was not shown).** One machine.
+
+| Container | Tests | First measure, lowest and highest of 41 | Second measure, lowest and highest of 41 | Seconds |
+|---|---|---|---|---|
+| No limit | 41 failed, 21 passed | 15.06, 18.56 | 13.71, 16.21 | 159.34 |
+| `--cpus 0.25` | 41 failed, 21 passed | 13.02, 18.95 | 14.99, 16.33 | 611.90 |
+| `--cpuset-cpus 0`, 3 busy loops | 41 failed, 21 passed | 13.32, 18.06 | 14.70, 18.46 | 600.89 |
+| `--cpus 1`, 3 busy loops | 41 failed, 21 passed | 14.09, 17.85 | 14.98, 18.51 | 646.51 |
+
+The time of these runs grew from the 78.90 to 290.61 s of the table at 0ec3bc7, as each failing shape now measures twice.
+
+**The real quadratics of the old readers fail both measures too.** The same test file on php.ts, node.ts and judge.ts of d42e172, no limit, one run: `Tests 18 failed | 44 passed | 133 skipped`, 709.75 s, the same 18 shapes as the table under "Red". 13 failed on two measures, and 5 stopped at a guard and were not measured again:
+
+| Shape | First, then second |
+|---|---|
+| `line feeds`, `phpImage` | 16.42, 16.68 |
+| `CRLF pairs`, `phpImage` | 15.66, 16.02 |
+| `lines of a space`, `phpImage` | 16.20, 15.97 |
+| `COPY and spaces`, `phpImage` | 16.09, 15.92 |
+| `COPY, tabs and spaces`, `phpImage` | 15.93, 16.02 |
+| `RUN and spaces`, `phpImage` | 15.95, 16.00 |
+| `a run of carriage returns`, `phpImage` | 16.06, 16.14 |
+| `a run of carriage returns, then a letter`, `phpImage` | 15.59, 15.90 |
+| `two carriage returns and a line feed, many times`, `phpImage` | 16.06, 16.02 |
+| `lockEntries`, 1,000 extraneous keys, 1,024 then 4,096 characters | 13.00, 13.25 |
+| `lockExtraneous`, the same | 13.21, 13.02 |
+| `lockKey`, the same | 13.48, 13.91 |
+| `packageLockInputs`, the same | 12.95, 13.15 |
+
+**With no reader changed, the count of failures did not go down, as it was already 0.** One run each in the review's 3 limited containers, and the whole file once with no limit:
+
+| Container | Tests | Failed | Before this rule, at 0ec3bc7 (of 58) | Measured again, of 136 | Control n / n² | Highest of the 134 | Seconds |
+|---|---|---|---|---|---|---|---|
+| `--cpus 0.25` | 62 | 0 | 0 in each of 3 runs | 0 | 4.00 / 15.47 | 6.18 `lines of #, nodeImage` | 146.69 |
+| `--cpuset-cpus 0`, 3 busy loops | 62 | 0 | 0 in each of 3 runs | 0 | 4.09 / 16.12 | 6.56 `backslash-newline pairs, phpImage` | 165.37 |
+| `--cpus 1`, 3 busy loops | 62 | 0 | 0 in each of 3 runs | 0 | 3.71 / 16.12 | 6.22 `backslash-newline pairs, phpImage` | 161.50 |
+| No limit, this file and records.test.ts, last tree | 209 | 0 | 0 in each of 3 runs | 0 | 4.11 / 16.09 | 6.20 `many FROM lines, phpImage` | 49.34 |
+
+**Runs that failed in the 3 limited containers with this rule: 0 of 3 (95% upper bound 63%).** So these runs do not show the rule doing anything: no measure reached the line, so no second measure was taken. A pass after a second measure has been run only in the test of the function (`a measure is taken again once at most`), not on a real measure. That a chance failure comes twice about as rarely as the square of once is reasoning: whether two measures in a row are independent was not measured.
+
+The closest seen to the line with no reader changed is 7.79: the control's plain scan, in the run with no limit that had the n² loop in php.ts, which the scan does not touch, at 0.0154 ms a call at n where the other runs give about 0.030. It is the first measure of the run, as the 7.31 was. On a reader's row, the highest is 7.56 (`backslash-newline pairs, phpImage`, the second review, under `--cpus 1`, with a second test file spinning).
 
 ## On the second head, 0ec3bc7, in Docker
 
@@ -50,7 +94,7 @@ Runs of `vitest run --project node --maxWorkers=2 packages/cli/test/dockerfile-c
 | `--cpus 1`, 3 busy loops | 3 | 58 | 0 | 161.40 | 3.77 | 16.38 | **7.27** `backslash-newline pairs, phpImage` |
 | `--cpuset-cpus 0`, 3 neighbours that walk 128 MiB of memory | 1 | 58 | 0 | 162.11 | 4.08 | 16.18 | 6.91 `backslash-newline pairs, nodeImage` |
 
-**Runs that failed in the 3 limited containers of the review: 0 of 9 (95% upper bound 28%).** With no limit: 0 of 3 (63%). With the neighbours that walk memory: 0 of 1 (95%). The margin is thin: 7.31 and 7.27 against a line of 8. The 7.31 is a plain scan, once, in the first measure of the run: its time at n was 0.0166 ms a call, where the other runs gave about 0.030. Why was not looked into; nor was why the shapes of many short lines go over 4. That head had no second measure.
+**Runs that failed in the 3 limited containers of the review: 0 of 9 (95% upper bound 28%).** With no limit: 0 of 3 (63%). With the neighbours that walk memory: 0 of 1 (95%). The margin is thin: 7.31 and 7.27 against a line of 8, and the second review saw 7.52 and 7.56 on a reader's row. The 7.31 is a plain scan, once, in the first measure of the run: its time at n was 0.0166 ms a call, where the other runs gave about 0.030. Why was not looked into; nor was why the shapes of many short lines go over 4. That head had no second measure.
 
 `lock-key-many-deps` over these 13 runs: `packageLockInputs`, 200 dependencies, key of 1,019 then 4,034 characters: 13.34 to 13.97. `resolveFrom` alone, the same keys: 13.74 to 14.55. `packageLockInputs`, key of 4,034 characters, 50 then 200 dependencies: 3.94 to 4.04.
 
@@ -81,11 +125,11 @@ Why the time at 4n suffered more, on a plain scan of 8,000 then 32,000, warmed u
 | `--cpus 1`, 3 busy loops | 8.55 and 33.67 ms | 8.74 and 111.36 ms | 12.75 | 3.94 |
 | `--cpus 1`, 3 busy loops | 4.10 and 17.74 ms | 77.82 and 21.07 ms | 0.27 | 4.33 |
 
-So a short sample can run with no wait while the long one after it takes the whole wait, and the clock ratio then depends on where the wait falls, not on the reader. This shows that on the scan, not on the readers. CPU time steps by 1 µs in these containers (read in a tight loop).
+So a short sample can run with no wait while the long one after it takes the whole wait, and the clock ratio then depends on where the wait falls, not on the reader. This shows that on the scan, not on the readers. CPU time steps by 1 µs in these containers (read in a tight loop). A coarser clock fails these tests: the second review simulated steps of 15.625 ms, and the n² control and `line feeds` failed with `No answer in 5000 ms`. Which machines have such a clock was not measured.
 
 ## What this measure still catches, and what it does not
 
-A real n² in a copy of the code: a loop of n²/32 reads at php.ts:108, in `officialImage`. One run each. It is not committed.
+A real n² in a copy of the code, at the second head, 0ec3bc7, where each measure was taken once: a loop of n²/32 reads at php.ts:108, in `officialImage`. One run each. It is not committed. With the second measure, the table is under "A measure over the line is taken once more".
 
 | Container | Tests | `phpImage` ratio, lowest and highest of 41 | Seconds |
 |---|---|---|---|
@@ -127,4 +171,4 @@ The test file of main 728fcf1, on the same old readers, failed 16 of `gate-reade
 
 ## CI
 
-The same tests' 4 runs on GitHub's runner at f7f4206, and the run at this head, are in this PR's description, with the ratios from each run's log (`scaling ratios:`, printed once at the end of the file).
+The same tests' 4 runs on GitHub's runner at f7f4206, the run at 0ec3bc7 and the run at the last head are in this PR's description, with the ratios from each run's log (`scaling ratios:`, printed once at the end of the file).

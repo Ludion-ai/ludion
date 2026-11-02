@@ -1,0 +1,89 @@
+# 2026-11-02 — Gate 3's new type: what one judgement of one fix is (LG3)
+
+Committed before any of it was implemented or measured. It writes down, for the code, the section 「C4 壊さない」 of docs/decisions/2026-11-02-definition-of-complete-final.md (the plan's text, at that file's lines 128 to 144). That section wins where the two differ, and CLAUDE.md wins over both until the protected PR lands. This file narrows and loosens nothing in it, and changes no wait and no numeric criterion of a gate.
+
+The section's words this writes down:
+
+> **古い版を仕様にする。** ビルドと型の確かめ。起動して GET のページを全部開き、状態コード、例外、コンソール、DOM（一次）、スクリーンショット（二次）を比べる。古い版を 2 回動かしてノイズを除き、時計は止める。テストがあれば両方。
+
+> **分母：** 古い版で状態 200・例外 0 のページが 1 つ以上ある（プロジェクト, 修正）だけ。［…］分母に入らないものは関門 3 が判定不能なので、pr に落とす。
+
+> `.env.example` があれば、その鍵にダミー値を入れてビルドする。
+
+> **限界：** 見るのは GET のページだけ。API ルート、Server Actions、動的ルート（\[id\]）は触らない。受け取りに書く。
+
+## What goes in and what comes out
+
+In: one project's source, and its package.json and package-lock.json before the fix (old) and after it (new). Out: one of three verdicts, with every reason, per-page results and the seconds of each step.
+
+| Verdict | Meaning | What it leads to |
+|---|---|---|
+| `not_broken` | Everything compared came out the same as on old | Gate 3 does not stop the fix |
+| `broken` | Something that worked on old does not work on new | The fix stops, with the reasons |
+| `undecidable` | Gate 3 cannot say | Falls to a PR for a person ("pr に落とす"); never an automatic apply |
+
+This first form covers npm projects that build with Next.js. Any other project is `undecidable`, with that reason. Which version of Next.js and which build setups it works on is measured, not assumed: see Limits.
+
+## The steps
+
+Dependencies are acquired outside the box, from the manifests alone, with `npm ci --ignore-scripts` and the same pinned npm and flags as `ludion patch`, on a network. No project source is in that step. Everything after it runs inside packages/sandbox's box, with no network, a read-only root, a non-root user and resource limits, and packages/sandbox is not changed for it. Old runs twice and new once, each in a fresh box, and each run is, in this order:
+
+1. **Build**: the project's Next.js build. With `.env.example` in the project, each of its keys is set to a dummy value for the whole run; real `.env` files never enter the image. A file the build wants to write in the project (its next-env.d.ts, its tsconfig.json) is written in the box's scratch space, so the source stays as it was.
+2. **Types**: with a tsconfig.json and TypeScript in the project, `tsc --noEmit`, whatever the project's own build settings say about type errors.
+3. **Start**: the project's production server, on the box's loopback.
+4. **Crawl**: every GET page, each in a real browser in the box.
+5. **Tests**: with a `test` script in package.json, that script.
+
+**The clock is stopped** in the build, the server and the browser: `Date` reads one fixed instant in all three runs, and `Math.random` gives one fixed sequence. Animations and transitions are off for the screenshot.
+
+**Which pages.** Every page in the lists the build itself writes (Next.js's app and pages route manifests), leaving out API routes, dynamic routes (anything with `[`) and the framework's own error pages. Nothing is followed from links, so no dynamic route is reached that way. More than 200 pages is `undecidable`: "all of them" could not be kept.
+
+**What is recorded for each page:** the final status of the document; exceptions (uncaught in the browser, and error lines from the server while the page is open); console messages with their level; the DOM once loaded (one hash per element, over its tag, sorted attributes and own text, without scripts, styles and links, and with the hashed paths under `/_next/static/` written the same); a hash of the full-page screenshot. Only hashes, counts and levels leave the box; no text of the source or of the pages does.
+
+## How the three runs are compared
+
+**Noise** is what differs between the two runs of old: it is left out of the comparison. An element whose hash differs between them is left out by its position. With a different number of elements, that page's DOM is not comparable. A page whose screenshot hash differs between them has no comparable screenshot. A console message or exception in only one of them is noise.
+
+**The specification pages** are those with status 200 and 0 exceptions in both runs of old.
+
+| Situation | Verdict |
+|---|---|
+| Old did not build, or its run timed out, or its result cannot be read, in either run | `undecidable` |
+| No specification page (the denominator) | `undecidable` |
+| Every specification page's DOM is noise | `undecidable` |
+| New did not build | `broken` |
+| New's server did not start | `broken` |
+| Types passed on both runs of old and fail on new | `broken` |
+| Tests passed on both runs of old and fail on new | `broken` |
+| A specification page: no longer in new's list, or its status on new is not 200 | `broken` |
+| A specification page: an exception on new | `broken` |
+| A specification page: a console message of level error on new that old did not have | `broken` |
+| A specification page: an element's hash differs on new outside the noise, or a different number of elements | `broken` |
+| A page that answered under 500 in both runs of old and answers 500 or over on new | `broken` |
+| A specification page: a console message of another level on new that old did not have | `undecidable` |
+| A specification page: same DOM, but its screenshot differs from old's outside the noise | `undecidable` |
+| New's run timed out, or its dependencies could not be acquired, or its result cannot be read | `undecidable` |
+| None of these | `not_broken` |
+
+`broken` wins over `undecidable` when both apply: every reason is listed. A page broken on both versions is not a difference (the section's table: 「差だけを比べる」), and the number of such pages is reported. Failing types or tests on old take no part in the comparison, and the result says so.
+
+## Limits (these go in the receipt)
+
+- GET pages only. API routes, Server Actions and dynamic routes are not touched. Nothing behind a login is seen, and no button or form is pressed.
+- A page that needs an outside service sees none in the box, on both versions, so only a difference shows.
+- The box's limits are packages/sandbox's: a project too large for them does not build on old, and that is `undecidable`.
+- The candidate's code runs in the same box as the crawl, so a candidate that means harm can write the result it likes. This gate says whether an update breaks things. It says nothing about whether the update is honest: that is gate 2, the wait and the re-query.
+- This is a first form. It is not yet called from `ludion patch`, and docs/status.md says what is missing. Until it is, nothing may describe a receipt as having passed this gate.
+
+## What one case costs: `c4-case-minutes-measured`
+
+The audit's item `c4-case-minutes-measured`: the end-to-end minutes of one case, from this first form on one PC's Docker, once measured. The raw seconds of each step are in docs/progress/2026-11-02-lg3-gate-3-type.md.
+
+| Item | Value |
+|---|---|
+| Example | not yet measured |
+| Runs | not yet measured |
+| Minutes per case (each run) | not yet measured |
+| Peak memory in the box | not yet measured |
+
+This table is the only part of this file to be filled in after measuring. Everything above it was fixed before.

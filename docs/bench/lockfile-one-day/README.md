@@ -17,15 +17,13 @@ Experiment, read-only. Definition: docs/decisions/2026-11-02-lockfile-one-day-de
 
 The hour files were read as streams and not kept. The full drawn order (365,374 repositories) and the journal of answers stayed in the Docker volume, and the volume was removed at the end. The two CSV files keep each answer's status, and the commands below make the order again.
 
-## What was run, and where
-
-Everything ran in containers of `node:24@sha256:e7add2a490bb17d97b485b8641bd88455fff7839ade0f5eba493c3508124d413` as uid 1000, with `--memory 1g`, no credentials, no socket and no host environment, with `scripts/` mounted read-only and writing only to the named volume. Results reached this folder through `cat` from the volume.
+## What was run
 
 1. **The population** (`scripts/population.mjs`).
 2. **The requests** (`scripts/measure.mjs`): 2026-11-02T09:29:13Z to 09:52:43Z. 9,408 HEADs (4,408 for package.json, 5,000 for the five files of the 1,000) and 50 ranged GETs. 0 retried, 0 with a 429, 0 with a 5xx, 0 failed, 0 unknown.
 3. **The counts** (`scripts/analyze.mjs`), with `--network none`.
 
-To run again (Git Bash, `MSYS_NO_PATHCONV=1`), with `B` this folder and `IMG` the image above:
+To run again (Git Bash, `MSYS_NO_PATHCONV=1`), with `B` this folder and `IMG` `node:24@sha256:e7add2a490bb17d97b485b8641bd88455fff7839ade0f5eba493c3508124d413`:
 
 ```sh
 docker volume create ludion-llock-w

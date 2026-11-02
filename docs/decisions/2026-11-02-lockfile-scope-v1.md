@@ -9,7 +9,7 @@ This record gives what was decided, not the owner's words.
 
 ## What Ludion will not do
 
-v1 will not say it supports pnpm-lock.yaml, yarn.lock, bun.lock or bun.lockb. Ludion does not read them today (docs/status.md, the scope table), so this takes away nothing it does. What it ends is the line in that table that they would be in if LV0 showed many.
+v1 will not say it supports pnpm-lock.yaml, yarn.lock, bun.lock or bun.lockb. Of npm's lockfiles, Ludion fixes only package-lock.json. Today its scan reads pnpm-lock.yaml and yarn.lock, and its judge reads pnpm-lock.yaml and never answers ready for it; it reads no bun lockfile. This record does not change that code, and whether those reads stay in v1 is not decided here. What it ends is the line in docs/status.md's scope table that they would be in if LV0 showed many.
 
 ## What it rests on
 
@@ -26,4 +26,4 @@ That measurement's limits apply here. It leaves out 23.5% of the repositories pu
 
 ## Undo
 
-A new decision record that adds a lockfile to v1, and the code and tests that read it.
+A new decision record that adds a lockfile to v1, and the code and tests that fix it and judge it.

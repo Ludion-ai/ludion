@@ -7,7 +7,7 @@
 
 **The owner decided on 2026-11-02 at 23:06 JST:**
 
-3. Ludion applies no fix to a project that has a lockfile other than package-lock.json at its root, or whose packageManager is not npm, and stops, writing the reason. The owner accepted that the share of projects it covers goes from 64.0% to 61.0% (below, "What it rests on").
+3. In v1, Ludion applies no fix to a project that has a lockfile other than package-lock.json at its root, or whose packageManager is not npm, and stops, writing the reason. The owner accepted that the share of projects it covers goes from 64.0% to 61.0% (below, "What it rests on").
 
 This record gives what was decided, not the owner's words.
 
@@ -23,7 +23,7 @@ Decision 3 is not yet what the code does. This is from reading the lines below a
 
 | Project | What the code does | Lines read (packages/cli/src/security/) |
 |---|---|---|
-| package-lock.json and another lockfile at the root | Does not stop for the other lockfile: it takes package-lock.json and does not look at the other | `inventory.ts:81`–`:82` take the first reader that finds its file, package-lock.json first; `inventory.ts:13` and `dependency-patch.ts:389` copy only package.json and package-lock.json; `deliver.ts:553`–`:554` name npm-shrinkwrap.json and package-lock.json only |
+| package-lock.json and another lockfile at the root | Does not stop for pnpm-lock.yaml, yarn.lock, bun.lock or bun.lockb: it takes package-lock.json and does not look at the other. With npm-shrinkwrap.json, the PR job refuses the fix (`deliver.ts:553`) | `inventory.ts:81`–`:82` take the first reader that finds its file, package-lock.json first; `inventory.ts:13` and `dependency-patch.ts:389` copy only package.json and package-lock.json; `deliver.ts:553`–`:554` name npm-shrinkwrap.json and package-lock.json only |
 | pnpm-lock.yaml or yarn.lock, and no package-lock.json | Stops with a reason when the scan has a finding; with none, it ends with no fix | `inventory.ts:87`, `dependency-patch.ts:330`; `dependency-patch.ts:308` |
 | bun.lock or bun.lockb, and none of package-lock.json, pnpm-lock.yaml and yarn.lock | Stops with a reason that does not name bun | `inventory.ts:83`, called from `dependency-patch.ts:305` |
 | packageManager is not npm, and package-lock.json at the root | Does not stop: nothing reads packageManager | The word has no match in `packages`, `action`, `action.yml`, `apps/site/src`, `tools` or `examples` |

@@ -6,11 +6,13 @@ Why it was asked for: docs/status.md at main 5b6e727de94ee5bd9fedfe12122f22d2ff4
 
 ## The answer
 
-**package-lock.json is the most common: 64.0% (95% interval 60.2–67.6) of public repositories with a package.json at their root, and 64.0% in each stratum.** Next is pnpm-lock.yaml, 15.5% (12.9–18.5). Its interval does not reach package-lock.json's.
+**Among public repositories with a root package.json and a default-branch push in GH Archive's files of 2026-10-25, package-lock.json is the most common: 64.0% (95% interval 60.2–67.6, n = 1,000, weighted, effective n 633; files as answered on 2026-11-02), and 320/500 in each stratum.** Next, among the same repositories, is pnpm-lock.yaml: 15.5% (95% interval 12.9–18.5, n = 1,000, weighted, effective n 633). Its interval does not reach package-lock.json's.
+
+What was decided from it: docs/decisions/2026-11-02-lockfile-scope-v1.md.
 
 ## Not the day the brief named
 
-The brief named 2026-11-01. All 24 of that day's GH Archive files hold 0 PushEvents (docs/bench/lockfile-one-day/archive-scan.jsonl). By the rule fixed in the definition's section 1, the day is **2026-10-25**, the latest with PushEvents in all 24 files. Why the events are missing is not known.
+The brief named 2026-11-01. All 24 of that day's GH Archive files hold 0 PushEvents (docs/bench/lockfile-one-day/archive-scan.jsonl). By the rule fixed in the definition's section 1, the day is **2026-10-25**, the latest with PushEvents in all 24 files. Why the events are missing is not known. The owner accepted the change of day, with the result of about ±3.7 points, on 2026-11-02 at 19:53 JST (docs/decisions/2026-11-02-lockfile-scope-v1.md).
 
 ## The numbers
 
@@ -64,7 +66,7 @@ Copied from docs/bench/lockfile-one-day/counts.md.
 
 - **Overall is about ±3.7 points at package-lock.json's share (60.2–67.6), not the brief's ±3.** 88% of the weight is the new stratum and the allocation is 500 and 500, so the effective n is 633.
 - **23.5% of the repositories pushed to are left out** (112,063 of 477,437), by the rule on the default branch: most (97,557) because the day names no default branch for them and they had no push to main or master. Those whose default branch has another name are not measured, and how many they are is not known.
-- **GH Archive's day may be partial.** The hourly PushEvent count is lower than earlier in the year (2026-06-01 hour 12: 135,957; 2026-10-25 hour 12: 66,648). Whether what is missing is random is not known.
+- **GH Archive's day may be partial.** The hourly PushEvent count is lower than earlier in the year (2026-06-01 hour 12: 135,957; 2026-10-25 hour 12: 66,648). Whether what is missing is random is not known. 2026-10-25 lies in a stretch with gaps: the same scan has 0 PushEvents in 2026-09-01 hour 12, 2026-10-22 hour 18, all four hours looked at on 2026-10-23, and 2026-10-24 hour 0.
 - **Who is counted.** Public repositories with a push that day, forks and bots included, with no filter for use or size. 88% by weight were made in about the last 12 months. It does not measure the projects of the people Ludion is to protect, or private repositories.
 - **A one-day count, and the root only.** A workspace's lockfile below the root is not counted. A repository deleted or made private since that day counts as having no package.json. `npm-shrinkwrap.json` was not among the things to count.
 - **Requests:** 9,408 HEADs and 50 GETs, more than the brief's "about 5,000", which leaves out the 4,408 HEADs that find the sample.

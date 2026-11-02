@@ -19,11 +19,11 @@ The hour files were read as streams and not kept. The full drawn order (365,374 
 
 ## What was run, and where
 
-Everything ran in containers of `node:24@sha256:e7add2a490bb17d97b485b8641bd88455fff7839ade0f5eba493c3508124d413` as uid 1000, with `--memory 1g`, no credentials, no socket and no host environment, with `scripts/` mounted read-only and writing only to the named volume. Results reached this folder through `cat` from the volume. Nothing on the host ran node, npm or python, and nothing was cloned.
+Everything ran in containers of `node:24@sha256:e7add2a490bb17d97b485b8641bd88455fff7839ade0f5eba493c3508124d413` as uid 1000, with `--memory 1g`, no credentials, no socket and no host environment, with `scripts/` mounted read-only and writing only to the named volume. Results reached this folder through `cat` from the volume.
 
-1. **The population** (`scripts/population.mjs`): about one minute. Memory peak 523,628,544 bytes.
-2. **The requests** (`scripts/measure.mjs`): 2026-11-02T09:29:13Z to 09:52:43Z. 9,408 HEADs (4,408 for package.json, 5,000 for the five files of the 1,000) and 50 ranged GETs. 0 retried, 0 with a 429, 0 with a 5xx, 0 failed, 0 unknown. Memory peak 167,702,528 bytes.
-3. **The counts** (`scripts/analyze.mjs`), with `--network none`. Memory peak 205,971,456 bytes.
+1. **The population** (`scripts/population.mjs`).
+2. **The requests** (`scripts/measure.mjs`): 2026-11-02T09:29:13Z to 09:52:43Z. 9,408 HEADs (4,408 for package.json, 5,000 for the five files of the 1,000) and 50 ranged GETs. 0 retried, 0 with a 429, 0 with a 5xx, 0 failed, 0 unknown.
+3. **The counts** (`scripts/analyze.mjs`), with `--network none`.
 
 To run again (Git Bash, `MSYS_NO_PATHCONV=1`), with `B` this folder and `IMG` the image above:
 

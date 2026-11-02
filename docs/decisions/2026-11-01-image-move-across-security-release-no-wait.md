@@ -29,7 +29,7 @@ On main 4aefb22, `imageMove` in packages/cli/src/security/php.ts (used for both 
 
 ## What this record does not change
 
-- CLAUDE.md. Its wait table (Product) has no exception for decision B or for this move. The brain's item 6 asks for CLAUDE.md:33 to say it as well; that sentence is not in this PR (see its description), so CLAUDE.md does not yet say it.
+- CLAUDE.md, by this record alone. The PR that adds this record also adds the sentence: from that merge, CLAUDE.md's Product says that a security release in an official runtime's line, and an official image's move across one, become a PR without waiting (docs/decisions/2026-11-01-claude-md-catches-up-lc0a.md, sentence 6; `git grep -c "move across one" CLAUDE.md` gives CLAUDE.md:1).
 - The wait table and any gate's numeric criteria.
 - The wait of automatic merge, which decision B leaves to be decided separately.
 

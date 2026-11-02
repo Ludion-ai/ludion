@@ -90,6 +90,7 @@ The tables below translate the record's. The "Today" column gives the record's v
 - Gate 3, "it starts": `patch` runs the runtime's version check in the built image and then the project's test (patch.ts); it does not start the project. How gate 3 is to check that it starts is not decided.
 - The Goal's official image, "the newest release of its line that Docker still builds in the project's variant": `imageMove` (php.ts) asks Docker Hub only about the tag of the newest release on the official list; without that tag it stops, and it looks for no older release of the variant.
 - A container that counts as the host: nothing refuses one where agents work. The host guard (.claude/hooks/guard.mjs) does not read a `docker run`'s mounts, and tools/records/test/bench-socket.test.ts catches only installs in the bench scripts. `ludion`'s own containers (packages/sandbox/src/docker.ts) are given neither the socket nor a mount of the work tree.
+- A hijacked official tag: CLAUDE.md (Product) says an official image's move is not caught before the PR, and README.md, packages/cli/README.md and the site do not say so yet (`git grep -iE 'hijack|takeover|compromis|乗っ取'` finds only npm's case in the READMEs, and nothing in apps/site/src).
 
 ### The former working list (until 2026-11-01)
 

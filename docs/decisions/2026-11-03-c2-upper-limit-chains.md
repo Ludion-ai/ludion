@@ -4,7 +4,7 @@
 
 Short names: `reading` is docs/decisions/2026-11-02-c2-counting-reading.md, cited as "line N" for the numbered lines of its section 2. `c2-definition` is docs/decisions/2026-11-02-c2-definition.md, `shadow-counting.md` is docs/decisions/2026-10-29-shadow-counting.md, `final.md` is docs/decisions/2026-11-02-definition-of-complete-final.md, `unit.md` is docs/decisions/2026-10-31-independent-unit-of-counts.md, and `replay.ts` is tools/shadow/src/replay.ts. Lines of code and records are as read at main, 4718d34ecef5451876ea53a9dcfaca2e1f3bee7e. Times are JST.
 
-**Who decided.** Sections 1 to 4 are the judgement of 2026-11-03 03:48 JST. The owner's OK of it: 不明. Sentences under the heading "This lane's notes" are this lane's and decide nothing.
+**Who decided.** Sections 1 to 4 are the judgement of 2026-11-03 03:48 JST, as this lane's brief gives it, except what the next two sentences name. The reasons under Why, the form of the line in section 4, its sentence on a miss in more than one row and the choice of 8, 34 and 158 as numerators are this lane's. So are the file:line citations and the sentences that tie a rule to an earlier record or say what the shares cover. The owner's OK of it: 不明. Sentences under the heading "This lane's notes" are this lane's and decide nothing.
 
 **What this record does.** It does not edit `reading`, c2-definition or shadow-counting.md. It adds a rule for n, which replaces "n is k" in c2-definition:19, and it changes lines 4, 6 and 9 of `reading`. The other lines of `reading` stand. It does not change CLAUDE.md, the wait table or any gate's numeric criteria. C2's line stays 0 misses.
 
@@ -17,7 +17,7 @@ Short names: `reading` is docs/decisions/2026-11-02-c2-counting-reading.md, cite
 - **The 7 days do not change after results are seen.**
 - **A chain is not a finding that its versions are one mechanism.** If different mechanisms fall into one chain, that is written in a note and n stays as it is. The limit then comes out higher, which is the honest side.
 
-Why: for versions on different packages, line 7 has only an alias to join them. In the wave of 2025-09-08, 17 versions on watched names have 17 MAL- ids and 17 package names, and they were published within 8 minutes (docs/bench/2026-10-28-judge-backtest/malicious.json; the first by time is at :3397 and the last at :3637). The rows hold no alias field, so whether any record has an alias is 不明 from this data. If no alias joins them, line 7 alone can count them as 17 attacks. As k, that gives a limit of 16.2%. As one chain, n = 1 gives 95%.
+Why: for versions on different packages, the field line 7 can read is the alias; its other word has no field in OSV, as the judgement says (section 5). In the wave of 2025-09-08, 17 versions on watched names have 17 MAL- ids and 17 package names, and they were published within 8 minutes (docs/bench/2026-10-28-judge-backtest/malicious.json; the first by time is at :3397 and the last at :3637). The rows hold no alias field, so whether any record has an alias is 不明 from this data. If no alias joins them, line 7 alone can count them as 17 attacks. As k, that gives a limit of 16.2%. As one chain, n = 1 gives 95%.
 
 ### This lane's notes
 

@@ -240,6 +240,7 @@ describe("C2's count (docs/decisions/2026-11-03-c2-upper-limit-chains.md)", () =
     expect(record.toLowerCase()).not.toContain("campaign");
     // A chain, not a span: 12 days in steps of 6 is one chain. Exactly 7 days joins; a millisecond more does not.
     expect(nOf([at(12 * DAY), at(0), at(6 * DAY)])).toBe(1);
+    expect(nOf([at(30 * DAY), at(0)])).toBe(2);
     expect(nOf([at(0), at(7 * DAY)])).toBe(1);
     expect(nOf([at(0), at(7 * DAY + 1)])).toBe(2);
     // False-report candidates alone are not in n. In a chain with a counted version, they stay in it and can join two.

@@ -4,10 +4,11 @@ What Ludion does today, what is missing before it is complete, and what waits fo
 
 ## Release
 
-Not released. Nothing is released until Ludion is complete (CLAUDE.md, Goal; docs/decisions/2026-10-29-security-agent-no-release-until-complete.md), apart from one release in PR mode from 2026-11-30, for npm only, when CI is green, every row of C6's table passes and no safety finding is open. It has not happened (docs/decisions/2026-11-02-policy-into-claude-md.md). Automatic merge also needs (a) and C2's result (CLAUDE.md, Product):
+Not released. Nothing is released until Ludion is complete (CLAUDE.md, Goal; docs/decisions/2026-10-29-security-agent-no-release-until-complete.md), apart from one release in PR mode from 2026-11-30, for npm only, when CI is green, every row of C6's table passes and no safety finding is open. It has not happened (docs/decisions/2026-11-02-policy-into-claude-md.md). Automatic merge also needs code that passed C1-1, C4 and C5, and C2's result with at least 100 decided judgements (CLAUDE.md, Product; the owner, 2026-11-02 18:36 JST):
 
-- (a) is not shown met: unknowns remain in backtest v5 (docs/bench/2026-10-28-backtest-v5), and the one malicious version it still misses is one v5 counts as disputed, shown apart.
-- C2 has no result yet. The shadow's recorder runs (docs/progress/2026-10-29-ls-shadow-recording-start.md) and the replay that judges what it captures is built (tools/shadow, #194). The old condition (b), four consecutive weeks and 100 decided judgements, is no longer a condition since the owner's decision of 2026-11-02; it stays counted after release, as a record.
+- C1-1 (docs/decisions/2026-11-02-definition-of-complete-final.md, the CI test that stops past attacks) is not shown met: nothing in packages, tools or .github names it, and unknowns remain in backtest v5 (docs/bench/2026-10-28-backtest-v5), where the one malicious version it still misses is one v5 counts as disputed, shown apart.
+- C4 is not measured and C5 is not built (the Safety table below).
+- C2 has no result yet. The shadow's recorder runs (docs/progress/2026-10-29-ls-shadow-recording-start.md) and the replay that judges what it captures is built (tools/shadow, #194). The old conditions (a) and (b) are gone: (b)'s four consecutive weeks stay counted after release as a record, and its 100 decided judgements stay as a check that the recorder runs.
 
 The preview's conditions of 2026-10-28 (L1, L9 and LP, in docs/decisions/2026-10-28-release-gates-by-stage.md) no longer release anything.
 
@@ -48,6 +49,8 @@ The tables below translate the record's. The "Today" column gives the record's v
 | C4 Does not break | After applying, the rate at which the build, the tests or the start broke. The sample is made like the projects of the people Ludion is to protect (strata: left open). 1 to 3 per project | 1% or less (95%). With 0 broken, 299 | Not measured |
 | C5 Reverts what breaks | After an automatic merge, when main's CI or deployment fails, Ludion reverts it by itself. 1 fix = 1 commit = 1 PR | In trials, every case that should be reverted is reverted. The lock is the same as before | Not built |
 | C6 The safety rules | For each rule of "Ludion must not become the attack path", a check that fails when it is broken | Every rule has one. 0 places a job that runs candidates can write to | Not met (the cache hole) |
+
+This table keeps the 2026-11-01 record's words. Since 2026-11-02, C2's line is per attack, with k always written and k=0 passing, and automatic merge needs C1-1, C4 and C5 (CLAUDE.md, Product).
 
 C6's table of rule and check does not exist yet as a file or a test, so the condition of the release in PR mode that every row passes (CLAUDE.md, Goal) cannot be met yet. Its first rows, from CLAUDE.md (Product; docs/decisions/2026-11-02-policy-into-claude-md.md):
 
@@ -109,7 +112,8 @@ Since 2026-11-02 (LPOLPR; `git grep -iE` on packages/cli/src, action and action.
 - The apply setting, its default of auto and automatic merge: not built (the Not built list above). Today the default only validates, and `--apply` makes a branch.
 - The stop file and automatic revert: not built (`stop.file|stopfile`: 0; the one `revert` is a comment on gate 4).
 - Dependabot: the two places that name it are `ludion judge`'s and gate 4's comments on an existing update. Nothing writes the link line on Ludion's PR, and no workflow starts on a Dependabot PR.
-- The attack as the unit of (a), with k and the 95% upper bound: docs/bench/2026-10-28-backtest-v5 counts versions.
+- The attack as the unit, with k and the 95% upper bound: docs/bench/2026-10-28-backtest-v5 counts versions.
+- C1-1 as a CI test: nothing names it (`C1-1` on packages, tools and .github: 0).
 - npm only: not built. action/patch-workflow.yml looks at the saved policy's ecosystem and does not keep to npm, and no test fails when the Action runs another. The READMEs and the site still name Composer (`git grep -c -i composer`: README.md 8, packages/cli/README.md 8, apps/site/src/strings/en.ts 11, ja.ts 11).
 
 ### The former working list (until 2026-11-01)

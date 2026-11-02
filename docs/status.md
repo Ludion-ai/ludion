@@ -53,18 +53,24 @@ The tables below translate the record's. The "Today" column gives the record's v
 
 This table keeps the 2026-11-01 record's words. Since 2026-11-02, C2's line is per attack, with k always written and k=0 passing, and automatic merge needs C1-1, C4 and C5 (CLAUDE.md, Product).
 
-C6's table of rule and check does not exist yet as a file or a test, so the condition of the release in PR mode that every row passes (CLAUDE.md, Goal) cannot be met yet. Its first rows; the first three are from CLAUDE.md (Product; docs/decisions/2026-11-02-policy-into-claude-md.md), and each of the others says where it is from:
+C6's table of rule and check is the one below. Only its form is tested so far (`c6-row-has-effect-column`, tools/records/test/c6-table.test.ts), and `c6-table-has-every-rule` is not written, so the condition of the release in PR mode (CLAUDE.md, Goal) cannot be met yet. Its first rows; the first three are from CLAUDE.md (Product; docs/decisions/2026-11-02-policy-into-claude-md.md), and each of the others says where it is from.
 
-| Check | Rule | Test |
-|---|---|---|
-| `stop-file-owner-only` | Only the owner writes the stop file; automation only notifies | Not written |
-| `stop-file-unreadable-holds` | A stop file that cannot be read holds automatic merge; the PR waits for the next run | Not written |
-| `crawl-failure-does-not-revert` | A failed production crawl notifies and stops that repository's automatic merge, and reverts nothing | Not written |
-| `action-runs-npm-only` | The Action fixes npm only: v1 does not fix official PHP or Node.js images or Composer (CLAUDE.md, Goal) | Not written |
-| `candidate-cache-not-read-from-main` | A job that runs candidates runs on a ref other than the default branch, and main reads no cache written there; whether this holds is to be confirmed in a trial repository (docs/decisions/2026-11-02-definition-of-complete-final.md, C6) | Not written |
-| `public-sentences-match-scope` | The READMEs and the site name no scope wider than v1's, npm only (CLAUDE.md, Goal), and no sentence describes what is not built (C16) | Not written |
-| `c6-table-has-every-rule` | Every rule of "Ludion must not become the attack path" has a row in this table, and a row with no check file fails (C6; docs/decisions/2026-11-02-definition-of-complete-final.md, C6) | Not written |
-| `action-does-not-comment-on-dependabot-pr` | The Action writes nothing on a PR whose author is dependabot[bot] (CLAUDE.md, Product: it never touches a Dependabot PR) | Not written |
+The condition of 2026-11-30 is that every row whose 効く時 is PR モード passes, and the rows whose 効く時 is 自動マージ pass before the SHA of 2026-12-02 (the judgement of 2026-11-03 03:48 JST).
+
+| Check | Rule | 効く時 | Test |
+|---|---|---|---|
+| `stop-file-owner-only` | Only the owner writes the stop file; automation only notifies | 自動マージ | Not written |
+| `stop-file-unreadable-holds` | A stop file that cannot be read holds automatic merge; the PR waits for the next run | 自動マージ | Not written |
+| `crawl-failure-does-not-revert` | A failed production crawl notifies and stops that repository's automatic merge, and reverts nothing | 自動マージ | Not written |
+| `action-runs-npm-only` | The Action fixes npm only: v1 does not fix official PHP or Node.js images or Composer (CLAUDE.md, Goal) | PR モード | Not written |
+| `candidate-cache-not-read-from-main` | A job that runs candidates runs on a ref other than the default branch, and main reads no cache written there; whether this holds is to be confirmed in a trial repository (docs/decisions/2026-11-02-definition-of-complete-final.md, C6) | PR モード | Not written |
+| `public-sentences-match-scope` | The READMEs and the site name no scope wider than v1's, npm only (CLAUDE.md, Goal), and no sentence describes what is not built (C16) | PR モード | Not written |
+| `c6-table-has-every-rule` | Every rule of "Ludion must not become the attack path" has a row in this table, and a row with no check file fails (C6; docs/decisions/2026-11-02-definition-of-complete-final.md, C6) | PR モード | Not written |
+| `action-does-not-comment-on-dependabot-pr` | The Action writes nothing on a PR whose author is dependabot[bot] (CLAUDE.md, Product: it never touches a Dependabot PR) | PR モード | Not written |
+| `pr-mode-has-no-merge-call` | The source of the Action and the CLI has no call to a merge API. It is searched as text, so a call put together at run time is not seen (CLAUDE.md, Goal: the release is in PR mode) | PR モード | `tools/records/test/c6-table.test.ts` |
+| `pr-changes-no-workflow-file` | The PR job refuses an artifact whose fix changes a workflow file (the judgement of 2026-11-03 03:48 JST) | PR モード | `packages/cli/test/deliver.test.ts` ("a receipt that lists a file a fix may not change") |
+| `self-update-never-auto-merged` | Updates to ludion-ai itself in users' projects are never auto-merged (CLAUDE.md, Ludion must not become the attack path) | 自動マージ | 未実装 |
+| `v1-stops-on-other-lockfile` | In v1, Ludion applies no fix to a project that has a lockfile other than package-lock.json at its root, or whose packageManager is not npm, and stops, writing the reason (docs/decisions/2026-11-02-lockfile-scope-v1.md, decision 3). The code does not do this yet | PR モード | 未実装 |
 
 ### Speed, running on its own, human work
 
@@ -93,7 +99,7 @@ Since 2026-11-02 the first release covers npm only: official PHP and Node.js ima
 | Kind | Ludion today | In "complete" (proposal; Maven and npm's lockfiles decided) |
 |---|---|---|
 | npm (package-lock.json) | Fixes. The only one that goes through gate 2's judgement | In |
-| npm (pnpm, yarn and bun locks) | Not fixed. The scan reads pnpm-lock.yaml and yarn.lock, and the judge reads pnpm-lock.yaml (never ready); bun's are not read. A project with package-lock.json at its root is not stopped by pnpm-lock.yaml, yarn.lock or a bun lockfile there (the PR job refuses one with npm-shrinkwrap.json) or by packageManager, which nothing reads (the lines read: docs/decisions/2026-11-02-lockfile-scope-v1.md). One day's count at the root of public repositories with a package.json and a default-branch push in GH Archive's files of 2026-10-25 (n = 1,000, weighted, 95% interval; files as answered on 2026-11-02; docs/progress/2026-11-02-llock-lockfile-one-day.md): package-lock.json 64.0% (60.2–67.6), package-lock.json with none of the other four 61.0% (57.1–64.7), pnpm-lock.yaml 15.5% (12.9–18.5), bun 5.4% (3.9–7.4), yarn.lock 1.5% (0.8–2.8), none of these 16.7% (14.0–19.8); packageManager was not measured | Out of v1; after v1 not decided (the owner, 2026-11-02; docs/decisions/2026-11-02-lockfile-scope-v1.md). Decided, not yet in the code: in v1, Ludion applies no fix to a project that has a lockfile other than package-lock.json at its root, or whose packageManager is not npm, and stops, writing the reason (the owner, 2026-11-02 23:06 JST; same record) |
+| npm (pnpm, yarn and bun locks) | Not fixed. The scan reads pnpm-lock.yaml and yarn.lock, and the judge reads pnpm-lock.yaml (never ready); bun's are not read. A project with package-lock.json at its root is not stopped by pnpm-lock.yaml, yarn.lock or a bun lockfile there (the PR job refuses one with npm-shrinkwrap.json) or by packageManager, which nothing reads (the lines read: docs/decisions/2026-11-02-lockfile-scope-v1.md). One day's count at the root of public repositories with a package.json and a default-branch push in GH Archive's files of 2026-10-25 (n = 1,000, weighted, 95% interval; files as answered on 2026-11-02; docs/progress/2026-11-02-llock-lockfile-one-day.md): package-lock.json 64.0% (60.2–67.6), package-lock.json with none of the other four 61.0% (57.1–64.7), pnpm-lock.yaml 15.5% (12.9–18.5), bun 5.4% (3.9–7.4), yarn.lock 1.5% (0.8–2.8), none of these 16.7% (14.0–19.8); packageManager was not measured | Out of v1; after v1 not decided (the owner, 2026-11-02; docs/decisions/2026-11-02-lockfile-scope-v1.md). Decided, not yet in the code: in v1, Ludion applies no fix to a project that has a lockfile other than package-lock.json at its root, or whose packageManager is not npm, and stops, writing the reason (the owner, 2026-11-02 23:06 JST; same record; C6's row `v1-stops-on-other-lockfile`) |
 | The official PHP and Node.js images (rebuilds of the same tag too) | Moves to the newest release of the line that Docker still builds | In |
 | Composer | Fixes. Does not go through gate 2's judgement | In. If LV0 shows few PHP projects, later in the order |
 | Maven | Read-only scan. `init`, `patch`, `watch` and the PR job refuse it (LMVN) | Out (the owner's OK, 2026-11-01 13:09 JST; the read-only check stays). Whether and when Maven's code is removed is not decided; it stays in the tree, no longer reached from those commands |

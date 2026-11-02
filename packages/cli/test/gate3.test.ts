@@ -1,8 +1,10 @@
 // Gate 3's new type, without Docker: the definition's table (docs/decisions/2026-11-02-gate-3-type-definition.md), the
 // reading of what the box prints, and the failure paths of one judgement. The real runs are in gate3-docker.test.ts.
+import { createHash } from "node:crypto";
+import { EventEmitter } from "node:events";
 import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join, posix, resolve } from "node:path";
 import { runInNewContext, Script } from "node:vm";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { ContainerOutcome } from "../../sandbox/src/docker.ts";
@@ -231,6 +233,36 @@ describe("what goes into the box", () => {
     expect(BOX_DRIVER).not.toContain("--remote-debugging-port");
     // Only a loopback address, and no address on the network.
     expect(BOX_DRIVER.match(/https?:\/\/[^"' ]+/g)).toEqual(["http://127.0.0.1:"]);
+  });
+
+  it("gate3-fits-box-at-50-pages: webpack's cache folder, and nothing else, is read-only before the build starts", async () => {
+    // The driver itself, with Node.js's modules stood in for: the measurement on real builds is in the progress record.
+    const events: string[] = [];
+    let printed = "";
+    const missing = () => { throw new Error("not in this stand-in"); };
+    const fs = {
+      readFileSync: (path: string) => path === "/ludion/config.json" ? JSON.stringify({ env: {}, freeze: "" }) : missing(),
+      readdirSync: () => [], copyFileSync: () => {}, symlinkSync: () => {},
+      mkdirSync: (path: string) => { events.push(`mkdir ${path}`); },
+      chmodSync: (path: string, mode: number) => { events.push(`chmod ${mode.toString(8)} ${path}`); },
+    };
+    const spawn = (_program: string, args: string[]) => {
+      events.push(`spawn ${args[args.length - 1]}`);
+      const child = new EventEmitter();
+      setImmediate(() => child.emit("close", 1));
+      return child;
+    };
+    const modules: Record<string, unknown> = { "node:child_process": { spawn }, "node:crypto": { createHash }, "node:fs": fs, "node:net": {}, "node:path": posix };
+    await new Promise<void>(done => {
+      const stream = { write: (text: string, callback?: () => void) => { printed += text; callback?.(); return true; } };
+      const box = { env: {}, execPath: "node", hrtime: process.hrtime, kill: () => {}, stderr: { write: () => true }, stdout: stream, exit: () => done() };
+      new Script(BOX_DRIVER).runInNewContext({ Buffer, clearTimeout, process: box, require: (name: string) => modules[name], setTimeout });
+    });
+    const cache = "/tmp/next/cache/webpack";
+    expect(events.filter(e => e.startsWith("chmod"))).toEqual([`chmod 555 ${cache}`]);
+    expect(events.indexOf(`mkdir ${cache}`)).toBeLessThan(events.indexOf(`chmod 555 ${cache}`));
+    expect(events.indexOf(`chmod 555 ${cache}`)).toBeLessThan(events.indexOf("spawn build"));
+    expect(parseRun(printed)?.build.status).toBe("failed");
   });
 
   it("the preload stops the clock and fixes the random numbers, and a date given still is that date", () => {

@@ -188,6 +188,10 @@ async function main() {
   for (const name of fs.readdirSync("/ludion/original")) fs.copyFileSync(path.join("/ludion/original", name), path.join(SCRATCH, name));
   // What the build leaves in /tmp/next finds its packages from there, as it would from /app/.next.
   fs.symlinkSync("/app/node_modules", "/tmp/node_modules");
+  // Webpack's cache fills the box's 64 MiB /tmp, and every box is new, so it would never be read. Webpack goes on when it
+  // cannot write there. Only this folder: with all of cache read-only, the build stops on its .tsbuildinfo.
+  fs.mkdirSync(path.join(DIST, "cache", "webpack"), { recursive: true });
+  fs.chmodSync(path.join(DIST, "cache", "webpack"), 0o555);
 
   out.build = await step(process.execPath, [NEXT, "build"], frozenEnv, 8 * MINUTE);
   if (out.build.status !== "passed") return out;

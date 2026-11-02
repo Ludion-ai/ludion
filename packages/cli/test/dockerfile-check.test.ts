@@ -1,11 +1,13 @@
-// The Dockerfile check reads a file in the order BuildKit does, and the lock and Dockerfile readers decide in linear time
-// (docs/mistakes/2026-11-02-dockerfile-check-not-as-buildkit-reads.md). Nothing here runs Docker. Which forms were built
+// The Dockerfile check reads a file in the order BuildKit does (docs/mistakes/2026-11-02-dockerfile-check-not-as-buildkit-reads.md).
+// For the input shapes listed here, the lock and Dockerfile readers' time grows less than 8 times from n to 4n, at the
+// sizes listed here; that says nothing of any other shape or size, and one lock shape is quadratic in a key's length
+// (lock-key-many-deps; docs/mistakes/2026-11-02-linear-said-with-fixed-ms.md). Nothing here runs Docker. Which forms were built
 // once with `docker build --network=none --pull=false`, and what it did, is in docs/progress/2026-11-02-ldock-dockerfile-check.md.
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
-import { runInNewContext } from "node:vm";
-import { describe, expect, it } from "vitest";
-import { lockEntries, lockExtraneous, lockKey, lockLinks, readLock } from "../src/security/judge.ts";
+import { createContext, runInContext } from "node:vm";
+import { afterAll, describe, expect, it } from "vitest";
+import { lockEntries, lockExtraneous, lockKey, lockLinks, readLock, resolveFrom } from "../src/security/judge.ts";
 import { packageLockInputs } from "../src/security/judge-cli.ts";
 import { namesNodeImage, nodeImage } from "../src/security/node.ts";
 import { officialImage, phpImage, replaceImage, type RuntimeImage } from "../src/security/php.ts";
@@ -222,76 +224,137 @@ describe("namesNodeImage finds a FROM behind whitespace or a continuation, so it
   });
 });
 
-const LIMIT_DOCKERFILE_MS = 50, LIMIT_LOCK_MS = 1000, LIMIT_LOCK_INPUTS_MS = 4000;
+/** The line for "grows as n does, here": a time that grows with n gives a ratio near 4 from n to 4n, and with n² near 16. */
+const RATIO_LINE = 8, SAMPLES = 7, FEWEST_SAMPLES = 3, MIN_SAMPLE_MS = 4;
 /**
- * Calls fn under a limit Node's VM enforces, as in time-cap-composer-name.test.ts, so an expression that backtracks fails
- * the test at the limit and does not hang it. A busy machine can pause one try, so it gets three; backtracking fails all
- * three. A refusal is an answer: what counts is that the answer came in time.
+ * Stop a run that would hang, as a backtracking expression's would: synchronous code cannot be stopped by the test's own
+ * timeout. The guards are for one sample, and the budget ends the samples of one measure early, so a reader that has
+ * become slow on every shape fails the test before the CI job's own limit ends it. None of the three says anything
+ * about how the time grows; the ratio does that.
  */
-function answersWithin(limit: number, fn: () => unknown): void {
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      runInNewContext("call()", { call: () => { try { fn(); } catch { /* a refusal */ } } }, { timeout: limit });
-      return;
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ERR_SCRIPT_EXECUTION_TIMEOUT") throw error;
-    }
+const GUARD_DOCKERFILE_MS = 5_000, GUARD_LOCK_MS = 30_000, MEASURE_BUDGET_MS = 15_000;
+const median = (values: number[]) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)]!;
+
+const guardContext = createContext({ call: () => {} });
+/** How long `calls` calls of fn take, in ms. A refusal is an answer, and counts as one. */
+function timed(fn: () => unknown, calls: number, guard: number): number {
+  let took = 0;
+  (guardContext as { call: () => void }).call = () => {
+    const start = performance.now();
+    for (let i = 0; i < calls; i++) { try { fn(); } catch { /* a refusal */ } }
+    took = performance.now() - start;
+  };
+  try {
+    runInContext("call()", guardContext, { timeout: guard });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ERR_SCRIPT_EXECUTION_TIMEOUT") throw error;
+    throw new Error(`No answer in ${guard} ms, where the guard stopped it.`);
   }
-  throw new Error(`Over ${limit} ms in each of 3 tries.`);
+  return took;
 }
 
-const KIB64 = 64 * 1024;
-/** `unit` repeated, with `before` and `after` round it, to just under the 64 KiB the check reads. */
-const fill = (unit: string, before = "", after = "") => `${before}${unit.repeat(Math.floor((KIB64 - before.length - after.length) / unit.length))}${after}`;
-describe("the Dockerfile readers decide 64 KiB in linear time", () => {
-  it.each<[string, string]>([
-    ["line feeds", fill("\n")],
-    ["spaces", fill(" ")],
-    ["spaces, then a line that is not a directive", fill(" ", "", "x")],
-    ["CRLF pairs", fill("\r\n")],
-    ["U+0085", fill("\u0085")],
-    ["lines of a space", fill(" \n")],
-    ["COPY and spaces", fill(" ", `${PHP}\nCOPY`, "x")],
-    ["line feeds, COPY and spaces: the old expression was cubic here", `${PHP}${"\n".repeat(32_000)}COPY${" ".repeat(32_000)}x`],
-    ["line feeds, RUN and spaces: the old expression was cubic here", `${PHP}${"\n".repeat(32_000)}RUN${" ".repeat(32_000)}x`],
-    ["COPY, tabs and spaces", fill(" \t", `${PHP}\nCOPY `, "x")],
-    ["RUN and spaces", fill(" ", `${PHP}\nRUN`, "x")],
-    ["RUN and runs of --network", fill("--network", `${PHP}\nRUN `)],
-    ["COPY and runs of --fro", fill("--fro", `${PHP}\nCOPY `)],
-    ["COPY and quotes", fill('"', `${PHP}\nCOPY --`)],
-    ["ADD and spaces", fill(" ", `${PHP}\nADD`)],
-    ["many COPY lines", fill("COPY \n", `${PHP}\n`)],
-    ["# and spaces", fill(" ", "#", "x")],
-    ["lines of #", fill("#\n")],
-    ["lines of //", fill("//\n")],
-    ["lines of # and spaces, with no directive", fill("# \n \n")],
-    ["# syntax and spaces", fill(" ", "# syntax", "x")],
-    ["many FROM lines", fill("FROM x\n")],
-    ["FROM and spaces", fill(" ", "FROM")],
-    ["FROM and spaces, then an image", fill(" ", "FROM ", "php:8.4.25-cli")],
-    ["FROM and a long image", fill("a", "FROM ")],
-    ["FROM and a long flavor", fill("a-", "FROM php:8.4.25-cli-", "!")],
-    ["FROM, flags and spaces", fill("--a ", "FROM ", "x")],
-    ["FROM, flags and form feeds", fill("--a\f", "FROM ", "x")],
-    ["FROM, flags and carriage returns", fill("--a\r", "FROM ", "x")],
-    ["FROM and carriage returns", fill("FROM\r")],
-    ["FROM and form feeds", fill("\f", "FROM", "x")],
-    ["a run of carriage returns", fill("\r")],
-    ["a run of carriage returns, then a letter", fill("\r", "FROM \\", "x")],
-    ["two carriage returns and a line feed, many times", fill("\r\r\n")],
-    ["a backslash and CRLF, many times", fill("\\\r\n")],
-    ["a comment and CRLF, many times", fill("#\r\n")],
-    ["backslashes and spaces", fill("\\ ")],
-    ["a backslash and spaces to the end", fill(" ", `${PHP}\n\\`)],
-    ["backticks and spaces", fill("` ")],
-    ["backslash-newline pairs", fill("\\\n")],
-    ["a line of many words", fill("a ", `${PHP}\nRUN `)],
-  ])("gate-reader-linear: %s", (_name, text) => {
-    expect(text.length).toBeLessThanOrEqual(KIB64);
-    answersWithin(LIMIT_DOCKERFILE_MS, () => phpImage(text));
-    answersWithin(LIMIT_DOCKERFILE_MS, () => nodeImage(text));
-    answersWithin(LIMIT_DOCKERFILE_MS, () => namesNodeImage(text));
-  });
+/**
+ * The time of `atN` and of `at4N`, which read the same shape at n and 4n, each the median of up to SAMPLES samples taken
+ * in turn, so a slow moment falls on both. A sample repeats the call often enough that the smaller takes MIN_SAMPLE_MS,
+ * and both repeat it the same number of times, as a reader's 64 KiB limit leaves no larger n. The first round of samples
+ * is thrown away, as the code is still warming up.
+ */
+function ratioOf(atN: () => unknown, at4N: () => unknown, guard: number) {
+  const started = performance.now();
+  timed(atN, 1, guard);
+  timed(at4N, 1, guard);
+  const once = Math.min(timed(atN, 1, guard), timed(atN, 1, guard), timed(atN, 1, guard));
+  const calls = Math.max(1, Math.ceil(MIN_SAMPLE_MS / Math.max(once, 0.0001)));
+  const small: number[] = [], large: number[] = [];
+  timed(atN, calls, guard);
+  timed(at4N, calls, guard);
+  for (let sample = 0; sample < SAMPLES && (sample < FEWEST_SAMPLES || performance.now() - started < MEASURE_BUDGET_MS); sample++) {
+    small.push(timed(atN, calls, guard));
+    large.push(timed(at4N, calls, guard));
+  }
+  return { ratio: median(large) / median(small), atN: median(small) / calls, at4N: median(large) / calls, calls };
+}
+
+// One line for each measure, so that a run's log shows how close each came to its line.
+const measured: string[] = [];
+const measure = (name: string, atN: () => unknown, at4N: () => unknown, guard: number) => {
+  const result = ratioOf(atN, at4N, guard);
+  measured.push(`${result.ratio.toFixed(2)}\t${result.atN.toFixed(4)} ms\t${result.at4N.toFixed(4)} ms\t${result.calls}\t${name}`);
+  return result;
+};
+afterAll(() => {
+  console.log(["scaling ratios: ratio, a call at n, a call at 4n, calls in a sample, what", ...measured].join("\n"));
+});
+
+let controlSum = 0;
+describe("the ratio tells these two apart on this machine", () => {
+  const text = "ab".repeat(16_000), scan = (size: number) => { for (let i = 0; i < size; i++) controlSum += text.charCodeAt(i); };
+  const scanEachPrefix = (size: number) => { for (let i = 0; i < size; i++) for (let j = 0; j <= i; j++) controlSum += text.charCodeAt(j); };
+  it("gate-reader-scaling-ratio-control: a scan of n gives under the line", () => {
+    expect(measure("control: a scan of 8,000, then 32,000", () => scan(8_000), () => scan(32_000), GUARD_DOCKERFILE_MS).ratio).toBeLessThan(RATIO_LINE);
+  }, 60_000);
+  it("gate-reader-scaling-ratio-control: a scan of each prefix of n, which is n², gives over the line", () => {
+    expect(measure("control: a scan of each prefix of 2,000, then 8,000", () => scanEachPrefix(2_000), () => scanEachPrefix(8_000), GUARD_DOCKERFILE_MS).ratio).toBeGreaterThanOrEqual(RATIO_LINE);
+    expect(controlSum).toBeGreaterThan(0);
+  }, 60_000);
+});
+
+const KIB16 = 16 * 1024, KIB64 = 64 * 1024;
+/** `unit` repeated, with `before` and `after` round it, to just under `size`. */
+const fill = (size: number, unit: string, before = "", after = "") => `${before}${unit.repeat(Math.floor((size - before.length - after.length) / unit.length))}${after}`;
+/** Up to 32,000 of a line feed and of a space at 64 KiB, the shape the old expression was cubic on, with 8,000 at 16 KiB. */
+const half = (size: number) => Math.floor(size * 32_000 / KIB64);
+describe("the Dockerfile readers' time grows less than 8 times from 16 KiB to 64 KiB, on these shapes", () => {
+  it.each<[string, (size: number) => string]>([
+    ["line feeds", size => fill(size, "\n")],
+    ["spaces", size => fill(size, " ")],
+    ["spaces, then a line that is not a directive", size => fill(size, " ", "", "x")],
+    ["CRLF pairs", size => fill(size, "\r\n")],
+    ["U+0085", size => fill(size, "\u0085")],
+    ["lines of a space", size => fill(size, " \n")],
+    ["COPY and spaces", size => fill(size, " ", `${PHP}\nCOPY`, "x")],
+    ["line feeds, COPY and spaces", size => `${PHP}${"\n".repeat(half(size))}COPY${" ".repeat(half(size))}x`],
+    ["line feeds, RUN and spaces", size => `${PHP}${"\n".repeat(half(size))}RUN${" ".repeat(half(size))}x`],
+    ["COPY, tabs and spaces", size => fill(size, " \t", `${PHP}\nCOPY `, "x")],
+    ["RUN and spaces", size => fill(size, " ", `${PHP}\nRUN`, "x")],
+    ["RUN and runs of --network", size => fill(size, "--network", `${PHP}\nRUN `)],
+    ["COPY and runs of --fro", size => fill(size, "--fro", `${PHP}\nCOPY `)],
+    ["COPY and quotes", size => fill(size, '"', `${PHP}\nCOPY --`)],
+    ["ADD and spaces", size => fill(size, " ", `${PHP}\nADD`)],
+    ["many COPY lines", size => fill(size, "COPY \n", `${PHP}\n`)],
+    ["# and spaces", size => fill(size, " ", "#", "x")],
+    ["lines of #", size => fill(size, "#\n")],
+    ["lines of //", size => fill(size, "//\n")],
+    ["lines of # and spaces, with no directive", size => fill(size, "# \n \n")],
+    ["# syntax and spaces", size => fill(size, " ", "# syntax", "x")],
+    ["many FROM lines", size => fill(size, "FROM x\n")],
+    ["FROM and spaces", size => fill(size, " ", "FROM")],
+    ["FROM and spaces, then an image", size => fill(size, " ", "FROM ", "php:8.4.25-cli")],
+    ["FROM and a long image", size => fill(size, "a", "FROM ")],
+    ["FROM and a long flavor", size => fill(size, "a-", "FROM php:8.4.25-cli-", "!")],
+    ["FROM, flags and spaces", size => fill(size, "--a ", "FROM ", "x")],
+    ["FROM, flags and form feeds", size => fill(size, "--a\f", "FROM ", "x")],
+    ["FROM, flags and carriage returns", size => fill(size, "--a\r", "FROM ", "x")],
+    ["FROM and carriage returns", size => fill(size, "FROM\r")],
+    ["FROM and form feeds", size => fill(size, "\f", "FROM", "x")],
+    ["a run of carriage returns", size => fill(size, "\r")],
+    ["a run of carriage returns, then a letter", size => fill(size, "\r", "FROM \\", "x")],
+    ["two carriage returns and a line feed, many times", size => fill(size, "\r\r\n")],
+    ["a backslash and CRLF, many times", size => fill(size, "\\\r\n")],
+    ["a comment and CRLF, many times", size => fill(size, "#\r\n")],
+    ["backslashes and spaces", size => fill(size, "\\ ")],
+    ["a backslash and spaces to the end", size => fill(size, " ", `${PHP}\n\\`)],
+    ["backticks and spaces", size => fill(size, "` ")],
+    ["backslash-newline pairs", size => fill(size, "\\\n")],
+    ["a line of many words", size => fill(size, "a ", `${PHP}\nRUN `)],
+  ])("gate-reader-scaling-ratio: %s", (name, shape) => {
+    const small = shape(KIB16), large = shape(KIB64);
+    expect(large.length).toBeLessThanOrEqual(KIB64);
+    for (const [reader, read] of [["phpImage", phpImage], ["nodeImage", nodeImage], ["namesNodeImage", namesNodeImage]] as const) {
+      const { ratio, atN, at4N } = measure(`${name}, ${reader}`, () => read(small), () => read(large), GUARD_DOCKERFILE_MS);
+      expect(ratio, `${reader}: ${atN} ms a call at 16 KiB, ${at4N} ms at 64 KiB`).toBeLessThan(RATIO_LINE);
+    }
+  }, 60_000);
   it("still refuses a file over 64 KiB before reading it", () => {
     expect(() => phpImage(`${PHP}\n${" ".repeat(KIB64)}`)).toThrow("exceeds 64 KiB");
   });
@@ -299,7 +362,7 @@ describe("the Dockerfile readers decide 64 KiB in linear time", () => {
 
 const LONGEST = "A package-lock path is longer than 4096 characters.";
 const lockOf = (packages: Record<string, unknown>) => JSON.stringify({ name: "a", lockfileVersion: 3, packages: { "": { name: "a" }, ...packages } });
-describe("lockKey: a key's length, and its time", () => {
+describe("lockKey: a key's length", () => {
   const exactly = (size: number) => `node_modules/${"a".repeat(size - "node_modules/".length)}`;
   it("takes a key of 4,096 characters and refuses one of 4,097, whatever its form, without repeating it", () => {
     expect(lockKey(exactly(4096), {})).toBe("install");
@@ -316,37 +379,62 @@ describe("lockKey: a key's length, and its time", () => {
     // A key of the longest size is read as any other.
     expect(lockEntries(lockOf({ [exactly(4096)]: { version: "1.0.0" } }))).toMatchObject([{ path: exactly(4096), version: "1.0.0" }]);
   });
+});
 
-  const MIB4 = 4 * 1024 * 1024;
-  /** A key the path pattern backtracks most on: every segment could start its node_modules part, and the last is out of form. */
-  const badKey = (size: number, lead = "") => `${lead}${"node_modules/a/".repeat(Math.floor((size - lead.length - 1) / "node_modules/a/".length))}!`;
-  const oneLongKey = lockOf({ [badKey(MIB4 - 256)]: { version: "1.0.0" } });
-  const oneLongFolder = lockOf({ [badKey(MIB4 - 256)]: { extraneous: true } });
-  // 4 MiB of keys of 4,096 characters, each out of form and marked extraneous: refused by nothing but read by every reader.
-  const manyExtraneous = lockOf(Object.fromEntries(Array.from({ length: 1000 }, (_, i) => [badKey(4096, `w${i}/`), { extraneous: true }])));
-  const manyInstalled = lockOf(Object.fromEntries(Array.from({ length: 1000 }, (_, i) => [`w${i}/${"node_modules/a/".repeat(270)}node_modules/z`, { version: "1.0.0" }])));
-  it.each<[string, string, () => unknown]>([
-    ["lockEntries, one key of 4 MiB", oneLongKey, () => lockEntries(oneLongKey)],
-    ["lockEntries, one extraneous key of 4 MiB", oneLongFolder, () => lockEntries(oneLongFolder)],
-    ["lockExtraneous, one extraneous key of 4 MiB", oneLongFolder, () => lockExtraneous(oneLongFolder)],
-    ["lockEntries, 1,000 extraneous keys of 4,096 characters", manyExtraneous, () => lockEntries(manyExtraneous)],
-    ["lockExtraneous, 1,000 extraneous keys of 4,096 characters", manyExtraneous, () => lockExtraneous(manyExtraneous)],
-    ["lockEntries, 1,000 install paths of about 4,096 characters", manyInstalled, () => lockEntries(manyInstalled)],
-    // 1,000 keys under the limit, read 10 times: the old expression took 2.3 s here, and this one 0.1 s.
-    ["lockKey, 10 times over 1,000 extraneous keys of 4,096 characters", manyExtraneous, () => {
-      const keys = Object.keys(readLock(manyExtraneous));
-      for (let round = 0; round < 10; round++) for (const key of keys) lockKey(key, { extraneous: true });
-    }],
-  ])("gate-reader-linear: %s", (_name, lock, read) => {
-    expect(lock.length).toBeLessThanOrEqual(MIB4);
-    answersWithin(LIMIT_LOCK_MS, read);
-  }, 30_000);
-  // Everything the judge reads from a lock change: each lock is parsed and read over and over, so this has its own limit.
-  // The old expression took 9.5 s here and this one 0.6 to 0.7 s, in the same container; GitHub's runner took over 1 s.
-  it("gate-reader-linear: packageLockInputs, 1,000 extraneous keys of 4,096 characters", () => {
-    expect(manyExtraneous.length).toBeLessThanOrEqual(MIB4);
-    answersWithin(LIMIT_LOCK_INPUTS_MS, () => packageLockInputs({ before: manyExtraneous, after: manyExtraneous }, { before: "{}", after: "{}" }));
-  }, 30_000);
+const MIB1 = 1024 * 1024, MIB4 = 4 * MIB1;
+/** A key out of form: every segment could start a node_modules part, and the last is out of form. The old expression backtracked most on this. */
+const badKey = (size: number, lead = "") => `${lead}${"node_modules/a/".repeat(Math.floor((size - lead.length - 1) / "node_modules/a/".length))}!`;
+const oneLongKey = (size: number) => lockOf({ [badKey(size - 256)]: { version: "1.0.0" } });
+const oneLongFolder = (size: number) => lockOf({ [badKey(size - 256)]: { extraneous: true } });
+/** `count` keys of `keyLength` characters, each out of form and marked extraneous: refused by nothing but read by every reader. */
+const manyExtraneous = (count: number, keyLength: number) => lockOf(Object.fromEntries(Array.from({ length: count }, (_, i) => [badKey(keyLength, `w${i}/`), { extraneous: true }])));
+const manyInstalled = (keyLength: number) => lockOf(Object.fromEntries(Array.from({ length: 1000 }, (_, i) => [`w${i}/${"node_modules/a/".repeat(Math.floor((keyLength - 32) / "node_modules/a/".length))}node_modules/z`, { version: "1.0.0" }])));
+const same = (lock: string) => () => packageLockInputs({ before: lock, after: lock }, { before: "{}", after: "{}" });
+const allKeys = (lock: string) => { const keys = Object.keys(readLock(lock)); return () => { for (const key of keys) lockKey(key, { extraneous: true }); }; };
+describe("the lock readers' time grows less than 8 times from n to 4n, on these shapes", () => {
+  // A key's length and the number of keys are two ways to grow: the old expression was quadratic only in the first.
+  it.each<[string, string, string, (lock: string) => () => unknown]>([
+    ["lockEntries, one key of 1 MiB, then 4 MiB", oneLongKey(MIB1), oneLongKey(MIB4), lock => () => lockEntries(lock)],
+    ["lockEntries, one extraneous key of 1 MiB, then 4 MiB", oneLongFolder(MIB1), oneLongFolder(MIB4), lock => () => lockEntries(lock)],
+    ["lockExtraneous, one extraneous key of 1 MiB, then 4 MiB", oneLongFolder(MIB1), oneLongFolder(MIB4), lock => () => lockExtraneous(lock)],
+    ["lockEntries, 1,000 extraneous keys of 1,024 characters, then 4,096", manyExtraneous(1000, 1024), manyExtraneous(1000, 4096), lock => () => lockEntries(lock)],
+    ["lockExtraneous, 1,000 extraneous keys of 1,024 characters, then 4,096", manyExtraneous(1000, 1024), manyExtraneous(1000, 4096), lock => () => lockExtraneous(lock)],
+    ["lockKey, 1,000 extraneous keys of 1,024 characters, then 4,096", manyExtraneous(1000, 1024), manyExtraneous(1000, 4096), allKeys],
+    ["lockEntries, 1,000 install paths of about 1,024 characters, then 4,096", manyInstalled(1024), manyInstalled(4096), lock => () => lockEntries(lock)],
+    ["packageLockInputs, 1,000 extraneous keys of 1,024 characters, then 4,096", manyExtraneous(1000, 1024), manyExtraneous(1000, 4096), same],
+    ["lockEntries, 250 extraneous keys of 4,096 characters, then 1,000", manyExtraneous(250, 4096), manyExtraneous(1000, 4096), lock => () => lockEntries(lock)],
+    ["lockExtraneous, 250 extraneous keys of 4,096 characters, then 1,000", manyExtraneous(250, 4096), manyExtraneous(1000, 4096), lock => () => lockExtraneous(lock)],
+    ["packageLockInputs, 250 extraneous keys of 4,096 characters, then 1,000", manyExtraneous(250, 4096), manyExtraneous(1000, 4096), same],
+  ])("gate-reader-scaling-ratio: %s", (name, small, large, read) => {
+    expect(large.length).toBeLessThanOrEqual(MIB4);
+    const { ratio, atN, at4N } = measure(name, read(small), read(large), GUARD_LOCK_MS);
+    expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeLessThan(RATIO_LINE);
+  }, 120_000);
+});
+
+// Not linear, and written down as it is. One install path of `segments` node_modules parts, with `deps` dependencies that
+// nothing in the lock meets, so each lookup climbs the whole path. The fix belongs in another PR; when it lands, the two
+// tests that say "16" fail, and go with this comment.
+const QUADRATIC_FROM = RATIO_LINE, QUADRATIC_BELOW = 32;
+const keyOf = (segments: number) => `${"node_modules/a/".repeat(segments)}node_modules/z`;
+const manyDeps = (segments: number, deps: number) => lockOf({ [keyOf(segments)]: { version: "1.0.0", dependencies: Object.fromEntries(Array.from({ length: deps }, (_, i) => [`d${i}`, "1.0.0"])) } });
+describe("lock-key-many-deps: one key with many dependencies is quadratic in the key's length today", () => {
+  it("lock-key-many-deps: packageLockInputs, 200 dependencies, a key of 1,019 characters, then 4,034: about 16 times, not under 8", () => {
+    const { ratio, atN, at4N } = measure("lock-key-many-deps: packageLockInputs, 200 deps, key of 1,019, then 4,034", same(manyDeps(67, 200)), same(manyDeps(268, 200)), GUARD_LOCK_MS);
+    expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeGreaterThanOrEqual(QUADRATIC_FROM);
+    expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeLessThan(QUADRATIC_BELOW);
+  }, 120_000);
+  it("lock-key-many-deps: resolveFrom alone, a key of 1,019 characters, then 4,034: about 16 times, not under 8", () => {
+    const none = new Map<string, unknown>(), at = (segments: number) => `${keyOf(segments)}/`;
+    const small = at(67), large = at(268);
+    const { ratio, atN, at4N } = measure("lock-key-many-deps: resolveFrom alone, key of 1,019, then 4,034", () => resolveFrom(none, small, "d"), () => resolveFrom(none, large, "d"), GUARD_LOCK_MS);
+    expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeGreaterThanOrEqual(QUADRATIC_FROM);
+    expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeLessThan(QUADRATIC_BELOW);
+  }, 120_000);
+  it("lock-key-many-deps: packageLockInputs, a key of 4,034 characters, 50 dependencies, then 200: under the line, in the number of dependencies alone", () => {
+    const { ratio, atN, at4N } = measure("lock-key-many-deps: packageLockInputs, key of 4,034, 50 deps, then 200", same(manyDeps(268, 50)), same(manyDeps(268, 200)), GUARD_LOCK_MS);
+    expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeLessThan(RATIO_LINE);
+  }, 120_000);
 });
 
 // The path pattern's answers before the fix, as digests. The old pattern stays out of the code, because kept as code it

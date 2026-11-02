@@ -1,6 +1,6 @@
-// C6's table of rule and check (docs/status.md; docs/decisions/2026-11-02-definition-of-complete-final.md, C6) is what the
-// release of 2026-11-30 is measured by, so every row says when it takes effect, and a row that names its check names a file
-// that is there. Also here: the one row whose check is a search of the source text, pr-mode-has-no-merge-call.
+// C6's table of rule and check (docs/status.md; docs/decisions/2026-11-02-definition-of-complete-final.md, C6): every row
+// says when its rule first applies, and a row that names its check names a file that is there. Also here: the one row whose
+// check is a search of the source text, pr-mode-has-no-merge-call.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -61,7 +61,7 @@ describe("C6's table (docs/status.md)", () => {
     expect(problems(table("| `a` | r | PR モード | 未実装 |", "| `a` | r | PR モード | 未実装 |"))).toEqual(["`a`: twice"]);
   });
 
-  it("c6-row-has-effect-column: a row the release of 2026-11-30 depends on is not moved to 自動マージ unnoticed", () => {
+  it("c6-row-has-effect-column: a row's 効く時 is not changed unnoticed", () => {
     const effect = Object.fromEntries((tableLines(status) ?? []).map(cells).map(([check, , value]) => [check, value]));
     expect(effect).toMatchObject({
       "`stop-file-owner-only`": "自動マージ",
@@ -80,15 +80,18 @@ describe("C6's table (docs/status.md)", () => {
   });
 });
 
+const GAP = String.raw`(?:\s|\\\s)+`; // Between two words of a command: blanks and shell line continuations.
+const ARG = String.raw`(?:"[^"\n]*"|'[^'\n]*'|\S+)`; // One argument of a command: quoted, or with no blank in it.
 const MERGE_CALLS = [
   /\/pulls\/[^\s"'`]*\/merge\b/, // REST: PUT /repos/{owner}/{repo}/pulls/{n}/merge
   /\/merges\b/, // REST: POST /repos/{owner}/{repo}/merges
-  /\bpulls\.merge\b/,
-  /\bgh\s+pr\s+merge\b/,
-  /\bgit\s+merge\b(?!-)/,
+  /\b(?:pulls|repos)\.merge\b/, // Octokit
+  new RegExp(String.raw`\bpr(?:${GAP}(?:-R|--repo)(?:=|${GAP})${ARG})*${GAP}merge\b`), // gh, whatever stands before "pr": gh -R x, "$GH"
+  new RegExp(String.raw`\bgit(?:${GAP}(?:-[cC]${GAP}${ARG}|--\S+))*${GAP}merge\b(?!-)`), // git merge, git -C x merge, git --no-pager merge
   /["'`]merge["'`]/, // an argument list: ["pr", "merge", …], ["merge", …]
   /\b(?:mergePullRequest|enablePullRequestAutoMerge|enqueuePullRequest|mergeBranch)\b/, // GraphQL
   /\b(?:merge_method|auto_merge)\b/,
+  /^\s*(?:-\s+)?uses:[^\n]*merge/im, // a workflow step whose action's name says merge, automerge or auto-merge
 ];
 const mergeCalls = (text: string) => MERGE_CALLS.filter(pattern => pattern.test(text)).map(String);
 
@@ -98,15 +101,31 @@ function files(dir: string): string[] {
 
 describe("pr-mode-has-no-merge-call", () => {
   // What is bundled into the Action and the CLI, from source: the built file exists only in a release commit.
-  const shipped = ["action.yml", ...files("action"), ...files("packages/cli/src"), ...files("packages/sandbox/src")];
+  // .github/judge/record.ts is action/build.ts's entry point, so action/dist/record.js holds it.
+  const shipped = ["action.yml", ".github/judge/record.ts", ...files("action"), ...files("packages/cli/src"), ...files("packages/sandbox/src")];
 
-  it("the source of the Action and the CLI calls no merge API", () => {
-    for (const path of ["action.yml", "action/patch.sh", "action/patch-workflow.yml", "packages/cli/src/security/deliver.ts", "packages/sandbox/src/docker.ts"]) expect(shipped).toContain(path);
+  it("the source of the Action and the CLI has none of these forms", () => {
+    for (const path of ["action.yml", ".github/judge/record.ts", "action/build.ts", "action/patch.sh", "action/patch-workflow.yml", "packages/cli/src/security/deliver.ts", "packages/sandbox/src/docker.ts"]) expect(shipped).toContain(path);
+    expect(read("action/build.ts")).toContain('entryPoints: [".github/judge/record.ts"]');
     expect(shipped.map(path => [path, mergeCalls(read(path))]).filter(([, found]) => found!.length)).toEqual([]);
   });
 
-  it("finds each way of calling one, and not the words the preview's notices and records use", () => {
+  it("finds these forms, and not the words the preview's notices and records use", () => {
     for (const call of [
+      'gh -R "$REPO" pr merge "$pr" --squash',
+      'gh --repo "$REPO" pr merge "$pr"',
+      '"$GH" pr merge "$pr"',
+      'gh pr \\\n  merge "$pr"',
+      'gh pr -R "$REPO" merge "$pr"',
+      'git -C "$GITHUB_WORKSPACE" merge --ff-only x',
+      "git -c user.name=x merge x",
+      'git -C "a b" \\\n  merge x',
+      "git --no-pager merge x",
+      "octokit.rest.repos.merge({ base, head })",
+      "uses: pascalgn/automerge-action@abc",
+      "uses: peter-evans/enable-pull-request-automerge@abc",
+      "      - uses: owner/auto-merge@abc",
+      "      - uses: owner/merge-me-action@abc",
       'gh api -X PUT "repos/$REPO/pulls/$PR/merge"',
       "`/repos/${repo}/pulls/${number}/merge`",
       "gh api repos/o/r/merges -f base=main",
@@ -130,6 +149,25 @@ describe("pr-mode-has-no-merge-call", () => {
       "merge_commit_sha",
       "refs/pull/1/merge",
       "git merge-base HEAD main",
+      'git -C "$GITHUB_WORKSPACE" merge-base a b',
+      'git -C "$GITHUB_WORKSPACE" log -1 --format=%cI "$GITHUB_SHA"',
+      "gh pr view 1 --json mergeable",
+      "the PR's merge base",
+      'jq -n --arg merge "$MERGE_SHA"',
+      'merge_sha: sha("MERGE_SHA")',
+      "MERGE_SHA: ${{ github.sha }}",
+      "# Nothing is merged. PRs opened with the workflow's token start no CI; start it before merging.",
+      "uses: actions/checkout@abc",
     ]) expect([word, mergeCalls(word)]).toEqual([word, []]);
+  });
+
+  it("does not find these forms, which the row names as what it does not see", () => {
+    for (const form of [
+      'const verb = "mer" + "ge"; execFileSync("gh", ["pr", verb]);',
+      '"$GIT" merge x',
+      "git pull origin main",
+      "gh repo sync",
+      "uses: owner/some-action@abc",
+    ]) expect([form, mergeCalls(form)]).toEqual([form, []]);
   });
 });

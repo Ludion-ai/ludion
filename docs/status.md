@@ -55,8 +55,6 @@ This table keeps the 2026-11-01 record's words. Since 2026-11-02, C2's line is p
 
 C6's table of rule and check is the one below. Only its form is tested so far (`c6-row-has-effect-column`, tools/records/test/c6-table.test.ts), and `c6-table-has-every-rule` is not written, so the condition of the release in PR mode (CLAUDE.md, Goal) cannot be met yet. Its first rows; the first three are from CLAUDE.md (Product; docs/decisions/2026-11-02-policy-into-claude-md.md), and each of the others says where it is from.
 
-The condition of 2026-11-30 is that every row whose 効く時 is PR モード passes, and the rows whose 効く時 is 自動マージ pass before the SHA of 2026-12-02 (the judgement of 2026-11-03 03:48 JST).
-
 | Check | Rule | 効く時 | Test |
 |---|---|---|---|
 | `stop-file-owner-only` | Only the owner writes the stop file; automation only notifies | 自動マージ | Not written |
@@ -67,7 +65,7 @@ The condition of 2026-11-30 is that every row whose 効く時 is PR モード pa
 | `public-sentences-match-scope` | The READMEs and the site name no scope wider than v1's, npm only (CLAUDE.md, Goal), and no sentence describes what is not built (C16) | PR モード | Not written |
 | `c6-table-has-every-rule` | Every rule of "Ludion must not become the attack path" has a row in this table, and a row with no check file fails (C6; docs/decisions/2026-11-02-definition-of-complete-final.md, C6) | PR モード | Not written |
 | `action-does-not-comment-on-dependabot-pr` | The Action writes nothing on a PR whose author is dependabot[bot] (CLAUDE.md, Product: it never touches a Dependabot PR) | PR モード | Not written |
-| `pr-mode-has-no-merge-call` | The source of the Action and the CLI has no call to a merge API. It is searched as text, so a call put together at run time is not seen (CLAUDE.md, Goal: the release is in PR mode) | PR モード | `tools/records/test/c6-table.test.ts` |
+| `pr-mode-has-no-merge-call` | The source of the Action and the CLI, with .github/judge/record.ts, which action/build.ts bundles, has no merge call in the forms its test lists. It is searched as text, so any other form is not seen: a call put together at run time, `"$GIT" merge`, `git pull`, `gh repo sync`, an action whose name does not say merge (CLAUDE.md, Goal: the release is in PR mode) | PR モード | `tools/records/test/c6-table.test.ts` |
 | `pr-changes-no-workflow-file` | The PR job refuses an artifact whose fix changes a workflow file (the judgement of 2026-11-03 03:48 JST) | PR モード | `packages/cli/test/deliver.test.ts` ("a receipt that lists a file a fix may not change") |
 | `self-update-never-auto-merged` | Updates to ludion-ai itself in users' projects are never auto-merged (CLAUDE.md, Ludion must not become the attack path) | 自動マージ | 未実装 |
 | `v1-stops-on-other-lockfile` | In v1, Ludion applies no fix to a project that has a lockfile other than package-lock.json at its root, or whose packageManager is not npm, and stops, writing the reason (docs/decisions/2026-11-02-lockfile-scope-v1.md, decision 3). The code does not do this yet | PR モード | 未実装 |

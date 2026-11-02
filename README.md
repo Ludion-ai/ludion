@@ -71,9 +71,9 @@ jobs:
           mode: comment
 ```
 
-A change to that SHA is an update to Ludion itself: review it like any dependency update, and do not auto-merge it.
+A change to that SHA (from Dependabot, for example) is an update to Ludion itself: review it like any dependency update, and do not auto-merge it.
 
-Limits: GitHub-hosted Linux runners (the action needs gh, jq, unzip, GNU date and Node 22 or later); only the root package.json and package-lock.json, and each changed */package.json, are read (the judge leaves a workspace package.json out of gate 4's changed-files stop when it agrees with the lockfile; one that does not agree stops, and one that cannot be read on both sides, such as an added, removed or renamed workspace's, is undecidable); a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. It sends package names and versions to OSV and the npm registry, and the IDs of the advisories OSV returns back to OSV. It downloads CISA's catalog of exploited vulnerabilities and FIRST's daily list of EPSS scores whole and looks the CVE IDs up in them, so no CVE ID is sent; a list it cannot download or read makes the judgement undecidable. No source is sent.
+Limits: GitHub-hosted Linux runners (the action needs gh, jq, unzip, GNU date and Node 22 or later); only the root package.json and package-lock.json, and each changed */package.json, are read (the judge leaves a workspace package.json out of gate 4's changed-files stop when it agrees with the lockfile; one that does not agree stops, and one that cannot be read on both sides, such as an added, removed or renamed workspace's, is undecidable); a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. It sends package names and versions to OSV and the npm registry, and the IDs of the advisories OSV returns back to OSV. It downloads CISA's catalog of exploited vulnerabilities and FIRST's daily list of EPSS scores whole and looks the CVE IDs up in them, so no CVE ID is sent; a list it cannot download or read makes the judgement undecidable. No source is sent. Ludion cannot stop your own Dependabot from moving the SHA you pin here.
 
 ## On a schedule: one PR per security fix
 

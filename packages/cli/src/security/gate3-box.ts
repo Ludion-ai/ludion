@@ -64,18 +64,49 @@ const secondsSince = started => Number(process.hrtime.bigint() - started) / 1e9;
 const baseEnv = { ...process.env, ...config.env, NEXT_TELEMETRY_DISABLED: "1", CI: "1", NODE_NO_WARNINGS: "1", CIRCLE_NODE_TOTAL: "2", TURBO_ENGINE_READ_ONLY: "1" };
 const frozenEnv = { ...baseEnv, NODE_OPTIONS: "--require=/ludion/freeze-clock.cjs" };
 
-/** Runs one program to its end. Its stdout is dropped; its stderr goes to the box's stderr. */
+// V8 stopping at its heap limit is no OOM kill, so the cgroup does not show it, and a full disk can be over before a reading
+// sees it. These two kinds of line say so. Only the counts go in the result, never a line (the definition's Limits).
+const stderrCounts = { heap_out_lines: 0, enospc_lines: 0 };
+const countLine = line => {
+  if (line.includes("heap out of memory")) stderrCounts.heap_out_lines++;
+  if (line.includes("ENOSPC")) stderrCounts.enospc_lines++;
+};
+
+/** Passes a program's stderr on to the box's, and counts its lines. Returns what ends it early: a last line with no newline still counts. */
+function watchStderr(stream, onLine) {
+  let partial = "";
+  const line = text => { countLine(text); if (onLine) onLine(text); };
+  const flush = () => { if (partial) line(partial); partial = ""; };
+  stream.on("data", chunk => {
+    process.stderr.write(chunk);
+    const parts = (partial + chunk).split("\n");
+    partial = parts.pop().slice(-65536);
+    for (const text of parts) line(text);
+  });
+  stream.on("end", flush);
+  return flush;
+}
+
+/** Runs one program to its end. Its stdout is dropped; its stderr goes to the box's stderr, through watchStderr. */
 function step(program, args, env, timeoutMs) {
   const started = process.hrtime.bigint();
   return new Promise(resolve => {
-    const child = spawn(program, args, { cwd: "/app", env, stdio: ["ignore", "ignore", "inherit"], detached: true });
-    let timedOut = false;
+    const child = spawn(program, args, { cwd: "/app", env, stdio: ["ignore", "ignore", "pipe"], detached: true });
+    const flush = child.stderr ? watchStderr(child.stderr) : () => {};
+    let timedOut = false, finished = false;
     const timer = setTimeout(() => { timedOut = true; try { process.kill(-child.pid, "SIGKILL"); } catch {} }, timeoutMs);
-    child.on("error", () => { clearTimeout(timer); resolve({ status: "failed", exit: null, seconds: secondsSince(started) }); });
-    child.on("close", exit => {
+    const finish = (status, exit) => {
+      if (finished) return;
+      finished = true;
       clearTimeout(timer);
-      resolve({ status: timedOut ? "timed_out" : exit === 0 ? "passed" : "failed", exit, seconds: secondsSince(started) });
-    });
+      flush();
+      resolve({ status, exit, seconds: secondsSince(started) });
+    };
+    const ended = exit => finish(timedOut ? "timed_out" : exit === 0 ? "passed" : "failed", exit);
+    child.on("error", () => finish("failed", null));
+    child.on("close", ended);
+    // Something the program left running can hold the pipe open, and then "close" does not come. Its exit still ends the step.
+    child.on("exit", exit => { setTimeout(() => ended(exit), 2000); });
   });
 }
 
@@ -207,13 +238,8 @@ async function main() {
   const startStarted = process.hrtime.bigint();
   const server = spawn(process.execPath, [NEXT, "start", "--hostname", "127.0.0.1", "--port", String(PORT)], { cwd: "/app", env: { ...frozenEnv, NODE_ENV: "production" }, stdio: ["ignore", "ignore", "pipe"], detached: true });
   const serverLines = { count: 0, lines: [] };
-  let serverExited = false, partial = "";
-  server.stderr.on("data", chunk => {
-    process.stderr.write(chunk);
-    const parts = (partial + chunk).split("\n");
-    partial = parts.pop();
-    for (const line of parts) { serverLines.lines.push(line); serverLines.count++; }
-  });
+  let serverExited = false;
+  watchStderr(server.stderr, line => { serverLines.lines.push(line); serverLines.count++; });
   server.on("close", () => { serverExited = true; });
   server.on("error", () => { serverExited = true; });
   const listening = () => new Promise(resolve => {
@@ -269,6 +295,8 @@ main().catch(error => {
   clearInterval(tmpReader);
   readTmpFree();
   out.tmp_min_free_bytes = tmpMinFree;
+  out.heap_out_lines = stderrCounts.heap_out_lines;
+  out.enospc_lines = stderrCounts.enospc_lines;
   out.seconds = secondsSince(whole);
   // The machine's CPUs, which the box's limit does not change: a result is read knowing what it ran on.
   out.host_cpus = os.cpus().length;

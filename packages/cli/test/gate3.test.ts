@@ -16,7 +16,7 @@ import { snapshot } from "../src/security/project.ts";
 const passed = { status: "passed" as StepStatus, seconds: 1 };
 const absent = { status: "absent" as StepStatus, seconds: 0 };
 const page = (path: string, over: Partial<Gate3Page> = {}): Gate3Page => ({ path, status: 200, exceptions: [], console: [], dom: ["aaaaaaaa", "bbbbbbbb"], screenshot: "0".repeat(32), ...over });
-const run = (pages: Gate3Page[], over: Partial<Gate3Run> = {}): Gate3Run => ({ build: passed, types: passed, start: passed, crawl: passed, tests: passed, too_many_pages: false, pages, seconds: 2, memory_peak_bytes: 1, memory_swap_peak_bytes: 0, memory_oom_kills: 0, tmp_min_free_bytes: 40 * 1_048_576, host_cpus: 16, ...over });
+const run = (pages: Gate3Page[], over: Partial<Gate3Run> = {}): Gate3Run => ({ build: passed, types: passed, start: passed, crawl: passed, tests: passed, too_many_pages: false, pages, seconds: 2, memory_peak_bytes: 1, memory_swap_peak_bytes: 0, memory_oom_kills: 0, tmp_min_free_bytes: 40 * 1_048_576, heap_out_lines: 0, enospc_lines: 0, host_cpus: 16, ...over });
 const failed = { status: "failed" as StepStatus, seconds: 1 }, timedOut = { status: "timed_out" as StepStatus, seconds: 1 };
 const old = () => run([page("/"), page("/about")]);
 
@@ -57,15 +57,15 @@ describe("the definition's table", () => {
 
     it.each(failing)("oom-is-undecidable-not-broken: %s, an OOM kill on either run", (_name, fails) => {
       for (const [first, second] of [[fails({ memory_oom_kills: 2 }), fails()], [fails(), fails({ memory_oom_kills: 1 })], [fails({ memory_oom_kills: 1 }), fails({ memory_oom_kills: 1 })]]) {
-        expect(compareRuns(old(), old(), first!, second!)).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources"] });
+        expect(compareRuns(old(), old(), first!, second!)).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources_new_only"] });
       }
     });
 
     it("oom-is-undecidable-not-broken: it comes before the second run's own result, and what the first run showed is kept", () => {
       const killed = noBuild({ memory_oom_kills: 1 });
-      expect(compareRuns(old(), old(), killed, up()).undecidable_reasons).toEqual(["box_resources"]);
-      expect(compareRuns(old(), old(), noBuild(), up({ memory_oom_kills: 1 })).undecidable_reasons).toEqual(["box_resources"]);
-      expect(compareRuns(old(), old(), killed, null).undecidable_reasons).toEqual(["box_resources"]);
+      expect(compareRuns(old(), old(), killed, up()).undecidable_reasons).toEqual(["box_resources_new_only"]);
+      expect(compareRuns(old(), old(), noBuild(), up({ memory_oom_kills: 1 })).undecidable_reasons).toEqual(["box_resources_new_only"]);
+      expect(compareRuns(old(), old(), killed, null).undecidable_reasons).toEqual(["box_resources_new_only"]);
       expect(compareRuns(old(), old(), killed, noBuild()).notes).toContain("New did not build; old did.");
       // A test that also failed in the first run does not make it broken: the box had run out.
       const result = compareRuns(old(), old(), noStart({ memory_oom_kills: 1, tests: failed }), noStart());
@@ -76,10 +76,40 @@ describe("the definition's table", () => {
     it.each(failing)("tmp-nearly-full-is-undecidable: %s, under the fixed number on either run, and not at it", (_name, fails) => {
       expect(TMP_NEARLY_FULL_BYTES).toBe(1_048_576);
       for (const free of [0, TMP_NEARLY_FULL_BYTES - 1]) {
-        expect(compareRuns(old(), old(), fails({ tmp_min_free_bytes: free }), fails())).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources"] });
-        expect(compareRuns(old(), old(), fails(), fails({ tmp_min_free_bytes: free }))).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources"] });
+        expect(compareRuns(old(), old(), fails({ tmp_min_free_bytes: free }), fails())).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources_new_only"] });
+        expect(compareRuns(old(), old(), fails(), fails({ tmp_min_free_bytes: free }))).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources_new_only"] });
       }
       expect(compareRuns(old(), old(), fails({ tmp_min_free_bytes: TMP_NEARLY_FULL_BYTES }), fails({ tmp_min_free_bytes: TMP_NEARLY_FULL_BYTES })).verdict).toBe("broken");
+    });
+
+    it.each(failing)("heap-out-on-new-is-undecidable: %s, V8 at its heap limit with no OOM kill, on either run", (_name, fails) => {
+      expect(fails({ heap_out_lines: 1 }).memory_oom_kills).toBe(0);
+      expect(compareRuns(old(), old(), fails({ heap_out_lines: 1 }), fails())).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources_new_only"] });
+      expect(compareRuns(old(), old(), fails(), fails({ heap_out_lines: 3 }))).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources_new_only"] });
+      expect(compareRuns(old(), old(), fails(), up({ heap_out_lines: 1 })).undecidable_reasons).toEqual(["box_resources_new_only"]);
+    });
+
+    it.each(failing)("enospc-on-new-is-undecidable: %s, with room at every reading of /tmp, on either run", (_name, fails) => {
+      expect(fails({ enospc_lines: 1 }).tmp_min_free_bytes).toBeGreaterThan(TMP_NEARLY_FULL_BYTES);
+      expect(compareRuns(old(), old(), fails({ enospc_lines: 1 }), fails())).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources_new_only"] });
+      expect(compareRuns(old(), old(), fails(), fails({ enospc_lines: 2 }))).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources_new_only"] });
+    });
+
+    it("new-only-resource-counted: the mark is there only when both runs of old showed room, and the two are counted apart", () => {
+      const ran = [noBuild({ memory_oom_kills: 1 }), noBuild({ heap_out_lines: 1 }), noBuild({ enospc_lines: 1 }), noBuild({ tmp_min_free_bytes: 0 })];
+      const newOnly = ran.map(next => compareRuns(old(), old(), next, noBuild()));
+      for (const result of newOnly) {
+        expect(result).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources_new_only"] });
+        expect(result.undecidable[0]).toContain("the box's limit on new only");
+      }
+      const short: Partial<Gate3Run>[] = [{ memory_oom_kills: 1 }, { heap_out_lines: 1 }, { enospc_lines: 1 }, { tmp_min_free_bytes: 0 }, { memory_oom_kills: null }, { tmp_min_free_bytes: null }];
+      const both = short.flatMap(over => [compareRuns(up(over), old(), noBuild({ heap_out_lines: 1 }), noBuild()), compareRuns(old(), up(over), noBuild({ heap_out_lines: 1 }), noBuild())]);
+      for (const result of both) {
+        expect(result).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources"] });
+        expect(result.undecidable[0]).not.toContain("new only");
+      }
+      const counts = undecidableCounts([...newOnly, ...both]);
+      expect([counts.box_resources_new_only, counts.box_resources]).toEqual([newOnly.length, both.length]);
     });
 
     it.each(failing)("flaky-new-is-undecidable: %s failed once and the second run came up, and its pages are not compared", (_name, fails) => {
@@ -109,7 +139,7 @@ describe("the definition's table", () => {
         expect(compareRuns(old(), old(), noBuild(missing), noBuild())).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_figures_missing"] });
         expect(compareRuns(old(), old(), noBuild(), noBuild(missing))).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_figures_missing"] });
       }
-      expect(compareRuns(old(), old(), noBuild({ tmp_min_free_bytes: null, memory_oom_kills: 1 }), noBuild()).undecidable_reasons).toEqual(["box_resources"]);
+      expect(compareRuns(old(), old(), noBuild({ tmp_min_free_bytes: null, memory_oom_kills: 1 }), noBuild()).undecidable_reasons).toEqual(["box_resources_new_only"]);
       expect(compareRuns(old(), old(), noBuild({ memory_oom_kills: null }), up()).undecidable_reasons).toEqual(["flaky_new"]);
     });
 
@@ -203,7 +233,7 @@ describe("the definition's table", () => {
         compareRuns(old(), old(), noBuild, noBuild),
         compareRuns(old(), old(), old()),
       ];
-      expect(undecidableCounts(results)).toEqual(counted({ box_resources: 2, flaky_new: 1, screenshot_differs: 2, console_other_level: 1 }));
+      expect(undecidableCounts(results)).toEqual(counted({ box_resources_new_only: 2, flaky_new: 1, screenshot_differs: 2, console_other_level: 1 }));
     });
   });
 
@@ -283,6 +313,12 @@ describe("parseRun: what the box prints is data the candidate could have written
     ["a CPU count that is not a number", print({ ...good, host_cpus: "16" })],
     ["a /tmp figure that is not a number", print({ ...good, tmp_min_free_bytes: "0" })],
     ["no /tmp figure at all", print({ ...good, tmp_min_free_bytes: undefined })],
+    ["a line of text where a count of heap lines belongs", print({ ...good, heap_out_lines: "FATAL ERROR: secret" })],
+    ["a line of text where a count of ENOSPC lines belongs", print({ ...good, enospc_lines: "ENOSPC: /app/secret" })],
+    ["a count that is not whole", print({ ...good, enospc_lines: 1.5 })],
+    ["a count under 0", print({ ...good, heap_out_lines: -1 })],
+    ["a count that is null", print({ ...good, heap_out_lines: null })],
+    ["no counts at all", print({ ...good, heap_out_lines: undefined, enospc_lines: undefined })],
   ])("no result: %s", (_name, stdout) => {
     expect(parseRun(stdout)).toBeNull();
   });
@@ -353,13 +389,13 @@ describe("what goes into the box", () => {
   });
 
   /** The driver itself, up to a build that fails, with Node.js's modules stood in for. It shows nothing about real builds: those are in the progress record. */
-  const driverUpToBuild = async (over: { env?: Record<string, string>; hostEnv?: Record<string, string>; cpus?: number; statfs?: (state: { inBuild: boolean; ended: boolean }) => { bavail: number; bsize: number }; buildMs?: number } = {}) => {
+  const driverUpToBuild = async (over: { env?: Record<string, string>; hostEnv?: Record<string, string>; cpus?: number; statfs?: (state: { inBuild: boolean; ended: boolean }) => { bavail: number; bsize: number }; buildMs?: number; buildExit?: number; stderr?: Record<string, string[]>; noStderrEnd?: boolean; noClose?: boolean } = {}) => {
     const events: string[] = [], envs: Record<string, Record<string, string>> = {}, state = { inBuild: false, ended: false };
-    let printed = "";
+    let printed = "", forwarded = "";
     const missing = () => { throw new Error("not in this stand-in"); };
     const fs = {
-      readFileSync: (path: string) => path === "/ludion/config.json" ? JSON.stringify({ env: over.env ?? {}, freeze: "" }) : missing(),
-      readdirSync: () => [], copyFileSync: () => {}, symlinkSync: () => {},
+      readFileSync: (path: string) => path === "/ludion/config.json" ? JSON.stringify({ env: over.env ?? {}, freeze: "" }) : path === "/app/package.json" ? "{}" : missing(),
+      readdirSync: () => [], copyFileSync: () => {}, symlinkSync: () => {}, existsSync: () => false,
       mkdirSync: (path: string) => { events.push(`mkdir ${path}`); },
       chmodSync: (path: string, mode: number) => { events.push(`chmod ${mode.toString(8)} ${path}`); },
       statfsSync: (path: string) => { events.push(`statfs ${path}`); return (over.statfs ?? (() => ({ bavail: 16_384, bsize: 4096 })))(state); },
@@ -368,20 +404,67 @@ describe("what goes into the box", () => {
       const name = args[args.length - 1]!;
       events.push(`spawn ${name}`);
       envs[name] = options.env;
-      const child = new EventEmitter();
+      const child = Object.assign(new EventEmitter(), { stderr: new EventEmitter(), pid: 1 });
       state.inBuild = true;
-      setTimeout(() => { state.inBuild = false; state.ended = true; child.emit("close", 1); }, over.buildMs ?? 0);
+      setTimeout(() => {
+        for (const chunk of over.stderr?.[name] ?? []) child.stderr.emit("data", Buffer.from(chunk));
+        if (!over.noStderrEnd) child.stderr.emit("end");
+        state.inBuild = false; state.ended = true;
+        const exit = name === "build" ? over.buildExit ?? 1 : 1;
+        if (over.noClose) child.emit("exit", exit); else child.emit("close", exit);
+      }, over.buildMs ?? 0);
       return child;
     };
+    // No server comes up in this stand-in: nothing listens on the port.
+    const net = { connect: () => { const socket = new EventEmitter(); setImmediate(() => socket.emit("error")); return socket; } };
     const os = { cpus: () => Array.from({ length: over.cpus ?? 16 }, () => ({})) };
-    const modules: Record<string, unknown> = { "node:child_process": { spawn }, "node:crypto": { createHash }, "node:fs": fs, "node:net": {}, "node:os": os, "node:path": posix };
+    const modules: Record<string, unknown> = { "node:child_process": { spawn }, "node:crypto": { createHash }, "node:fs": fs, "node:net": net, "node:os": os, "node:path": posix };
     await new Promise<void>(done => {
       const stream = { write: (text: string, callback?: () => void) => { printed += text; callback?.(); return true; } };
-      const box = { env: over.hostEnv ?? {}, execPath: "node", hrtime: process.hrtime, kill: () => {}, stderr: { write: () => true }, stdout: stream, exit: () => done() };
+      const box = { env: over.hostEnv ?? {}, execPath: "node", hrtime: process.hrtime, kill: () => {}, stderr: { write: (text: unknown) => { forwarded += String(text); return true; } }, stdout: stream, exit: () => done() };
       new Script(BOX_DRIVER).runInNewContext({ Buffer, clearInterval, clearTimeout, process: box, require: (name: string) => modules[name], setInterval, setTimeout });
     });
-    return { events, envs, printed };
+    return { events, envs, printed, forwarded };
   };
+
+  it("stderr-counts: lines are counted, also when split between chunks, passed on as they came, and no line is in the result", async () => {
+    const chunks = ["a line\nFATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out", " of memory at /app/secret-path\nError: ENOSPC: no space left on device, write\n", "ENOSPC with no newline at /app/secret-path"];
+    const { printed, forwarded } = await driverUpToBuild({ stderr: { build: chunks } });
+    expect(parseRun(printed)).toMatchObject({ heap_out_lines: 1, enospc_lines: 2 });
+    expect(forwarded).toContain(chunks.join(""));
+    expect(printed).not.toContain("secret-path");
+    expect(printed).not.toContain("FATAL");
+  });
+
+  it("stderr-counts: 0 with none of the exact text, and one line holding both counts in both", async () => {
+    const none = await driverUpToBuild({ stderr: { build: ["No space left on device\nHeap Out Of Memory\nenospc\n"] } });
+    expect(parseRun(none.printed)).toMatchObject({ heap_out_lines: 0, enospc_lines: 0 });
+    expect(parseRun((await driverUpToBuild()).printed)).toMatchObject({ heap_out_lines: 0, enospc_lines: 0 });
+    const both = await driverUpToBuild({ stderr: { build: ["heap out of memory, ENOSPC\n"] } });
+    expect(parseRun(both.printed)).toMatchObject({ heap_out_lines: 1, enospc_lines: 1 });
+  });
+
+  it("stderr-counts: a last line with no newline counts when the stream has not ended", async () => {
+    const { printed } = await driverUpToBuild({ stderr: { build: ["heap out of memory"] }, noStderrEnd: true });
+    expect(parseRun(printed)?.heap_out_lines).toBe(1);
+  });
+
+  it("stderr-counts: the server's stderr counts too, when the build passed and the server does not start", async () => {
+    const { printed, forwarded } = await driverUpToBuild({ buildExit: 0, stderr: { "3000": ["FATAL ERROR: JavaScript heap out of memory\n"] } });
+    const result = parseRun(printed);
+    expect(result).toMatchObject({ heap_out_lines: 1, enospc_lines: 0 });
+    expect(result?.build.status).toBe("passed");
+    expect(result?.start.status).toBe("failed");
+    expect(forwarded).toContain("heap out of memory");
+    // Nothing ends the server's stream but the stream: a last line with no newline counts there too.
+    const unended = parseRun((await driverUpToBuild({ buildExit: 0, stderr: { "3000": ["ENOSPC with no newline"] } })).printed);
+    expect(unended).toMatchObject({ heap_out_lines: 0, enospc_lines: 1 });
+  });
+
+  it("stderr-counts: something left holding the pipe open does not stop the step from ending when the program has exited", async () => {
+    const { printed } = await driverUpToBuild({ noClose: true, noStderrEnd: true, stderr: { build: ["ENOSPC\n"] } });
+    expect(parseRun(printed)).toMatchObject({ enospc_lines: 1, build: { status: "failed" } });
+  });
 
   it("tmp-min-free: the result holds the lowest /tmp reading of the run, of the box's /tmp, in bytes", async () => {
     const { events, printed } = await driverUpToBuild();
@@ -648,7 +731,7 @@ describe("one judgement, with Docker stood in for", () => {
     it("oom-is-undecidable-not-broken: through the whole judgement, and the second run still runs", async () => {
       const { result, labels } = await judge(exited(printed(noBuild({ memory_oom_kills: 1 }))), exited(printed(noBuild())));
       expect(labels).toEqual(["old-1", "old-2", "new", "new-2"]);
-      expect(result).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources"] });
+      expect(result).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources_new_only"] });
       expect(result.runs[2]!.run?.memory_oom_kills).toBe(1);
     });
 
@@ -659,7 +742,27 @@ describe("one judgement, with Docker stood in for", () => {
 
     it("tmp-nearly-full-is-undecidable: through the whole judgement", async () => {
       const { result } = await judge(exited(printed(noBuild())), exited(printed(noBuild({ tmp_min_free_bytes: 0 }))));
-      expect(result).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources"] });
+      expect(result).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources_new_only"] });
+    });
+
+    it("heap-out-on-new-is-undecidable: through the whole judgement, and what the box printed reaches the result", async () => {
+      const { result } = await judge(exited(printed(noBuild({ heap_out_lines: 1 }))), exited(printed(noBuild({ heap_out_lines: 1 }))));
+      expect(result).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources_new_only"] });
+      expect(result.runs[2]!.run).toMatchObject({ heap_out_lines: 1, memory_oom_kills: 0 });
+    });
+
+    it("enospc-on-new-is-undecidable: through the whole judgement", async () => {
+      const { result } = await judge(exited(printed(noBuild())), exited(printed(noBuild({ enospc_lines: 1 }))));
+      expect(result).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources_new_only"] });
+    });
+
+    it("new-only-resource-counted: through the whole judgement, not new only when a run of old that passed showed a shortage", async () => {
+      const short = exited(printed(run(old().pages, { enospc_lines: 1 })));
+      const d = docker(), b = boxes(short, exited(printed(old())), exited(printed(noBuild({ heap_out_lines: 1 }))), exited(printed(noBuild())));
+      const result = await judgeGate3({ dir, old: sides, new: sides }, deps(d, b));
+      expect(result.undecidable_reasons).toEqual(["box_resources"]);
+      const alone = (await judge(exited(printed(noBuild({ heap_out_lines: 1 }))), exited(printed(noBuild())))).result;
+      expect(undecidableCounts([result, alone])).toMatchObject({ box_resources: 1, box_resources_new_only: 1 });
     });
 
     it.each<[string, ContainerOutcome]>([
@@ -697,6 +800,8 @@ describe("one judgement, with Docker stood in for", () => {
     // Old's own lack of room is told apart from old failing: it is how many projects fit the box.
     expect(await reasonOf([noBuild({ memory_oom_kills: 1 })])).toEqual(["old_box_resources"]);
     expect(await reasonOf([good, noBuild({ tmp_min_free_bytes: 0 })])).toEqual(["old_box_resources"]);
+    expect(await reasonOf([noBuild({ heap_out_lines: 1 })])).toEqual(["old_box_resources"]);
+    expect(await reasonOf([noBuild({ enospc_lines: 1 })])).toEqual(["old_box_resources"]);
     expect(await reasonOf([exited(printed(run([], { start: failed, memory_oom_kills: 1 })))])).toEqual(["old_box_resources"]);
     expect(await reasonOf([exited(printed(run([], { crawl: failed, memory_oom_kills: 1 })))])).toEqual(["old_box_resources"]);
     expect(await reasonOf([good, good, exited("", { timedOut: true })])).toEqual(["new_no_result"]);

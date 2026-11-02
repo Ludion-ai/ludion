@@ -47,13 +47,15 @@ export type Gate3Run = {
   memory_peak_bytes: number | null; memory_swap_peak_bytes: number | null;
   /** Read together, only on a run that failed to build or start, or a run of old that did not finish its crawl: whether the box ran out (`outOfBox`). */
   memory_oom_kills: number | null; tmp_min_free_bytes: number | null;
+  /** How many lines of stderr held `heap out of memory` and `ENOSPC`, read with those two. Counts only: no line leaves the box. */
+  heap_out_lines: number; enospc_lines: number;
   /** The machine's CPUs as Node.js counts them, whatever the box's limit. Recorded; no verdict reads it. */
   host_cpus: number | null;
 };
 export type Verdict = "not_broken" | "broken" | "undecidable";
 export type PageResult = { path: string; role: "specification" | "other"; status: [number | null, number | null, number | null]; dom: "same" | "differs" | "noise" | "not_compared"; noise_elements: number };
 /** The name of each reason a verdict can be undecidable, so that C4 can count them: the definition's Limits say what each is. */
-export const UNDECIDABLE_REASONS = ["not_covered", "prepare_failed", "could_not_run", "old_no_result", "old_failed", "old_box_resources", "too_many_pages", "no_denominator", "new_no_result", "new_timed_out", "new_step_absent", "new_crawl_failed", "box_resources", "box_figures_missing", "flaky_new", "console_other_level", "screenshot_differs", "all_dom_noise"] as const;
+export const UNDECIDABLE_REASONS = ["not_covered", "prepare_failed", "could_not_run", "old_no_result", "old_failed", "old_box_resources", "too_many_pages", "no_denominator", "new_no_result", "new_timed_out", "new_step_absent", "new_crawl_failed", "box_resources", "box_resources_new_only", "box_figures_missing", "flaky_new", "console_other_level", "screenshot_differs", "all_dom_noise"] as const;
 export type UndecidableReason = (typeof UNDECIDABLE_REASONS)[number];
 export type Comparison = {
   verdict: Verdict; broken: string[];
@@ -145,7 +147,8 @@ export function parseRun(stdout: string): Gate3Run | null {
     if (p.screenshot !== null && !isText(p.screenshot, HASH32)) return null;
   }
   for (const key of ["memory_peak_bytes", "memory_swap_peak_bytes", "memory_oom_kills", "tmp_min_free_bytes", "host_cpus"]) if (value[key] !== null && typeof value[key] !== "number") return null;
-  return { build: value.build, types: value.types, start: value.start, crawl: value.crawl, tests: value.tests, too_many_pages: value.too_many_pages, pages: value.pages, seconds: value.seconds, memory_peak_bytes: value.memory_peak_bytes, memory_swap_peak_bytes: value.memory_swap_peak_bytes, memory_oom_kills: value.memory_oom_kills, tmp_min_free_bytes: value.tmp_min_free_bytes, host_cpus: value.host_cpus };
+  for (const key of ["heap_out_lines", "enospc_lines"]) if (!Number.isInteger(value[key]) || value[key] < 0) return null;
+  return { heap_out_lines: value.heap_out_lines, enospc_lines: value.enospc_lines, build: value.build, types: value.types, start: value.start, crawl: value.crawl, tests: value.tests, too_many_pages: value.too_many_pages, pages: value.pages, seconds: value.seconds, memory_peak_bytes: value.memory_peak_bytes, memory_swap_peak_bytes: value.memory_swap_peak_bytes, memory_oom_kills: value.memory_oom_kills, tmp_min_free_bytes: value.tmp_min_free_bytes, host_cpus: value.host_cpus };
 }
 
 const byPath = (run: Gate3Run) => new Map(run.pages.map(p => [p.path, p]));
@@ -158,7 +161,7 @@ export function specificationPages(a: Gate3Run, b: Gate3Run): string[] {
 }
 
 /** The box ran out of memory or /tmp on this run. A figure that could not be read says nothing either way: `figureMissing`. */
-const outOfBox = (run: Gate3Run) => (run.memory_oom_kills ?? 0) >= 1 || (run.tmp_min_free_bytes ?? Infinity) < TMP_NEARLY_FULL_BYTES;
+const outOfBox = (run: Gate3Run) => (run.memory_oom_kills ?? 0) >= 1 || run.heap_out_lines >= 1 || (run.tmp_min_free_bytes ?? Infinity) < TMP_NEARLY_FULL_BYTES || run.enospc_lines >= 1;
 const figureMissing = (run: Gate3Run) => run.memory_oom_kills === null || run.tmp_min_free_bytes === null;
 /** The build failed, or it built and the server did not start: what new gets a second run for. */
 const didNotComeUp = (run: Gate3Run) => run.build.status === "failed" || (run.build.status === "passed" && run.start.status !== "passed");
@@ -183,7 +186,12 @@ export function compareRuns(oldA: Gate3Run, oldB: Gate3Run, next: Gate3Run, agai
   const first = compareOneRun(oldA, oldB, next);
   if (!didNotComeUp(next)) return first;
   const stop = (reason: UndecidableReason, sentence: string): Comparison => ({ ...first, verdict: "undecidable", broken: [], undecidable: [sentence], undecidable_reasons: [reason], notes: [...first.notes, ...first.broken] });
-  if (outOfBox(next) || (again && outOfBox(again))) return stop("box_resources", "New failed to build or start, and the box ran out of memory or /tmp on one of its two runs, so this says nothing about the fix.");
+  if (outOfBox(next) || (again && outOfBox(again))) {
+    const oldHadRoom = [oldA, oldB].every(run => !outOfBox(run) && !figureMissing(run));
+    return oldHadRoom
+      ? stop("box_resources_new_only", "New failed to build or start, and the box ran out of memory or /tmp on one of its two runs and on neither run of old. This is the box's limit on new only, and says nothing about whether the fix breaks anything.")
+      : stop("box_resources", "New failed to build or start, and the box ran out of memory or /tmp on one of its two runs, and old also ran short or could not show room, so this says nothing about the fix.");
+  }
   if (!again || again.build.status === "absent") return stop("new_no_result", "New failed to build or start, and its second run gave no result.");
   if (again.build.status === "timed_out") return stop("new_timed_out", "New failed to build or start, and its second run's build timed out.");
   if (!didNotComeUp(again)) return stop("flaky_new", "New failed to build or start on its first run, and built and started on its second.");

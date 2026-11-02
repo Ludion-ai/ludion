@@ -1,0 +1,267 @@
+{
+ "day": "2026-10-25",
+ "boundary": 1087451773,
+ "seed": "llock-2026-11-02",
+ "count": {
+  "pushEvents": 1360916,
+  "notPublic": 6,
+  "notABranch": 0,
+  "nameNotUsable": 0
+ },
+ "distinctPushedRepositories": 477437,
+ "repositoriesWithAKnownDefault": 111222,
+ "excluded": {
+  "knownDefaultNotPushed": 14506,
+  "defaultNotKnownAndNotMainOrMaster": 97557
+ },
+ "how": {
+  "knownDefault": 33108,
+  "assumedMainOrMaster": 332266
+ },
+ "strata": {
+  "new": 321251,
+  "old": 44123
+ },
+ "hours": [
+  {
+   "hour": 0,
+   "bytes": 8951535,
+   "attempt": 1,
+   "lines": 34719,
+   "bad": 0,
+   "push": 26687,
+   "create": 3115,
+   "fork": 35
+  },
+  {
+   "hour": 1,
+   "bytes": 8384349,
+   "attempt": 1,
+   "lines": 34464,
+   "bad": 0,
+   "push": 26554,
+   "create": 3201,
+   "fork": 42
+  },
+  {
+   "hour": 2,
+   "bytes": 8987844,
+   "attempt": 1,
+   "lines": 41896,
+   "bad": 0,
+   "push": 32608,
+   "create": 3635,
+   "fork": 31
+  },
+  {
+   "hour": 3,
+   "bytes": 9326174,
+   "attempt": 1,
+   "lines": 46726,
+   "bad": 2,
+   "push": 38208,
+   "create": 3992,
+   "fork": 41
+  },
+  {
+   "hour": 4,
+   "bytes": 10334372,
+   "attempt": 1,
+   "lines": 54377,
+   "bad": 0,
+   "push": 44558,
+   "create": 4940,
+   "fork": 31
+  },
+  {
+   "hour": 5,
+   "bytes": 10914843,
+   "attempt": 1,
+   "lines": 56838,
+   "bad": 0,
+   "push": 46544,
+   "create": 5373,
+   "fork": 42
+  },
+  {
+   "hour": 6,
+   "bytes": 10488073,
+   "attempt": 1,
+   "lines": 54801,
+   "bad": 0,
+   "push": 44363,
+   "create": 5373,
+   "fork": 39
+  },
+  {
+   "hour": 7,
+   "bytes": 11607871,
+   "attempt": 1,
+   "lines": 66027,
+   "bad": 0,
+   "push": 53960,
+   "create": 6774,
+   "fork": 34
+  },
+  {
+   "hour": 8,
+   "bytes": 12725893,
+   "attempt": 1,
+   "lines": 73144,
+   "bad": 0,
+   "push": 59529,
+   "create": 7599,
+   "fork": 34
+  },
+  {
+   "hour": 9,
+   "bytes": 12741393,
+   "attempt": 1,
+   "lines": 72884,
+   "bad": 0,
+   "push": 58783,
+   "create": 7577,
+   "fork": 44
+  },
+  {
+   "hour": 10,
+   "bytes": 13365388,
+   "attempt": 1,
+   "lines": 74888,
+   "bad": 0,
+   "push": 61352,
+   "create": 7424,
+   "fork": 39
+  },
+  {
+   "hour": 11,
+   "bytes": 13154805,
+   "attempt": 1,
+   "lines": 76946,
+   "bad": 3,
+   "push": 62895,
+   "create": 8087,
+   "fork": 29
+  },
+  {
+   "hour": 12,
+   "bytes": 13639064,
+   "attempt": 1,
+   "lines": 81571,
+   "bad": 4,
+   "push": 66648,
+   "create": 9073,
+   "fork": 34
+  },
+  {
+   "hour": 13,
+   "bytes": 14181462,
+   "attempt": 1,
+   "lines": 85732,
+   "bad": 0,
+   "push": 69749,
+   "create": 8871,
+   "fork": 41
+  },
+  {
+   "hour": 14,
+   "bytes": 13569365,
+   "attempt": 1,
+   "lines": 83002,
+   "bad": 0,
+   "push": 67957,
+   "create": 8803,
+   "fork": 31
+  },
+  {
+   "hour": 15,
+   "bytes": 13963417,
+   "attempt": 1,
+   "lines": 85835,
+   "bad": 0,
+   "push": 71105,
+   "create": 8655,
+   "fork": 33
+  },
+  {
+   "hour": 16,
+   "bytes": 14214773,
+   "attempt": 1,
+   "lines": 83153,
+   "bad": 2,
+   "push": 68149,
+   "create": 8813,
+   "fork": 23
+  },
+  {
+   "hour": 17,
+   "bytes": 13769765,
+   "attempt": 1,
+   "lines": 82025,
+   "bad": 3,
+   "push": 66925,
+   "create": 8615,
+   "fork": 27
+  },
+  {
+   "hour": 18,
+   "bytes": 13561614,
+   "attempt": 1,
+   "lines": 79713,
+   "bad": 0,
+   "push": 65039,
+   "create": 8460,
+   "fork": 28
+  },
+  {
+   "hour": 19,
+   "bytes": 13016811,
+   "attempt": 1,
+   "lines": 78636,
+   "bad": 0,
+   "push": 64196,
+   "create": 8501,
+   "fork": 21
+  },
+  {
+   "hour": 20,
+   "bytes": 13195666,
+   "attempt": 1,
+   "lines": 79732,
+   "bad": 0,
+   "push": 65431,
+   "create": 8147,
+   "fork": 20
+  },
+  {
+   "hour": 21,
+   "bytes": 13589050,
+   "attempt": 1,
+   "lines": 81789,
+   "bad": 0,
+   "push": 67027,
+   "create": 8301,
+   "fork": 27
+  },
+  {
+   "hour": 22,
+   "bytes": 14185770,
+   "attempt": 1,
+   "lines": 81595,
+   "bad": 0,
+   "push": 66499,
+   "create": 8055,
+   "fork": 32
+  },
+  {
+   "hour": 23,
+   "bytes": 13450605,
+   "attempt": 1,
+   "lines": 79915,
+   "bad": 0,
+   "push": 66150,
+   "create": 7825,
+   "fork": 22
+  }
+ ]
+}

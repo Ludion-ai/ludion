@@ -74,7 +74,7 @@ The tables below translate the record's. The "Today" column gives the record's v
 | Kind | Ludion today | In "complete" (proposal; Maven decided) |
 |---|---|---|
 | npm (package-lock.json) | Fixes. The only one that goes through gate 2's judgement | In |
-| npm (pnpm, yarn and bun locks) | Not read | In if LV0 shows many |
+| npm (pnpm, yarn and bun locks) | Not read. One day's count at the root of public repositories with a package.json (pushes of 2026-10-25, n = 1,000, weighted, 95% interval; docs/progress/2026-11-02-llock-lockfile-one-day.md): package-lock.json 64.0% (60.2–67.6), pnpm-lock.yaml 15.5% (12.9–18.5), bun 5.4% (3.9–7.4), yarn.lock 1.5% (0.8–2.8), none of these 16.7% (14.0–19.8) | In if LV0 shows many |
 | The official PHP and Node.js images (rebuilds of the same tag too) | Moves to the newest release of the line that Docker still builds | In |
 | Composer | Fixes. Does not go through gate 2's judgement | In. If LV0 shows few PHP projects, later in the order |
 | Maven | Read-only scan. `init`, `patch`, `watch` and the PR job refuse it (LMVN) | Out (the owner's OK, 2026-11-01 13:09 JST; the read-only check stays). Whether and when Maven's code is removed is not decided; it stays in the tree, no longer reached from those commands |

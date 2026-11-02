@@ -111,7 +111,7 @@ Since 2026-11-02 (LPOLPR; `git grep -iE` on packages/cli/src, action and action.
 - Gate 3's comparison of GET pages: not built (`crawl`: 0).
 - The apply setting, its default of auto and automatic merge: not built (the Not built list above). Today the default only validates, and `--apply` makes a branch.
 - The stop file and automatic revert: not built (`stop.file|stopfile`: 0; the one `revert` is a comment on gate 4).
-- Dependabot: the two places that name it are `ludion judge`'s and gate 4's comments on an existing update. Nothing writes the link line on Ludion's PR, and no workflow starts on a Dependabot PR.
+- Dependabot: the two places that name it are `ludion judge`'s and gate 4's comments on an existing update. Nothing writes the link line on Ludion's PR, and no workflow takes a Dependabot PR as the signal that starts discovery (`dependabot` in .github/workflows, action and action.yml: 0). `judge.yml` and the Action's judge mode run on such a PR as on any update, and only comment (judge.yml's runs by Dependabot on GitHub, read on 2026-11-02: 5, on PRs #161 to #165).
 - The attack as the unit, with k and the 95% upper bound: docs/bench/2026-10-28-backtest-v5 counts versions.
 - C1-1 as a CI test: nothing names it (`C1-1` on packages, tools and .github: 0).
 - npm only: not built. action/patch-workflow.yml looks at the saved policy's ecosystem and does not keep to npm, and no test fails when the Action runs another. The READMEs and the site still name Composer (`git grep -c -i composer`: README.md 8, packages/cli/README.md 8, apps/site/src/strings/en.ts 11, ja.ts 11).

@@ -39,9 +39,9 @@ export type Gate3Deps = {
 
 export type StepStatus = "passed" | "failed" | "timed_out" | "absent";
 export type Gate3Page = { path: string; status: number | null; exceptions: string[]; console: string[]; dom: string[] | null; screenshot: string | null };
+export type Gate3Step = { status: StepStatus; seconds: number; exit?: number | null };
 export type Gate3Run = {
-  build: { status: StepStatus; seconds: number }; types: { status: StepStatus; seconds: number }; start: { status: StepStatus; seconds: number };
-  crawl: { status: StepStatus; seconds: number }; tests: { status: StepStatus; seconds: number };
+  build: Gate3Step; types: Gate3Step; start: Gate3Step; crawl: Gate3Step; tests: Gate3Step;
   too_many_pages: boolean; pages: Gate3Page[]; seconds: number;
   /** The peak counts the page cache, so it reaches the box's limit without anything having run out. No verdict reads the peak or the swap. */
   memory_peak_bytes: number | null; memory_swap_peak_bytes: number | null;
@@ -121,7 +121,10 @@ function envExample(dir: string): string {
 }
 
 const STATUSES: readonly string[] = ["passed", "failed", "timed_out", "absent"];
-const isStep = (v: any) => v && typeof v === "object" && STATUSES.includes(v.status) && typeof v.seconds === "number";
+const isStep = (v: any) => v && typeof v === "object" && STATUSES.includes(v.status) && typeof v.seconds === "number" && (v.exit === undefined || v.exit === null || typeof v.exit === "number");
+/** A step and a page made anew from the keys the driver prints, so that nothing else the box wrote in them is kept. */
+const stepOf = (v: any): Gate3Step => ({ status: v.status, seconds: v.seconds, exit: v.exit ?? null });
+const pageOf = (p: any): Gate3Page => ({ path: p.path, status: p.status, exceptions: p.exceptions, console: p.console, dom: p.dom, screenshot: p.screenshot });
 const isText = (v: unknown, pattern: RegExp) => typeof v === "string" && pattern.test(v);
 const isList = (v: unknown, pattern: RegExp) => Array.isArray(v) && v.every(x => isText(x, pattern));
 const HASH8 = /^[a-f0-9]{8}$/, HASH16 = /^(?:server:)?[a-f0-9]{16}$/, CONSOLE = /^[a-zA-Z]{1,20}:[a-f0-9]{16}$/, HASH32 = /^[a-f0-9]{32}$/;
@@ -148,7 +151,7 @@ export function parseRun(stdout: string): Gate3Run | null {
   }
   for (const key of ["memory_peak_bytes", "memory_swap_peak_bytes", "memory_oom_kills", "tmp_min_free_bytes", "host_cpus"]) if (value[key] !== null && typeof value[key] !== "number") return null;
   for (const key of ["heap_out_lines", "enospc_lines"]) if (!Number.isInteger(value[key]) || value[key] < 0) return null;
-  return { heap_out_lines: value.heap_out_lines, enospc_lines: value.enospc_lines, build: value.build, types: value.types, start: value.start, crawl: value.crawl, tests: value.tests, too_many_pages: value.too_many_pages, pages: value.pages, seconds: value.seconds, memory_peak_bytes: value.memory_peak_bytes, memory_swap_peak_bytes: value.memory_swap_peak_bytes, memory_oom_kills: value.memory_oom_kills, tmp_min_free_bytes: value.tmp_min_free_bytes, host_cpus: value.host_cpus };
+  return { heap_out_lines: value.heap_out_lines, enospc_lines: value.enospc_lines, build: stepOf(value.build), types: stepOf(value.types), start: stepOf(value.start), crawl: stepOf(value.crawl), tests: stepOf(value.tests), too_many_pages: value.too_many_pages, pages: value.pages.map(pageOf), seconds: value.seconds, memory_peak_bytes: value.memory_peak_bytes, memory_swap_peak_bytes: value.memory_swap_peak_bytes, memory_oom_kills: value.memory_oom_kills, tmp_min_free_bytes: value.tmp_min_free_bytes, host_cpus: value.host_cpus };
 }
 
 const byPath = (run: Gate3Run) => new Map(run.pages.map(p => [p.path, p]));
@@ -179,8 +182,9 @@ function oldProblem(run: Gate3Run, label: string): { reason: UndecidableReason; 
 /**
  * The definition's table and its Limits on new's build or start: two runs of old against new's run and, when that failed
  * to build or start, its second run (null when that gave no result). A box's limits are Ludion's and not the user's
- * production, so only two failures with room in the box are broken. Anything else on those runs is undecidable, and
- * what the first run showed is kept in the notes.
+ * production, so a failure that an OOM kill, the two stderr lines or /tmp show as the box running out is undecidable, and
+ * what the first run showed is kept in the notes. The process limit and the wait for the server to start are not read,
+ * so two failures on either are broken, like two failures that none of those figures shows.
  */
 export function compareRuns(oldA: Gate3Run, oldB: Gate3Run, next: Gate3Run, again: Gate3Run | null = null): Comparison {
   const first = compareOneRun(oldA, oldB, next);
@@ -196,7 +200,7 @@ export function compareRuns(oldA: Gate3Run, oldB: Gate3Run, next: Gate3Run, agai
   if (again.build.status === "timed_out") return stop("new_timed_out", "New failed to build or start, and its second run's build timed out.");
   if (!didNotComeUp(again)) return stop("flaky_new", "New failed to build or start on its first run, and built and started on its second.");
   if (figureMissing(next) || figureMissing(again)) return stop("box_figures_missing", "New failed to build or start on both runs, and a memory or /tmp figure could not be read, so it cannot be shown that the box had room.");
-  return { ...first, notes: [...first.notes, "New failed to build or start on both of its runs, with room in the box."] };
+  return { ...first, notes: [...first.notes, "New failed to build or start on both of its runs, and no OOM kill, stderr line or /tmp reading showed the box running out. The process limit and the wait for the server to start are not read."] };
 }
 
 /** One run of new against the two of old. Every reason is listed, and broken wins over undecidable. */

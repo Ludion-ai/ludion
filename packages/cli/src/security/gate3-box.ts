@@ -35,7 +35,7 @@ export const MAX_PAGES = 200;
 
 /**
  * Build, types, start, crawl and tests, in one box: its scratch space is gone when the box ends. Prints one line, the
- * result. Everything else goes to stderr or nowhere, and only hashes, counts, levels and page paths are in the result.
+ * result. Everything else goes to stderr or nowhere, and only step statuses, numbers, hashes, levels and page paths are in the result.
  */
 export const BOX_DRIVER = String.raw`"use strict";
 const { spawn } = require("node:child_process");

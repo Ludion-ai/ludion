@@ -117,12 +117,16 @@ describe("the definition's table", () => {
       expect(compareRuns(old(), old(), fails(), run([page("/", { status: 500 })]))).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["flaky_new"] });
     });
 
-    it("two-failures-with-room-are-broken: only then, with the first run's reasons, whichever step failed on each", () => {
+    it("two-failures-no-figure-explains-are-broken: only then, with the first run's reasons, whichever step failed on each", () => {
       expect(compareRuns(old(), old(), noBuild(), noBuild())).toMatchObject({ verdict: "broken", broken: ["New did not build; old did."], undecidable_reasons: [] });
       expect(compareRuns(old(), old(), noStart(), noStart())).toMatchObject({ verdict: "broken", broken: ["New's server did not start; old's did."] });
       expect(compareRuns(old(), old(), noBuild(), noStart())).toMatchObject({ verdict: "broken", broken: ["New did not build; old did."] });
       expect(compareRuns(old(), old(), noStart(), noBuild())).toMatchObject({ verdict: "broken", broken: ["New's server did not start; old's did."] });
-      expect(compareRuns(old(), old(), noBuild(), noBuild()).notes.join(" ")).toContain("on both of its runs");
+      // The note says what was read, and what was not: it does not say the box had room.
+      const notes = compareRuns(old(), old(), noBuild(), noBuild()).notes.join(" ");
+      expect(notes).toContain("on both of its runs");
+      expect(notes).toContain("The process limit and the wait for the server to start are not read.");
+      expect(notes).not.toContain("with room");
     });
 
     it("one failed run is never broken by itself: no second run, or one that gave no result or timed out", () => {
@@ -301,11 +305,15 @@ describe("parseRun: what the box prints is data the candidate could have written
     ["another schema", print({ ...good, schema: 2 })],
     ["the driver's own failure", print({ schema: 1, driver_failed: true })],
     ["a step's status it does not know", print({ ...good, build: { status: "fine", seconds: 1 } })],
+    ["a step's exit that is text", print({ ...good, build: { status: "passed", seconds: 1, exit: "Text with spaces, from the box." } })],
+    ["a step's exit that is a list", print({ ...good, tests: { status: "passed", seconds: 1, exit: ["Text with spaces, from the box."] } })],
     ["a page that is not a path", print({ ...good, pages: [page("https://example.com/")] })],
     ["the same page twice", print({ ...good, pages: [page("/"), page("/")] })],
     ["a status out of range", print({ ...good, pages: [page("/", { status: 999 })] })],
     ["text where a hash belongs", print({ ...good, pages: [page("/", { dom: ["<p>secret</p>"] })] })],
     ["a console message with its text", print({ ...good, pages: [page("/", { console: ["error:the text"] })] })],
+    ["a console level with spaces", print({ ...good, pages: [page("/", { console: [`two words:${"0".repeat(16)}`] })] })],
+    ["a console level over 20 letters", print({ ...good, pages: [page("/", { console: [`${"x".repeat(21)}:${"0".repeat(16)}`] })] })],
     ["an exception with its text", print({ ...good, pages: [page("/", { exceptions: ["TypeError"] })] })],
     ["a screenshot that is not a hash", print({ ...good, pages: [page("/", { screenshot: "x" })] })],
     ["too many pages", print({ ...good, pages: Array.from({ length: MAX_PAGES + 1 }, (_, i) => page(`/${i}`)) })],
@@ -323,8 +331,26 @@ describe("parseRun: what the box prints is data the candidate could have written
     expect(parseRun(stdout)).toBeNull();
   });
 
-  it("a page path is the one text it lets through, as a path with no space, and it reaches the reasons", () => {
-    // Hashes, counts and levels have a shape that holds no text. A path does not: it comes out of the box as it was printed.
+  it("parserun-step-rebuilt: a step keeps its status, seconds and exit, and nothing else the box wrote", () => {
+    const text = "Text with spaces, from the box.";
+    const steps = ["build", "types", "start", "crawl", "tests"] as const;
+    const parsed = parseRun(print({ ...good, ...Object.fromEntries(steps.map(s => [s, { status: "passed", seconds: 1, exit: 0, note: text }])), note: text }))!;
+    for (const s of steps) expect(parsed[s]).toEqual({ status: "passed", seconds: 1, exit: 0 });
+    expect(JSON.stringify(parsed)).not.toContain(text);
+    // The driver prints a crawl with no exit, and a build killed by a signal with exit null.
+    const exits = parseRun(print({ ...good, crawl: { status: "passed", seconds: 1 }, build: { status: "failed", seconds: 1, exit: null }, tests: { status: "failed", seconds: 1, exit: 137 } }))!;
+    expect([exits.crawl.exit, exits.build.exit, exits.tests.exit]).toEqual([null, null, 137]);
+  });
+
+  it("parserun-page-rebuilt: a page keeps the fields the driver prints, and nothing else the box wrote", () => {
+    const text = "Text with spaces, from the box.";
+    const parsed = parseRun(print({ ...good, pages: [{ ...page("/"), note: text }] }))!;
+    expect(parsed.pages).toEqual([page("/")]);
+    expect(JSON.stringify(parsed)).not.toContain(text);
+  });
+
+  it("a page path is the one text that reaches the comparison, as a path with no space, and it reaches the reasons", () => {
+    // Hashes and counts have a shape that holds no text. A path does not: it comes out of the box as it was printed.
     const words = "/any-text-without-a-space-can-be-written-here";
     expect(parseRun(print({ ...good, pages: [page(words)] }))?.pages[0]!.path).toBe(words);
     expect(parseRun(print({ ...good, pages: [page(`/${"x".repeat(2000)}`)] }))?.pages.length).toBe(1);
@@ -332,6 +358,13 @@ describe("parseRun: what the box prints is data the candidate could have written
     expect(parseRun(print({ ...good, pages: [page("/two words")] }))).toBeNull();
     const before = run([page(words)]);
     expect(compareRuns(before, before, run([page(words, { status: 500 })])).broken.join(" ")).toContain(words);
+    // A console level is read as up to 20 letters, and the comparison only counts it.
+    const level = "Twentylettersoftextx";
+    const leveled = parseRun(print({ ...good, pages: [page("/", { console: [`${level}:${"0".repeat(16)}`] })] }))!;
+    expect(leveled.pages[0]!.console[0]).toContain(level);
+    const comparison = compareRuns(run([page("/")]), run([page("/")]), leveled);
+    expect(comparison.undecidable_reasons).toEqual(["console_other_level"]);
+    expect(JSON.stringify(comparison)).not.toContain(level);
   });
 });
 
@@ -635,6 +668,17 @@ describe("one judgement, with Docker stood in for", () => {
     expect(Object.values(result.seconds).every(s => typeof s === "number")).toBe(true);
     expect(removed(d).length).toBe(4);
     expect("logs" in result).toBe(false);
+  });
+
+  it("parserun-step-rebuilt: through the whole judgement, what else the box wrote in a run reaches no part of the result", async () => {
+    const text = "Text with spaces, from the box.";
+    const wrote = { schema: 1, ...old(), note: text, build: { ...passed, exit: 0, note: text }, pages: old().pages.map(p => ({ ...p, note: text })) };
+    const answer = exited(`${RESULT_MARKER}${JSON.stringify(wrote)}\n`);
+    const result = await judgeGate3({ dir, old: sides, new: sides }, deps(docker(), boxes(answer, answer, answer)));
+    expect(result.verdict).toBe("not_broken");
+    expect(result.runs[0]!.run!.build).toEqual({ status: "passed", seconds: 1, exit: 0 });
+    expect(result.runs.every(r => r.run && !("pages" in r.run))).toBe(true);
+    expect(JSON.stringify(result)).not.toContain(text);
   });
 
   it("acquires from the manifests alone on a network, then builds with none, without credentials or installed files", async () => {

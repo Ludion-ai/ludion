@@ -36,6 +36,69 @@ export function compare(a: string, b: string): number {
 /** A Dockerfile as Docker (BuildKit) reads it: one UTF-8 byte-order mark at the start of the file is removed. */
 export const withoutBom = (text: string): string => text.startsWith("\u{FEFF}") ? text.slice(1) : text;
 
+/** What BuildKit takes off a line's left (Go's unicode.IsSpace) and JavaScript's `\s`, together: `\s` lacks U+0085. */
+export const isSpace = (char: string): boolean => /[\s\u0085]/.test(char);
+/**
+ * A directive BuildKit acts on, at a `#` or `//` that starts a line: `# escape=`, `# syntax=`, and `// syntax=`, which
+ * sends the build to another frontend. Tried at each such place only, so the runs of space it crosses are read once.
+ */
+const DIRECTIVE = /(?:#|\/\/)\s*(?:syntax|escape)\s*=/iy;
+const COPY_FROM = /--from(?:[=\s]|$)/i;
+const RUN_OVERRIDE = /--(?:network|mount)(?:[=\s]|$)/i;
+const NOT_READ = "Dockerfile frontend directives and continuations are not supported in this preview.";
+
+/** One instruction of a Dockerfile: its first word in lower case, and what follows it on the line, at `at` in the text. */
+type Instruction = { word: string; args: string; at: number; lead: string; bare: boolean };
+
+/**
+ * A Dockerfile's instructions, read in the order of BuildKit's parser: cut at line feeds, drop the carriage returns at a
+ * line's end, drop the left's whitespace, then look at the directives and continuations, and then at the first word. A
+ * form BuildKit would read differently is refused here, not guessed at:
+ * - an `escape` or `syntax` directive anywhere (so the escape is always a backslash), and a `//` one. The third form, a
+ *   whole file of JSON with a `syntax` key, has no line that starts with FROM, so it has no stage.
+ * - a line whose last non-space character is a backslash: BuildKit continues it when only spaces and tabs follow.
+ * - a carriage return, U+2028 or U+2029 inside a line. BuildKit reads them as part of the line; what is read here must
+ *   not depend on that.
+ * Every line counts, a heredoc's too: that can only refuse more.
+ */
+function instructions(dockerfile: string): Instruction[] {
+  const found: Instruction[] = [];
+  let next = 0;
+  for (const raw of dockerfile.split("\n")) {
+    const lineAt = next;
+    next += raw.length + 1;
+    let end = raw.length;
+    while (end > 0 && raw[end - 1] === "\r") end--;
+    const line = raw.slice(0, end);
+    if (/[\r\u2028\u2029]/.test(line)) throw new Error("A carriage return or Unicode line separator inside a Dockerfile line is not supported in this preview.");
+    let first = 0, last = end;
+    while (first < end && isSpace(line[first]!)) first++;
+    if (first === end) continue;
+    while (last > first && isSpace(line[last - 1]!)) last--;
+    if (line[first] === "#" || line.startsWith("//", first)) {
+      DIRECTIVE.lastIndex = lineAt + first;
+      if (DIRECTIVE.test(dockerfile)) throw new Error(NOT_READ);
+    }
+    if (line[last - 1] === "\\") throw new Error(NOT_READ);
+    // A comment's first word starts with #, so it is no instruction that is looked for.
+    let wordEnd = first;
+    while (wordEnd < end && !isSpace(line[wordEnd]!)) wordEnd++;
+    found.push({ word: line.slice(first, wordEnd).toLowerCase(), args: line.slice(wordEnd), at: lineAt + wordEnd, lead: line.slice(0, first), bare: wordEnd >= last });
+  }
+  return found;
+}
+
+/**
+ * Whether an instruction reaches outside the build's own context: ADD, COPY --from, RUN --network or --mount. A flag's
+ * name counts as BuildKit reads it, with its quotes and backslashes taken out (`--fr"om"=x` is `--from=x`), anywhere on
+ * the line; COPY or RUN with nothing after it is one too, as the flag could only be on a line BuildKit would not read.
+ */
+function reachesOutside({ word, args, bare }: Instruction): boolean {
+  if (word === "add") return true;
+  if (word !== "copy" && word !== "run") return false;
+  return bare || (word === "copy" ? COPY_FROM : RUN_OVERRIDE).test(args.replace(/["'\\]/g, ""));
+}
+
 /**
  * Deliberately narrow: one stage, an exact version, an official image. Never guess ARGs or floating tags. `ref` matches the
  * whole FROM image and captures its version and flavor; `usage` is the refusal when it does not match. The file is read
@@ -44,21 +107,19 @@ export const withoutBom = (text: string): string => text.startsWith("\u{FEFF}") 
 export function officialImage(file: string, ref: RegExp, usage: string, line: (version: string) => string): RuntimeImage {
   if (file.length > 64 * 1024) throw new Error("Dockerfile exceeds 64 KiB.");
   const dockerfile = withoutBom(file), mark = file.length - dockerfile.length;
-  if (/^\s*#\s*(?:syntax|escape)\s*=/im.test(dockerfile) || /\\\r?\n/.test(dockerfile)) {
-    throw new Error("Dockerfile frontend directives and continuations are not supported in this preview.");
-  }
-  const stages = [...dockerfile.matchAll(/^\s*FROM\s+([^\r\n]+)$/gim)];
+  const read = instructions(dockerfile), stages = read.filter(instruction => instruction.word === "from");
   if (stages.length !== 1) throw new Error("Expected one FROM stage. Multi-stage and missing-base projects need manual review.");
   const stage = stages[0]!;
-  const from = stage[1]!.trim();
-  const match = ref.exec(from);
+  const from = stage.args.trim();
+  // U+0085 before the image, or after it, stays in `from` (JavaScript's trim keeps it), so `ref` does not match. Before FROM it is refused here.
+  const match = stage.lead.includes("\u0085") ? null : ref.exec(from);
   if (!match) throw new Error(usage);
   // Block hidden downloads/frontends in an otherwise offline build. No remote ADD, external COPY or network overrides.
-  if (/^\s*ADD\s/im.test(dockerfile) || /^\s*COPY\s+.*--from[=\s]/im.test(dockerfile) || /^\s*RUN\s+.*--(?:network|mount)[=\s]/im.test(dockerfile)) {
+  if (read.some(reachesOutside)) {
     throw new Error("ADD, external COPY and RUN network/mount overrides are not supported by the offline validator.");
   }
-  const start = mark + stage.index! + stage[0].indexOf(stage[1]!);
-  return { reference: from, version: match[1]!, branch: line(match[1]!), flavor: match[2]!, start, end: start + stage[1]!.length };
+  const start = mark + stage.at + stage.args.length - stage.args.trimStart().length;
+  return { reference: from, version: match[1]!, branch: line(match[1]!), flavor: match[2]!, start, end: mark + stage.at + stage.args.length };
 }
 
 export function phpImage(dockerfile: string): RuntimeImage {

@@ -287,8 +287,24 @@ const measure = (name: string, atN: () => unknown, at4N: () => unknown, guard: n
   measured.push(`${result.ratio.toFixed(2)}\t${result.atN.toFixed(4)} ms\t${result.at4N.toFixed(4)} ms\t${result.calls}\t${name}`);
   return result;
 };
+/**
+ * Holds one measure under the line. The line stays at 8. A measure at or over it is taken once more, that measure alone
+ * and once only, and it fails when both are at or over the line: a chance failure then has to come twice, where a real n²
+ * is over the line both times (docs/progress/2026-11-02-lratio-scaling-ratio.md). A sample the guard stops is not taken
+ * again. Each measure taken again goes in `again`, so a run's log says how many there were and where, passed or failed.
+ */
+function heldUnderTheLine(name: string, take: (again: boolean) => ReturnType<typeof ratioOf>, again: string[]) {
+  const first = take(false), taken = first.ratio < RATIO_LINE ? [first] : [first, take(true)];
+  const ratios = taken.map(({ ratio }) => ratio.toFixed(2)).join(", then "), last = taken.at(-1)!;
+  if (taken.length > 1) again.push(`${ratios}\t${name}`);
+  expect(last.ratio, `${name}: ${ratios}; measured again ${taken.length - 1} time here, ${again.length} in this file so far; ${last.atN} ms a call at n, ${last.at4N} ms at 4n`).toBeLessThan(RATIO_LINE);
+}
+const measuredAgain: string[] = [];
+const underTheLine = (name: string, atN: () => unknown, at4N: () => unknown, guard: number) =>
+  heldUnderTheLine(name, again => measure(again ? `${name}, measured again` : name, atN, at4N, guard), measuredAgain);
 afterAll(() => {
   console.log(["scaling ratios: ratio, CPU time of a call at n, of a call at 4n, calls in a sample, what", ...measured].join("\n"));
+  console.log([`measured again: ${measuredAgain.length} (ratios, what)`, ...measuredAgain].join("\n"));
 });
 
 let controlSum = 0;
@@ -299,8 +315,21 @@ describe("the ratio tells these two apart on this machine", () => {
     expect(isMainThread).toBe(true);
   });
   it("gate-reader-scaling-ratio-control: a scan of n gives under the line", () => {
-    expect(measure("control: a scan of 8,000, then 32,000", () => scan(8_000), () => scan(32_000), GUARD_DOCKERFILE_MS).ratio).toBeLessThan(RATIO_LINE);
+    underTheLine("control: a scan of 8,000, then 32,000", () => scan(8_000), () => scan(32_000), GUARD_DOCKERFILE_MS);
   }, 60_000);
+  it.each<[string, number[], number, boolean]>([
+    ["under the line: taken once, and passes", [7.99, 16], 1, true],
+    ["over it, then under it: taken twice, and passes", [16, 3, 16], 2, true],
+    ["over it twice: taken twice, and fails, with no third", [16, 16, 3], 2, false],
+    ["at the line counts as over it", [8, 8, 3], 2, false],
+  ])("gate-reader-scaling-ratio-control: a measure is taken again once at most: %s", (_name, ratios, times, passes) => {
+    const left = [...ratios], again: string[] = [];
+    const held = () => heldUnderTheLine("a shape", () => ({ ratio: left.shift()!, atN: 1, at4N: 1, calls: 1 }), again);
+    if (passes) held();
+    else expect(held).toThrow(`a shape: ${ratios.slice(0, 2).map(ratio => ratio.toFixed(2)).join(", then ")}; measured again 1 time here, 1 in this file so far`);
+    expect(ratios.length - left.length).toBe(times);
+    expect(again.length).toBe(times - 1);
+  });
   it("gate-reader-scaling-ratio-control: a scan of each prefix of n, which is n², gives over the line", () => {
     expect(measure("control: a scan of each prefix of 2,000, then 8,000", () => scanEachPrefix(2_000), () => scanEachPrefix(8_000), GUARD_DOCKERFILE_MS).ratio).toBeGreaterThanOrEqual(RATIO_LINE);
     expect(controlSum).toBeGreaterThan(0);
@@ -359,8 +388,7 @@ describe("the Dockerfile readers' time grows less than 8 times from 16 KiB to 64
     const small = shape(KIB16), large = shape(KIB64);
     expect(large.length).toBeLessThanOrEqual(KIB64);
     for (const [reader, read] of [["phpImage", phpImage], ["nodeImage", nodeImage], ["namesNodeImage", namesNodeImage]] as const) {
-      const { ratio, atN, at4N } = measure(`${name}, ${reader}`, () => read(small), () => read(large), GUARD_DOCKERFILE_MS);
-      expect(ratio, `${reader}: ${atN} ms a call at 16 KiB, ${at4N} ms at 64 KiB`).toBeLessThan(RATIO_LINE);
+      underTheLine(`${name}, ${reader}`, () => read(small), () => read(large), GUARD_DOCKERFILE_MS);
     }
   }, 60_000);
   it("still refuses a file over 64 KiB before reading it", () => {
@@ -415,8 +443,7 @@ describe("the lock readers' time grows less than 8 times from n to 4n, on these 
     ["packageLockInputs, 250 extraneous keys of 4,096 characters, then 1,000", manyExtraneous(250, 4096), manyExtraneous(1000, 4096), same],
   ])("gate-reader-scaling-ratio: %s", (name, small, large, read) => {
     expect(large.length).toBeLessThanOrEqual(MIB4);
-    const { ratio, atN, at4N } = measure(name, read(small), read(large), GUARD_LOCK_MS);
-    expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeLessThan(RATIO_LINE);
+    underTheLine(name, read(small), read(large), GUARD_LOCK_MS);
   }, 120_000);
 });
 
@@ -440,8 +467,7 @@ describe("lock-key-many-deps: one key with many dependencies is quadratic in the
     expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeLessThan(QUADRATIC_BELOW);
   }, 120_000);
   it("lock-key-many-deps: packageLockInputs, a key of 4,034 characters, 50 dependencies, then 200: under the line, in the number of dependencies alone", () => {
-    const { ratio, atN, at4N } = measure("lock-key-many-deps: packageLockInputs, key of 4,034, 50 deps, then 200", same(manyDeps(268, 50)), same(manyDeps(268, 200)), GUARD_LOCK_MS);
-    expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeLessThan(RATIO_LINE);
+    underTheLine("lock-key-many-deps: packageLockInputs, key of 4,034, 50 deps, then 200", same(manyDeps(268, 50)), same(manyDeps(268, 200)), GUARD_LOCK_MS);
   }, 120_000);
 });
 

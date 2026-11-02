@@ -18,7 +18,19 @@ Limits that remain, none of which decides what is linear: 5 s (Dockerfile) and 3
 
 CPU time is the whole process's, so the file must not share its process with another test file's thread. `gate-reader-scaling-ratio-control: this file is not in a worker thread` holds that part: with `--pool=threads` it failed (one run).
 
-## On this head, in Docker
+## A measure over the line is taken once more
+
+Decided before the measures below of this rule were taken, and not moved after them.
+
+- The line stays at 8. A measure at or over it is taken once more: that measure alone, one reader on one shape, and once only. It fails when both are at or over 8. The reasoning: a chance failure has to come twice, and a real n² fails both times.
+- This holds for the tests that say "under the line": the 134 (41 Dockerfile shapes on 3 readers, 11 lock shapes), the control's scan of n, and `lock-key-many-deps` in the number of dependencies alone.
+- It does not hold for the tests that want a ratio at or over the line: the control's n² and the two `lock-key-many-deps` "from 8 up to 32". A sample that a guard stops is not measured again either: it fails at once.
+- A failure says the ratios of both measures, the shape, and how many measures were taken again in the file so far. The log's `measured again:` lists each one with its ratios, the ones that then passed included, so chance failures can be counted later.
+- The rule stands only if a real n² fails both measures: the n² loop at php.ts:108 in a copy, one run each with no limit and in the 3 limited containers.
+
+## On the second head, 0ec3bc7, in Docker
+
+These runs were before the rule above, so each measure was taken once.
 
 Runs of `vitest run --project node --maxWorkers=2 packages/cli/test/dockerfile-check.test.ts -t "gate-reader-scaling-ratio|lock-key-many-deps"`, Node 24.22.2, `--network none --memory 2g`. "Highest" is of the 134 under the line (123 + 11). The busy loops are shell loops in the same container.
 
@@ -38,7 +50,7 @@ Runs of `vitest run --project node --maxWorkers=2 packages/cli/test/dockerfile-c
 | `--cpus 1`, 3 busy loops | 3 | 58 | 0 | 161.40 | 3.77 | 16.38 | **7.27** `backslash-newline pairs, phpImage` |
 | `--cpuset-cpus 0`, 3 neighbours that walk 128 MiB of memory | 1 | 58 | 0 | 162.11 | 4.08 | 16.18 | 6.91 `backslash-newline pairs, nodeImage` |
 
-**Runs that failed in the 3 limited containers of the review: 0 of 9 (95% upper bound 28%).** With no limit: 0 of 3 (63%). With the neighbours that walk memory: 0 of 1 (95%). The margin is thin: 7.31 and 7.27 against a line of 8. The 7.31 is a plain scan, once, in the first measure of the run: its time at n was 0.0166 ms a call, where the other runs gave about 0.030. Why was not looked into; nor was why the shapes of many short lines go over 4. No retry was added.
+**Runs that failed in the 3 limited containers of the review: 0 of 9 (95% upper bound 28%).** With no limit: 0 of 3 (63%). With the neighbours that walk memory: 0 of 1 (95%). The margin is thin: 7.31 and 7.27 against a line of 8. The 7.31 is a plain scan, once, in the first measure of the run: its time at n was 0.0166 ms a call, where the other runs gave about 0.030. Why was not looked into; nor was why the shapes of many short lines go over 4. That head had no second measure.
 
 `lock-key-many-deps` over these 13 runs: `packageLockInputs`, 200 dependencies, key of 1,019 then 4,034 characters: 13.34 to 13.97. `resolveFrom` alone, the same keys: 13.74 to 14.55. `packageLockInputs`, key of 4,034 characters, 50 then 200 dependencies: 3.94 to 4.04.
 

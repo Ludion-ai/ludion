@@ -4,10 +4,10 @@ What Ludion does today, what is missing before it is complete, and what waits fo
 
 ## Release
 
-Not released. Nothing is released until Ludion is complete (CLAUDE.md, Goal; docs/decisions/2026-10-29-security-agent-no-release-until-complete.md), apart from one release in PR mode on 2026-11-30, which has not happened (docs/decisions/2026-11-02-policy-into-claude-md.md). Automatic merge also needs (a) and (b) (CLAUDE.md, Product):
+Not released. Nothing is released until Ludion is complete (CLAUDE.md, Goal; docs/decisions/2026-10-29-security-agent-no-release-until-complete.md), apart from one release in PR mode from 2026-11-30, for npm only, when CI is green, every row of C6's table passes and no safety finding is open. It has not happened (docs/decisions/2026-11-02-policy-into-claude-md.md). Automatic merge also needs (a) and C2's result (CLAUDE.md, Product):
 
 - (a) is not shown met: unknowns remain in backtest v5 (docs/bench/2026-10-28-backtest-v5), and the one malicious version it still misses is one v5 counts as disputed, shown apart.
-- (b) has no result yet. The shadow's recorder runs (docs/progress/2026-10-29-ls-shadow-recording-start.md) and the replay that judges what it captures is built (tools/shadow, #194). It needs four consecutive weeks.
+- C2 has no result yet. The shadow's recorder runs (docs/progress/2026-10-29-ls-shadow-recording-start.md) and the replay that judges what it captures is built (tools/shadow, #194). The old condition (b), four consecutive weeks and 100 decided judgements, is no longer a condition since the owner's decision of 2026-11-02; it stays counted after release, as a record.
 
 The preview's conditions of 2026-10-28 (L1, L9 and LP, in docs/decisions/2026-10-28-release-gates-by-stage.md) no longer release anything.
 
@@ -49,7 +49,7 @@ The tables below translate the record's. The "Today" column gives the record's v
 | C5 Reverts what breaks | After an automatic merge, when main's CI or deployment fails, Ludion reverts it by itself. 1 fix = 1 commit = 1 PR | In trials, every case that should be reverted is reverted. The lock is the same as before | Not built |
 | C6 The safety rules | For each rule of "Ludion must not become the attack path", a check that fails when it is broken | Every rule has one. 0 places a job that runs candidates can write to | Not met (the cache hole) |
 
-C6's table of rule and check does not exist yet as a file or a test. Its first rows, from CLAUDE.md (Product; docs/decisions/2026-11-02-policy-into-claude-md.md):
+C6's table of rule and check does not exist yet as a file or a test, so the condition of the release in PR mode that every row passes (CLAUDE.md, Goal) cannot be met yet. Its first rows, from CLAUDE.md (Product; docs/decisions/2026-11-02-policy-into-claude-md.md):
 
 | Check | Rule | Test |
 |---|---|---|
@@ -78,6 +78,8 @@ C6's table of rule and check does not exist yet as a file or a test. Its first r
 | C16 What is published | npm, the Action, the site | npm from publish.yml, with provenance, 0 dependencies, 0 scripts. The Action pinned by SHA with the CLI bundled. The site: 0 sentences that describe what is not built, the same in English and Japanese, a section at the top for people with no background, why it is needed told from CVE-2024-4577 | Not met |
 
 ### Scope (a proposal, decided once LV0's numbers are in, apart from Maven, decided on 2026-11-01)
+
+Since 2026-11-02 the first release covers npm only: official PHP and Node.js images and Composer keep their code and tests and are not fixed in v1 (CLAUDE.md, Goal; docs/decisions/2026-11-02-policy-into-claude-md.md). The "In" below for them is the proposal of 2026-11-01.
 
 | Kind | Ludion today | In "complete" (proposal; Maven decided) |
 |---|---|---|
@@ -108,6 +110,7 @@ Since 2026-11-02 (LPOLPR; `git grep -iE` on packages/cli/src, action and action.
 - The stop file and automatic revert: not built (`stop.file|stopfile`: 0; the one `revert` is a comment on gate 4).
 - Dependabot: the two places that name it are `ludion judge`'s and gate 4's comments on an existing update. Nothing writes the link line on Ludion's PR, and no workflow starts on a Dependabot PR.
 - The attack as the unit of (a), with k and the 95% upper bound: docs/bench/2026-10-28-backtest-v5 counts versions.
+- npm only: not built. action/patch-workflow.yml looks at the saved policy's ecosystem and does not keep to npm, and no test fails when the Action runs another. The READMEs and the site still name Composer (`git grep -c -i composer`: README.md 8, packages/cli/README.md 8, apps/site/src/strings/en.ts 11, ja.ts 11).
 
 ### The former working list (until 2026-11-01)
 
@@ -128,4 +131,3 @@ Decided on 2026-10-29: every changed version counts as production (docs/decision
 2. **Shorter waits for official runtime releases.** The owner's point (2026-10-29): once a fix is public the race is short. Whether a fix from a runtime's own official channel (php.net, the official Docker image) waits less than the table says changes the wait table, so it is the owner's. Since 2026-11-01 CLAUDE.md answers this for a security release in an official runtime's line and an official image's move across one (docs/decisions/2026-11-01-claude-md-catches-up-lc0a.md); the wait of automatic merge is decided separately.
 3. **Gates and learned models.** The owner, 2026-10-29 18:24 JST: 「ニューラルネットワーク式にやったらいいじゃない？関門は全てアルゴで まぁ設計はまた後で深掘りする」. Taken for now as: improve the way of working like training, each mistake fed back into a rule or a check, and every checkpoint as code (docs/decisions/2026-10-29-way-of-working.md). Whether any of Ludion's gates should use a learned model is for the design deep-dive. A note for it from the Claude chat: a learned score could add a reason to wait or to notify, but should not lift a stop, because a release can be tuned against a model and a receipt has to say why.
 4. **The design.** docs/design.md's roadmap puts the judge first, and its open decision on where to start says 「推奨は判定役から」; the Goal now wins over both, and the owner redoes the design.
-5. **Condition (b) and the plan's C2.** CLAUDE.md's (b) still asks for four consecutive weeks and at least 100 decided judgements, counted as docs/decisions/2026-10-29-shadow-counting.md fixes; the plan of 2026-11-02 (its lines 104 to 107) counts per attack, passes at k=0 and ends its window on 2026-11-26. (b) was left as it is (docs/decisions/2026-11-02-policy-into-claude-md.md), so while it stands, automatic merge needs it as well as C2's result, and it may not be met on 2026-12-02.

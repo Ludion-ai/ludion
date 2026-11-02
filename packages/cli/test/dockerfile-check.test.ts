@@ -6,6 +6,7 @@
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { createContext, runInContext } from "node:vm";
+import { isMainThread } from "node:worker_threads";
 import { afterAll, describe, expect, it } from "vitest";
 import { lockEntries, lockExtraneous, lockKey, lockLinks, readLock, resolveFrom } from "../src/security/judge.ts";
 import { packageLockInputs } from "../src/security/judge-cli.ts";
@@ -227,22 +228,23 @@ describe("namesNodeImage finds a FROM behind whitespace or a continuation, so it
 /** The line for "grows as n does, here": a time that grows with n gives a ratio near 4 from n to 4n, and with n² near 16. */
 const RATIO_LINE = 8, SAMPLES = 7, FEWEST_SAMPLES = 3, MIN_SAMPLE_MS = 4;
 /**
- * Stop a run that would hang, as a backtracking expression's would: synchronous code cannot be stopped by the test's own
- * timeout. The guards are for one sample, and the budget ends the samples of one measure early, so a reader that has
- * become slow on every shape fails the test before the CI job's own limit ends it. None of the three says anything
- * about how the time grows; the ratio does that.
+ * The guards stop a sample that would hang, as a backtracking expression's would: synchronous code cannot be stopped by
+ * the test's own timeout. The budget ends the samples of one measure early, down to FEWEST_SAMPLES, and fails nothing.
+ * All three are clock time. None of them says anything about how the time grows; the ratio does that.
  */
 const GUARD_DOCKERFILE_MS = 5_000, GUARD_LOCK_MS = 30_000, MEASURE_BUDGET_MS = 15_000;
 const median = (values: number[]) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)]!;
 
 const guardContext = createContext({ call: () => {} });
-/** How long `calls` calls of fn take, in ms. A refusal is an answer, and counts as one. */
+/** The CPU time this whole process has used, in ms, V8's helper threads included. A wait for a CPU is not in it. */
+const cpuMs = () => { const { user, system } = process.cpuUsage(); return (user + system) / 1_000; };
+/** The CPU time `calls` calls of fn take, in ms. A refusal is an answer, and counts as one. */
 function timed(fn: () => unknown, calls: number, guard: number): number {
   let took = 0;
   (guardContext as { call: () => void }).call = () => {
-    const start = performance.now();
+    const start = cpuMs();
     for (let i = 0; i < calls; i++) { try { fn(); } catch { /* a refusal */ } }
-    took = performance.now() - start;
+    took = cpuMs() - start;
   };
   try {
     runInContext("call()", guardContext, { timeout: guard });
@@ -254,10 +256,13 @@ function timed(fn: () => unknown, calls: number, guard: number): number {
 }
 
 /**
- * The time of `atN` and of `at4N`, which read the same shape at n and 4n, each the median of up to SAMPLES samples taken
- * in turn, so a slow moment falls on both. A sample repeats the call often enough that the smaller takes MIN_SAMPLE_MS,
- * and both repeat it the same number of times, as a reader's 64 KiB limit leaves no larger n. The first round of samples
- * is thrown away, as the code is still warming up.
+ * The CPU time of `atN` and of `at4N`, which read the same shape at n and 4n, each the median of up to SAMPLES samples
+ * taken in turn. CPU time, as on a limited or busy machine the wait for a CPU does not fall evenly on clock time: under
+ * `--cpus 0.25` a sample of 4 ms ran with no wait and the sample of 16 ms after it took 89 ms, a ratio of 22 on a plain
+ * scan (docs/progress/2026-11-02-lratio-scaling-ratio.md). A time that uses no CPU, as a wait does, is not seen here.
+ * A sample repeats the call often enough that the smaller takes MIN_SAMPLE_MS of CPU, and both repeat it the same number
+ * of times, as a reader's 64 KiB limit leaves no larger n. The first round of samples is thrown away, as the code is
+ * still warming up.
  */
 function ratioOf(atN: () => unknown, at4N: () => unknown, guard: number) {
   const started = performance.now();
@@ -283,13 +288,16 @@ const measure = (name: string, atN: () => unknown, at4N: () => unknown, guard: n
   return result;
 };
 afterAll(() => {
-  console.log(["scaling ratios: ratio, a call at n, a call at 4n, calls in a sample, what", ...measured].join("\n"));
+  console.log(["scaling ratios: ratio, CPU time of a call at n, of a call at 4n, calls in a sample, what", ...measured].join("\n"));
 });
 
 let controlSum = 0;
 describe("the ratio tells these two apart on this machine", () => {
   const text = "ab".repeat(16_000), scan = (size: number) => { for (let i = 0; i < size; i++) controlSum += text.charCodeAt(i); };
   const scanEachPrefix = (size: number) => { for (let i = 0; i < size; i++) for (let j = 0; j <= i; j++) controlSum += text.charCodeAt(j); };
+  it("gate-reader-scaling-ratio-control: this file is not in a worker thread, as the CPU time read is the whole process's", () => {
+    expect(isMainThread).toBe(true);
+  });
   it("gate-reader-scaling-ratio-control: a scan of n gives under the line", () => {
     expect(measure("control: a scan of 8,000, then 32,000", () => scan(8_000), () => scan(32_000), GUARD_DOCKERFILE_MS).ratio).toBeLessThan(RATIO_LINE);
   }, 60_000);
@@ -414,17 +422,17 @@ describe("the lock readers' time grows less than 8 times from n to 4n, on these 
 
 // Not linear, and written down as it is. One install path of `segments` node_modules parts, with `deps` dependencies that
 // nothing in the lock meets, so each lookup climbs the whole path. The fix belongs in another PR; when it lands, the two
-// tests that say "16" fail, and go with this comment.
+// tests that say "from 8 up to 32" fail, and go with this comment.
 const QUADRATIC_FROM = RATIO_LINE, QUADRATIC_BELOW = 32;
 const keyOf = (segments: number) => `${"node_modules/a/".repeat(segments)}node_modules/z`;
 const manyDeps = (segments: number, deps: number) => lockOf({ [keyOf(segments)]: { version: "1.0.0", dependencies: Object.fromEntries(Array.from({ length: deps }, (_, i) => [`d${i}`, "1.0.0"])) } });
 describe("lock-key-many-deps: one key with many dependencies is quadratic in the key's length today", () => {
-  it("lock-key-many-deps: packageLockInputs, 200 dependencies, a key of 1,019 characters, then 4,034: about 16 times, not under 8", () => {
+  it("lock-key-many-deps: packageLockInputs, 200 dependencies, a key of 1,019 characters, then 4,034: from 8 up to 32 times, not under 8", () => {
     const { ratio, atN, at4N } = measure("lock-key-many-deps: packageLockInputs, 200 deps, key of 1,019, then 4,034", same(manyDeps(67, 200)), same(manyDeps(268, 200)), GUARD_LOCK_MS);
     expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeGreaterThanOrEqual(QUADRATIC_FROM);
     expect(ratio, `${atN} ms a call at n, ${at4N} ms at 4n`).toBeLessThan(QUADRATIC_BELOW);
   }, 120_000);
-  it("lock-key-many-deps: resolveFrom alone, a key of 1,019 characters, then 4,034: about 16 times, not under 8", () => {
+  it("lock-key-many-deps: resolveFrom alone, a key of 1,019 characters, then 4,034: from 8 up to 32 times, not under 8", () => {
     const none = new Map<string, unknown>(), at = (segments: number) => `${keyOf(segments)}/`;
     const small = at(67), large = at(268);
     const { ratio, atN, at4N } = measure("lock-key-many-deps: resolveFrom alone, key of 1,019, then 4,034", () => resolveFrom(none, small, "d"), () => resolveFrom(none, large, "d"), GUARD_LOCK_MS);

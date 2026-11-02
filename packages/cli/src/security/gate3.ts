@@ -1,6 +1,6 @@
 // Gate 3's new type, a first form (docs/decisions/2026-11-02-gate-3-type-definition.md): the old version is the
 // specification. One project, its lockfile before and after a fix: build, types, start, a crawl of every GET page and the
-// tests, old twice and new once, each in packages/sandbox's box. Nothing calls this from `ludion patch` yet (docs/status.md).
+// tests, old twice and new once (twice when it fails to build or start), each in packages/sandbox's box. Nothing calls this from `ludion patch` yet (docs/status.md).
 // This file imports only Node.js's own modules and Ludion's, no package: its heavy check runs with the host's Docker socket.
 import { randomUUID } from "node:crypto";
 import { cpSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -15,6 +15,8 @@ export const BOX_IMAGE = "mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff1
 export const ACQUIRE_IMAGE = "node:24@sha256:e7add2a490bb17d97b485b8641bd88455fff7839ade0f5eba493c3508124d413";
 const BOX_TIMEOUT_MS = 20 * 60_000;
 const MAX_ENV_KEYS = 200;
+/** Less free than this in the box's /tmp of 64 MiB, at a run's lowest reading, is /tmp nearly full: fixed in the definition's Limits before any run read it. */
+export const TMP_NEARLY_FULL_BYTES = 1_048_576;
 
 export const LIMITS = [
   "GET pages only: API routes, Server Actions and dynamic routes are not touched, nothing behind a login is seen, and no button or form is pressed.",
@@ -41,16 +43,23 @@ export type Gate3Run = {
   build: { status: StepStatus; seconds: number }; types: { status: StepStatus; seconds: number }; start: { status: StepStatus; seconds: number };
   crawl: { status: StepStatus; seconds: number }; tests: { status: StepStatus; seconds: number };
   too_many_pages: boolean; pages: Gate3Page[]; seconds: number;
-  /** The peak counts the page cache, so it reaches the box's limit without anything having run out. */
-  memory_peak_bytes: number | null; memory_swap_peak_bytes: number | null; memory_oom_kills: number | null;
-  /** The machine's CPUs as Node.js counts them, whatever the box's limit. Recorded; no verdict reads it, or the memory figures. */
+  /** The peak counts the page cache, so it reaches the box's limit without anything having run out. No verdict reads the peak or the swap. */
+  memory_peak_bytes: number | null; memory_swap_peak_bytes: number | null;
+  /** Read together, only on a run that failed to build or start, or a run of old that did not finish its crawl: whether the box ran out (`outOfBox`). */
+  memory_oom_kills: number | null; tmp_min_free_bytes: number | null;
+  /** The machine's CPUs as Node.js counts them, whatever the box's limit. Recorded; no verdict reads it. */
   host_cpus: number | null;
 };
 export type Verdict = "not_broken" | "broken" | "undecidable";
 export type PageResult = { path: string; role: "specification" | "other"; status: [number | null, number | null, number | null]; dom: "same" | "differs" | "noise" | "not_compared"; noise_elements: number };
+/** The name of each reason a verdict can be undecidable, so that C4 can count them: the definition's Limits say what each is. */
+export const UNDECIDABLE_REASONS = ["not_covered", "prepare_failed", "could_not_run", "old_no_result", "old_failed", "old_box_resources", "too_many_pages", "no_denominator", "new_no_result", "new_timed_out", "new_step_absent", "new_crawl_failed", "box_resources", "box_figures_missing", "flaky_new", "console_other_level", "screenshot_differs", "all_dom_noise"] as const;
+export type UndecidableReason = (typeof UNDECIDABLE_REASONS)[number];
 export type Comparison = {
-  verdict: Verdict; broken: string[]; undecidable: string[]; notes: string[];
-  specification_pages: number; broken_on_both: number; pages: PageResult[];
+  verdict: Verdict; broken: string[];
+  /** The sentences, and beside them, in the same order, the name of each. */
+  undecidable: string[]; undecidable_reasons: UndecidableReason[];
+  notes: string[]; specification_pages: number; broken_on_both: number; pages: PageResult[];
 };
 export type Gate3Result = Comparison & {
   schema: 1; limits: string[];
@@ -135,8 +144,8 @@ export function parseRun(stdout: string): Gate3Run | null {
     if (p.dom !== null && !isList(p.dom, HASH8)) return null;
     if (p.screenshot !== null && !isText(p.screenshot, HASH32)) return null;
   }
-  for (const key of ["memory_peak_bytes", "memory_swap_peak_bytes", "memory_oom_kills", "host_cpus"]) if (value[key] !== null && typeof value[key] !== "number") return null;
-  return { build: value.build, types: value.types, start: value.start, crawl: value.crawl, tests: value.tests, too_many_pages: value.too_many_pages, pages: value.pages, seconds: value.seconds, memory_peak_bytes: value.memory_peak_bytes, memory_swap_peak_bytes: value.memory_swap_peak_bytes, memory_oom_kills: value.memory_oom_kills, host_cpus: value.host_cpus };
+  for (const key of ["memory_peak_bytes", "memory_swap_peak_bytes", "memory_oom_kills", "tmp_min_free_bytes", "host_cpus"]) if (value[key] !== null && typeof value[key] !== "number") return null;
+  return { build: value.build, types: value.types, start: value.start, crawl: value.crawl, tests: value.tests, too_many_pages: value.too_many_pages, pages: value.pages, seconds: value.seconds, memory_peak_bytes: value.memory_peak_bytes, memory_swap_peak_bytes: value.memory_swap_peak_bytes, memory_oom_kills: value.memory_oom_kills, tmp_min_free_bytes: value.tmp_min_free_bytes, host_cpus: value.host_cpus };
 }
 
 const byPath = (run: Gate3Run) => new Map(run.pages.map(p => [p.path, p]));
@@ -148,35 +157,62 @@ export function specificationPages(a: Gate3Run, b: Gate3Run): string[] {
   return a.pages.filter(p => isSpecification(p) && isSpecification(other.get(p.path))).map(p => p.path);
 }
 
+/** The box ran out of memory or /tmp on this run. A figure that could not be read says nothing either way: `figureMissing`. */
+const outOfBox = (run: Gate3Run) => (run.memory_oom_kills ?? 0) >= 1 || (run.tmp_min_free_bytes ?? Infinity) < TMP_NEARLY_FULL_BYTES;
+const figureMissing = (run: Gate3Run) => run.memory_oom_kills === null || run.tmp_min_free_bytes === null;
+/** The build failed, or it built and the server did not start: what new gets a second run for. */
+const didNotComeUp = (run: Gate3Run) => run.build.status === "failed" || (run.build.status === "passed" && run.start.status !== "passed");
+
 /** Why a run of old gives no specification, or null when it can be used. */
-function oldProblem(run: Gate3Run, label: string): string | null {
-  if (run.build.status !== "passed") return `${label} did not build (${run.build.status}), so nothing can be compared with it.`;
-  if (run.too_many_pages) return `${label} has more than ${MAX_PAGES} pages, so not all of them could be opened.`;
-  if (run.start.status !== "passed") return `${label}'s server did not start, so no page has a specification.`;
-  if (run.crawl.status !== "passed") return `${label}'s crawl did not finish.`;
+function oldProblem(run: Gate3Run, label: string): { reason: UndecidableReason; sentence: string } | null {
+  const failed = (sentence: string) => ({ reason: outOfBox(run) ? "old_box_resources" as const : "old_failed" as const, sentence });
+  if (run.build.status !== "passed") return failed(`${label} did not build (${run.build.status}), so nothing can be compared with it.`);
+  if (run.too_many_pages) return { reason: "too_many_pages", sentence: `${label} has more than ${MAX_PAGES} pages, so not all of them could be opened.` };
+  if (run.start.status !== "passed") return failed(`${label}'s server did not start, so no page has a specification.`);
+  if (run.crawl.status !== "passed") return failed(`${label}'s crawl did not finish.`);
   return null;
 }
 
-/** The definition's table: two runs of old against one of new. Every reason is listed, and broken wins over undecidable. */
-export function compareRuns(oldA: Gate3Run, oldB: Gate3Run, next: Gate3Run): Comparison {
-  const broken: string[] = [], undecidable: string[] = [], notes: string[] = [], pages: PageResult[] = [];
+/**
+ * The definition's table and its Limits on new's build or start: two runs of old against new's run and, when that failed
+ * to build or start, its second run (null when that gave no result). A box's limits are Ludion's and not the user's
+ * production, so only two failures with room in the box are broken. Anything else on those runs is undecidable, and
+ * what the first run showed is kept in the notes.
+ */
+export function compareRuns(oldA: Gate3Run, oldB: Gate3Run, next: Gate3Run, again: Gate3Run | null = null): Comparison {
+  const first = compareOneRun(oldA, oldB, next);
+  if (!didNotComeUp(next)) return first;
+  const stop = (reason: UndecidableReason, sentence: string): Comparison => ({ ...first, verdict: "undecidable", broken: [], undecidable: [sentence], undecidable_reasons: [reason], notes: [...first.notes, ...first.broken] });
+  if (outOfBox(next) || (again && outOfBox(again))) return stop("box_resources", "New failed to build or start, and the box ran out of memory or /tmp on one of its two runs, so this says nothing about the fix.");
+  if (!again || again.build.status === "absent") return stop("new_no_result", "New failed to build or start, and its second run gave no result.");
+  if (again.build.status === "timed_out") return stop("new_timed_out", "New failed to build or start, and its second run's build timed out.");
+  if (!didNotComeUp(again)) return stop("flaky_new", "New failed to build or start on its first run, and built and started on its second.");
+  if (figureMissing(next) || figureMissing(again)) return stop("box_figures_missing", "New failed to build or start on both runs, and a memory or /tmp figure could not be read, so it cannot be shown that the box had room.");
+  return { ...first, notes: [...first.notes, "New failed to build or start on both of its runs, with room in the box."] };
+}
+
+/** One run of new against the two of old. Every reason is listed, and broken wins over undecidable. */
+function compareOneRun(oldA: Gate3Run, oldB: Gate3Run, next: Gate3Run): Comparison {
+  const broken: string[] = [], undecidable: string[] = [], reasons: UndecidableReason[] = [], notes: string[] = [], pages: PageResult[] = [];
+  const stop = (reason: UndecidableReason, sentence: string) => { reasons.push(reason); undecidable.push(sentence); };
   const a = byPath(oldA), b = byPath(oldB), n = byPath(next);
   const specification = specificationPages(oldA, oldB), isSpec = new Set(specification);
   let compared = 0, brokenOnBoth = 0;
 
-  if (!specification.length) undecidable.push("No page has status 200 and no exception in both runs of old, so this project and fix have no denominator.");
+  if (!specification.length) stop("no_denominator", "No page has status 200 and no exception in both runs of old, so this project and fix have no denominator.");
   if (next.build.status === "failed") broken.push("New did not build; old did.");
-  else if (next.build.status !== "passed") undecidable.push(`New's build ${next.build.status === "timed_out" ? "timed out" : "did not run"}.`);
+  else if (next.build.status === "timed_out") stop("new_timed_out", "New's build timed out.");
+  else if (next.build.status !== "passed") stop("new_step_absent", "New's build did not run.");
   else if (next.start.status !== "passed") broken.push("New's server did not start; old's did.");
-  else if (next.too_many_pages) undecidable.push(`New has more than ${MAX_PAGES} pages, so not all of them could be opened.`);
-  else if (next.crawl.status !== "passed") undecidable.push("New's crawl did not finish.");
+  else if (next.too_many_pages) stop("too_many_pages", `New has more than ${MAX_PAGES} pages, so not all of them could be opened.`);
+  else if (next.crawl.status !== "passed") stop("new_crawl_failed", "New's crawl did not finish.");
 
   for (const [label, step] of [["Types", "types"], ["Tests", "tests"]] as const) {
     if (oldA[step].status === "absent" && oldB[step].status === "absent") continue;
     if (oldA[step].status !== "passed" || oldB[step].status !== "passed") { notes.push(`${label} did not pass on both runs of old, so they take no part in the comparison.`); continue; }
     if (next[step].status === "failed") broken.push(`${label} passed on both runs of old and fail on new.`);
-    else if (next[step].status === "timed_out") undecidable.push(`${label} timed out on new.`);
-    else if (next[step].status === "absent" && next.build.status === "passed") undecidable.push(`${label} did not run on new.`);
+    else if (next[step].status === "timed_out") stop("new_timed_out", `${label} timed out on new.`);
+    else if (next[step].status === "absent" && next.build.status === "passed") stop("new_step_absent", `${label} did not run on new.`);
   }
 
   const newPagesRead = next.build.status === "passed" && next.start.status === "passed" && next.crawl.status === "passed" && !next.too_many_pages;
@@ -198,7 +234,7 @@ export function compareRuns(oldA: Gate3Run, oldB: Gate3Run, next: Gate3Run): Com
     const added = [...new Set(pn.console)].filter(m => !known.has(m));
     const errors = added.filter(m => m.startsWith("error:"));
     if (errors.length) broken.push(`${path} has ${errors.length} console error(s) on new that old did not have.`);
-    if (added.length > errors.length) undecidable.push(`${path} has ${added.length - errors.length} console message(s) of another level on new that old did not have.`);
+    if (added.length > errors.length) stop("console_other_level", `${path} has ${added.length - errors.length} console message(s) of another level on new that old did not have.`);
 
     const domA = pa!.dom, domB = pb!.dom;
     if (!domA || !domB || domA.length !== domB.length) { result.dom = "noise"; notes.push(`${path}'s DOM differs in size between the two runs of old, so it is not compared.`); }
@@ -215,17 +251,28 @@ export function compareRuns(oldA: Gate3Run, oldB: Gate3Run, next: Gate3Run): Com
       }
       if (result.dom === "same" && pn.status === 200) {
         if (pa!.screenshot && pa!.screenshot === pb!.screenshot) {
-          if (pn.screenshot !== pa!.screenshot) undecidable.push(`${path} has the same DOM, and its screenshot differs from old's.`);
+          if (pn.screenshot !== pa!.screenshot) stop("screenshot_differs", `${path} has the same DOM, and its screenshot differs from old's.`);
         } else notes.push(`${path}'s screenshot differs between the two runs of old, so it is not compared.`);
       }
     }
   }
-  if (specification.length && newPagesRead && !compared) undecidable.push("Every specification page's DOM is noise, so no page's DOM could be compared.");
+  if (specification.length && newPagesRead && !compared) stop("all_dom_noise", "Every specification page's DOM is noise, so no page's DOM could be compared.");
   const verdict: Verdict = broken.length ? "broken" : undecidable.length ? "undecidable" : "not_broken";
-  return { verdict, broken, undecidable, notes, specification_pages: specification.length, broken_on_both: brokenOnBoth, pages };
+  return { verdict, broken, undecidable, undecidable_reasons: reasons, notes, specification_pages: specification.length, broken_on_both: brokenOnBoth, pages };
 }
 
-const emptyComparison = (reason: string, notes: string[] = []): Comparison => ({ verdict: "undecidable", broken: [], undecidable: [reason], notes, specification_pages: 0, broken_on_both: 0, pages: [] });
+/**
+ * For C4: of these judgements, how many were undecidable for each reason, with every reason listed, at 0 when none gave it.
+ * A judgement counts once under each reason it gave, so the counts can add up to more than the undecidable judgements.
+ * A broken judgement is not counted: its other reasons did not decide it.
+ */
+export function undecidableCounts(results: readonly Pick<Comparison, "verdict" | "undecidable_reasons">[]): Record<UndecidableReason, number> {
+  const counts = Object.fromEntries(UNDECIDABLE_REASONS.map(reason => [reason, 0])) as Record<UndecidableReason, number>;
+  for (const result of results) if (result.verdict === "undecidable") for (const reason of new Set(result.undecidable_reasons)) counts[reason]++;
+  return counts;
+}
+
+const emptyComparison = (sentence: string, reason: UndecidableReason, notes: string[] = []): Comparison => ({ verdict: "undecidable", broken: [], undecidable: [sentence], undecidable_reasons: [reason], notes, specification_pages: 0, broken_on_both: 0, pages: [] });
 const elapsed = (start: bigint) => Number(process.hrtime.bigint() - start) / 1e9;
 
 /** Judges one fix. Anything that goes wrong outside the comparison is undecidable, with its reason; nothing here applies anything. */
@@ -244,8 +291,8 @@ export async function judgeGate3(input: Gate3Input, deps: Gate3Deps): Promise<Ga
   try {
     for (const [label, side] of [["old", input.old], ["new", input.new]] as const) {
       let manifest: any;
-      try { manifest = JSON.parse(side.manifest); } catch { return finish(emptyComparison(`${label}'s package.json cannot be read.`)); }
-      if (!manifest?.dependencies?.next && !manifest?.devDependencies?.next) return finish(emptyComparison(`${label}'s package.json has no next dependency: this first form covers only Next.js projects.`));
+      try { manifest = JSON.parse(side.manifest); } catch { return finish(emptyComparison(`${label}'s package.json cannot be read.`, "not_covered")); }
+      if (!manifest?.dependencies?.next && !manifest?.devDependencies?.next) return finish(emptyComparison(`${label}'s package.json has no next dependency: this first form covers only Next.js projects.`, "not_covered"));
     }
     temp = mkdtempSync(join(tmpdir(), "ludion-gate3-"));
     const source = join(temp, "source"); mkdirSync(source);
@@ -300,32 +347,34 @@ export async function judgeGate3(input: Gate3Input, deps: Gate3Deps): Promise<Ga
     seconds.pull = elapsed(pullStarted);
     let oldImage: string;
     try { oldImage = await prepare("old", input.old); }
-    catch (error) { return finish(emptyComparison(`Old's dependencies or image could not be prepared: ${message(error)}`, notes)); }
+    catch (error) { return finish(emptyComparison(`Old's dependencies or image could not be prepared: ${message(error)}`, "prepare_failed", notes)); }
     const oldA = await once("old-1", oldImage);
-    if (!oldA) return finish(emptyComparison("The first run of old gave no result: it timed out or ran out of what the box allows.", notes));
+    if (!oldA) return finish(emptyComparison("The first run of old gave no result: it timed out or ran out of what the box allows.", "old_no_result", notes));
     const problemA = oldProblem(oldA, "Old");
-    if (problemA) return finish(emptyComparison(problemA, notes));
+    if (problemA) return finish(emptyComparison(problemA.sentence, problemA.reason, notes));
     const oldB = await once("old-2", oldImage);
-    if (!oldB) return finish(emptyComparison("The second run of old gave no result: it timed out or ran out of what the box allows.", notes));
+    if (!oldB) return finish(emptyComparison("The second run of old gave no result: it timed out or ran out of what the box allows.", "old_no_result", notes));
     const problemB = oldProblem(oldB, "Old's second run");
-    if (problemB) return finish(emptyComparison(problemB, notes));
+    if (problemB) return finish(emptyComparison(problemB.sentence, problemB.reason, notes));
     if (!specificationPages(oldA, oldB).length) {
       const compareStarted = process.hrtime.bigint();
       const comparison = compareRuns(oldA, oldB, { ...oldA, pages: [] });
       seconds.compare = elapsed(compareStarted);
-      return finish({ ...emptyComparison(comparison.undecidable[0]!, notes), pages: comparison.pages });
+      return finish({ ...emptyComparison(comparison.undecidable[0]!, "no_denominator", notes), pages: comparison.pages });
     }
     let newImage: string;
     try { newImage = await prepare("new", input.new); }
-    catch (error) { return finish(emptyComparison(`New's dependencies or image could not be prepared: ${message(error)}`, notes)); }
+    catch (error) { return finish(emptyComparison(`New's dependencies or image could not be prepared: ${message(error)}`, "prepare_failed", notes)); }
     const next = await once("new", newImage);
-    if (!next) return finish(emptyComparison("The run of new gave no result: it timed out or ran out of what the box allows.", notes));
+    if (!next) return finish(emptyComparison("The run of new gave no result: it timed out or ran out of what the box allows.", "new_no_result", notes));
+    // In a fresh box, from the same image. Whatever the first run shows, so that both are in the result.
+    const again = didNotComeUp(next) ? await once("new-2", newImage) : null;
     const compareStarted = process.hrtime.bigint();
-    const comparison = compareRuns(oldA, oldB, next);
+    const comparison = compareRuns(oldA, oldB, next, again);
     seconds.compare = elapsed(compareStarted);
     return finish({ ...comparison, notes: [...notes, ...comparison.notes] });
   } catch (error) {
-    return finish(emptyComparison(`Gate 3 could not run: ${message(error)}`));
+    return finish(emptyComparison(`Gate 3 could not run: ${message(error)}`, "could_not_run"));
   } finally {
     for (const image of images.reverse()) await command(["image", "rm", image], 15_000).catch(() => {});
     if (temp && resolve(temp).startsWith(resolve(tmpdir()) + sep)) rmSync(temp, { recursive: true, force: true });

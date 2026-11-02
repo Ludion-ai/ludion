@@ -248,16 +248,32 @@ async function main() {
   return out;
 }
 
+// The least room /tmp had in this run: with the kills below, what the verdict reads when a build or a start fails (the
+// definition's Limits). Read through the run, since what a build fills it can free before it exits. A reading that fails
+// is left out, and none at all is null, which says nothing about room.
+let tmpMinFree = null;
+const readTmpFree = () => {
+  try {
+    const { bavail, bsize } = fs.statfsSync("/tmp");
+    if (tmpMinFree === null || bavail * bsize < tmpMinFree) tmpMinFree = bavail * bsize;
+  } catch {}
+};
+readTmpFree();
+const tmpReader = setInterval(readTmpFree, 200);
+
 const whole = process.hrtime.bigint();
 main().catch(error => {
   process.stderr.write(String(error && error.stack || error) + "\n");
   return { schema: 1, driver_failed: true };
 }).then(out => {
+  clearInterval(tmpReader);
+  readTmpFree();
+  out.tmp_min_free_bytes = tmpMinFree;
   out.seconds = secondsSince(whole);
   // The machine's CPUs, which the box's limit does not change: a result is read knowing what it ran on.
   out.host_cpus = os.cpus().length;
   // What the box used. The peak counts the page cache, so it reaches the limit without anything having run out; swap and
-  // kills say whether something did. Not every system has these files.
+  // kills say whether something did. Not every system has these files, and a verdict that needs them says so.
   const cgroup = name => { try { return fs.readFileSync("/sys/fs/cgroup/" + name, "utf8").trim(); } catch { return null; } };
   const number = text => text === null || !/^\d+$/.test(text) ? null : Number(text);
   out.memory_peak_bytes = number(cgroup("memory.peak"));

@@ -9,14 +9,14 @@ import { runInNewContext, Script } from "node:vm";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { ContainerOutcome } from "../../sandbox/src/docker.ts";
 import { acquisitionPolicy, resolverDockerfile } from "../src/security/dependency-patch.ts";
-import { acquireDockerfile, ACQUIRE_IMAGE, BOX_IMAGE, boxDockerfile, compareRuns, dummyEnv, judgeGate3, parseRun, specificationPages, type Gate3Page, type Gate3Run, type StepStatus } from "../src/security/gate3.ts";
+import { acquireDockerfile, ACQUIRE_IMAGE, BOX_IMAGE, boxDockerfile, compareRuns, dummyEnv, judgeGate3, parseRun, specificationPages, TMP_NEARLY_FULL_BYTES, UNDECIDABLE_REASONS, undecidableCounts, type Gate3Page, type Gate3Run, type StepStatus, type UndecidableReason } from "../src/security/gate3.ts";
 import { BOX_DRIVER, FREEZE_CLOCK, MAX_PAGES, RESULT_MARKER } from "../src/security/gate3-box.ts";
 import { snapshot } from "../src/security/project.ts";
 
 const passed = { status: "passed" as StepStatus, seconds: 1 };
 const absent = { status: "absent" as StepStatus, seconds: 0 };
 const page = (path: string, over: Partial<Gate3Page> = {}): Gate3Page => ({ path, status: 200, exceptions: [], console: [], dom: ["aaaaaaaa", "bbbbbbbb"], screenshot: "0".repeat(32), ...over });
-const run = (pages: Gate3Page[], over: Partial<Gate3Run> = {}): Gate3Run => ({ build: passed, types: passed, start: passed, crawl: passed, tests: passed, too_many_pages: false, pages, seconds: 2, memory_peak_bytes: 1, memory_swap_peak_bytes: 0, memory_oom_kills: 0, host_cpus: 16, ...over });
+const run = (pages: Gate3Page[], over: Partial<Gate3Run> = {}): Gate3Run => ({ build: passed, types: passed, start: passed, crawl: passed, tests: passed, too_many_pages: false, pages, seconds: 2, memory_peak_bytes: 1, memory_swap_peak_bytes: 0, memory_oom_kills: 0, tmp_min_free_bytes: 40 * 1_048_576, host_cpus: 16, ...over });
 const failed = { status: "failed" as StepStatus, seconds: 1 }, timedOut = { status: "timed_out" as StepStatus, seconds: 1 };
 const old = () => run([page("/"), page("/about")]);
 
@@ -44,15 +44,80 @@ describe("the definition's table", () => {
     ["types pass on old and fail on new", { types: failed }, /Types passed on both runs of old and fail on new/],
     ["tests pass on old and fail on new", { tests: failed }, /Tests passed on both runs of old and fail on new/],
   ])("broken: %s", (_name, over, reason) => {
-    const result = compareRuns(old(), old(), run(old().pages, over));
+    const result = compareRuns(old(), old(), run(old().pages, over), run(old().pages, over));
     expect(result.verdict).toBe("broken");
     expect(result.broken.join(" ")).toMatch(reason);
   });
 
-  it("broken: new's build failing for lack of memory is still new not building; the verdict reads no memory figure", () => {
-    const killed = run([], { build: failed, memory_swap_peak_bytes: 536_870_912, memory_oom_kills: 2 });
-    expect(compareRuns(old(), old(), killed)).toMatchObject({ verdict: "broken", broken: ["New did not build; old did."] });
-    expect(compareRuns(old(), old(), { ...killed, memory_oom_kills: 0 }).verdict).toBe("broken");
+  describe("new failing to build or start: the two runs are read as the definition's Limits say", () => {
+    const noBuild = (over: Partial<Gate3Run> = {}) => run([], { build: failed, types: absent, start: absent, crawl: absent, tests: absent, ...over });
+    const noStart = (over: Partial<Gate3Run> = {}) => run([], { start: failed, crawl: absent, ...over });
+    const up = (over: Partial<Gate3Run> = {}) => run(old().pages, over);
+    const failing: [string, typeof noBuild][] = [["build", noBuild], ["start", noStart]];
+
+    it.each(failing)("oom-is-undecidable-not-broken: %s, an OOM kill on either run", (_name, fails) => {
+      for (const [first, second] of [[fails({ memory_oom_kills: 2 }), fails()], [fails(), fails({ memory_oom_kills: 1 })], [fails({ memory_oom_kills: 1 }), fails({ memory_oom_kills: 1 })]]) {
+        expect(compareRuns(old(), old(), first!, second!)).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources"] });
+      }
+    });
+
+    it("oom-is-undecidable-not-broken: it comes before the second run's own result, and what the first run showed is kept", () => {
+      const killed = noBuild({ memory_oom_kills: 1 });
+      expect(compareRuns(old(), old(), killed, up()).undecidable_reasons).toEqual(["box_resources"]);
+      expect(compareRuns(old(), old(), noBuild(), up({ memory_oom_kills: 1 })).undecidable_reasons).toEqual(["box_resources"]);
+      expect(compareRuns(old(), old(), killed, null).undecidable_reasons).toEqual(["box_resources"]);
+      expect(compareRuns(old(), old(), killed, noBuild()).notes).toContain("New did not build; old did.");
+      // A test that also failed in the first run does not make it broken: the box had run out.
+      const result = compareRuns(old(), old(), noStart({ memory_oom_kills: 1, tests: failed }), noStart());
+      expect(result).toMatchObject({ verdict: "undecidable", broken: [] });
+      expect(result.notes).toContain("Tests passed on both runs of old and fail on new.");
+    });
+
+    it.each(failing)("tmp-nearly-full-is-undecidable: %s, under the fixed number on either run, and not at it", (_name, fails) => {
+      expect(TMP_NEARLY_FULL_BYTES).toBe(1_048_576);
+      for (const free of [0, TMP_NEARLY_FULL_BYTES - 1]) {
+        expect(compareRuns(old(), old(), fails({ tmp_min_free_bytes: free }), fails())).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources"] });
+        expect(compareRuns(old(), old(), fails(), fails({ tmp_min_free_bytes: free }))).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources"] });
+      }
+      expect(compareRuns(old(), old(), fails({ tmp_min_free_bytes: TMP_NEARLY_FULL_BYTES }), fails({ tmp_min_free_bytes: TMP_NEARLY_FULL_BYTES })).verdict).toBe("broken");
+    });
+
+    it.each(failing)("flaky-new-is-undecidable: %s failed once and the second run came up, and its pages are not compared", (_name, fails) => {
+      expect(compareRuns(old(), old(), fails(), up())).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["flaky_new"] });
+      expect(compareRuns(old(), old(), fails(), run([page("/", { status: 500 })]))).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["flaky_new"] });
+    });
+
+    it("two-failures-with-room-are-broken: only then, with the first run's reasons, whichever step failed on each", () => {
+      expect(compareRuns(old(), old(), noBuild(), noBuild())).toMatchObject({ verdict: "broken", broken: ["New did not build; old did."], undecidable_reasons: [] });
+      expect(compareRuns(old(), old(), noStart(), noStart())).toMatchObject({ verdict: "broken", broken: ["New's server did not start; old's did."] });
+      expect(compareRuns(old(), old(), noBuild(), noStart())).toMatchObject({ verdict: "broken", broken: ["New did not build; old did."] });
+      expect(compareRuns(old(), old(), noStart(), noBuild())).toMatchObject({ verdict: "broken", broken: ["New's server did not start; old's did."] });
+      expect(compareRuns(old(), old(), noBuild(), noBuild()).notes.join(" ")).toContain("on both of its runs");
+    });
+
+    it("one failed run is never broken by itself: no second run, or one that gave no result or timed out", () => {
+      for (const fails of [noBuild, noStart]) {
+        expect(compareRuns(old(), old(), fails())).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["new_no_result"] });
+        expect(compareRuns(old(), old(), fails(), null).undecidable_reasons).toEqual(["new_no_result"]);
+        expect(compareRuns(old(), old(), fails(), run([], { build: timedOut })).undecidable_reasons).toEqual(["new_timed_out"]);
+        expect(compareRuns(old(), old(), fails(), run([], { build: absent })).undecidable_reasons).toEqual(["new_no_result"]);
+      }
+    });
+
+    it("a figure that could not be read is not room, on either run, and a figure that says the box ran out still decides", () => {
+      for (const missing of [{ memory_oom_kills: null }, { tmp_min_free_bytes: null }]) {
+        expect(compareRuns(old(), old(), noBuild(missing), noBuild())).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_figures_missing"] });
+        expect(compareRuns(old(), old(), noBuild(), noBuild(missing))).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_figures_missing"] });
+      }
+      expect(compareRuns(old(), old(), noBuild({ tmp_min_free_bytes: null, memory_oom_kills: 1 }), noBuild()).undecidable_reasons).toEqual(["box_resources"]);
+      expect(compareRuns(old(), old(), noBuild({ memory_oom_kills: null }), up()).undecidable_reasons).toEqual(["flaky_new"]);
+    });
+
+    it("what this does not change: a run that came up reads no figure, so a test or a page that fails on it is broken", () => {
+      expect(compareRuns(old(), old(), up({ memory_oom_kills: 3, tmp_min_free_bytes: 0 })).verdict).toBe("not_broken");
+      expect(compareRuns(old(), old(), up({ tests: failed, tmp_min_free_bytes: 0 })).verdict).toBe("broken");
+      expect(compareRuns(old(), old(), run([page("/", { status: null, dom: null, screenshot: null }), page("/about")], { memory_oom_kills: 1 })).verdict).toBe("broken");
+    });
   });
 
   it.each<[string, Partial<Gate3Page> | null, RegExp]>([
@@ -79,26 +144,30 @@ describe("the definition's table", () => {
     expect(compareRuns(pages(500), pages(500), pages(500))).toMatchObject({ verdict: "not_broken", broken_on_both: 1 });
   });
 
-  it.each<[string, Partial<Gate3Run>, RegExp]>([
-    ["new's build timed out", { build: timedOut, pages: [] }, /New's build timed out/],
-    ["new's crawl did not finish", { crawl: failed, pages: [] }, /crawl did not finish/],
-    ["new has too many pages", { too_many_pages: true, pages: [] }, /more than 200 pages/],
-    ["types time out on new", { types: timedOut }, /Types timed out on new/],
-    ["tests time out on new", { tests: timedOut }, /Tests timed out on new/],
-    ["tests no longer run on new", { tests: absent }, /Tests did not run on new/],
-  ])("undecidable: %s", (_name, over, reason) => {
+  it.each<[string, Partial<Gate3Run>, RegExp, UndecidableReason]>([
+    ["new's build timed out", { build: timedOut, pages: [] }, /New's build timed out/, "new_timed_out"],
+    ["new's build did not run", { build: absent, pages: [] }, /New's build did not run/, "new_step_absent"],
+    ["new's crawl did not finish", { crawl: failed, pages: [] }, /crawl did not finish/, "new_crawl_failed"],
+    ["new has too many pages", { too_many_pages: true, pages: [] }, /more than 200 pages/, "too_many_pages"],
+    ["types time out on new", { types: timedOut }, /Types timed out on new/, "new_timed_out"],
+    ["tests time out on new", { tests: timedOut }, /Tests timed out on new/, "new_timed_out"],
+    ["tests no longer run on new", { tests: absent }, /Tests did not run on new/, "new_step_absent"],
+  ])("undecidable: %s", (_name, over, reason, name) => {
     const result = compareRuns(old(), old(), run(old().pages, over));
     expect(result.verdict).toBe("undecidable");
     expect(result.undecidable.join(" ")).toMatch(reason);
+    expect(result.undecidable_reasons).toEqual([name]);
   });
 
   it("undecidable: another level's new console message, and a screenshot alone", () => {
     const warned = compareRuns(old(), old(), run([page("/"), page("/about", { console: ["warning:0123456789abcdef"] })]));
     expect(warned.verdict).toBe("undecidable");
     expect(warned.undecidable.join(" ")).toMatch(/1 console message\(s\) of another level/);
+    expect(warned.undecidable_reasons).toEqual(["console_other_level"]);
     const pictured = compareRuns(old(), old(), run([page("/"), page("/about", { screenshot: "1".repeat(32) })]));
     expect(pictured.verdict).toBe("undecidable");
     expect(pictured.undecidable.join(" ")).toMatch(/same DOM, and its screenshot differs/);
+    expect(pictured.undecidable_reasons).toEqual(["screenshot_differs"]);
     const noShot = compareRuns(old(), old(), run([page("/"), page("/about", { screenshot: null })]));
     expect(noShot.verdict).toBe("undecidable");
   });
@@ -108,6 +177,34 @@ describe("the definition's table", () => {
     expect(result.verdict).toBe("broken");
     expect(result.broken.length).toBeGreaterThan(0);
     expect(result.undecidable.length).toBeGreaterThan(0);
+    expect(result.undecidable_reasons.length).toBe(result.undecidable.length);
+  });
+
+  describe("undecidableCounts: what C4 counts", () => {
+    const counted = (over: Partial<Record<UndecidableReason, number>>) => ({ ...Object.fromEntries(UNDECIDABLE_REASONS.map(r => [r, 0])), ...over });
+
+    it("every reason is there at 0, so a reason that never happened is written and not left out", () => {
+      expect(undecidableCounts([])).toEqual(counted({}));
+      expect(Object.keys(undecidableCounts([])).length).toBe(UNDECIDABLE_REASONS.length);
+    });
+
+    it("counts real results by reason: one judgement once under each of its reasons, and a broken one not at all", () => {
+      const noBuild = run([], { build: failed, types: absent, start: absent, crawl: absent, tests: absent });
+      const shot = page("/", { screenshot: "1".repeat(32) });
+      const results = [
+        compareRuns(old(), old(), noBuild, { ...noBuild, memory_oom_kills: 1 }),
+        compareRuns(old(), old(), { ...noBuild, tmp_min_free_bytes: 0 }, noBuild),
+        compareRuns(old(), old(), noBuild, old()),
+        // Two pages with the same reason are one judgement.
+        compareRuns(old(), old(), run([shot, { ...shot, path: "/about" }])),
+        compareRuns(old(), old(), run([shot, { ...shot, path: "/about", console: ["info:0123456789abcdef"] }])),
+        // Decided by broken, though it also holds an undecidable reason.
+        compareRuns(old(), old(), run([page("/", { status: 500 }), page("/about", { console: ["info:0123456789abcdef"] })])),
+        compareRuns(old(), old(), noBuild, noBuild),
+        compareRuns(old(), old(), old()),
+      ];
+      expect(undecidableCounts(results)).toEqual(counted({ box_resources: 2, flaky_new: 1, screenshot_differs: 2, console_other_level: 1 }));
+    });
   });
 
   describe("noise, what differs between the two runs of old", () => {
@@ -184,6 +281,8 @@ describe("parseRun: what the box prints is data the candidate could have written
     ["too many pages", print({ ...good, pages: Array.from({ length: MAX_PAGES + 1 }, (_, i) => page(`/${i}`)) })],
     ["memory that is not a number", print({ ...good, memory_oom_kills: "0" })],
     ["a CPU count that is not a number", print({ ...good, host_cpus: "16" })],
+    ["a /tmp figure that is not a number", print({ ...good, tmp_min_free_bytes: "0" })],
+    ["no /tmp figure at all", print({ ...good, tmp_min_free_bytes: undefined })],
   ])("no result: %s", (_name, stdout) => {
     expect(parseRun(stdout)).toBeNull();
   });
@@ -254,8 +353,8 @@ describe("what goes into the box", () => {
   });
 
   /** The driver itself, up to a build that fails, with Node.js's modules stood in for. It shows nothing about real builds: those are in the progress record. */
-  const driverUpToBuild = async (over: { env?: Record<string, string>; hostEnv?: Record<string, string>; cpus?: number } = {}) => {
-    const events: string[] = [], envs: Record<string, Record<string, string>> = {};
+  const driverUpToBuild = async (over: { env?: Record<string, string>; hostEnv?: Record<string, string>; cpus?: number; statfs?: (state: { inBuild: boolean; ended: boolean }) => { bavail: number; bsize: number }; buildMs?: number } = {}) => {
+    const events: string[] = [], envs: Record<string, Record<string, string>> = {}, state = { inBuild: false, ended: false };
     let printed = "";
     const missing = () => { throw new Error("not in this stand-in"); };
     const fs = {
@@ -263,13 +362,15 @@ describe("what goes into the box", () => {
       readdirSync: () => [], copyFileSync: () => {}, symlinkSync: () => {},
       mkdirSync: (path: string) => { events.push(`mkdir ${path}`); },
       chmodSync: (path: string, mode: number) => { events.push(`chmod ${mode.toString(8)} ${path}`); },
+      statfsSync: (path: string) => { events.push(`statfs ${path}`); return (over.statfs ?? (() => ({ bavail: 16_384, bsize: 4096 })))(state); },
     };
     const spawn = (_program: string, args: string[], options: { env: Record<string, string> }) => {
       const name = args[args.length - 1]!;
       events.push(`spawn ${name}`);
       envs[name] = options.env;
       const child = new EventEmitter();
-      setImmediate(() => child.emit("close", 1));
+      state.inBuild = true;
+      setTimeout(() => { state.inBuild = false; state.ended = true; child.emit("close", 1); }, over.buildMs ?? 0);
       return child;
     };
     const os = { cpus: () => Array.from({ length: over.cpus ?? 16 }, () => ({})) };
@@ -277,10 +378,34 @@ describe("what goes into the box", () => {
     await new Promise<void>(done => {
       const stream = { write: (text: string, callback?: () => void) => { printed += text; callback?.(); return true; } };
       const box = { env: over.hostEnv ?? {}, execPath: "node", hrtime: process.hrtime, kill: () => {}, stderr: { write: () => true }, stdout: stream, exit: () => done() };
-      new Script(BOX_DRIVER).runInNewContext({ Buffer, clearTimeout, process: box, require: (name: string) => modules[name], setTimeout });
+      new Script(BOX_DRIVER).runInNewContext({ Buffer, clearInterval, clearTimeout, process: box, require: (name: string) => modules[name], setInterval, setTimeout });
     });
     return { events, envs, printed };
   };
+
+  it("tmp-min-free: the result holds the lowest /tmp reading of the run, of the box's /tmp, in bytes", async () => {
+    const { events, printed } = await driverUpToBuild();
+    expect(events).toContain("statfs /tmp");
+    expect(events.filter(e => e.startsWith("statfs")).every(e => e === "statfs /tmp")).toBe(true);
+    expect(parseRun(printed)?.tmp_min_free_bytes).toBe(16_384 * 4096);
+  });
+
+  it("tmp-min-free: a build that fills /tmp and frees it before it exits is still seen, by the readings during the build", async () => {
+    const { printed } = await driverUpToBuild({ buildMs: 700, statfs: state => ({ bavail: state.inBuild ? 3 : 16_384, bsize: 4096 }) });
+    expect(parseRun(printed)?.tmp_min_free_bytes).toBe(3 * 4096);
+  });
+
+  it("tmp-min-free: what is left when the build has ended is read too, before the result is printed", async () => {
+    const { printed } = await driverUpToBuild({ statfs: state => ({ bavail: state.ended ? 5 : 16_384, bsize: 4096 }) });
+    expect(parseRun(printed)?.tmp_min_free_bytes).toBe(5 * 4096);
+  });
+
+  it("tmp-min-free: with no reading the figure is null, not a figure that looks like room, and the run still prints", async () => {
+    const { printed } = await driverUpToBuild({ statfs: () => { throw new Error("no statfs here"); } });
+    const result = parseRun(printed);
+    expect(result?.build.status).toBe("failed");
+    expect(result?.tmp_min_free_bytes).toBeNull();
+  });
 
   it("gate3-webpack-cache-read-only-before-build: that folder, and nothing else, is read-only before the build starts", async () => {
     const { events, printed } = await driverUpToBuild();
@@ -494,6 +619,87 @@ describe("one judgement, with Docker stood in for", () => {
       expect(b.names.length).toBe(runs);
       expect(removed(d).length).toBeGreaterThan(0);
     }
+  });
+
+  describe("new's second run", () => {
+    const noBuild = (over: Partial<Gate3Run> = {}) => run([], { build: failed, types: absent, start: absent, crawl: absent, tests: absent, ...over });
+    const noStart = (over: Partial<Gate3Run> = {}) => run([], { start: failed, crawl: absent, ...over });
+    const judge = async (...news: ContainerOutcome[]) => {
+      const d = docker(), b = boxes(exited(printed(old())), exited(printed(old())), ...news);
+      const result = await judgeGate3({ dir, old: sides, new: sides }, deps(d, b));
+      return { d, b, result, labels: result.runs.map(r => r.label) };
+    };
+
+    it("is not run when new builds and starts", async () => {
+      const { result, labels } = await judge(exited(printed(old())));
+      expect(labels).toEqual(["old-1", "old-2", "new"]);
+      expect(result.verdict).toBe("not_broken");
+    });
+
+    it.each([["build", noBuild], ["start", noStart]] as const)("when new's %s fails: a second, fresh box from the same image, and both are in the result", async (_name, fails) => {
+      const { d, b, result, labels } = await judge(exited(printed(fails())), exited(printed(fails())));
+      expect(labels).toEqual(["old-1", "old-2", "new", "new-2"]);
+      expect(new Set(b.names).size).toBe(4);
+      expect(result.runs.every(r => r.outcome === "ran")).toBe(true);
+      expect(d.contexts.length).toBe(4);
+      expect(result.verdict).toBe("broken");
+    });
+
+    it("oom-is-undecidable-not-broken: through the whole judgement, and the second run still runs", async () => {
+      const { result, labels } = await judge(exited(printed(noBuild({ memory_oom_kills: 1 }))), exited(printed(noBuild())));
+      expect(labels).toEqual(["old-1", "old-2", "new", "new-2"]);
+      expect(result).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["box_resources"] });
+      expect(result.runs[2]!.run?.memory_oom_kills).toBe(1);
+    });
+
+    it("flaky-new-is-undecidable: through the whole judgement", async () => {
+      const { result } = await judge(exited(printed(noBuild())), exited(printed(old())));
+      expect(result).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["flaky_new"] });
+    });
+
+    it("tmp-nearly-full-is-undecidable: through the whole judgement", async () => {
+      const { result } = await judge(exited(printed(noBuild())), exited(printed(noBuild({ tmp_min_free_bytes: 0 }))));
+      expect(result).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["box_resources"] });
+    });
+
+    it.each<[string, ContainerOutcome]>([
+      ["times out", exited(printed(old()), { timedOut: true })],
+      ["prints nothing that can be read", exited("killed", { exitCode: 137 })],
+    ])("undecidable, not broken, when it %s", async (_name, outcome) => {
+      const { result, labels } = await judge(exited(printed(noBuild())), outcome);
+      expect(labels).toEqual(["old-1", "old-2", "new", "new-2"]);
+      expect(result).toMatchObject({ verdict: "undecidable", broken: [], undecidable_reasons: ["new_no_result"] });
+    });
+
+    it("a first run of new with no result gets no second run", async () => {
+      const { result, labels } = await judge(exited("killed", { exitCode: 137 }));
+      expect(labels).toEqual(["old-1", "old-2", "new"]);
+      expect(result).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["new_no_result"] });
+    });
+  });
+
+  it("every way out says its reason's name, so that C4 can count it", async () => {
+    const reasonOf = async (answers: ContainerOutcome[], failOn?: RegExp, manifestText = manifest) => (await judgeGate3({ dir, old: { manifest: manifestText, lock: "{}" }, new: sides }, deps(docker(failOn), boxes(...answers)))).undecidable_reasons;
+    const good = exited(printed(old()));
+    const noBuild = (over: Partial<Gate3Run> = {}) => exited(printed(run([], { build: failed, ...over })));
+    expect(await reasonOf([], undefined, JSON.stringify({ dependencies: {} }))).toEqual(["not_covered"]);
+    expect(await reasonOf([], undefined, "{")).toEqual(["not_covered"]);
+    expect(await reasonOf([], /^pull /)).toEqual(["could_not_run"]);
+    expect(await reasonOf([], /--network=none/)).toEqual(["prepare_failed"]);
+    expect(await reasonOf([{ kind: "spawn_error", message: "no docker" }])).toEqual(["could_not_run"]);
+    expect(await reasonOf([exited("", { timedOut: true })])).toEqual(["old_no_result"]);
+    expect(await reasonOf([good, exited("", { timedOut: true })])).toEqual(["old_no_result"]);
+    expect(await reasonOf([noBuild()])).toEqual(["old_failed"]);
+    expect(await reasonOf([good, exited(printed(run([], { crawl: failed })))])).toEqual(["old_failed"]);
+    expect(await reasonOf([exited(printed(run([], { too_many_pages: true })))])).toEqual(["too_many_pages"]);
+    const none = exited(printed(run([page("/", { status: 500 })])));
+    expect(await reasonOf([none, none])).toEqual(["no_denominator"]);
+    // Old's own lack of room is told apart from old failing: it is how many projects fit the box.
+    expect(await reasonOf([noBuild({ memory_oom_kills: 1 })])).toEqual(["old_box_resources"]);
+    expect(await reasonOf([good, noBuild({ tmp_min_free_bytes: 0 })])).toEqual(["old_box_resources"]);
+    expect(await reasonOf([exited(printed(run([], { start: failed, memory_oom_kills: 1 })))])).toEqual(["old_box_resources"]);
+    expect(await reasonOf([exited(printed(run([], { crawl: failed, memory_oom_kills: 1 })))])).toEqual(["old_box_resources"]);
+    expect(await reasonOf([good, good, exited("", { timedOut: true })])).toEqual(["new_no_result"]);
   });
 
   it("a result that says all is well does not count when the box timed out", async () => {

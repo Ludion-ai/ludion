@@ -197,8 +197,20 @@ describe("C2's count (docs/decisions/2026-11-03-c2-upper-limit-chains.md)", () =
   const record = read(RECORD);
 
   // Section 1's rule. No code on main computes n; the replay's code for it belongs to C12's fix.
-  type Version = { name: string; version: string; published: string; falseReport?: boolean };
+  type Version = { name: string; version: string; published: string; falseReport?: boolean; aliases?: string[] };
   const SEVEN_DAYS = 7 * 24 * 3_600_000;
+  // Line 7 as section 6 amends it. "Where there is none" is read here for the pair: no alias joins these two.
+  const sameAttack = (a: Version, b: Version) => (a.aliases ?? []).some(alias => (b.aliases ?? []).includes(alias))
+    || (a.name === b.name && Math.abs(Date.parse(a.published) - Date.parse(b.published)) <= SEVEN_DAYS);
+  /** Puts together the parts that have versions of one attack, directly or through another part. */
+  const joinAttacks = (parts: Version[][]) => {
+    let out: Version[][] = [];
+    for (const part of parts) {
+      const joined = out.filter(other => other.some(a => part.some(b => sameAttack(a, b))));
+      out = [...out.filter(other => !joined.includes(other)), [...joined.flat(), ...part]];
+    }
+    return out;
+  };
   const chains = (versions: Version[]) => {
     const out: Version[][] = [];
     let last = -Infinity;
@@ -208,8 +220,9 @@ describe("C2's count (docs/decisions/2026-11-03-c2-upper-limit-chains.md)", () =
       out.at(-1)!.push(v);
       last = at;
     }
-    return out;
+    return joinAttacks(out);
   };
+  const attacks = (versions: Version[]) => joinAttacks(versions.map(v => [v]));
   const nOf = (versions: Version[]) => chains(versions).filter(chain => chain.some(v => !v.falseReport)).length;
   const limit = (n: number) => 1 - 0.05 ** (1 / n);
 
@@ -248,6 +261,45 @@ describe("C2's count (docs/decisions/2026-11-03-c2-upper-limit-chains.md)", () =
     expect(nOf([at(0, true), at(30 * DAY)])).toBe(1);
     expect(nOf([at(0), at(6 * DAY, true), at(12 * DAY)])).toBe(1);
     expect(nOf([])).toBe(0);
+  });
+
+  it("c2-n-is-at-most-k: versions of one attack are in one chain, so a chain is a union of attacks and n <= k", () => {
+    expect(flat(record)).toContain("Versions that line 7 makes one attack are also in the same chain.");
+    expect(flat(record)).toContain("Attacks are joined by the OSV alias; where there is none, the same package within 7 days.");
+    const on = (day: number, name: string, aliases: string[] = [], falseReport = false): Version => ({ name, version: `${day}`, published: new Date(Date.UTC(2025, 0, 1 + day)).toISOString(), aliases, falseReport });
+    // The case the sentence closes: one attack through an alias, 30 days apart, was 2 chains and k = 1.
+    const apart = [on(0, "p", ["A"]), on(30, "q", ["A"])];
+    expect([nOf(apart), attacks(apart).length]).toEqual([1, 1]);
+    // No alias: two attacks, whether the package is the same or not.
+    expect([nOf([on(0, "p"), on(30, "q")]), attacks([on(0, "p"), on(30, "q")]).length]).toEqual([2, 2]);
+    expect([nOf([on(0, "p"), on(30, "p")]), attacks([on(0, "p"), on(30, "p")]).length]).toEqual([2, 2]);
+    // An attack that spans another stays apart from it: the join goes by attack, not by the time between.
+    const spans = [on(0, "p", ["A"]), on(15, "r"), on(30, "q", ["A"])];
+    expect([nOf(spans), attacks(spans).length]).toEqual([2, 2]);
+    // Candidates alone are in k and not in n (line 6, section 1), so n can be smaller than k.
+    const candidates = [on(0, "p", [], true), on(30, "q")];
+    expect([nOf(candidates), attacks(candidates).length]).toEqual([1, 2]);
+
+    // Every set of up to 3 versions over these values, the alias pair [A, B] joining through a third version.
+    const options = [0, 6, 30].flatMap(day => ["p", "q"].flatMap(name => [[], ["A"], ["B"], ["A", "B"]].flatMap(aliases => [false, true].map(fr => on(day, name, aliases, fr)))));
+    const check = (versions: Version[]) => {
+      const inChains = chains(versions), inAttacks = attacks(versions);
+      for (const attack of inAttacks) if (inChains.filter(chain => attack.some(v => chain.includes(v))).length !== 1) return false;
+      return nOf(versions) <= inAttacks.length && inChains.flat().length === versions.length && inAttacks.flat().length === versions.length;
+    };
+    let tried = 0;
+    expect(check([])).toBe(true);
+    for (const a of options) {
+      expect(check([a])).toBe(true);
+      for (const b of options) {
+        if (!check([a, b])) throw new Error(JSON.stringify([a, b]));
+        for (const c of options) {
+          tried++;
+          if (!check([a, b, c])) throw new Error(JSON.stringify([a, b, c]));
+        }
+      }
+    }
+    expect(tried).toBe(48 ** 3);
   });
 
   /** What is wrong with section 4 of a record, given the text of each file it cites. Empty when nothing is. */

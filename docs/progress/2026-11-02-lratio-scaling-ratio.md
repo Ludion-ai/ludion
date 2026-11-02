@@ -14,7 +14,7 @@ Each point is the median of up to 7 samples of CPU time (`process.cpuUsage`, use
 - **Dockerfile shapes:** the 41 inputs `gate-reader-linear` had, each at 16 KiB and 64 KiB, for each of `phpImage`, `nodeImage` and `namesNodeImage`: 123 measures. `officialImage` refuses over 64 KiB before reading, so n cannot be larger than 16 KiB; repeating the call is what makes a short sample long enough. No shape was taken out.
 - **Lock shapes:** the 8 inputs `gate-reader-linear` had, each grown by what grows on it, plus 3 grown by the number of keys: one key from 1 MiB to 4 MiB (3), 1,000 keys from 1,024 characters to 4,096 (5), and 250 keys of 4,096 characters to 1,000 (3). `lockKey` is now timed alone, over all the keys of a lock; it was 10 rounds plus reading the lock before. A key's length and the number of keys need separate rows: on the old expression only the first gave a high ratio (below).
 
-Limits that remain, none of which decides what is linear: 5 s (Dockerfile) and 30 s (lock) for a sample, under Node's VM, so a backtracking expression fails and does not hang; and 15 s for a measure, after which it stops at 3 samples at the fewest and fails nothing. These are clock time, as are the tests' own 60 s and 120 s. In the runs of the next section the longest test took 19.88 s.
+Limits that remain, none of which decides what is linear: 5 s (Dockerfile) and 30 s (lock) for a sample, under Node's VM, so a backtracking expression fails and does not hang; and 15 s for a measure, after which it stops at 3 samples at the fewest and fails nothing. These are clock time, as are the tests' own 60 s and 120 s. In the runs on the second head, 0ec3bc7, the longest test took 19.88 s.
 
 CPU time is the whole process's, so the file must not share its process with another test file's thread. `gate-reader-scaling-ratio-control: this file is not in a worker thread` holds that part: with `--pool=threads` it failed (one run).
 
@@ -66,7 +66,7 @@ The time of these runs grew from the 78.90 to 290.61 s of the table at 0ec3bc7, 
 | `--cpus 0.25` | 62 | 0 | 0 in each of 3 runs | 0 | 4.00 / 15.47 | 6.18 `lines of #, nodeImage` | 146.69 |
 | `--cpuset-cpus 0`, 3 busy loops | 62 | 0 | 0 in each of 3 runs | 0 | 4.09 / 16.12 | 6.56 `backslash-newline pairs, phpImage` | 165.37 |
 | `--cpus 1`, 3 busy loops | 62 | 0 | 0 in each of 3 runs | 0 | 3.71 / 16.12 | 6.22 `backslash-newline pairs, phpImage` | 161.50 |
-| No limit, this file and records.test.ts, last tree | 209 | 0 | 0 in each of 3 runs | 0 | 4.11 / 16.09 | 6.20 `many FROM lines, phpImage` | 49.34 |
+| No limit, this file and records.test.ts, 4c07209's tree | 209 | 0 | 0 in each of 3 runs | 0 | 4.11 / 16.09 | 6.20 `many FROM lines, phpImage` | 49.34 |
 
 **Runs that failed in the 3 limited containers with this rule: 0 of 3 (95% upper bound 63%).** So these runs do not show the rule doing anything: no measure reached the line, so no second measure was taken. A pass after a second measure has been run only in the test of the function (`a measure is taken again once at most`), not on a real measure. That a chance failure comes twice about as rarely as the square of once is reasoning: whether two measures in a row are independent was not measured.
 
@@ -145,7 +145,7 @@ Not caught, both shown on the one shape `line feeds`, in a copy, with no limit:
 
 ## Red: on the readers from before #258
 
-The test file of this head, on php.ts, node.ts and judge.ts of d42e172, in Docker with no limit (`Tests 18 failed | 40 passed | 133 skipped`, 510.99 s):
+The test file of the second head, 0ec3bc7, on php.ts, node.ts and judge.ts of d42e172, in Docker with no limit (`Tests 18 failed | 40 passed | 133 skipped`, 510.99 s):
 
 | Shape | Ratio, or what stopped it |
 |---|---|
@@ -171,4 +171,4 @@ The test file of main 728fcf1, on the same old readers, failed 16 of `gate-reade
 
 ## CI
 
-The same tests' 4 runs on GitHub's runner at f7f4206, the run at 0ec3bc7 and the run at the last head are in this PR's description, with the ratios from each run's log (`scaling ratios:`, printed once at the end of the file).
+The same tests' 4 runs on GitHub's runner at f7f4206, the run at 0ec3bc7 and the run at 4c07209 are in this PR's description, with the ratios from each run's log (`scaling ratios:`, printed once at the end of the file).

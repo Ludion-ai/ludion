@@ -1,7 +1,7 @@
 // Gate 3's new type, a first form (docs/decisions/2026-11-02-gate-3-type-definition.md): the old version is the
 // specification. One project, its lockfile before and after a fix: build, types, start, a crawl of every GET page and the
 // tests, old twice and new once (twice when it fails to build or start), each in packages/sandbox's box. Nothing calls this from `ludion patch` yet (docs/status.md).
-// This file imports only Node.js's own modules and Ludion's, no package: its heavy check runs with the host's Docker socket.
+// This file imports only Node.js's own modules and Ludion's, no package: its heavy check needs Docker's socket, and is for C4's VM, or CI, not a PC.
 import { randomUUID } from "node:crypto";
 import { cpSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

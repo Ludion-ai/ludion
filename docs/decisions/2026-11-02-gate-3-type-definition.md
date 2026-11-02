@@ -92,6 +92,7 @@ Dependencies are acquired outside the box, from the manifests alone, with `npm c
   4. **New only.** When new ran out and both runs of old show room, with every figure read, the reason is `box_resources_new_only`, and its sentence says that it is the box's limit on new only, so that a person reading the PR can read it as that. Otherwise, when a run of old also ran short or could not read a figure, it stays `box_resources`. The verdict is `undecidable` either way. `undecidableCounts` counts the two apart, and C4's figure for the box's resources on new is their sum.
   5. Words on stderr can be printed by anything, so a project or a candidate that prints them moves a failed build from `broken` to `undecidable`, which falls to a PR. A message without the exact text is not counted, such as `No space left on device` with no `ENOSPC`, or another of V8's out-of-memory messages: then only the other figures can show it.
   This item is also an exception to this file's last paragraph. No gate's numeric criterion and no wait changes.
+- **A project that reads `next/font/google`, create-next-app's default template included, cannot build in the box, which has no network, and is `undecidable`.** Added 2026-11-03, after the definition was fixed, from an audit, and not measured in this PR. Source: ludion-ops#1 comment 6581794907, 01:01 JST.
 
 ## What one case costs: `c4-case-minutes-measured`
 

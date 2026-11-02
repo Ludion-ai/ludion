@@ -1,5 +1,5 @@
-// Runs the real cases with Node.js alone, and no test runner: where the host's Docker socket is, only Ludion's own code runs
-// (CLAUDE.md, "counts as the host"). Prints one JSON line per case. Usage: node gate3-docker-run.ts <examples> <case>...
+// Runs the real cases with Node.js alone, and no test runner: where Docker's socket is, only Ludion's own code runs
+// (CLAUDE.md, "counts as the host"). For C4's VM, or CI, not a PC. Prints one JSON line per case. Usage: node gate3-docker-run.ts <examples> <case>...
 // The acquisition policy and project.ts's snapshot need packages, and the example is our own, so they are stand-ins here:
 // gate3-docker.test.ts has the real ones.
 import { spawnSync } from "node:child_process";

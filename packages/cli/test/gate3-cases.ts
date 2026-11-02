@@ -1,5 +1,5 @@
 // The real cases of gate 3's new type, on examples/nextjs-security: real Docker, real builds, real pages. Used by
-// gate3-docker.test.ts and gate3-docker-run.ts. Imports no package, so it can run where the host's Docker socket is.
+// gate3-docker.test.ts and gate3-docker-run.ts. Imports no package, so it can run with Docker's socket in C4's VM, or CI, not on a PC.
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

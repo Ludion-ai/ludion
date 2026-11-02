@@ -81,9 +81,9 @@ The audit's item `c4-case-minutes-measured`: the end-to-end minutes of one case,
 
 | Item | Value |
 |---|---|
-| Example | not yet measured |
-| Runs | not yet measured |
-| Minutes per case (each run) | not yet measured |
-| Peak memory in the box | not yet measured |
+| Example | examples/nextjs-security, next 15.5.6 -> 15.5.7 (4 pages; tiny, so it says little about C4's sample) |
+| Runs | 2 of the 3 asked for; the third was stopped for lack of memory on the machine, and not run again |
+| Minutes per case (each run) | 3.73 and 3.69 (223.9 s and 221.5 s), with no build cache and the images already present |
+| Peak memory in the box | `memory.peak` at the box's limit, 536,870,912 bytes, on every run; `memory.swap.peak` up to 221,097,984 bytes in these runs; no OOM kill |
 
 This table is the only part of this file to be filled in after measuring. Everything above it was fixed before.

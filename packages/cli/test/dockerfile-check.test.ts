@@ -140,6 +140,8 @@ describe("namesNodeImage finds a FROM behind whitespace or a continuation, so it
     ["a backtick continuation", "# escape=`\nFR`\nOM node:22-alpine\n"],
     ["a comment that ends in a backslash, then the line itself", "# a \\\nFROM node:22-alpine\n"],
     ["a comment inside a continuation", "FROM \\\n# a comment\nnode:22-alpine\n"],
+    ["an indented comment inside a continuation", "FROM \\\n  # a comment\nnode:22-alpine\n"],
+    ["spaces and a tab before FROM", "  \t FROM node:22-alpine\n"],
     ["a line that ends in a backtick, which continues nothing here, then the line itself", "RUN echo `date`\nFROM node:22-alpine\n"],
   ])("dockerfile-check-names-node: %s", (_name, text) => {
     expect(namesNodeImage(text)).toBe(true);
@@ -157,6 +159,42 @@ describe("namesNodeImage finds a FROM behind whitespace or a continuation, so it
   ])("dockerfile-check-names-node-separator: %s", (_name, text) => {
     expect(namesNodeImage(text)).toBe(true);
   });
+  // A continuation under each line end: `docker build` built each of these forms with scratch (a review of this PR, B2).
+  // When a policy names node, the check refuses each as a continuation.
+  it.each<[string, string]>([
+    ["a backslash, LF, the image", "FROM \\\nnode:22.11.0-alpine\n"],
+    ["a backslash, CRLF, the image", "FROM \\\r\nnode:22.11.0-alpine\r\n"],
+    ["a backslash, two carriage returns and a line feed, the image", "FROM \\\r\r\nnode:22.11.0-alpine\r\n"],
+    ["a backslash, a space, CRLF, the image", "FROM \\ \r\nnode:22.11.0-alpine\r\n"],
+    ["a name split by a backslash and CRLF", "FROM no\\\r\nde:22.11.0-alpine\r\n"],
+    ["a comment with CRLF, then the continuation", "# c\r\nFROM \\\r\nnode:22.11.0-alpine\r\n"],
+    ["a comment inside a continuation with CRLF", "FROM \\\r\n# c\r\nnode:22.11.0-alpine\r\n"],
+    ["a blank line inside a continuation with CRLF", "FROM \\\r\n\r\nnode:22.11.0-alpine\r\n"],
+    ["a backtick continuation with CRLF", "# escape=`\r\nFR`\r\nOM node:22.11.0-alpine\r\n"],
+    ["a backslash right after FROM, then the image indented, with LF", "FROM\\\n  node:22.11.0-alpine\n"],
+    ["a backslash right after FROM, then the image after a tab, with CRLF", "FROM\\\r\n\tnode:22.11.0-alpine\r\n"],
+  ])("dockerfile-check-names-node-crlf: %s", (_name, text) => {
+    expect(namesNodeImage(text)).toBe(true);
+    expect(() => nodeImage(text)).toThrow(READING);
+  });
+  // `docker build` built each of these forms with scratch: what follows the name on its line is taken off.
+  it.each<[string, string]>([
+    ["a backslash on the last line", "FROM node\\\n"],
+    ["a backslash at the end of the file", "FROM node\\"],
+    ["a backslash on the last line, with CRLF", "FROM node\\\r\n"],
+    ["a no-break space after the name", "FROM node \n"],
+    ["U+0085 after the name", "FROM node\u0085\n"],
+    ["U+0085 after the name, with CRLF", "FROM node\u0085\r\n"],
+    ["U+2003 after the name", "FROM node \n"],
+  ])("dockerfile-check-names-node-line-end: %s", (_name, text) => {
+    expect(namesNodeImage(text)).toBe(true);
+  });
+  // BuildKit fails on FROM alone, under either line end, so neither is a FROM it reads; nor is a heredoc's body.
+  it.each(["FROM\nnode:22.11.0-alpine\n", "FROM\r\nnode:22.11.0-alpine\r\n", "FROM --platform=linux/amd64\r\nnode:22.11.0-alpine\r\n", "RUN <<EOF\r\nfrom\r\nnode x\r\nEOF\r\n", "# c\r\nFROM php:8.4.26-cli-alpine\r\nCOPY --chown=node:node . .\r\n",
+    // BuildKit fails on these too: the join makes FROMnode, and FR and OM stay two words.
+    "FROM\\\nnode:22.11.0-alpine\n", "FR\\\n  OM node:22.11.0-alpine\n"])("dockerfile-check-names-node-crlf: does not take %j for one", text => {
+    expect(namesNodeImage(text)).toBe(false);
+  });
   // What each of these forms does when a policy names node, so finding them gives the check that image reads or refuses.
   it("dockerfile-check-names-node-separator: nodeImage takes a form feed and a vertical tab after FROM, and refuses a carriage return", () => {
     expect(nodeImage("FROM\fnode:22.11.0-alpine\n")).toMatchObject({ reference: "node:22.11.0-alpine" });
@@ -173,7 +211,12 @@ describe("namesNodeImage finds a FROM behind whitespace or a continuation, so it
   // `docker build` reads these forms too (built with scratch), and they are not found, so an unconfigured scan says
   // nothing about them: docs/mistakes/2026-11-02-dockerfile-check-not-as-buildkit-reads.md says so. A policy that names
   // node refuses each. When detection reads them, this test goes, and that sentence with it.
-  it.each([`FROM "node:22.11.0-alpine"\n`, `FROM 'node:22.11.0-alpine'\n`, `FROM no"de":22.11.0-alpine\n`, "ARG X=node:22.11.0-alpine\nFROM $X\n", "FROM ${X:-node:22.11.0-alpine}\n"])("dockerfile-check-names-node-gap: does not find %j, and nodeImage refuses it", text => {
+  it.each([
+    `FROM "node:22.11.0-alpine"\n`, `FROM 'node:22.11.0-alpine'\n`, `FROM no"de":22.11.0-alpine\n`, "ARG X=node:22.11.0-alpine\nFROM $X\n", "FROM ${X:-node:22.11.0-alpine}\n",
+    // `--` alone ends the flags. A backslash inside the name. A raw byte 0x85 or 0xA0 after a flag ends the flag in
+    // BuildKit, and a file read as UTF-8 gives U+FFFD there, which reads as part of the flag.
+    "FROM -- node:22.11.0-alpine\n", "FROM --platform=linux/amd64 -- node:22.11.0-alpine\n", "FROM no\\de:22.11.0-alpine\n", "FROM --platform=linux/amd64\u{FFFD}node:22.11.0-alpine\n",
+  ])("dockerfile-check-names-node-gap: does not find %j, and nodeImage refuses it", text => {
     expect(namesNodeImage(text)).toBe(false);
     expect(() => nodeImage(text)).toThrow("exact version");
   });
@@ -233,6 +276,11 @@ describe("the Dockerfile readers decide 64 KiB in linear time", () => {
     ["FROM, flags and carriage returns", fill("--a\r", "FROM ", "x")],
     ["FROM and carriage returns", fill("FROM\r")],
     ["FROM and form feeds", fill("\f", "FROM", "x")],
+    ["a run of carriage returns", fill("\r")],
+    ["a run of carriage returns, then a letter", fill("\r", "FROM \\", "x")],
+    ["two carriage returns and a line feed, many times", fill("\r\r\n")],
+    ["a backslash and CRLF, many times", fill("\\\r\n")],
+    ["a comment and CRLF, many times", fill("#\r\n")],
     ["backslashes and spaces", fill("\\ ")],
     ["a backslash and spaces to the end", fill(" ", `${PHP}\n\\`)],
     ["backticks and spaces", fill("` ")],

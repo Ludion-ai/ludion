@@ -37,7 +37,7 @@ export function compare(a: string, b: string): number {
 export const withoutBom = (text: string): string => text.startsWith("\u{FEFF}") ? text.slice(1) : text;
 
 /** What BuildKit takes off a line's left (Go's unicode.IsSpace) and JavaScript's `\s`, together: `\s` lacks U+0085. */
-const isSpace = (char: string): boolean => /[\s\u0085]/.test(char);
+export const isSpace = (char: string): boolean => /[\s\u0085]/.test(char);
 /**
  * A directive BuildKit acts on, at a `#` or `//` that starts a line: `# escape=`, `# syntax=`, and `// syntax=`, which
  * sends the build to another frontend. Tried at each such place only, so the runs of space it crosses are read once.

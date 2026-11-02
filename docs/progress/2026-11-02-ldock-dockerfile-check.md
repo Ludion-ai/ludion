@@ -1,6 +1,6 @@
 # 2026-11-02 — LDOCK: the Dockerfile check reads a file as BuildKit does, and a lock key has a limit
 
-**Lane LDOCK**, from main d42e172, after a first-principles audit reported forms that passed the check and readers over linear time. Mistake: docs/mistakes/2026-11-02-dockerfile-check-not-as-buildkit-reads.md.
+**Lane LDOCK**, from main d42e172, after a first-principles audit reported forms that passed the check and readers whose time grew faster than the input on the shapes it measured. Mistake: docs/mistakes/2026-11-02-dockerfile-check-not-as-buildkit-reads.md.
 
 ## What changed
 
@@ -63,9 +63,9 @@ The old-took row by reason: 1,246,289 for a carriage return or separator inside 
 | `lockEntries`, one key of 4,096 characters | 0.92 ms | 0.48 ms |
 | `lockEntries`, one key in a 4 MiB lock | not run | 0.8 ms |
 
-`gate-reader-linear` holds these under limits Node's VM enforces: 50 ms for each of phpImage, nodeImage and namesNodeImage on 41 inputs of up to 64 KiB, 1 s for the readers of a 4 MiB lock, and 4 s for `packageLockInputs`.
+At this lane's head, `gate-reader-linear` held these under limits Node's VM enforces: 50 ms for each of phpImage, nodeImage and namesNodeImage on 41 inputs of up to 64 KiB, 1 s for the readers of a 4 MiB lock, and 4 s for `packageLockInputs`. A limit at one size does not show how the time grows, so the name said more than the test held. LRATIO replaced these with `gate-reader-scaling-ratio`, which measures n and 4n on named shapes (docs/progress/2026-11-02-lratio-scaling-ratio.md, docs/mistakes/2026-11-02-linear-said-with-fixed-ms.md). The times in the table above are one run each, as written.
 
-A length limit alone was not enough, as 1,000 extraneous keys of 4,096 characters are each under it. In the same container, the old expression against the new: `packageLockInputs` 9,526 and 9,456 ms against 728 and 556 ms; `lockKey` on those keys 10 times over 2,342 and 2,313 ms against 112 and 104 ms; `lockEntries` 471 and 479 ms against 31 and 33 ms. The test first held `packageLockInputs` to 1 s, which GitHub's runner went over in all 3 tries (`Over 1000 ms in each of 3 tries.`) with the new expression. That limit was this lane's own, and that call reads each lock many times over, so it has 4 s now, between the two times, and the lock readers keep 1 s, with `lockKey` added at 1 s because `lockEntries` alone does not tell the two apart.
+A length limit alone was not enough, as 1,000 extraneous keys of 4,096 characters are each under it. In the same container, the old expression against the new: `packageLockInputs` 9,526 and 9,456 ms against 728 and 556 ms; `lockKey` on those keys 10 times over 2,342 and 2,313 ms against 112 and 104 ms; `lockEntries` 471 and 479 ms against 31 and 33 ms. The test first held `packageLockInputs` to 1 s, which GitHub's runner went over in all 3 tries (`Over 1000 ms in each of 3 tries.`) with the new expression. That limit was this lane's own, and that call reads each lock many times over, so it was given 4 s, between the two times, and the lock readers kept 1 s, with `lockKey` added at 1 s because `lockEntries` alone did not tell the two apart. The 4 s was picked after CI went over the first limit; LRATIO's ratio replaced all three.
 
 Measured and not changed: `packageLockInputs` on 1,000 valid install paths of about 4,096 characters (4 MiB), each with one dependency, took 3,971 and 3,867 ms. That the time is in `resolveFrom` is read from the code, not profiled. It is no bound: a review of this PR measured 37,105 ms on one key of about 4,096 characters with 10,000 dependencies, and 35,959 ms on main's code.
 

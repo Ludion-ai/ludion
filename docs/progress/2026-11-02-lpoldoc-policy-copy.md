@@ -2,7 +2,7 @@
 
 What was copied: the plan 「Ludion 完成の定義：最終決定（11-02）」 (28,602 bytes), into docs/decisions/2026-11-02-definition-of-complete-final.md, with seven lines added above it and its operational lines removed. docs/decisions/2026-11-02-definition-of-complete-corrections.md holds part of what was decided after the plan was written, says that later changes exist outside it, and wins over the copy within the limit its third line gives. Nothing else in Ludion changes in this PR.
 
-The earlier heads of this PR copied the plan byte for byte under three lines, and their bodies had the plan's sha256. The present body does not, by design: it is the plan less the lines its preamble lists, and each removed line stays as an empty line or empty table row so that the plan's line N is the record's line N+7.
+The body does not have the plan's sha256, by design: it is the plan less the lines its preamble lists, and each removed line stays as an empty line or empty table row so that the plan's line N is the record's line N+7.
 
 These rows ran inside Docker (node:24.22.2-alpine, no network, read-only mounts).
 

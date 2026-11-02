@@ -53,13 +53,18 @@ The tables below translate the record's. The "Today" column gives the record's v
 
 This table keeps the 2026-11-01 record's words. Since 2026-11-02, C2's line is per attack, with k always written and k=0 passing, and automatic merge needs C1-1, C4 and C5 (CLAUDE.md, Product).
 
-C6's table of rule and check does not exist yet as a file or a test, so the condition of the release in PR mode that every row passes (CLAUDE.md, Goal) cannot be met yet. Its first rows, from CLAUDE.md (Product; docs/decisions/2026-11-02-policy-into-claude-md.md):
+C6's table of rule and check does not exist yet as a file or a test, so the condition of the release in PR mode that every row passes (CLAUDE.md, Goal) cannot be met yet. Its first rows; the first three are from CLAUDE.md (Product; docs/decisions/2026-11-02-policy-into-claude-md.md), and each of the others says where it is from:
 
 | Check | Rule | Test |
 |---|---|---|
 | `stop-file-owner-only` | Only the owner writes the stop file; automation only notifies | Not written |
 | `stop-file-unreadable-holds` | A stop file that cannot be read holds automatic merge; the PR waits for the next run | Not written |
 | `crawl-failure-does-not-revert` | A failed production crawl notifies and stops that repository's automatic merge, and reverts nothing | Not written |
+| `action-runs-npm-only` | The Action fixes npm only: v1 does not fix official PHP or Node.js images or Composer (CLAUDE.md, Goal) | Not written |
+| `candidate-cache-not-read-from-main` | A job that runs candidates runs on a ref other than the default branch, and main reads no cache written there; whether this holds is to be confirmed in a trial repository (docs/decisions/2026-11-02-definition-of-complete-final.md, C6) | Not written |
+| `public-sentences-match-scope` | The READMEs and the site name no scope wider than v1's, npm only (CLAUDE.md, Goal), and no sentence describes what is not built (C16) | Not written |
+| `c6-table-has-every-rule` | Every rule of "Ludion must not become the attack path" has a row in this table, and a row with no check file fails (C6; docs/decisions/2026-11-02-definition-of-complete-final.md, C6) | Not written |
+| `action-does-not-comment-on-dependabot-pr` | The Action writes nothing on a PR whose author is dependabot[bot] (CLAUDE.md, Product: it never touches a Dependabot PR) | Not written |
 
 ### Speed, running on its own, human work
 

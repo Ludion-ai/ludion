@@ -152,7 +152,7 @@ export const en = {
         "scope": "Standalone POM; public Maven Central. Parents, profiles, modules and extensions need review."
       }
     ],
-    "supportedNote": "Yarn/pnpm discovery is partial and does not enable automatic patching. Python, Go, Rust, Gradle, live server inventory, runtime upgrades beyond PHP and automatic production deployment are not supported in this preview. Custom build tools may need an explicitly trusted offline cache."
+    "supportedNote": "Yarn/pnpm discovery is partial and does not enable automatic patching. Python, Go and Rust are scanned read-only, with no updates. Gradle, live server inventory, runtime upgrades beyond PHP and Node.js and automatic production deployment are not supported in this preview. Custom build tools may need an explicitly trusted offline cache."
   },
   "start": {
     "title": "Try the multi-stack preview | Ludion",
@@ -182,7 +182,7 @@ export const en = {
     "source": {
       "summary": "1 · Build the source preview",
       "note": "Keep the existing npm install separate",
-      "body": "Use the multi-stack source revision. These commands become available on the default branch when its pull request is merged.",
+      "body": "Use the multi-stack source revision. These commands are on the default branch, which the clone below checks out.",
       "copy": "Copy source setup"
     },
     "init": {

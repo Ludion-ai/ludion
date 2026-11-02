@@ -16,7 +16,7 @@ Yarn/pnpm discovery is partial and cannot enable automatic patching. Python, Go 
 
 **プレビュー：コメントのみ。マージは行わない。** Preview: comments only; nothing is merged.
 
-The judge reads a dependency PR's package.json and package-lock.json (from Dependabot, Renovate or a person) and comments on the PR with what it found. It checks parts of gates 1, 2 and 4 and the wait (docs/design.md). It does not build or test anything (gate 3), so it never says a PR can be applied, and its output lists what it did not check. It is not a required check unless you make it one.
+The judge reads a dependency PR's package.json and package-lock.json (from Renovate or a person) and comments on the PR with what it found. It checks parts of gates 1, 2 and 4 and the wait (docs/design.md). It does not build or test anything (gate 3), so it never says a PR can be applied, and its output lists what it did not check. It is not a required check unless you make it one.
 
 **Not released yet.** No release commit exists yet. The action needs a release commit, because only that carries the bundled judge; at any other commit it stops with an error. When one is published, pin its full 40-character SHA (not a tag or branch) in both workflows.
 
@@ -71,7 +71,7 @@ jobs:
           mode: comment
 ```
 
-A change to that SHA (from Dependabot, for example) is an update to Ludion itself: review it like any dependency update, and do not auto-merge it.
+A change to that SHA is an update to Ludion itself: review it like any dependency update, and do not auto-merge it.
 
 Limits: GitHub-hosted Linux runners (the action needs gh, jq, unzip, GNU date and Node 22 or later); only the root package.json and package-lock.json, and each changed */package.json, are read (the judge leaves a workspace package.json out of gate 4's changed-files stop when it agrees with the lockfile; one that does not agree stops, and one that cannot be read on both sides, such as an added, removed or renamed workspace's, is undecidable); a PR that changes .github/ or 300 or more files is shown as undecidable; the comment job posts only for PRs into the default branch. It sends package names and versions to OSV and the npm registry, and the IDs of the advisories OSV returns back to OSV. It downloads CISA's catalog of exploited vulnerabilities and FIRST's daily list of EPSS scores whole and looks the CVE IDs up in them, so no CVE ID is sent; a list it cannot download or read makes the judgement undecidable. No source is sent.
 

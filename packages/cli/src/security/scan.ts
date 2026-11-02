@@ -42,7 +42,7 @@ export async function scanProject(root: string, selected?: string, deps: { reade
   const detected = detectEcosystems(root), ecosystems = !auto ? selected === "php" || selected === "node" || readOnly ? [] : [selected as Ecosystem] : detected;
   const client = deps.client ?? new OsvClient();
   for (const ecosystem of ecosystems) {
-    if (!["npm", "composer", "maven"].includes(ecosystem)) throw new Error("Supported ecosystems: php, node, npm, composer, maven, python, go, rust (scan only), auto.");
+    if (!["npm", "composer", "maven"].includes(ecosystem)) throw new Error("Supported ecosystems: php, node, npm, composer, auto; scan only: maven, python, go, rust.");
     try {
       let installed = inventory(root, ecosystem);
       const originals = installed.files.map(f => [f, textFile(root, f)] as const);

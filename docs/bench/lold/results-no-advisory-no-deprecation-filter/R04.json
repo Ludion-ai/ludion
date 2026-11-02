@@ -1,0 +1,202 @@
+{
+  "id": "R04",
+  "name": "react-server-dom-webpack",
+  "from": "19.1.1",
+  "v": "19.1.2",
+  "advisory": "GHSA-fv66-9v8q-g76r",
+  "why": "first eligible rows, one per package",
+  "vulnerable": ">=19.1.0 <19.1.2",
+  "started_at": "2026-11-01T16:39:15.759Z",
+  "base_before": "2025-07-28T15:55:55.634Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 82,
+    "duplicate_names": 1,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/react-server-dom-webpack@19.1.1"
+    ]
+  },
+  "t": "2025-12-03T19:07:39.000Z",
+  "v_published": "2025-12-03T15:32:24.004Z",
+  "picks": [
+    {
+      "req": "react-server-dom-webpack@19.1.2",
+      "picked": "19.1.2",
+      "is_v": true
+    },
+    {
+      "req": "react@^19.1.2",
+      "picked": "19.2.0",
+      "reused_base": false,
+      "published": "2025-10-01T21:38:32.757Z",
+      "counts": {
+        "in_range": 21,
+        "no_time": 0,
+        "after_t": 18,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "react-dom@^19.1.2",
+      "picked": "19.2.0",
+      "reused_base": false,
+      "published": "2025-10-01T21:38:42.388Z",
+      "counts": {
+        "in_range": 21,
+        "no_time": 0,
+        "after_t": 18,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "webpack@^5.59.0",
+      "picked": "5.101.0",
+      "reused_base": true,
+      "published": "2025-07-28T13:46:00.166Z",
+      "counts": {
+        "in_range": 114,
+        "no_time": 0,
+        "after_t": 30,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "scheduler@^0.27.0",
+      "picked": "0.27.0",
+      "reused_base": false,
+      "published": "2025-10-01T21:39:15.208Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 66,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 3,
+    "youngest_age": {
+      "hours": 431.8,
+      "version": "react-dom@19.3.1",
+      "published": "2026-10-14T16:49:10.081Z"
+    },
+    "published_after_t": 3,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 1,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 3,
+    "youngest_age": {
+      "hours": 3.7,
+      "version": "react@19.2.1",
+      "published": "2025-12-03T15:28:21.493Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 1,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/react",
+      "name": "react",
+      "from": "19.1.1",
+      "to": "19.2.0",
+      "published": "2025-10-01T21:38:32.757Z",
+      "age_at_t_hours": 1509.5,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^19.2.0",
+        "^19.1.2"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    },
+    {
+      "path": "node_modules/react-dom",
+      "name": "react-dom",
+      "from": "19.1.1",
+      "to": "19.2.0",
+      "published": "2025-10-01T21:38:42.388Z",
+      "age_at_t_hours": 1509.5,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^19.1.2"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    },
+    {
+      "path": "node_modules/scheduler",
+      "name": "scheduler",
+      "from": "0.26.0",
+      "to": "0.27.0",
+      "published": "2025-10-01T21:39:15.208Z",
+      "age_at_t_hours": 1509.5,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^0.27.0"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    }
+  ],
+  "moved_non_v": 3,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 1,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 1509.5,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 3,
+  "differing_paths_vs_normal_at_t": 2,
+  "checks_on_normal_at_t_fail": 1,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 9.914
+}

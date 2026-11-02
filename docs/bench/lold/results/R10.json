@@ -1,0 +1,102 @@
+{
+  "id": "R10",
+  "name": "psitransfer",
+  "from": "2.3.0",
+  "v": "2.3.1",
+  "advisory": "GHSA-xphh-5v4r-r3rx",
+  "why": "first eligible rows, one per package",
+  "vulnerable": "<2.3.1",
+  "started_at": "2026-11-01T16:31:49.268Z",
+  "base_before": "2025-06-04T12:19:25.634Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 201,
+    "duplicate_names": 12,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/psitransfer@2.3.0"
+    ]
+  },
+  "t": "2025-12-30T19:25:04.000Z",
+  "v_published": "2025-12-29T12:12:36.109Z",
+  "picks": [
+    {
+      "req": "psitransfer@2.3.1",
+      "picked": "2.3.1",
+      "is_v": true
+    }
+  ],
+  "stops": [
+    {
+      "req": "axios@^1.13.2",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 17,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    }
+  ],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 0,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 7,
+    "youngest_age": {
+      "hours": 129.2,
+      "version": "axios@1.21.0",
+      "published": "2026-10-27T07:18:54.313Z"
+    },
+    "published_after_t": 5,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 12,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 3,
+    "youngest_age": {
+      "hours": 1047.1,
+      "version": "form-data@4.0.5",
+      "published": "2025-11-17T04:16:07.493Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 12,
+    "ls_problems": 0
+  },
+  "outcome": "stopped_no_allowed",
+  "reason": [
+    {
+      "req": "axios@^1.13.2",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 17,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    }
+  ],
+  "tool_failure": {
+    "code": "LOLD_STOP",
+    "message": "LOLD: nothing allowed for axios@^1.13.2"
+  },
+  "took_s": 3.913
+}

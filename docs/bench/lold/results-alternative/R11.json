@@ -1,0 +1,14 @@
+{
+  "id": "R11",
+  "name": "@sentry/nestjs",
+  "from": "8.48.0",
+  "v": "8.49.0",
+  "t": "2025-01-28T20:37:26.000Z",
+  "before": "2025-01-25T20:37:26.000Z",
+  "outcome": "built",
+  "moved_non_v": 8,
+  "youngest_age_at_t_hours": 122.6,
+  "duplicate_names": 4,
+  "new_ls_problems": 0,
+  "failures": []
+}

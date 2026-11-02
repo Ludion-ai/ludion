@@ -91,7 +91,7 @@ test("the Japanese home page carries the same workflow and limits, with its link
   await page.goto("/ja/");
   await expect(page.locator("h1")).toContainText("開発を続けながら、");
   await expect(page.locator("h1")).toContainText("スタックも前へ進めましょう。");
-  await expect(page.locator(".introduction")).toContainText("PHP、JavaScript、TypeScript、Java");
+  await expect(page.locator(".introduction")).toContainText("PHP、JavaScript、TypeScript の");
   await expect(page.getByRole("link", { name: "プレビューを試す" }).first()).toHaveAttribute("href", "/ja/start/");
   await expect(page.getByRole("link", { name: "しくみ", exact: true })).toHaveAttribute("href", "/ja/#guard");
   await expect(page.getByRole("link", { name: "流れを見る", exact: true })).toHaveAttribute("href", "#guard");

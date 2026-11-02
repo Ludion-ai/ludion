@@ -1,0 +1,14 @@
+{
+  "id": "R17",
+  "name": "@webrecorder/wabac",
+  "from": "2.23.10",
+  "v": "2.23.11",
+  "t": "2025-09-10T17:13:45.000Z",
+  "before": "2025-09-07T17:13:45.000Z",
+  "outcome": "built",
+  "moved_non_v": 1,
+  "youngest_age_at_t_hours": 159.4,
+  "duplicate_names": 2,
+  "new_ls_problems": 0,
+  "failures": []
+}

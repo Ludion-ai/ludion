@@ -172,7 +172,11 @@ export async function npmReleases(name: string, fetchFn: typeof fetch = fetch): 
   return { created: firstPublish(doc.time), published, requires, modified: typeof doc.time.modified === "string" ? doc.time.modified : null };
 }
 
-const COMPOSER_NAME = /^[a-z0-9]([_.-]?[a-z0-9]+)*\/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$/;
+// One way to match any name, so it decides in linear time. A "+" inside the repeats gives a run of n letters 2^(n-1) ways
+// to fail, and these names come from Packagist's metadata (docs/mistakes/2026-11-02-composer-name-regex-backtracking.md).
+const COMPOSER_NAME = /^[a-z0-9](?:[_.-]?[a-z0-9])*\/[a-z0-9](?:(?:[_.]|-{1,2})?[a-z0-9])*$/;
+/** Is this a Composer `vendor/package` name, of at most 240 characters (inventory.ts's limit on a package's name)? */
+export const isComposerName = (name: string) => name.length <= 240 && COMPOSER_NAME.test(name);
 /** Without a leading "v", so "v1.2.3" in a lockfile and "1.2.3" on Packagist are one version. */
 export const composerVersion = (version: string) => version.replace(/^v(?=\d)/, "");
 /**
@@ -181,7 +185,7 @@ export const composerVersion = (version: string) => version.replace(/^v(?=\d)/, 
  * author sets: a backdated release is not caught by the cap (docs/decisions.md).
  */
 export async function packagistReleases(name: string, fetchFn: typeof fetch = fetch): Promise<Releases> {
-  if (!COMPOSER_NAME.test(name)) throw new Error(`Invalid Composer package name: ${name}`);
+  if (!isComposerName(name)) throw new Error(`Invalid Composer package name: ${name}`);
   const doc = await boundedJson(fetchFn, `https://repo.packagist.org/p2/${name}.json`, 32 * 1024 * 1024);
   const list = doc?.packages?.[name];
   if (!Array.isArray(list)) throw new Error(`Invalid Packagist metadata for ${name}.`);

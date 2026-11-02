@@ -1,0 +1,14 @@
+{
+  "id": "R22",
+  "name": "@vitest/browser",
+  "from": "3.0.3",
+  "v": "3.0.4",
+  "t": "2025-02-04T16:51:08.000Z",
+  "before": "2025-02-01T16:51:08.000Z",
+  "outcome": "built",
+  "moved_non_v": 38,
+  "youngest_age_at_t_hours": 80.2,
+  "duplicate_names": 3,
+  "new_ls_problems": 0,
+  "failures": []
+}

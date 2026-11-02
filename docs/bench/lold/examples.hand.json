@@ -1,0 +1,29 @@
+{
+  "examples": [
+    {
+      "id": "C1",
+      "why": "the owned example, a control that moves nothing but V",
+      "kind": "repo",
+      "project": "examples/npm-security",
+      "advisory": "GHSA-35jh-r3h4-6jhm",
+      "name": "lodash",
+      "from": "4.17.20",
+      "v": "4.17.21",
+      "vulnerable": "<4.17.21",
+      "t_rule": "V's publish time plus one hour (synthetic)"
+    },
+    {
+      "id": "T1",
+      "why": "a transitive fix, written by hand",
+      "kind": "hand",
+      "project_dependencies": { "micromatch": "4.0.5" },
+      "base_before": "2024-01-01T00:00:00Z",
+      "advisory": "GHSA-grv7-fg5c-xmjg",
+      "name": "braces",
+      "from": "3.0.2",
+      "v": "3.0.3",
+      "vulnerable": "<3.0.3",
+      "t_rule": "V's publish time plus one hour (synthetic)"
+    }
+  ]
+}

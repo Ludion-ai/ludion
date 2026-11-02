@@ -8,7 +8,7 @@ test("the home page describes security updates and clearly limits production cla
   const heading = page.locator("h1");
   await expect(heading).toContainText("Keep building.");
   await expect(heading).toContainText("Keep your stack moving.");
-  await expect(page.locator(".introduction")).toContainText("PHP, JavaScript, TypeScript and Java");
+  await expect(page.locator(".introduction")).toContainText("PHP, JavaScript and TypeScript");
   await expect(page.getByRole("link", { name: "Try the preview" }).first()).toHaveAttribute("href", "/start/");
   await expect(page.getByRole("link", { name: "See the workflow", exact: true })).toHaveAttribute("href", "#guard");
   for (const id of SECTIONS) {
@@ -27,7 +27,7 @@ test("the security workflow stays in the page without JavaScript", async ({ brow
   const page = await context.newPage();
   await page.goto("/");
   await expect(page.locator("h1")).toContainText("Keep building.");
-  await expect(page.locator(".introduction")).toContainText("PHP, JavaScript, TypeScript and Java");
+  await expect(page.locator(".introduction")).toContainText("PHP, JavaScript and TypeScript");
   await expect(page.getByRole("link", { name: "See the workflow", exact: true })).toHaveAttribute("href", "#guard");
   for (const id of SECTIONS) await expect(page.locator(`#${id}`)).toContainText(EXAMPLES[id]!);
   await expect(page.locator("[data-guard-state]")).toHaveCount(4);

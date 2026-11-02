@@ -1,0 +1,14 @@
+{
+  "id": "R16",
+  "name": "mcp-server-kubernetes",
+  "from": "2.9.7",
+  "v": "2.9.8",
+  "t": "2025-12-03T20:44:45.000Z",
+  "before": "2025-11-30T20:44:45.000Z",
+  "outcome": "built",
+  "moved_non_v": 1,
+  "youngest_age_at_t_hours": 509.4,
+  "duplicate_names": 23,
+  "new_ls_problems": 0,
+  "failures": []
+}

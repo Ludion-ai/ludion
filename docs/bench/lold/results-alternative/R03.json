@@ -1,0 +1,12 @@
+{
+  "id": "R03",
+  "name": "next",
+  "from": "15.5.6",
+  "v": "15.5.7",
+  "t": "2025-12-03T19:07:11.000Z",
+  "before": "2025-11-30T19:07:11.000Z",
+  "outcome": "failed",
+  "reason": "npm error code ETARGET\nnpm error notarget No matching version found for @next/env@15.5.7 with a date before 11/30/2025, 7:07:11 PM.\nnpm error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.\nnpm error A complete log of this run can be found in: /vol/cache/_logs/2026-11-01T16_34_01_631Z-debug-0.log\n",
+  "peer_conflict": false,
+  "etarget": true
+}

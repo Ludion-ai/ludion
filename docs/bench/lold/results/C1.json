@@ -1,0 +1,79 @@
+{
+  "id": "C1",
+  "name": "lodash",
+  "from": "4.17.20",
+  "v": "4.17.21",
+  "advisory": "GHSA-35jh-r3h4-6jhm",
+  "why": "the owned example, a control that moves nothing but V",
+  "vulnerable": "<4.17.21",
+  "started_at": "2026-11-01T16:33:11.971Z",
+  "base_before": null,
+  "base": {
+    "lockfile_version": 3,
+    "entries": 1,
+    "duplicate_names": 0,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/lodash@4.17.20"
+    ]
+  },
+  "t": "2021-02-20T16:42:16.891Z",
+  "v_published": "2021-02-20T15:42:16.891Z",
+  "picks": [
+    {
+      "req": "lodash@4.17.21",
+      "picked": "4.17.21",
+      "is_v": true
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 0,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 0,
+    "youngest_age": null,
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 0,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 0,
+    "youngest_age": null,
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 0,
+    "ls_problems": 0
+  },
+  "items": [],
+  "moved_non_v": 0,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 0,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": null,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 0,
+  "differing_paths_vs_normal_at_t": 0,
+  "checks_on_normal_at_t_fail": 0,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 2.017
+}

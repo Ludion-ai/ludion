@@ -1,0 +1,411 @@
+{
+  "id": "R03",
+  "name": "next",
+  "from": "15.5.6",
+  "v": "15.5.7",
+  "advisory": "GHSA-9qr9-h5gf-34mp",
+  "why": "first eligible rows, one per package",
+  "vulnerable": ">=15.5.0-canary.0 <15.5.7",
+  "started_at": "2026-11-01T16:38:59.559Z",
+  "base_before": "2025-10-17T03:25:46.825Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 49,
+    "duplicate_names": 0,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/next@15.5.6"
+    ]
+  },
+  "t": "2025-12-03T19:07:11.000Z",
+  "v_published": "2025-12-03T15:26:07.201Z",
+  "picks": [
+    {
+      "req": "next@15.5.7",
+      "picked": "15.5.7",
+      "is_v": true
+    },
+    {
+      "req": "react@^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0",
+      "picked": "19.2.0",
+      "reused_base": true,
+      "published": "2025-10-01T21:38:32.757Z",
+      "counts": {
+        "in_range": 37,
+        "no_time": 0,
+        "after_t": 26,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "react-dom@^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0",
+      "picked": "19.2.0",
+      "reused_base": true,
+      "published": "2025-10-01T21:38:42.388Z",
+      "counts": {
+        "in_range": 37,
+        "no_time": 0,
+        "after_t": 26,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@next/swc-linux-arm64-gnu@15.5.7",
+      "picked": "15.5.7",
+      "reused_base": false,
+      "published": "2025-12-03T15:24:41.883Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@next/swc-darwin-arm64@15.5.7",
+      "picked": "15.5.7",
+      "reused_base": false,
+      "published": "2025-12-03T15:24:28.388Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@next/swc-linux-x64-musl@15.5.7",
+      "picked": "15.5.7",
+      "reused_base": false,
+      "published": "2025-12-03T15:24:58.926Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@next/swc-linux-arm64-musl@15.5.7",
+      "picked": "15.5.7",
+      "reused_base": false,
+      "published": "2025-12-03T15:24:42.572Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@next/swc-darwin-x64@15.5.7",
+      "picked": "15.5.7",
+      "reused_base": false,
+      "published": "2025-12-03T15:24:28.836Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@next/swc-win32-x64-msvc@15.5.7",
+      "picked": "15.5.7",
+      "reused_base": false,
+      "published": "2025-12-03T15:25:13.908Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@next/swc-linux-x64-gnu@15.5.7",
+      "picked": "15.5.7",
+      "reused_base": false,
+      "published": "2025-12-03T15:24:58.096Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@next/swc-win32-arm64-msvc@15.5.7",
+      "picked": "15.5.7",
+      "reused_base": false,
+      "published": "2025-12-03T15:25:09.744Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@next/env@15.5.7",
+      "picked": "15.5.7",
+      "reused_base": false,
+      "published": "2025-12-03T15:26:12.822Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 52,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 9,
+    "youngest_age": {
+      "hours": 7993.2,
+      "version": "@next/env@15.5.7",
+      "published": "2025-12-03T15:26:12.822Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 0,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 9,
+    "youngest_age": {
+      "hours": 3.7,
+      "version": "@next/env@15.5.7",
+      "published": "2025-12-03T15:26:12.822Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 0,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/@next/env",
+      "name": "@next/env",
+      "from": "15.5.6",
+      "to": "15.5.7",
+      "published": "2025-12-03T15:26:12.822Z",
+      "age_at_t_hours": 3.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "15.5.7"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@next/swc-darwin-arm64",
+      "name": "@next/swc-darwin-arm64",
+      "from": "15.5.6",
+      "to": "15.5.7",
+      "published": "2025-12-03T15:24:28.388Z",
+      "age_at_t_hours": 3.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "15.5.7"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    },
+    {
+      "path": "node_modules/@next/swc-darwin-x64",
+      "name": "@next/swc-darwin-x64",
+      "from": "15.5.6",
+      "to": "15.5.7",
+      "published": "2025-12-03T15:24:28.836Z",
+      "age_at_t_hours": 3.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "15.5.7"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    },
+    {
+      "path": "node_modules/@next/swc-linux-arm64-gnu",
+      "name": "@next/swc-linux-arm64-gnu",
+      "from": "15.5.6",
+      "to": "15.5.7",
+      "published": "2025-12-03T15:24:41.883Z",
+      "age_at_t_hours": 3.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "15.5.7"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    },
+    {
+      "path": "node_modules/@next/swc-linux-arm64-musl",
+      "name": "@next/swc-linux-arm64-musl",
+      "from": "15.5.6",
+      "to": "15.5.7",
+      "published": "2025-12-03T15:24:42.572Z",
+      "age_at_t_hours": 3.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "15.5.7"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    },
+    {
+      "path": "node_modules/@next/swc-linux-x64-gnu",
+      "name": "@next/swc-linux-x64-gnu",
+      "from": "15.5.6",
+      "to": "15.5.7",
+      "published": "2025-12-03T15:24:58.096Z",
+      "age_at_t_hours": 3.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "15.5.7"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    },
+    {
+      "path": "node_modules/@next/swc-linux-x64-musl",
+      "name": "@next/swc-linux-x64-musl",
+      "from": "15.5.6",
+      "to": "15.5.7",
+      "published": "2025-12-03T15:24:58.926Z",
+      "age_at_t_hours": 3.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "15.5.7"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    },
+    {
+      "path": "node_modules/@next/swc-win32-arm64-msvc",
+      "name": "@next/swc-win32-arm64-msvc",
+      "from": "15.5.6",
+      "to": "15.5.7",
+      "published": "2025-12-03T15:25:09.744Z",
+      "age_at_t_hours": 3.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "15.5.7"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    },
+    {
+      "path": "node_modules/@next/swc-win32-x64-msvc",
+      "name": "@next/swc-win32-x64-msvc",
+      "from": "15.5.6",
+      "to": "15.5.7",
+      "published": "2025-12-03T15:25:13.908Z",
+      "age_at_t_hours": 3.7,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "15.5.7"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "optional"
+      ]
+    }
+  ],
+  "moved_non_v": 9,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 0,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 3.7,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 0,
+  "differing_paths_vs_normal_at_t": 0,
+  "checks_on_normal_at_t_fail": 0,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 16.198
+}

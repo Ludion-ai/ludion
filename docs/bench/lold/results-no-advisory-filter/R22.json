@@ -1,0 +1,2628 @@
+{
+  "id": "R22",
+  "name": "@vitest/browser",
+  "from": "3.0.3",
+  "v": "3.0.4",
+  "advisory": "GHSA-8gvc-j273-4wm5",
+  "why": "first eligible rows with a new or changed peer range",
+  "vulnerable": ">=3.0.0 <3.0.4",
+  "started_at": "2026-11-01T16:38:11.079Z",
+  "base_before": "2025-01-21T14:59:08.820Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 166,
+    "duplicate_names": 3,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/@vitest/browser@3.0.3"
+    ]
+  },
+  "t": "2025-02-04T16:51:08.000Z",
+  "v_published": "2025-01-23T13:42:04.946Z",
+  "picks": [
+    {
+      "req": "@vitest/browser@3.0.4",
+      "picked": "3.0.4",
+      "is_v": true
+    },
+    {
+      "req": "vitest@3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:42:08.962Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@vitest/utils@3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:41:44.804Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "magic-string@^0.30.17",
+      "picked": "0.30.17",
+      "reused_base": true,
+      "published": "2024-12-16T06:14:54.054Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tinyexec@^0.3.2",
+      "picked": "0.3.2",
+      "reused_base": true,
+      "published": "2024-12-29T12:03:44.675Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "std-env@^3.8.0",
+      "picked": "3.8.0",
+      "reused_base": true,
+      "published": "2024-11-08T18:14:35.056Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "vite-node@3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:41:41.516Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tinybench@^2.9.0",
+      "picked": "2.9.0",
+      "reused_base": true,
+      "published": "2024-08-02T15:09:44.961Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@testing-library/user-event@^14.6.1",
+      "picked": "14.6.1",
+      "reused_base": false,
+      "published": "2025-01-21T17:35:55.574Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@testing-library/dom@^10.4.0",
+      "picked": "10.4.0",
+      "reused_base": true,
+      "published": "2024-07-22T12:18:29.622Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@vitest/mocker@3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:41:48.066Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@vitest/mocker@3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:41:48.066Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "debug@^4.4.0",
+      "picked": "4.4.0",
+      "reused_base": true,
+      "published": "2024-12-06T12:32:46.280Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "msw@^2.7.0",
+      "picked": "2.7.0",
+      "reused_base": true,
+      "published": "2024-12-17T01:40:06.321Z",
+      "counts": {
+        "in_range": 60,
+        "no_time": 0,
+        "after_t": 59,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "pathe@^2.0.2",
+      "picked": "2.0.2",
+      "reused_base": true,
+      "published": "2025-01-17T12:58:32.081Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tinyrainbow@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": true,
+      "published": "2025-01-13T17:35:45.218Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tinyrainbow@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": true,
+      "published": "2025-01-13T17:35:45.218Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tinypool@^1.0.2",
+      "picked": "1.0.2",
+      "reused_base": true,
+      "published": "2024-11-14T14:48:53.894Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "chai@^5.1.2",
+      "picked": "5.1.2",
+      "reused_base": true,
+      "published": "2024-10-23T09:22:01.011Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 7,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "expect-type@^1.1.0",
+      "picked": "1.1.0",
+      "reused_base": true,
+      "published": "2024-10-09T19:02:52.657Z",
+      "counts": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 5,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@vitest/spy@3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:41:38.090Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@vitest/runner@3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:41:50.873Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@vitest/snapshot@3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:41:54.358Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@vitest/pretty-format@^3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:41:35.214Z",
+      "counts": {
+        "in_range": 19,
+        "no_time": 0,
+        "after_t": 17,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "why-is-node-running@^2.3.0",
+      "picked": "2.3.0",
+      "reused_base": true,
+      "published": "2024-07-08T12:57:23.951Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@vitest/expect@3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:41:57.639Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "vite@^5.0.0 || ^6.0.0",
+      "picked": "6.0.11",
+      "reused_base": true,
+      "published": "2025-01-21T10:29:23.105Z",
+      "counts": {
+        "in_range": 112,
+        "no_time": 0,
+        "after_t": 40,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@vitest/pretty-format@3.0.4",
+      "picked": "3.0.4",
+      "reused_base": false,
+      "published": "2025-01-23T13:41:35.214Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "chalk@^4.1.0",
+      "picked": "4.1.2",
+      "reused_base": true,
+      "published": "2021-07-30T12:02:52.839Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "pretty-format@^27.0.2",
+      "picked": "27.5.1",
+      "reused_base": true,
+      "published": "2022-02-08T10:52:12.132Z",
+      "counts": {
+        "in_range": 17,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "type-fest@^4.26.1",
+      "picked": "4.33.0",
+      "reused_base": true,
+      "published": "2025-01-20T17:19:35.086Z",
+      "counts": {
+        "in_range": 24,
+        "no_time": 0,
+        "after_t": 11,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "yargs@^17.7.2",
+      "picked": "17.7.2",
+      "reused_base": true,
+      "published": "2023-04-27T19:59:02.861Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/aria-query@^5.0.1",
+      "picked": "5.0.4",
+      "reused_base": true,
+      "published": "2023-11-06T23:21:27.739Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@jridgewell/sourcemap-codec@^1.5.0",
+      "picked": "1.5.0",
+      "reused_base": true,
+      "published": "2024-07-09T19:28:12.902Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "estree-walker@^3.0.3",
+      "picked": "3.0.3",
+      "reused_base": true,
+      "published": "2023-01-20T02:27:12.467Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "aria-query@5.3.0",
+      "picked": "5.3.0",
+      "reused_base": true,
+      "published": "2023-06-24T20:48:55.075Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "lz-string@^1.5.0",
+      "picked": "1.5.0",
+      "reused_base": true,
+      "published": "2023-03-04T08:24:59.879Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@babel/code-frame@^7.10.4",
+      "picked": "7.26.2",
+      "reused_base": true,
+      "published": "2024-10-30T17:46:11.750Z",
+      "counts": {
+        "in_range": 26,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "dom-accessibility-api@^0.5.9",
+      "picked": "0.5.16",
+      "reused_base": true,
+      "published": "2023-01-18T20:03:50.833Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "graphql@^16.8.1",
+      "picked": "16.10.0",
+      "reused_base": true,
+      "published": "2024-12-15T10:35:18.376Z",
+      "counts": {
+        "in_range": 12,
+        "no_time": 0,
+        "after_t": 8,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "picocolors@^1.1.1",
+      "picked": "1.1.1",
+      "reused_base": true,
+      "published": "2024-10-16T18:20:03.921Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/cookie@^0.6.0",
+      "picked": "0.6.0",
+      "reused_base": true,
+      "published": "2023-11-26T22:07:02.296Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "is-node-process@^1.2.0",
+      "picked": "1.2.0",
+      "reused_base": true,
+      "published": "2023-03-23T16:43:26.667Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/statuses@^2.0.4",
+      "picked": "2.0.5",
+      "reused_base": true,
+      "published": "2024-03-08T17:13:49.770Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "path-to-regexp@^6.3.0",
+      "picked": "6.3.0",
+      "reused_base": true,
+      "published": "2024-09-12T01:09:36.065Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@open-draft/until@^2.1.0",
+      "picked": "2.1.0",
+      "reused_base": true,
+      "published": "2023-04-18T16:50:45.090Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@mswjs/interceptors@^0.37.0",
+      "picked": "0.37.5",
+      "reused_base": true,
+      "published": "2025-01-04T18:53:29.006Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "headers-polyfill@^4.0.2",
+      "picked": "4.0.3",
+      "reused_base": true,
+      "published": "2024-03-18T17:46:49.126Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@inquirer/confirm@^5.0.0",
+      "picked": "5.1.3",
+      "reused_base": true,
+      "published": "2025-01-13T22:52:08.495Z",
+      "counts": {
+        "in_range": 25,
+        "no_time": 0,
+        "after_t": 16,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "strict-event-emitter@^0.5.1",
+      "picked": "0.5.1",
+      "reused_base": true,
+      "published": "2023-09-21T08:33:11.732Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@bundled-es-modules/cookie@^2.0.1",
+      "picked": "2.0.1",
+      "reused_base": true,
+      "published": "2024-11-05T16:30:40.197Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@bundled-es-modules/statuses@^1.0.1",
+      "picked": "1.0.1",
+      "reused_base": true,
+      "published": "2023-04-29T07:18:52.913Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@open-draft/deferred-promise@^2.2.0",
+      "picked": "2.2.0",
+      "reused_base": true,
+      "published": "2023-09-07T14:40:53.461Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@bundled-es-modules/tough-cookie@^0.1.6",
+      "picked": "0.1.6",
+      "reused_base": true,
+      "published": "2024-07-22T17:48:56.517Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "outvariant@^1.4.3",
+      "picked": "1.4.3",
+      "reused_base": true,
+      "published": "2024-07-05T10:02:08.996Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "loupe@^3.1.2",
+      "picked": "3.1.2",
+      "reused_base": true,
+      "published": "2024-10-07T09:49:56.282Z",
+      "counts": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@babel/runtime@^7.12.5",
+      "picked": "7.26.0",
+      "reused_base": true,
+      "published": "2024-10-25T13:30:11.826Z",
+      "counts": {
+        "in_range": 89,
+        "no_time": 0,
+        "after_t": 14,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "picocolors@^1.0.0",
+      "picked": "1.1.1",
+      "reused_base": true,
+      "published": "2024-10-16T18:20:03.921Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "supports-color@^7.1.0",
+      "picked": "7.2.0",
+      "reused_base": true,
+      "published": "2020-08-28T11:17:34.870Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "ansi-regex@^5.0.1",
+      "picked": "5.0.1",
+      "reused_base": true,
+      "published": "2021-09-14T15:55:19.540Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@babel/helper-validator-identifier@^7.25.9",
+      "picked": "7.25.9",
+      "reused_base": true,
+      "published": "2024-10-22T15:20:36.986Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "ansi-styles@^4.1.0",
+      "picked": "4.3.0",
+      "reused_base": true,
+      "published": "2020-10-04T19:18:25.986Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "ansi-styles@^5.0.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2021-03-31T07:15:34.766Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "js-tokens@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": true,
+      "published": "2018-01-28T11:58:58.170Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "dequal@^2.0.3",
+      "picked": "2.0.3",
+      "reused_base": true,
+      "published": "2022-07-11T23:29:04.965Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "regenerator-runtime@^0.14.0",
+      "picked": "0.14.1",
+      "reused_base": true,
+      "published": "2023-12-15T20:52:02.938Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "react-is@^17.0.1",
+      "picked": "17.0.2",
+      "reused_base": true,
+      "published": "2021-03-22T21:56:47.976Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tinyspy@^3.0.2",
+      "picked": "3.0.2",
+      "reused_base": true,
+      "published": "2024-09-09T11:12:10.264Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/estree@^1.0.0",
+      "picked": "1.0.6",
+      "reused_base": true,
+      "published": "2024-09-18T09:37:01.060Z",
+      "counts": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "has-flag@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": true,
+      "published": "2019-04-06T15:49:21.907Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "color-convert@^2.0.1",
+      "picked": "2.0.1",
+      "reused_base": true,
+      "published": "2019-08-19T21:05:36.605Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "color-name@~1.1.4",
+      "picked": "1.1.4",
+      "reused_base": true,
+      "published": "2018-09-21T10:48:56.546Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/node@>=18",
+      "picked": "22.10.7",
+      "reused_base": true,
+      "published": "2025-01-16T00:46:59.957Z",
+      "counts": {
+        "in_range": 823,
+        "no_time": 0,
+        "after_t": 376,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@open-draft/until@^2.0.0",
+      "picked": "2.1.0",
+      "reused_base": true,
+      "published": "2023-04-18T16:50:45.090Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "undici-types@~6.20.0",
+      "picked": "6.20.0",
+      "reused_base": true,
+      "published": "2024-10-09T07:50:38.926Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@open-draft/logger@^0.3.0",
+      "picked": "0.3.0",
+      "reused_base": true,
+      "published": "2023-04-14T17:41:39.768Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tough-cookie@^4.1.4",
+      "picked": "4.1.4",
+      "reused_base": true,
+      "published": "2024-04-29T14:11:42.984Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "cookie@^0.7.2",
+      "picked": "0.7.2",
+      "reused_base": true,
+      "published": "2024-10-07T03:41:28.828Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "cliui@^8.0.1",
+      "picked": "8.0.1",
+      "reused_base": true,
+      "published": "2022-10-01T01:16:14.782Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "string-width@^4.2.3",
+      "picked": "4.2.3",
+      "reused_base": true,
+      "published": "2021-09-23T17:17:21.341Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "require-directory@^2.1.1",
+      "picked": "2.1.1",
+      "reused_base": true,
+      "published": "2015-05-28T08:31:04.702Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "get-caller-file@^2.0.5",
+      "picked": "2.0.5",
+      "reused_base": true,
+      "published": "2019-03-09T21:48:30.527Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "y18n@^5.0.5",
+      "picked": "5.0.8",
+      "reused_base": true,
+      "published": "2021-04-07T18:57:33.969Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "statuses@^2.0.1",
+      "picked": "2.0.1",
+      "reused_base": true,
+      "published": "2021-01-03T06:37:47.488Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@inquirer/type@^3.0.2",
+      "picked": "3.0.2",
+      "reused_base": true,
+      "published": "2024-12-20T19:35:18.694Z",
+      "counts": {
+        "in_range": 9,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "yargs-parser@^21.1.1",
+      "picked": "21.1.1",
+      "reused_base": true,
+      "published": "2022-08-04T21:13:43.411Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@inquirer/core@^10.1.4",
+      "picked": "10.1.4",
+      "reused_base": true,
+      "published": "2025-01-13T22:52:06.262Z",
+      "counts": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 15,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/tough-cookie@^4.0.5",
+      "picked": "4.0.5",
+      "reused_base": true,
+      "published": "2023-11-07T20:48:15.280Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "escalade@^3.1.1",
+      "picked": "3.2.0",
+      "reused_base": true,
+      "published": "2024-08-29T22:59:36.690Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "universalify@^0.2.0",
+      "picked": "0.2.0",
+      "reused_base": true,
+      "published": "2020-02-19T16:24:46.080Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "psl@^1.1.33",
+      "picked": "1.15.0",
+      "reused_base": true,
+      "published": "2024-12-02T10:16:04.251Z",
+      "counts": {
+        "in_range": 16,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "punycode@^2.1.1",
+      "picked": "2.3.1",
+      "reused_base": true,
+      "published": "2023-10-30T18:28:32.512Z",
+      "counts": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "url-parse@^1.5.3",
+      "picked": "1.5.10",
+      "reused_base": true,
+      "published": "2022-02-22T15:49:03.624Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "mute-stream@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": true,
+      "published": "2024-09-24T19:12:06.702Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "wrap-ansi@^6.2.0",
+      "picked": "6.2.0",
+      "reused_base": true,
+      "published": "2019-11-11T16:08:17.322Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@inquirer/figures@^1.0.9",
+      "picked": "1.0.9",
+      "reused_base": true,
+      "published": "2024-12-20T19:35:18.701Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 5,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "cli-width@^4.1.0",
+      "picked": "4.1.0",
+      "reused_base": true,
+      "published": "2023-08-05T16:14:01.241Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "strip-ansi@^6.0.1",
+      "picked": "6.0.1",
+      "reused_base": true,
+      "published": "2021-09-23T16:34:41.798Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "yoctocolors-cjs@^2.1.2",
+      "picked": "2.1.2",
+      "reused_base": true,
+      "published": "2024-07-03T23:19:11.886Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "ansi-escapes@^4.3.2",
+      "picked": "4.3.2",
+      "reused_base": true,
+      "published": "2021-03-24T13:41:41.518Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "signal-exit@^4.1.0",
+      "picked": "4.1.0",
+      "reused_base": true,
+      "published": "2023-07-29T05:44:56.721Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "type-fest@^0.21.3",
+      "picked": "0.21.3",
+      "reused_base": true,
+      "published": "2021-03-10T07:44:05.493Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "string-width@^4.1.0",
+      "picked": "4.2.3",
+      "reused_base": true,
+      "published": "2021-09-23T17:17:21.341Z",
+      "counts": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "punycode@^2.3.1",
+      "picked": "2.3.1",
+      "reused_base": true,
+      "published": "2023-10-30T18:28:32.512Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "querystringify@^2.1.1",
+      "picked": "2.2.0",
+      "reused_base": true,
+      "published": "2020-08-17T18:18:46.969Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "requires-port@^1.0.0",
+      "picked": "1.0.0",
+      "reused_base": true,
+      "published": "2015-10-30T14:42:33.794Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@types/node@^18.0.0 || ^20.0.0 || >=22.0.0",
+      "picked": "22.10.7",
+      "reused_base": true,
+      "published": "2025-01-16T00:46:59.957Z",
+      "counts": {
+        "in_range": 823,
+        "no_time": 0,
+        "after_t": 376,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "ms@^2.1.3",
+      "picked": "2.1.3",
+      "reused_base": true,
+      "published": "2020-12-08T13:54:35.223Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "stackback@0.0.2",
+      "picked": "0.0.2",
+      "reused_base": true,
+      "published": "2012-10-20T00:56:54.591Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "cac@^6.7.14",
+      "picked": "6.7.14",
+      "reused_base": true,
+      "published": "2022-08-29T03:02:03.481Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "es-module-lexer@^1.6.0",
+      "picked": "1.6.0",
+      "reused_base": true,
+      "published": "2024-12-26T16:07:36.478Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "assertion-error@^2.0.1",
+      "picked": "2.0.1",
+      "reused_base": true,
+      "published": "2023-10-18T18:04:13.507Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "pathval@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": true,
+      "published": "2023-07-21T19:56:52.805Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "siginfo@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": true,
+      "published": "2020-06-16T20:30:23.515Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "esbuild@^0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:57:44.621Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "postcss@^8.4.49",
+      "picked": "8.5.1",
+      "reused_base": true,
+      "published": "2025-01-14T10:55:44.939Z",
+      "counts": {
+        "in_range": 34,
+        "no_time": 0,
+        "after_t": 31,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "fsevents@~2.3.3",
+      "picked": "2.3.3",
+      "reused_base": true,
+      "published": "2023-08-21T16:24:22.854Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "deep-eql@^5.0.1",
+      "picked": "5.0.2",
+      "reused_base": true,
+      "published": "2024-06-03T08:03:16.644Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "check-error@^2.1.1",
+      "picked": "2.1.1",
+      "reused_base": true,
+      "published": "2024-05-08T20:49:55.268Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "rollup@^4.23.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:33.411Z",
+      "counts": {
+        "in_range": 127,
+        "no_time": 0,
+        "after_t": 100,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/aix-ppc64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:57:31.414Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/sunos-x64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:57:34.319Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/netbsd-x64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:56:12.289Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/linux-arm@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:56:50.665Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/linux-x64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:56:52.550Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/linux-ppc64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:57:34.639Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/darwin-x64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:56:14.010Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/linux-arm64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:57:17.541Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/win32-x64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:55:36.931Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/freebsd-x64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:55:53.447Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/android-arm@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:56:34.298Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/android-x64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:56:33.357Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/linux-ia32@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:56:50.883Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/win32-ia32@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:55:35.658Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/linux-s390x@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:57:32.774Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/openbsd-x64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:55:54.689Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/darwin-arm64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:56:13.272Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/android-arm64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:56:35.346Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/freebsd-arm64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:55:53.052Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/openbsd-arm64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:55:52.372Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/linux-riscv64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:57:17.333Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "source-map-js@^1.2.1",
+      "picked": "1.2.1",
+      "reused_base": true,
+      "published": "2024-09-08T16:22:55.645Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "nanoid@^3.3.8",
+      "picked": "3.3.8",
+      "reused_base": true,
+      "published": "2024-11-26T11:55:05.967Z",
+      "counts": {
+        "in_range": 13,
+        "no_time": 0,
+        "after_t": 12,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/netbsd-arm64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:56:14.321Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-darwin-x64@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:18.941Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/linux-loong64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:57:15.292Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/linux-mips64el@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:57:16.312Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-freebsd-x64@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:24.172Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@esbuild/win32-arm64@0.24.2",
+      "picked": "0.24.2",
+      "reused_base": true,
+      "published": "2024-12-20T17:55:36.441Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-darwin-arm64@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:56:42.667Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-android-arm64@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:56:45.414Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-freebsd-arm64@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:56:50.339Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-win32-x64-msvc@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:21.879Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-linux-x64-gnu@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:26.976Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-linux-x64-musl@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:29.846Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-linux-arm64-gnu@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:56:52.987Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-android-arm-eabi@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:56:57.811Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-win32-ia32-msvc@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:05.640Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-linux-s390x-gnu@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:15.700Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-linux-arm64-musl@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:56:55.451Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-win32-arm64-msvc@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:56:47.836Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-linux-arm-musleabihf@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:02.951Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-linux-arm-gnueabihf@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:00.448Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-linux-riscv64-gnu@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:10.477Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-linux-powerpc64le-gnu@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:13.239Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@rollup/rollup-linux-loongarch64-gnu@4.31.0",
+      "picked": "4.31.0",
+      "reused_base": true,
+      "published": "2025-01-19T12:57:08.131Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "emoji-regex@^8.0.0",
+      "picked": "8.0.0",
+      "reused_base": true,
+      "published": "2019-03-05T18:58:23.040Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "is-fullwidth-code-point@^3.0.0",
+      "picked": "3.0.0",
+      "reused_base": true,
+      "published": "2019-03-18T08:09:05.035Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "wrap-ansi@^7.0.0",
+      "picked": "7.0.0",
+      "reused_base": true,
+      "published": "2020-04-22T16:53:23.889Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 1146,
+    "withdrawn": 0,
+    "deprecated": 0,
+    "advisory": 0
+  },
+  "excluded_names": [],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 122,
+    "youngest_age": {
+      "hours": 8.8,
+      "version": "@rollup/rollup-openbsd-x64@4.67.4",
+      "published": "2026-11-01T07:47:59.788Z"
+    },
+    "published_after_t": 108,
+    "publish_time_unknown": 0,
+    "removed_paths": 22,
+    "duplicate_names": 2,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 37,
+    "youngest_age": {
+      "hours": 8.7,
+      "version": "@rollup/rollup-android-arm-eabi@4.34.2",
+      "published": "2025-02-04T08:10:12.968Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 2,
+    "duplicate_names": 3,
+    "ls_problems": 0
+  },
+  "items": [
+    {
+      "path": "node_modules/@testing-library/user-event",
+      "name": "@testing-library/user-event",
+      "from": "14.6.0",
+      "to": "14.6.1",
+      "published": "2025-01-21T17:35:55.574Z",
+      "age_at_t_hours": 335.3,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "^14.6.1"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@vitest/expect",
+      "name": "@vitest/expect",
+      "from": "3.0.3",
+      "to": "3.0.4",
+      "published": "2025-01-23T13:41:57.639Z",
+      "age_at_t_hours": 291.2,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "3.0.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    },
+    {
+      "path": "node_modules/@vitest/mocker",
+      "name": "@vitest/mocker",
+      "from": "3.0.3",
+      "to": "3.0.4",
+      "published": "2025-01-23T13:41:48.066Z",
+      "age_at_t_hours": 291.2,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "3.0.4",
+        "3.0.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@vitest/pretty-format",
+      "name": "@vitest/pretty-format",
+      "from": "3.0.3",
+      "to": "3.0.4",
+      "published": "2025-01-23T13:41:35.214Z",
+      "age_at_t_hours": 291.2,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "3.0.4",
+        "3.0.4",
+        "^3.0.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@vitest/runner",
+      "name": "@vitest/runner",
+      "from": "3.0.3",
+      "to": "3.0.4",
+      "published": "2025-01-23T13:41:50.873Z",
+      "age_at_t_hours": 291.2,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "3.0.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    },
+    {
+      "path": "node_modules/@vitest/snapshot",
+      "name": "@vitest/snapshot",
+      "from": "3.0.3",
+      "to": "3.0.4",
+      "published": "2025-01-23T13:41:54.358Z",
+      "age_at_t_hours": 291.2,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "3.0.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    },
+    {
+      "path": "node_modules/@vitest/spy",
+      "name": "@vitest/spy",
+      "from": "3.0.3",
+      "to": "3.0.4",
+      "published": "2025-01-23T13:41:38.090Z",
+      "age_at_t_hours": 291.2,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "3.0.4",
+        "3.0.4",
+        "3.0.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/@vitest/utils",
+      "name": "@vitest/utils",
+      "from": "3.0.3",
+      "to": "3.0.4",
+      "published": "2025-01-23T13:41:44.804Z",
+      "age_at_t_hours": 291.2,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "3.0.4",
+        "3.0.4",
+        "3.0.4",
+        "3.0.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": []
+    },
+    {
+      "path": "node_modules/vite-node",
+      "name": "vite-node",
+      "from": "3.0.3",
+      "to": "3.0.4",
+      "published": "2025-01-23T13:41:41.516Z",
+      "age_at_t_hours": 291.2,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "3.0.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    },
+    {
+      "path": "node_modules/vitest",
+      "name": "vitest",
+      "from": "3.0.3",
+      "to": "3.0.4",
+      "published": "2025-01-23T13:42:08.962Z",
+      "age_at_t_hours": 291.1,
+      "oldest": true,
+      "reused_base": false,
+      "excluded_reason_of_to": null,
+      "ranges": [
+        "3.0.4"
+      ],
+      "has_install_script": false,
+      "engines_not_node24": false,
+      "flags": [
+        "peer"
+      ]
+    }
+  ],
+  "moved_non_v": 10,
+  "all_oldest": true,
+  "removed_paths": 0,
+  "flag_only_paths": 0,
+  "duplicate_names": 3,
+  "duplicates_new_vs_base": [],
+  "ls_problems": 0,
+  "new_ls_problems": 0,
+  "youngest_age_at_t_hours": 291.1,
+  "install_scripts": [],
+  "engines_not_node24": [],
+  "differing_paths_vs_normal": 135,
+  "differing_paths_vs_normal_at_t": 29,
+  "checks_on_normal_at_t_fail": 10,
+  "failures": [],
+  "outcome": "built",
+  "took_s": 27.932
+}

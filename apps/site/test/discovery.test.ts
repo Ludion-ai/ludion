@@ -26,7 +26,8 @@ describe("being found", () => {
 
   it("describes the security source preview and says the old endpoints ended", () => {
     const txt = llmsTxt("https://ludion.ai");
-    expect(txt).toContain("One workflow for security updates across PHP Docker, npm, Composer and Maven.");
+    expect(txt).toContain("One workflow for security updates across PHP Docker, npm and Composer, with a read-only scan of Maven.");
+    expect(txt).toContain("Read-only scan, with no updates: standalone Maven");
     expect(txt).toContain("Python, Go, Rust, Gradle, live server inventory and automatic production deployment are unsupported.");
     expect(txt).toContain("(/index.json, /index/*, /mcp) ended on 2026-10-28");
     expect(txt).not.toContain("https://ludion.ai/index.json");

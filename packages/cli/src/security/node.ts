@@ -1,4 +1,4 @@
-import { compare, imageMove, officialImage, releaseJson, withoutBom, type Release, type RuntimeImage, type Scan } from "./php.ts";
+import { compare, imageMove, isSpace, officialImage, releaseJson, type Release, type RuntimeImage, type Scan } from "./php.ts";
 
 /**
  * The official Node.js image, moved to the newest release of its line that Docker still builds in its variant
@@ -10,11 +10,34 @@ export const NODE_INDEX_URL = "https://nodejs.org/dist/index.json";
  * A FROM line that names a node image, for init and scan to offer the Node.js policy: after any --flag arguments, with
  * any registry or namespace prefix, by tag, digest or neither. Only the FROM line counts (not `COPY --chown=node:node`).
  * Detecting is not reading: nodeImage accepts only the official image at an exact version, and every other form found
- * here becomes a check that could not be made, never a skipped one.
+ * here becomes a check that could not be made, never a skipped one. A space, tab, vertical tab, form feed or carriage
+ * return separates the words, as in BuildKit.
  */
-export const NODE_FROM = /^[ \t]*FROM[ \t]+(?:--\S+[ \t]+)*(?:\S*\/)?node(?=[:@ \t\r]|$)/im;
-/** Whether a Dockerfile names a node image (NODE_FROM), read as Docker reads it: without a leading byte-order mark. */
-export const namesNodeImage = (dockerfile: string): boolean => NODE_FROM.test(withoutBom(dockerfile));
+export const NODE_FROM = /^[ \t]*FROM[ \t\v\f\r]+(?:--\S+[ \t\v\f\r]+)*(?:\S*\/)?node(?=[:@ \t\v\f\r]|$)/im;
+/**
+ * Whether a Dockerfile names a node image (NODE_FROM). Each line, cut at a line feed, is read without the whitespace at
+ * its end: a carriage return, U+0085 and a byte-order mark are among it, so CRLF is one line end. Blank lines are left out.
+ * The lines are read without their left whitespace too, once as they stand, and once with comments left out and
+ * continuations joined, a backtick's too, before that left whitespace goes, as it separates words across a join
+ * (a backtick continues only under an escape directive, so the lines are read both ways). Finding more here only makes a
+ * check that nodeImage then reads or refuses. It does not find every FROM BuildKit reads: not an image in quotes or with a
+ * backslash in its name, not one from an ARG or `${X:-...}`, and not one after `--` or a raw byte that ends a flag. A policy
+ * that names node refuses each (dockerfile-check.test.ts holds these).
+ */
+export const namesNodeImage = (dockerfile: string): boolean => {
+  const withoutLeft = (line: string): string => {
+    let first = 0;
+    while (first < line.length && isSpace(line[first]!)) first++;
+    return line.slice(first);
+  };
+  const named = (lines: string[]): boolean => NODE_FROM.test(lines.map(withoutLeft).join("\n"));
+  const lines = dockerfile.split("\n").map(line => {
+    let end = line.length;
+    while (end > 0 && isSpace(line[end - 1]!)) end--;
+    return line.slice(0, end);
+  }).filter(line => line !== "");
+  return named(lines) || named([...lines.filter(line => !withoutLeft(line).startsWith("#")), ""].join("\n").replace(/[\\`]\n/g, "").split("\n"));
+};
 
 export function nodeImage(dockerfile: string): RuntimeImage {
   return officialImage(dockerfile, /^(?:(?:docker\.io\/)?library\/)?node:(\d+\.\d+\.\d+)((?:-[a-z][a-z0-9.-]{0,63})?)(?:@sha256:[a-f0-9]{64})?$/,

@@ -1,0 +1,2241 @@
+{
+  "id": "R09",
+  "name": "snowflake-sdk",
+  "from": "2.0.1",
+  "v": "2.0.2",
+  "advisory": "GHSA-xfhv-wqj6-rx99",
+  "why": "first eligible rows, one per package",
+  "vulnerable": ">=1.12.0 <=2.0.1",
+  "started_at": "2026-11-01T16:31:25.306Z",
+  "base_before": "2024-12-13T15:26:55.479Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 298,
+    "duplicate_names": 20,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/snowflake-sdk@2.0.1"
+    ]
+  },
+  "t": "2025-01-29T18:42:26.000Z",
+  "v_published": "2025-01-29T16:13:52.043Z",
+  "picks": [
+    {
+      "req": "snowflake-sdk@2.0.2",
+      "picked": "2.0.2",
+      "is_v": true
+    },
+    {
+      "req": "asn1.js@^5.4.1",
+      "picked": "5.4.1",
+      "reused_base": true,
+      "published": "2020-06-18T16:11:51.629Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/node-http-handler@^4.0.1",
+      "picked": "4.0.1",
+      "reused_base": false,
+      "published": "2025-01-09T17:52:50.953Z",
+      "counts": {
+        "in_range": 70,
+        "no_time": 0,
+        "after_t": 68,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/client-s3@^3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T20:05:38.292Z",
+      "counts": {
+        "in_range": 322,
+        "no_time": 0,
+        "after_t": 312,
+        "withdrawn": 0,
+        "deprecated": 7,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/storage-blob@12.26.x",
+      "picked": "12.26.0",
+      "reused_base": false,
+      "published": "2024-11-20T10:34:25.721Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.6.2",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/core@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:13.967Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/md5-js@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:16.640Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/core@^3.0.0",
+      "picked": "3.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:12.651Z",
+      "counts": {
+        "in_range": 118,
+        "no_time": 0,
+        "after_t": 114,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-utf8@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:25.294Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/url-parser@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:21.717Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-retry@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:24.611Z",
+      "counts": {
+        "in_range": 62,
+        "no_time": 0,
+        "after_t": 60,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-base64@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:21.862Z",
+      "counts": {
+        "in_range": 34,
+        "no_time": 0,
+        "after_t": 33,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/client-sts@3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:56:06.675Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-waiter@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:25.605Z",
+      "counts": {
+        "in_range": 56,
+        "no_time": 0,
+        "after_t": 53,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/types@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:13.905Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-stream@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:24.902Z",
+      "counts": {
+        "in_range": 69,
+        "no_time": 0,
+        "after_t": 66,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/types@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:22.283Z",
+      "counts": {
+        "in_range": 34,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/hash-node@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:15.681Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/xml-builder@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:13.820Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/sha256-js@5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:46.966Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/node-http-handler@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:18.495Z",
+      "counts": {
+        "in_range": 71,
+        "no_time": 0,
+        "after_t": 68,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/smithy-client@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:21.538Z",
+      "counts": {
+        "in_range": 115,
+        "no_time": 0,
+        "after_t": 110,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/protocol-http@^5.0.0",
+      "picked": "5.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:19.367Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-endpoints@^3.0.0",
+      "picked": "3.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:24.057Z",
+      "counts": {
+        "in_range": 57,
+        "no_time": 0,
+        "after_t": 55,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/util-endpoints@3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:55:57.269Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-middleware@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:24.654Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/sha1-browser@5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:47.013Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/middleware-retry@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:17.941Z",
+      "counts": {
+        "in_range": 121,
+        "no_time": 0,
+        "after_t": 116,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/client-sso-oidc@3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:56:06.378Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/middleware-serde@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:18.419Z",
+      "counts": {
+        "in_range": 61,
+        "no_time": 0,
+        "after_t": 58,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/hash-stream-node@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:15.316Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/middleware-stack@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:18.396Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/middleware-ssec@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:40.311Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/hash-blob-browser@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:15.090Z",
+      "counts": {
+        "in_range": 52,
+        "no_time": 0,
+        "after_t": 50,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/sha256-browser@5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:49.151Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/middleware-sdk-s3@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:57.455Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/middleware-logger@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:31.876Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/fetch-http-handler@^5.0.0",
+      "picked": "5.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:14.772Z",
+      "counts": {
+        "in_range": 56,
+        "no_time": 0,
+        "after_t": 54,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/invalid-dependency@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:15.521Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/middleware-endpoint@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:17.407Z",
+      "counts": {
+        "in_range": 112,
+        "no_time": 0,
+        "after_t": 108,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/node-config-provider@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:18.506Z",
+      "counts": {
+        "in_range": 54,
+        "no_time": 0,
+        "after_t": 52,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/util-user-agent-node@3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:55:56.652Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/middleware-user-agent@3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:55:57.285Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/eventstream-serde-node@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:11.851Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/util-user-agent-browser@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:48.232Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/region-config-resolver@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:40.173Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-body-length-node@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:22.059Z",
+      "counts": {
+        "in_range": 34,
+        "no_time": 0,
+        "after_t": 33,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "tslib@^2.2.0",
+      "picked": "2.8.1",
+      "reused_base": true,
+      "published": "2024-10-31T22:42:48.624Z",
+      "counts": {
+        "in_range": 17,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-body-length-browser@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:22.748Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-defaults-mode-node@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:23.178Z",
+      "counts": {
+        "in_range": 119,
+        "no_time": 0,
+        "after_t": 114,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/credential-provider-node@3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:56:06.026Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/middleware-host-header@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:21.969Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/eventstream-serde-browser@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:12.610Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/middleware-content-length@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:17.032Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/signature-v4-multi-region@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:51:06.561Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-defaults-mode-browser@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:23.181Z",
+      "counts": {
+        "in_range": 115,
+        "no_time": 0,
+        "after_t": 110,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/middleware-bucket-endpoint@3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:55:57.121Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/middleware-expect-continue@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:22.315Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/middleware-location-constraint@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:22.301Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/middleware-flexible-checksums@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:57.098Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/types@^4.1.0",
+      "picked": "4.1.0",
+      "reused_base": false,
+      "published": "2025-01-09T17:52:53.647Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/protocol-http@^5.0.1",
+      "picked": "5.0.1",
+      "reused_base": false,
+      "published": "2025-01-09T17:52:51.120Z",
+      "counts": {
+        "in_range": 50,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/middleware-recursion-detection@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:31.792Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/eventstream-serde-config-resolver@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:12.216Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "events@^3.0.0",
+      "picked": "3.3.0",
+      "reused_base": true,
+      "published": "2021-02-27T16:51:27.318Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/logger@^1.0.0",
+      "picked": "1.1.4",
+      "reused_base": true,
+      "published": "2024-08-02T00:29:50.350Z",
+      "counts": {
+        "in_range": 13,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-lro@^2.2.0",
+      "picked": "2.7.2",
+      "reused_base": true,
+      "published": "2024-04-11T01:16:03.147Z",
+      "counts": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-auth@^1.4.0",
+      "picked": "1.9.0",
+      "reused_base": true,
+      "published": "2024-10-16T23:35:51.197Z",
+      "counts": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-xml@^1.4.3",
+      "picked": "1.4.3",
+      "reused_base": false,
+      "published": "2024-08-02T00:31:16.618Z",
+      "counts": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-util@^1.6.1",
+      "picked": "1.11.0",
+      "reused_base": true,
+      "published": "2024-10-16T22:42:16.893Z",
+      "counts": {
+        "in_range": 13,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-paging@^1.1.1",
+      "picked": "1.6.2",
+      "reused_base": true,
+      "published": "2024-04-11T01:15:46.432Z",
+      "counts": {
+        "in_range": 12,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-client@^1.6.2",
+      "picked": "1.7.0",
+      "reused_base": false,
+      "published": "2023-01-05T22:35:03.193Z",
+      "counts": {
+        "in_range": 15,
+        "no_time": 0,
+        "after_t": 7,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/abort-controller@^2.1.2",
+      "picked": "2.1.2",
+      "reused_base": true,
+      "published": "2024-04-11T00:52:03.863Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-http-compat@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": false,
+      "published": "2023-01-05T21:41:39.066Z",
+      "counts": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-tracing@^1.1.2",
+      "picked": "1.1.2",
+      "reused_base": false,
+      "published": "2024-04-11T01:15:09.882Z",
+      "counts": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/abort-controller@^4.0.1",
+      "picked": "4.0.1",
+      "reused_base": false,
+      "published": "2025-01-09T17:52:44.473Z",
+      "counts": {
+        "in_range": 32,
+        "no_time": 0,
+        "after_t": 31,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-rest-pipeline@^1.10.1",
+      "picked": "1.10.1",
+      "reused_base": false,
+      "published": "2023-01-05T23:57:41.430Z",
+      "counts": {
+        "in_range": 30,
+        "no_time": 0,
+        "after_t": 10,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/querystring-builder@^4.0.1",
+      "picked": "4.0.1",
+      "reused_base": false,
+      "published": "2025-01-09T17:52:51.098Z",
+      "counts": {
+        "in_range": 50,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/types@^3.222.0",
+      "picked": "3.709.0",
+      "reused_base": true,
+      "published": "2024-12-10T20:36:02.584Z",
+      "counts": {
+        "in_range": 120,
+        "no_time": 0,
+        "after_t": 46,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-utf8@^2.0.0",
+      "picked": "2.3.0",
+      "reused_base": true,
+      "published": "2024-03-14T23:03:22.152Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/types@^3.222.0",
+      "picked": "3.709.0",
+      "reused_base": true,
+      "published": "2024-12-10T20:36:02.584Z",
+      "counts": {
+        "in_range": 120,
+        "no_time": 0,
+        "after_t": 46,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-utf8@^2.0.0",
+      "picked": "2.3.0",
+      "reused_base": true,
+      "published": "2024-03-14T23:03:22.152Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/sha256-js@^5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:46.966Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/types@^3.222.0",
+      "picked": "3.709.0",
+      "reused_base": true,
+      "published": "2024-12-10T20:36:02.584Z",
+      "counts": {
+        "in_range": 120,
+        "no_time": 0,
+        "after_t": 46,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/shared-ini-file-loader@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:20.927Z",
+      "counts": {
+        "in_range": 52,
+        "no_time": 0,
+        "after_t": 50,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/property-provider@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:18.804Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/property-provider@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:18.804Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/signature-v4@^5.0.0",
+      "picked": "5.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:20.809Z",
+      "counts": {
+        "in_range": 55,
+        "no_time": 0,
+        "after_t": 53,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/util@^5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:45.324Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/util@^5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:45.324Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/util@^5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:45.324Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/util@5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:45.324Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/credential-provider-env@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:48.112Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/util-locate-window@^3.0.0",
+      "picked": "3.693.0",
+      "reused_base": true,
+      "published": "2024-11-15T02:47:55.780Z",
+      "counts": {
+        "in_range": 57,
+        "no_time": 0,
+        "after_t": 15,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/util-locate-window@^3.0.0",
+      "picked": "3.693.0",
+      "reused_base": true,
+      "published": "2024-11-15T02:47:55.780Z",
+      "counts": {
+        "in_range": 57,
+        "no_time": 0,
+        "after_t": 15,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/supports-web-crypto@^5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:45.390Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/supports-web-crypto@^5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:45.390Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/credential-provider-ini@3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:56:05.668Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/credential-provider-sso@3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:56:05.831Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/credential-provider-process@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:48.483Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/credential-provider-http@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:48.569Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/querystring-builder@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:19.045Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/credential-provider-imds@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:12.472Z",
+      "counts": {
+        "in_range": 56,
+        "no_time": 0,
+        "after_t": 54,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/util-arn-parser@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:13.710Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/util-arn-parser@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:13.710Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/credential-provider-web-identity@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:48.720Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-config-provider@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:22.710Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-config-provider@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:22.710Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-config-provider@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:22.710Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/crc32c@5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:47.063Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-crypto/crc32@5.2.0",
+      "picked": "5.2.0",
+      "reused_base": true,
+      "published": "2023-10-16T19:44:46.959Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/is-array-buffer@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:15.524Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "bowser@^2.11.0",
+      "picked": "2.11.0",
+      "reused_base": true,
+      "published": "2020-09-12T08:25:10.987Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 7,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "bowser@^2.11.0",
+      "picked": "2.11.0",
+      "reused_base": true,
+      "published": "2020-09-12T08:25:10.987Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 7,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/abort-controller@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:12.448Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 31,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/eventstream-serde-universal@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:13.796Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/eventstream-serde-universal@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:13.796Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/chunked-blob-reader@^5.0.0",
+      "picked": "5.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:12.402Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/chunked-blob-reader-native@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:12.166Z",
+      "counts": {
+        "in_range": 34,
+        "no_time": 0,
+        "after_t": 33,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-buffer-from@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:22.351Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-buffer-from@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:22.351Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-buffer-from@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:22.351Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-buffer-from@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:22.351Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/service-error-classification@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:20.075Z",
+      "counts": {
+        "in_range": 56,
+        "no_time": 0,
+        "after_t": 54,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/service-error-classification@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:20.075Z",
+      "counts": {
+        "in_range": 56,
+        "no_time": 0,
+        "after_t": 54,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/querystring-parser@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:19.394Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-hex-encoding@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:24.151Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-buffer-from@^2.2.0",
+      "picked": "2.2.0",
+      "reused_base": true,
+      "published": "2024-03-14T23:03:18.315Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/util-uri-escape@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:25.407Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 32,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/client-sts@^3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:56:06.675Z",
+      "counts": {
+        "in_range": 303,
+        "no_time": 0,
+        "after_t": 297,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/client-sts@^3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:51:15.960Z",
+      "counts": {
+        "in_range": 304,
+        "no_time": 0,
+        "after_t": 297,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/token-providers@3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:50:40.510Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/client-sso@3.726.0",
+      "picked": "3.726.0",
+      "reused_base": false,
+      "published": "2025-01-09T19:55:57.667Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@aws-sdk/client-sso-oidc@^3.723.0",
+      "picked": "3.723.0",
+      "reused_base": false,
+      "published": "2025-01-06T20:51:16.195Z",
+      "counts": {
+        "in_range": 304,
+        "no_time": 0,
+        "after_t": 297,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-util@^1.11.0",
+      "picked": "1.11.0",
+      "reused_base": true,
+      "published": "2024-10-16T22:42:16.893Z",
+      "counts": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-util@^1.0.0",
+      "picked": "1.11.0",
+      "reused_base": true,
+      "published": "2024-10-16T22:42:16.893Z",
+      "counts": {
+        "in_range": 23,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-tracing@^1.0.0",
+      "picked": "1.0.0",
+      "reused_base": false,
+      "published": "2022-03-31T19:22:23.312Z",
+      "counts": {
+        "in_range": 9,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/abort-controller@^1.0.0",
+      "picked": "1.1.0",
+      "reused_base": true,
+      "published": "2022-05-05T19:02:15.161Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-rest-pipeline@^1.9.1",
+      "picked": "1.9.1",
+      "reused_base": false,
+      "published": "2022-08-04T21:40:23.279Z",
+      "counts": {
+        "in_range": 33,
+        "no_time": 0,
+        "after_t": 10,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/abort-controller@^1.0.4",
+      "picked": "1.1.0",
+      "reused_base": true,
+      "published": "2022-05-05T19:02:15.161Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-rest-pipeline@^1.3.0",
+      "picked": "1.3.0",
+      "reused_base": false,
+      "published": "2021-09-02T19:58:19.626Z",
+      "counts": {
+        "in_range": 43,
+        "no_time": 0,
+        "after_t": 10,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-util@^1.2.0",
+      "picked": "1.11.0",
+      "reused_base": true,
+      "published": "2024-10-16T22:42:16.893Z",
+      "counts": {
+        "in_range": 20,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-util@^1.0.0",
+      "picked": "1.11.0",
+      "reused_base": true,
+      "published": "2024-10-16T22:42:16.893Z",
+      "counts": {
+        "in_range": 23,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/core-tracing@^1.0.1",
+      "picked": "1.0.1",
+      "reused_base": false,
+      "published": "2022-05-05T18:43:17.020Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@azure/abort-controller@^1.0.0",
+      "picked": "1.1.0",
+      "reused_base": true,
+      "published": "2022-05-05T19:02:15.161Z",
+      "counts": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "https-proxy-agent@^5.0.0",
+      "picked": "5.0.1",
+      "reused_base": true,
+      "published": "2022-04-14T18:42:00.761Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "agent-base@6",
+      "picked": "6.0.2",
+      "reused_base": true,
+      "published": "2020-10-23T19:33:15.354Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/eventstream-codec@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": false,
+      "published": "2025-01-06T17:39:12.216Z",
+      "counts": {
+        "in_range": 51,
+        "no_time": 0,
+        "after_t": 49,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@smithy/is-array-buffer@^2.2.0",
+      "picked": "2.2.0",
+      "reused_base": true,
+      "published": "2024-03-14T23:03:10.299Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [
+    {
+      "req": "@smithy/config-resolver@^4.0.0",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 61,
+        "no_time": 0,
+        "after_t": 59,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 2
+      }
+    },
+    {
+      "req": "fast-xml-parser@4.4.1",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "req": "uuid@^9.0.1",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    }
+  ],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 4662,
+    "withdrawn": 0,
+    "deprecated": 10,
+    "advisory": 0
+  },
+  "excluded_names": [
+    "@aws-sdk/client-s3@^3.726.0",
+    "@azure/abort-controller@^1.0.0",
+    "@azure/abort-controller@^1.0.4",
+    "@azure/abort-controller@^1.0.0"
+  ],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 47,
+    "youngest_age": {
+      "hours": 41.3,
+      "version": "@smithy/core@3.38.1",
+      "published": "2026-10-30T23:11:40.632Z"
+    },
+    "published_after_t": 45,
+    "publish_time_unknown": 0,
+    "removed_paths": 92,
+    "duplicate_names": 18,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 89,
+    "youngest_age": {
+      "hours": 51,
+      "version": "@smithy/core@3.1.2",
+      "published": "2025-01-27T15:42:58.148Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 14,
+    "duplicate_names": 20,
+    "ls_problems": 0
+  },
+  "outcome": "stopped_no_allowed",
+  "reason": [
+    {
+      "req": "@smithy/config-resolver@^4.0.0",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 61,
+        "no_time": 0,
+        "after_t": 59,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 2
+      }
+    },
+    {
+      "req": "fast-xml-parser@4.4.1",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "req": "uuid@^9.0.1",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    }
+  ],
+  "tool_failure": {
+    "code": "LOLD_STOP",
+    "message": "LOLD: nothing allowed for @smithy/config-resolver@^4.0.0"
+  },
+  "took_s": 23.961
+}

@@ -1,0 +1,791 @@
+{
+  "id": "R02",
+  "name": "@react-native-community/cli-server-api",
+  "from": "19.1.1",
+  "v": "19.1.2",
+  "advisory": "GHSA-399j-vxmf-hjvr",
+  "why": "first eligible rows, one per package",
+  "vulnerable": ">=19.0.0-alpha.0 <19.1.2",
+  "started_at": "2026-11-01T16:30:18.562Z",
+  "base_before": "2025-07-24T13:28:10.877Z",
+  "base": {
+    "lockfile_version": 3,
+    "entries": 142,
+    "duplicate_names": 7,
+    "ls_problems": 0,
+    "vulnerable_copies": [
+      "node_modules/@react-native-community/cli-server-api@19.1.1"
+    ]
+  },
+  "t": "2025-11-05T21:56:39.769Z",
+  "v_published": "2025-11-05T21:56:39.769Z",
+  "picks": [
+    {
+      "req": "@react-native-community/cli-server-api@19.1.2",
+      "picked": "19.1.2",
+      "is_v": true
+    },
+    {
+      "req": "@react-native-community/cli-tools@19.1.2",
+      "picked": "19.1.2",
+      "reused_base": false,
+      "published": "2025-11-05T21:56:37.128Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "semver@^7.5.2",
+      "picked": "7.7.2",
+      "reused_base": true,
+      "published": "2025-05-12T17:02:28.372Z",
+      "counts": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 7,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "prompts@^2.4.2",
+      "picked": "2.4.2",
+      "reused_base": true,
+      "published": "2021-10-07T21:23:57.263Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "execa@^5.0.0",
+      "picked": "5.1.1",
+      "reused_base": true,
+      "published": "2021-06-04T16:38:11.620Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "find-up@^5.0.0",
+      "picked": "5.0.0",
+      "reused_base": true,
+      "published": "2020-08-11T18:44:24.748Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "mime@^2.4.1",
+      "picked": "2.6.0",
+      "reused_base": true,
+      "published": "2021-11-02T18:00:20.963Z",
+      "counts": {
+        "in_range": 10,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "appdirsjs@^1.2.4",
+      "picked": "1.2.7",
+      "reused_base": true,
+      "published": "2022-07-08T14:15:18.385Z",
+      "counts": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "ora@^5.4.1",
+      "picked": "5.4.1",
+      "reused_base": true,
+      "published": "2021-06-08T07:38:49.815Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "@vscode/sudo-prompt@^9.0.0",
+      "picked": "9.3.1",
+      "reused_base": true,
+      "published": "2021-11-19T18:53:16.624Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "is-stream@^2.0.0",
+      "picked": "2.0.1",
+      "reused_base": true,
+      "published": "2021-07-26T10:51:04.495Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "path-exists@^4.0.0",
+      "picked": "4.0.0",
+      "reused_base": true,
+      "published": "2019-04-04T03:29:16.887Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "signal-exit@^3.0.3",
+      "picked": "3.0.7",
+      "reused_base": true,
+      "published": "2022-02-03T21:05:34.544Z",
+      "counts": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "npm-run-path@^4.0.1",
+      "picked": "4.0.1",
+      "reused_base": true,
+      "published": "2019-12-22T22:04:32.828Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "wcwidth@^1.0.1",
+      "picked": "1.0.1",
+      "reused_base": true,
+      "published": "2016-05-30T03:56:57.274Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "merge-stream@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": true,
+      "published": "2019-05-23T13:36:45.932Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "strip-ansi@^6.0.0",
+      "picked": "6.0.1",
+      "reused_base": true,
+      "published": "2021-09-23T16:34:41.798Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "get-stream@^6.0.0",
+      "picked": "6.0.1",
+      "reused_base": true,
+      "published": "2021-04-15T04:56:42.936Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "onetime@^5.1.2",
+      "picked": "5.1.2",
+      "reused_base": true,
+      "published": "2020-08-09T20:29:04.963Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "bl@^4.1.0",
+      "picked": "4.1.0",
+      "reused_base": true,
+      "published": "2021-02-09T10:37:35.452Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "human-signals@^2.1.0",
+      "picked": "2.1.0",
+      "reused_base": true,
+      "published": "2020-03-14T15:10:37.036Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "cross-spawn@^7.0.3",
+      "picked": "7.0.6",
+      "reused_base": true,
+      "published": "2024-11-18T13:59:52.129Z",
+      "counts": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 2
+      }
+    },
+    {
+      "req": "cli-cursor@^3.1.0",
+      "picked": "3.1.0",
+      "reused_base": true,
+      "published": "2019-06-11T16:57:35.876Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "locate-path@^6.0.0",
+      "picked": "6.0.0",
+      "reused_base": true,
+      "published": "2020-08-10T17:49:10.766Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "strip-final-newline@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": true,
+      "published": "2018-10-28T08:36:42.180Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "log-symbols@^4.1.0",
+      "picked": "4.1.0",
+      "reused_base": true,
+      "published": "2021-03-17T10:29:21.279Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "is-unicode-supported@^0.1.0",
+      "picked": "0.1.0",
+      "reused_base": true,
+      "published": "2021-03-17T10:11:13.836Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "kleur@^3.0.3",
+      "picked": "3.0.3",
+      "reused_base": true,
+      "published": "2019-04-07T22:02:01.149Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "is-interactive@^1.0.0",
+      "picked": "1.0.0",
+      "reused_base": true,
+      "published": "2019-07-21T15:31:23.890Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "cli-spinners@^2.5.0",
+      "picked": "2.9.2",
+      "reused_base": true,
+      "published": "2023-11-24T16:52:19.154Z",
+      "counts": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "sisteransi@^1.0.5",
+      "picked": "1.0.5",
+      "reused_base": true,
+      "published": "2020-03-18T12:53:26.602Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "shebang-command@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": true,
+      "published": "2019-09-06T14:53:25.901Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "which@^2.0.1",
+      "picked": "2.0.2",
+      "reused_base": true,
+      "published": "2019-11-18T22:26:15.325Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "mimic-fn@^2.1.0",
+      "picked": "2.1.0",
+      "reused_base": true,
+      "published": "2019-03-31T17:53:34.125Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "path-key@^3.1.0",
+      "picked": "3.1.1",
+      "reused_base": true,
+      "published": "2019-11-22T16:47:18.153Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "path-key@^3.0.0",
+      "picked": "3.1.1",
+      "reused_base": true,
+      "published": "2019-11-22T16:47:18.153Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "shebang-regex@^3.0.0",
+      "picked": "3.0.0",
+      "reused_base": true,
+      "published": "2019-04-27T10:46:19.256Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "isexe@^2.0.0",
+      "picked": "2.0.0",
+      "reused_base": true,
+      "published": "2017-03-23T00:53:16.356Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "p-locate@^5.0.0",
+      "picked": "5.0.0",
+      "reused_base": true,
+      "published": "2020-08-10T17:42:34.692Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "p-limit@^3.0.2",
+      "picked": "3.1.0",
+      "reused_base": true,
+      "published": "2020-11-25T07:42:37.364Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "defaults@^1.0.3",
+      "picked": "1.0.4",
+      "reused_base": true,
+      "published": "2022-10-10T06:15:56.068Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "buffer@^5.5.0",
+      "picked": "5.7.1",
+      "reused_base": true,
+      "published": "2020-11-04T21:51:35.578Z",
+      "counts": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "restore-cursor@^3.1.0",
+      "picked": "3.1.0",
+      "reused_base": true,
+      "published": "2019-04-26T06:29:35.632Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "readable-stream@^3.4.0",
+      "picked": "3.6.2",
+      "reused_base": true,
+      "published": "2023-03-10T09:02:34.449Z",
+      "counts": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "base64-js@^1.3.1",
+      "picked": "1.5.1",
+      "reused_base": true,
+      "published": "2020-11-11T19:33:48.234Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "string_decoder@^1.1.1",
+      "picked": "1.3.0",
+      "reused_base": true,
+      "published": "2019-08-07T09:20:36.634Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "util-deprecate@^1.0.1",
+      "picked": "1.0.2",
+      "reused_base": true,
+      "published": "2015-10-07T18:37:40.665Z",
+      "counts": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "ieee754@^1.1.13",
+      "picked": "1.2.1",
+      "reused_base": true,
+      "published": "2020-10-27T23:06:07.424Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "yocto-queue@^0.1.0",
+      "picked": "0.1.0",
+      "reused_base": true,
+      "published": "2020-11-24T06:05:35.875Z",
+      "counts": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "req": "clone@^1.0.2",
+      "picked": "1.0.4",
+      "reused_base": true,
+      "published": "2018-03-21T21:21:25.570Z",
+      "counts": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    }
+  ],
+  "stops": [
+    {
+      "req": "launch-editor@^2.9.1",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 5
+      }
+    }
+  ],
+  "probe_stops": [],
+  "excluded_totals": {
+    "no_time": 0,
+    "after_t": 9,
+    "withdrawn": 0,
+    "deprecated": 1,
+    "advisory": 2
+  },
+  "excluded_names": [
+    "cross-spawn@^7.0.3",
+    "clone@^1.0.2"
+  ],
+  "normal": {
+    "label": "normal",
+    "built": true,
+    "versions_moved": 6,
+    "youngest_age": {
+      "hours": 637.3,
+      "version": "launch-editor@2.14.2",
+      "published": "2026-10-06T03:12:21.311Z"
+    },
+    "published_after_t": 5,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 7,
+    "ls_problems": 0
+  },
+  "normal_at_t": {
+    "label": "normal at T",
+    "built": true,
+    "versions_moved": 3,
+    "youngest_age": {
+      "hours": 0,
+      "version": "@react-native-community/cli-tools@19.1.2",
+      "published": "2025-11-05T21:56:37.128Z"
+    },
+    "published_after_t": 0,
+    "publish_time_unknown": 0,
+    "removed_paths": 0,
+    "duplicate_names": 7,
+    "ls_problems": 0
+  },
+  "outcome": "stopped_no_allowed",
+  "reason": [
+    {
+      "req": "launch-editor@^2.9.1",
+      "reason": "no_allowed",
+      "counts": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 5
+      }
+    }
+  ],
+  "tool_failure": {
+    "code": "LOLD_STOP",
+    "message": "LOLD: nothing allowed for launch-editor@^2.9.1"
+  },
+  "took_s": 5.982
+}

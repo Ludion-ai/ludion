@@ -1,0 +1,14 @@
+{
+  "id": "R20",
+  "name": "glob",
+  "from": "11.0.3",
+  "v": "11.1.0",
+  "t": "2025-11-17T17:38:56.000Z",
+  "before": "2025-11-14T17:38:56.000Z",
+  "outcome": "built",
+  "moved_non_v": 1,
+  "youngest_age_at_t_hours": 474.7,
+  "duplicate_names": 6,
+  "new_ls_problems": 0,
+  "failures": []
+}

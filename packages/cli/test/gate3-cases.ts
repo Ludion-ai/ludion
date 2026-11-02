@@ -17,6 +17,8 @@ export const CASES = {
   c: { expected: "undecidable" as Verdict, title: "no page answers 200 on old" },
   /** A type error the build is told to ignore, and a failing test: both must be seen on every run, and take no part. */
   d: { expected: "not_broken" as Verdict, title: "types and tests that fail on old" },
+  /** The same manifest on both sides, on Next.js 16's default build (Turbopack): the box and the crawl hold on it. */
+  e: { expected: "not_broken" as Verdict, title: "next 16.4.4 against itself" },
 };
 export type CaseName = keyof typeof CASES;
 
@@ -24,6 +26,7 @@ export async function runCase(name: CaseName, examples: string, deps: Gate3Deps)
   const app = join(examples, "nextjs-security"), cases = join(examples, "nextjs-security-cases");
   if (name === "a") return judgeGate3({ dir: app, old: sides(app), new: sides(join(cases, "next-15.5.7")) }, deps);
   if (name === "b") return judgeGate3({ dir: app, old: sides(app), new: sides(join(cases, "lodash-4.17.21")) }, deps);
+  if (name === "e") return judgeGate3({ dir: app, old: sides(join(cases, "next-16.4.4")), new: sides(join(cases, "next-16.4.4")) }, deps);
   const work = mkdtempSync(join(tmpdir(), "ludion-gate3-case-"));
   try {
     cpSync(app, work, { recursive: true });
@@ -61,7 +64,7 @@ export function caseProblems(name: CaseName, result: Gate3Result): string[] {
     expect(result.runs.length === 3 && result.runs.every(r => r.run?.types.status === "failed"), "types did not fail on every run");
     expect(result.runs.every(r => r.run?.tests.status === "failed"), "tests did not fail on every run");
     expect(result.notes.some(n => n.startsWith("Types")) && result.notes.some(n => n.startsWith("Tests")), `notes: ${result.notes.join(" ")}`);
-  } else if (name === "a") {
+  } else if (name === "a" || name === "e") {
     expect(result.pages.every(p => p.dom === "same"), `DOM: ${result.pages.map(p => p.dom).join()}`);
     expect(result.runs.every(r => r.run?.tests.status === "passed"), "tests did not pass on every run");
     expect(result.runs.every(r => r.run?.types.status === "passed"), "types did not pass on every run");

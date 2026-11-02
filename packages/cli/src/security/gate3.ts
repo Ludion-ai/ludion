@@ -43,6 +43,8 @@ export type Gate3Run = {
   too_many_pages: boolean; pages: Gate3Page[]; seconds: number;
   /** The peak counts the page cache, so it reaches the box's limit without anything having run out. */
   memory_peak_bytes: number | null; memory_swap_peak_bytes: number | null; memory_oom_kills: number | null;
+  /** The machine's CPUs as Node.js counts them, whatever the box's limit. Recorded; no verdict reads it, or the memory figures. */
+  host_cpus: number | null;
 };
 export type Verdict = "not_broken" | "broken" | "undecidable";
 export type PageResult = { path: string; role: "specification" | "other"; status: [number | null, number | null, number | null]; dom: "same" | "differs" | "noise" | "not_compared"; noise_elements: number };
@@ -84,7 +86,7 @@ export function boxDockerfile(acquired: string, image: string): string {
 }
 
 /** Keys the driver and Node.js themselves read: a project's .env.example does not set them. */
-const RESERVED_ENV = /^(?:NODE_|NPM_|LD_|DYLD_|npm_)|^(?:PATH|HOME|PORT|HOSTNAME|CI|NEXT_TELEMETRY_DISABLED|TMPDIR)$/;
+const RESERVED_ENV = /^(?:NODE_|NPM_|LD_|DYLD_|npm_)|^(?:PATH|HOME|PORT|HOSTNAME|CI|NEXT_TELEMETRY_DISABLED|TMPDIR|CIRCLE_NODE_TOTAL|TURBO_ENGINE_READ_ONLY)$/;
 
 /** The keys of a .env.example, each with a dummy value. Its values are not read: they are the project's data. */
 export function dummyEnv(text: string): { env: Record<string, string>; left_out: string[] } {
@@ -133,8 +135,8 @@ export function parseRun(stdout: string): Gate3Run | null {
     if (p.dom !== null && !isList(p.dom, HASH8)) return null;
     if (p.screenshot !== null && !isText(p.screenshot, HASH32)) return null;
   }
-  for (const key of ["memory_peak_bytes", "memory_swap_peak_bytes", "memory_oom_kills"]) if (value[key] !== null && typeof value[key] !== "number") return null;
-  return { build: value.build, types: value.types, start: value.start, crawl: value.crawl, tests: value.tests, too_many_pages: value.too_many_pages, pages: value.pages, seconds: value.seconds, memory_peak_bytes: value.memory_peak_bytes, memory_swap_peak_bytes: value.memory_swap_peak_bytes, memory_oom_kills: value.memory_oom_kills };
+  for (const key of ["memory_peak_bytes", "memory_swap_peak_bytes", "memory_oom_kills", "host_cpus"]) if (value[key] !== null && typeof value[key] !== "number") return null;
+  return { build: value.build, types: value.types, start: value.start, crawl: value.crawl, tests: value.tests, too_many_pages: value.too_many_pages, pages: value.pages, seconds: value.seconds, memory_peak_bytes: value.memory_peak_bytes, memory_swap_peak_bytes: value.memory_swap_peak_bytes, memory_oom_kills: value.memory_oom_kills, host_cpus: value.host_cpus };
 }
 
 const byPath = (run: Gate3Run) => new Map(run.pages.map(p => [p.path, p]));

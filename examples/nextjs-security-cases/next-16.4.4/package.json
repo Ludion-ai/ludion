@@ -1,0 +1,22 @@
+{
+  "name": "ludion-nextjs-security-example",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "start": "next start",
+    "test": "node --test tests/smoke.test.cjs"
+  },
+  "dependencies": {
+    "lodash": "3.10.1",
+    "next": "16.4.4",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.0.0",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "typescript": "5.9.3"
+  }
+}

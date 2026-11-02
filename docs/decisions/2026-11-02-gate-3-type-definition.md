@@ -72,6 +72,7 @@ Dependencies are acquired outside the box, from the manifests alone, with `npm c
 - GET pages only. API routes, Server Actions and dynamic routes are not touched. Nothing behind a login is seen, and no button or form is pressed.
 - A page that needs an outside service sees none in the box, on both versions, so only a difference shows.
 - The box's limits are packages/sandbox's: a project too large for them does not build on old, and that is `undecidable`.
+- Which Next.js has been measured (added after measuring, 2026-11-02): 15.5.6 and 15.5.7 with webpack, and 16.4.4 with Turbopack, its default, on one machine of 16 CPUs. The driver relies on two values that are not public settings: `CIRCLE_NODE_TOTAL`, which sets the build's number of workers, and `TURBO_ENGINE_READ_ONLY`, which keeps Turbopack from writing its cache to the box's /tmp and was found in 16.4.4's native file, with no document read for it. A version that does not read them goes on building, with workers by the machine's CPUs or its cache in /tmp. Turbopack's cache folder must not be made read-only: 16.4.4 then stops with exit 1 within a second. No public setting for that cache was found that the box can use: `experimental.turbopackFileSystemCacheForBuild` is in `next.config`, the project's file. A project's own settings can still raise the workers, and its own tests may start workers by the machine's CPUs, which was not measured.
 - The candidate's code runs in the same box as the crawl, so a candidate that means harm can write the result it likes. This gate says whether an update breaks things. It says nothing about whether the update is honest: that is gate 2, the wait and the re-query.
 - This is a first form. It is not yet called from `ludion patch`, and docs/status.md says what is missing. Until it is, nothing may describe a receipt as having passed this gate.
 
@@ -86,4 +87,4 @@ The audit's item `c4-case-minutes-measured`: the end-to-end minutes of one case,
 | Minutes per case (each run) | 3.73 and 3.69 (223.9 s and 221.5 s), with no build cache and the images already present |
 | Peak memory in the box | `memory.peak` at the box's limit, 536,870,912 bytes, on every run; `memory.swap.peak` up to 221,097,984 bytes in these runs; no OOM kill |
 
-This table is the only part of this file to be filled in after measuring. Everything above it was fixed before.
+This table and the Limits' line on which Next.js has been measured are the only parts of this file to be filled in after measuring. Everything else above was fixed before. The table's figures are from before the box's fixes in the progress record, and were not measured again.

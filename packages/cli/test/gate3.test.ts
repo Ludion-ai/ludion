@@ -16,7 +16,7 @@ import { snapshot } from "../src/security/project.ts";
 const passed = { status: "passed" as StepStatus, seconds: 1 };
 const absent = { status: "absent" as StepStatus, seconds: 0 };
 const page = (path: string, over: Partial<Gate3Page> = {}): Gate3Page => ({ path, status: 200, exceptions: [], console: [], dom: ["aaaaaaaa", "bbbbbbbb"], screenshot: "0".repeat(32), ...over });
-const run = (pages: Gate3Page[], over: Partial<Gate3Run> = {}): Gate3Run => ({ build: passed, types: passed, start: passed, crawl: passed, tests: passed, too_many_pages: false, pages, seconds: 2, memory_peak_bytes: 1, memory_swap_peak_bytes: 0, memory_oom_kills: 0, ...over });
+const run = (pages: Gate3Page[], over: Partial<Gate3Run> = {}): Gate3Run => ({ build: passed, types: passed, start: passed, crawl: passed, tests: passed, too_many_pages: false, pages, seconds: 2, memory_peak_bytes: 1, memory_swap_peak_bytes: 0, memory_oom_kills: 0, host_cpus: 16, ...over });
 const failed = { status: "failed" as StepStatus, seconds: 1 }, timedOut = { status: "timed_out" as StepStatus, seconds: 1 };
 const old = () => run([page("/"), page("/about")]);
 
@@ -47,6 +47,12 @@ describe("the definition's table", () => {
     const result = compareRuns(old(), old(), run(old().pages, over));
     expect(result.verdict).toBe("broken");
     expect(result.broken.join(" ")).toMatch(reason);
+  });
+
+  it("broken: new's build failing for lack of memory is still new not building; the verdict reads no memory figure", () => {
+    const killed = run([], { build: failed, memory_swap_peak_bytes: 536_870_912, memory_oom_kills: 2 });
+    expect(compareRuns(old(), old(), killed)).toMatchObject({ verdict: "broken", broken: ["New did not build; old did."] });
+    expect(compareRuns(old(), old(), { ...killed, memory_oom_kills: 0 }).verdict).toBe("broken");
   });
 
   it.each<[string, Partial<Gate3Page> | null, RegExp]>([
@@ -177,8 +183,20 @@ describe("parseRun: what the box prints is data the candidate could have written
     ["a screenshot that is not a hash", print({ ...good, pages: [page("/", { screenshot: "x" })] })],
     ["too many pages", print({ ...good, pages: Array.from({ length: MAX_PAGES + 1 }, (_, i) => page(`/${i}`)) })],
     ["memory that is not a number", print({ ...good, memory_oom_kills: "0" })],
+    ["a CPU count that is not a number", print({ ...good, host_cpus: "16" })],
   ])("no result: %s", (_name, stdout) => {
     expect(parseRun(stdout)).toBeNull();
+  });
+
+  it("a page path is the one text it lets through, as a path with no space, and it reaches the reasons", () => {
+    // Hashes, counts and levels have a shape that holds no text. A path does not: it comes out of the box as it was printed.
+    const words = "/any-text-without-a-space-can-be-written-here";
+    expect(parseRun(print({ ...good, pages: [page(words)] }))?.pages[0]!.path).toBe(words);
+    expect(parseRun(print({ ...good, pages: [page(`/${"x".repeat(2000)}`)] }))?.pages.length).toBe(1);
+    expect(parseRun(print({ ...good, pages: [page(`/${"x".repeat(2001)}`)] }))).toBeNull();
+    expect(parseRun(print({ ...good, pages: [page("/two words")] }))).toBeNull();
+    const before = run([page(words)]);
+    expect(compareRuns(before, before, run([page(words, { status: 500 })])).broken.join(" ")).toContain(words);
   });
 });
 
@@ -190,9 +208,9 @@ describe("dummyEnv", () => {
   });
 
   it("leaves out what the run itself reads: a project's file cannot move the clock or the driver", () => {
-    const { env, left_out } = dummyEnv("NODE_OPTIONS=--require=/x\nPATH=/x\nLD_PRELOAD=/x\nHOME=/x\nPORT=1\nnpm_config_x=1\nNPM_CONFIG_CACHE=/x\nOK=1\n");
+    const { env, left_out } = dummyEnv("NODE_OPTIONS=--require=/x\nPATH=/x\nLD_PRELOAD=/x\nHOME=/x\nPORT=1\nnpm_config_x=1\nNPM_CONFIG_CACHE=/x\nCIRCLE_NODE_TOTAL=64\nOK=1\n");
     expect(env).toEqual({ OK: "ludion-dummy" });
-    expect(left_out).toEqual(["NODE_OPTIONS", "PATH", "LD_PRELOAD", "HOME", "PORT", "npm_config_x", "NPM_CONFIG_CACHE"]);
+    expect(left_out).toEqual(["NODE_OPTIONS", "PATH", "LD_PRELOAD", "HOME", "PORT", "npm_config_x", "NPM_CONFIG_CACHE", "CIRCLE_NODE_TOTAL"]);
   });
 
   it("stops at a limit", () => {
@@ -235,34 +253,62 @@ describe("what goes into the box", () => {
     expect(BOX_DRIVER.match(/https?:\/\/[^"' ]+/g)).toEqual(["http://127.0.0.1:"]);
   });
 
-  it("gate3-fits-box-at-50-pages: webpack's cache folder, and nothing else, is read-only before the build starts", async () => {
-    // The driver itself, with Node.js's modules stood in for: the measurement on real builds is in the progress record.
-    const events: string[] = [];
+  /** The driver itself, up to a build that fails, with Node.js's modules stood in for. It shows nothing about real builds: those are in the progress record. */
+  const driverUpToBuild = async (over: { env?: Record<string, string>; hostEnv?: Record<string, string>; cpus?: number } = {}) => {
+    const events: string[] = [], envs: Record<string, Record<string, string>> = {};
     let printed = "";
     const missing = () => { throw new Error("not in this stand-in"); };
     const fs = {
-      readFileSync: (path: string) => path === "/ludion/config.json" ? JSON.stringify({ env: {}, freeze: "" }) : missing(),
+      readFileSync: (path: string) => path === "/ludion/config.json" ? JSON.stringify({ env: over.env ?? {}, freeze: "" }) : missing(),
       readdirSync: () => [], copyFileSync: () => {}, symlinkSync: () => {},
       mkdirSync: (path: string) => { events.push(`mkdir ${path}`); },
       chmodSync: (path: string, mode: number) => { events.push(`chmod ${mode.toString(8)} ${path}`); },
     };
-    const spawn = (_program: string, args: string[]) => {
-      events.push(`spawn ${args[args.length - 1]}`);
+    const spawn = (_program: string, args: string[], options: { env: Record<string, string> }) => {
+      const name = args[args.length - 1]!;
+      events.push(`spawn ${name}`);
+      envs[name] = options.env;
       const child = new EventEmitter();
       setImmediate(() => child.emit("close", 1));
       return child;
     };
-    const modules: Record<string, unknown> = { "node:child_process": { spawn }, "node:crypto": { createHash }, "node:fs": fs, "node:net": {}, "node:path": posix };
+    const os = { cpus: () => Array.from({ length: over.cpus ?? 16 }, () => ({})) };
+    const modules: Record<string, unknown> = { "node:child_process": { spawn }, "node:crypto": { createHash }, "node:fs": fs, "node:net": {}, "node:os": os, "node:path": posix };
     await new Promise<void>(done => {
       const stream = { write: (text: string, callback?: () => void) => { printed += text; callback?.(); return true; } };
-      const box = { env: {}, execPath: "node", hrtime: process.hrtime, kill: () => {}, stderr: { write: () => true }, stdout: stream, exit: () => done() };
+      const box = { env: over.hostEnv ?? {}, execPath: "node", hrtime: process.hrtime, kill: () => {}, stderr: { write: () => true }, stdout: stream, exit: () => done() };
       new Script(BOX_DRIVER).runInNewContext({ Buffer, clearTimeout, process: box, require: (name: string) => modules[name], setTimeout });
     });
+    return { events, envs, printed };
+  };
+
+  it("gate3-webpack-cache-read-only-before-build: that folder, and nothing else, is read-only before the build starts", async () => {
+    const { events, printed } = await driverUpToBuild();
     const cache = "/tmp/next/cache/webpack";
+    expect(events).toContain(`mkdir ${cache}`);
+    // Not Turbopack's folder too: Next.js 16's default build stops at once when it cannot open its cache there.
     expect(events.filter(e => e.startsWith("chmod"))).toEqual([`chmod 555 ${cache}`]);
     expect(events.indexOf(`mkdir ${cache}`)).toBeLessThan(events.indexOf(`chmod 555 ${cache}`));
     expect(events.indexOf(`chmod 555 ${cache}`)).toBeLessThan(events.indexOf("spawn build"));
     expect(parseRun(printed)?.build.status).toBe("failed");
+  });
+
+  it.each([1, 2, 16, 64])("gate3-one-worker-whatever-the-host: on %i CPUs the build is told one worker, and the result says how many there were", async cpus => {
+    const { envs, printed } = await driverUpToBuild({ cpus });
+    // Next.js 15.5.6 and 16.4.4: Math.max(1, (Number(process.env.CIRCLE_NODE_TOTAL) || os.cpus().length) - 1). That real builds obey it is in the progress record.
+    expect(Math.max(1, Number(envs.build!.CIRCLE_NODE_TOTAL) - 1)).toBe(1);
+    expect(parseRun(printed)?.host_cpus).toBe(cpus);
+  });
+
+  it("gate3-one-worker-whatever-the-host: neither the project's .env.example nor the environment can raise it", async () => {
+    const { envs } = await driverUpToBuild({ env: { CIRCLE_NODE_TOTAL: "64" }, hostEnv: { CIRCLE_NODE_TOTAL: "64" } });
+    expect(envs.build!.CIRCLE_NODE_TOTAL).toBe("2");
+  });
+
+  it("gate3-turbopack-cache-not-written: the build is told not to write it, and a project's file cannot say otherwise", async () => {
+    const { envs } = await driverUpToBuild({ env: { TURBO_ENGINE_READ_ONLY: "" }, hostEnv: { TURBO_ENGINE_READ_ONLY: "" } });
+    expect(envs.build!.TURBO_ENGINE_READ_ONLY).toBe("1");
+    expect(dummyEnv("TURBO_ENGINE_READ_ONLY=\nOK=1\n")).toEqual({ env: { OK: "ludion-dummy" }, left_out: ["TURBO_ENGINE_READ_ONLY"] });
   });
 
   it("the preload stops the clock and fixes the random numbers, and a date given still is that date", () => {
@@ -292,7 +338,7 @@ describe("examples/nextjs-security", () => {
 
   it("passes the real acquisition policy and snapshot, on every side of every case", () => {
     expect(() => acquisitionPolicy(app, "npm")).not.toThrow();
-    for (const name of ["next-15.5.7", "lodash-4.17.21"]) expect(() => acquisitionPolicy(join(examples, "nextjs-security-cases", name), "npm")).not.toThrow();
+    for (const name of ["next-15.5.7", "lodash-4.17.21", "next-16.4.4"]) expect(() => acquisitionPolicy(join(examples, "nextjs-security-cases", name), "npm")).not.toThrow();
     const copy = mkdtempSync(join(tmpdir(), "ludion-gate3-example-"));
     try { expect(() => snapshot(app, copy)).not.toThrow(); expect(existsSync(join(copy, ".env.example"))).toBe(false); }
     finally { rmSync(copy, { recursive: true, force: true }); }
@@ -316,6 +362,15 @@ describe("examples/nextjs-security", () => {
     expect(packagesOf(app)["node_modules/next"]!.version).toBe("15.5.6");
     expect(packagesOf(join(cases, "next-15.5.7"))["node_modules/next"]!.version).toBe("15.5.7");
     expect(packagesOf(app)["node_modules/lodash"]!.version).toBe("3.10.1");
+  });
+
+  it("the Next.js 16 side has that exact version, with every locked package from the registry with an integrity", () => {
+    const packages = packagesOf(join(examples, "nextjs-security-cases", "next-16.4.4"));
+    expect(packages["node_modules/next"]!.version).toBe("16.4.4");
+    for (const [path, entry] of Object.entries(packages)) if (path) {
+      expect(entry.resolved, path).toMatch(/^https:\/\/registry\.npmjs\.org\//);
+      expect(entry.integrity, path).toMatch(/^sha512-/);
+    }
   });
 });
 

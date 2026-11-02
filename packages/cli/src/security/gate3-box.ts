@@ -35,13 +35,14 @@ export const MAX_PAGES = 200;
 
 /**
  * Build, types, start, crawl and tests, in one box: its scratch space is gone when the box ends. Prints one line, the
- * result. Everything else goes to stderr or nowhere, and only hashes, counts and levels are in the result.
+ * result. Everything else goes to stderr or nowhere, and only hashes, counts, levels and page paths are in the result.
  */
 export const BOX_DRIVER = String.raw`"use strict";
 const { spawn } = require("node:child_process");
 const { createHash } = require("node:crypto");
 const fs = require("node:fs");
 const net = require("node:net");
+const os = require("node:os");
 const path = require("node:path");
 
 const config = JSON.parse(fs.readFileSync("/ludion/config.json", "utf8"));
@@ -56,7 +57,11 @@ const hash = (text, length) => createHash("sha256").update(text).digest("hex").s
 const sameStaticPaths = text => text.replace(/\/_next\/static\/[^\s"')]*/g, "/_next/static/*");
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const secondsSince = started => Number(process.hrtime.bigint() - started) / 1e9;
-const baseEnv = { ...process.env, ...config.env, NEXT_TELEMETRY_DISABLED: "1", CI: "1", NODE_NO_WARNINGS: "1" };
+// Next.js makes its build's workers from this value minus one, or without it from the machine's CPUs minus one, and does
+// not see the box's one CPU. So the same project would fit the box or not by the machine it ran on. This value gives one worker.
+// Turbopack's cache takes the box's /tmp as webpack's does, and every box is new, so it would never be read. With the other
+// value it writes none. Neither is a public setting: where one is not read, the build goes on as it would without it.
+const baseEnv = { ...process.env, ...config.env, NEXT_TELEMETRY_DISABLED: "1", CI: "1", NODE_NO_WARNINGS: "1", CIRCLE_NODE_TOTAL: "2", TURBO_ENGINE_READ_ONLY: "1" };
 const frozenEnv = { ...baseEnv, NODE_OPTIONS: "--require=/ludion/freeze-clock.cjs" };
 
 /** Runs one program to its end. Its stdout is dropped; its stderr goes to the box's stderr. */
@@ -189,7 +194,8 @@ async function main() {
   // What the build leaves in /tmp/next finds its packages from there, as it would from /app/.next.
   fs.symlinkSync("/app/node_modules", "/tmp/node_modules");
   // Webpack's cache fills the box's 64 MiB /tmp, and every box is new, so it would never be read. Webpack goes on when it
-  // cannot write there. Only this folder: with all of cache read-only, the build stops on its .tsbuildinfo.
+  // cannot write there. Only this folder: with all of cache read-only, the build stops on its .tsbuildinfo, and with
+  // cache/turbopack read-only, Next.js 16's default build stops at once.
   fs.mkdirSync(path.join(DIST, "cache", "webpack"), { recursive: true });
   fs.chmodSync(path.join(DIST, "cache", "webpack"), 0o555);
 
@@ -248,6 +254,8 @@ main().catch(error => {
   return { schema: 1, driver_failed: true };
 }).then(out => {
   out.seconds = secondsSince(whole);
+  // The machine's CPUs, which the box's limit does not change: a result is read knowing what it ran on.
+  out.host_cpus = os.cpus().length;
   // What the box used. The peak counts the page cache, so it reaches the limit without anything having run out; swap and
   // kills say whether something did. Not every system has these files.
   const cgroup = name => { try { return fs.readFileSync("/sys/fs/cgroup/" + name, "utf8").trim(); } catch { return null; } };

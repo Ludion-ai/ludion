@@ -1,5 +1,5 @@
 // Gate 3's new type on the real example, in real Docker. Heavy: it pulls a browser image of several GB and builds the
-// application seven times, so it runs only when asked for (LUDION_GATE3_DOCKER=1), and CI does not ask yet: docs/status.md.
+// application nine times, so it runs only when asked for (LUDION_GATE3_DOCKER=1), and CI does not ask yet: docs/status.md.
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { acquisitionPolicy } from "../src/security/dependency-patch.ts";

@@ -1,0 +1,546 @@
+{
+ "a1": {
+  "name": "a1",
+  "wallSeconds": 328.2,
+  "expected": 8,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 8,
+  "sumTestSeconds": 648.5,
+  "status": {
+   "passed": 8
+  },
+  "byFile": {
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 648.5
+   }
+  },
+  "wall": "exit=0 start=1793570792.006135279 end=1793571120.663606454"
+ },
+ "a2": {
+  "name": "a2",
+  "wallSeconds": 325,
+  "expected": 8,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 8,
+  "sumTestSeconds": 641.4,
+  "status": {
+   "passed": 8
+  },
+  "byFile": {
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 641.4
+   }
+  },
+  "wall": "exit=0 start=1793571130.839101638 end=1793571456.338665270"
+ },
+ "a3": {
+  "name": "a3",
+  "wallSeconds": 323.5,
+  "expected": 8,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 8,
+  "sumTestSeconds": 643.3,
+  "status": {
+   "passed": 8
+  },
+  "byFile": {
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 643.3
+   }
+  },
+  "wall": "exit=0 start=1793572723.138039152 end=1793573047.167658535"
+ },
+ "b1": {
+  "name": "b1",
+  "wallSeconds": 36.8,
+  "expected": 8,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 8,
+  "sumTestSeconds": 70.1,
+  "status": {
+   "passed": 8
+  },
+  "byFile": {
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 70.1
+   }
+  },
+  "wall": "exit=0 start=1793571464.846925750 end=1793571502.165607110"
+ },
+ "b2": {
+  "name": "b2",
+  "wallSeconds": 37,
+  "expected": 8,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 8,
+  "sumTestSeconds": 70.5,
+  "status": {
+   "passed": 8
+  },
+  "byFile": {
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 70.5
+   }
+  },
+  "wall": "exit=0 start=1793571503.668857878 end=1793571541.247017503"
+ },
+ "c": {
+  "name": "c",
+  "wallSeconds": 157.6,
+  "expected": 4,
+  "unexpected": 0,
+  "skipped": 4,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 8,
+  "sumTestSeconds": 278.4,
+  "status": {
+   "skipped": 4,
+   "passed": 4
+  },
+  "byFile": {
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 278.4
+   }
+  },
+  "wall": "exit=0 start=1793571723.522843180 end=1793571881.621695499"
+ },
+ "f1": {
+  "name": "f1",
+  "wallSeconds": 38.9,
+  "expected": 8,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 8,
+  "sumTestSeconds": 73.1,
+  "status": {
+   "passed": 8
+  },
+  "byFile": {
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 73.1
+   }
+  },
+  "wall": "exit=0 start=1793572505.127518657 end=1793572544.602496128"
+ },
+ "f2": {
+  "name": "f2",
+  "wallSeconds": 38,
+  "expected": 8,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 8,
+  "sumTestSeconds": 70.9,
+  "status": {
+   "passed": 8
+  },
+  "byFile": {
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 70.9
+   }
+  },
+  "wall": "exit=0 start=1793572546.023076545 end=1793572584.601345739"
+ },
+ "m1-threshold": {
+  "name": "m1-threshold",
+  "wallSeconds": 41,
+  "expected": 7,
+  "unexpected": 2,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 9,
+  "sumTestSeconds": 75.3,
+  "status": {
+   "passed": 7,
+   "failed": 2
+  },
+  "byFile": {
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 75.3
+   }
+  },
+  "wall": "exit=1 start=1793573260.406209060 end=1793573301.984736502"
+ },
+ "m2-no-added": {
+  "name": "m2-no-added",
+  "wallSeconds": 38.7,
+  "expected": 8,
+  "unexpected": 1,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 9,
+  "sumTestSeconds": 72.1,
+  "status": {
+   "passed": 8,
+   "failed": 1
+  },
+  "byFile": {
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 72.1
+   }
+  },
+  "wall": "exit=1 start=1793573302.020076272 end=1793573341.187268931"
+ },
+ "m3-dark-peak": {
+  "name": "m3-dark-peak",
+  "wallSeconds": 38.8,
+  "expected": 9,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 9,
+  "sumTestSeconds": 72.9,
+  "status": {
+   "passed": 9
+  },
+  "byFile": {
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 72.9
+   }
+  },
+  "wall": "exit=0 start=1793573341.226367989 end=1793573380.466530445"
+ },
+ "m3b-dark-strong": {
+  "name": "m3b-dark-strong",
+  "wallSeconds": 40.6,
+  "expected": 7,
+  "unexpected": 2,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 9,
+  "sumTestSeconds": 74.7,
+  "status": {
+   "passed": 7,
+   "failed": 2
+  },
+  "byFile": {
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 74.7
+   }
+  },
+  "wall": "exit=1 start=1793573459.894083390 end=1793573501.041271504"
+ },
+ "m4-light-tint": {
+  "name": "m4-light-tint",
+  "wallSeconds": 40.5,
+  "expected": 5,
+  "unexpected": 4,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 9,
+  "sumTestSeconds": 75.4,
+  "status": {
+   "failed": 4,
+   "passed": 5
+  },
+  "byFile": {
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 75.4
+   }
+  },
+  "wall": "exit=1 start=1793573380.502184033 end=1793573421.441152502"
+ },
+ "m5-frozen": {
+  "name": "m5-frozen",
+  "wallSeconds": 18.5,
+  "expected": 1,
+  "unexpected": 8,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 9,
+  "sumTestSeconds": 30.8,
+  "status": {
+   "failed": 8,
+   "passed": 1
+  },
+  "byFile": {
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 30.8
+   }
+  },
+  "wall": "exit=1 start=1793573421.475529996 end=1793573440.466220950"
+ },
+ "t0-all": {
+  "name": "t0-all",
+  "wallSeconds": 356.1,
+  "expected": 48,
+  "unexpected": 0,
+  "skipped": 1,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 49,
+  "sumTestSeconds": 702.8,
+  "status": {
+   "passed": 48,
+   "skipped": 1
+  },
+  "byFile": {
+   "a11y.spec.ts": {
+    "n": 4,
+    "seconds": 19.8
+   },
+   "home-mobile.spec.ts": {
+    "n": 2,
+    "seconds": 2.8
+   },
+   "home.spec.ts": {
+    "n": 4,
+    "seconds": 23.7
+   },
+   "ja.spec.ts": {
+    "n": 14,
+    "seconds": 34.1
+   },
+   "redirects.spec.ts": {
+    "n": 14,
+    "seconds": 0.3
+   },
+   "screenshots.spec.ts": {
+    "n": 1,
+    "seconds": 0
+   },
+   "start.spec.ts": {
+    "n": 1,
+    "seconds": 8
+   },
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 614.2
+   }
+  },
+  "wall": "exit=0 start=1793570094.374383667 end=1793570451.296517571"
+ },
+ "t0-water": {
+  "name": "t0-water",
+  "wallSeconds": 313.2,
+  "expected": 9,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 9,
+  "sumTestSeconds": 621.5,
+  "status": {
+   "passed": 9
+  },
+  "byFile": {
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 621.5
+   }
+  },
+  "wall": "exit=0 start=1793570467.203243794 end=1793570780.868962643"
+ },
+ "t1-all": {
+  "name": "t1-all",
+  "wallSeconds": 83.8,
+  "expected": 45,
+  "unexpected": 3,
+  "skipped": 9,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 57,
+  "sumTestSeconds": 161.1,
+  "status": {
+   "passed": 45,
+   "skipped": 9,
+   "failed": 3
+  },
+  "byFile": {
+   "a11y.spec.ts": {
+    "n": 4,
+    "seconds": 18.3
+   },
+   "home-mobile.spec.ts": {
+    "n": 2,
+    "seconds": 2.8
+   },
+   "home.spec.ts": {
+    "n": 4,
+    "seconds": 27.5
+   },
+   "ja.spec.ts": {
+    "n": 14,
+    "seconds": 31.5
+   },
+   "redirects.spec.ts": {
+    "n": 14,
+    "seconds": 0.2
+   },
+   "screenshots.spec.ts": {
+    "n": 1,
+    "seconds": 0
+   },
+   "start.spec.ts": {
+    "n": 1,
+    "seconds": 5.8
+   },
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 0
+   },
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 75.1
+   }
+  },
+  "wall": "exit=1 start=1793572596.272523358 end=1793572680.564160642"
+ },
+ "t1-water": {
+  "name": "t1-water",
+  "wallSeconds": 39.4,
+  "expected": 6,
+  "unexpected": 3,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 9,
+  "sumTestSeconds": 73.4,
+  "status": {
+   "passed": 6,
+   "failed": 3
+  },
+  "byFile": {
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 73.4
+   }
+  },
+  "wall": "exit=1 start=1793572682.085160993 end=1793572722.094345333"
+ },
+ "t1b-all": {
+  "name": "t1b-all",
+  "wallSeconds": 85.2,
+  "expected": 48,
+  "unexpected": 0,
+  "skipped": 9,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 57,
+  "sumTestSeconds": 162.1,
+  "status": {
+   "passed": 48,
+   "skipped": 9
+  },
+  "byFile": {
+   "a11y.spec.ts": {
+    "n": 4,
+    "seconds": 19.1
+   },
+   "home-mobile.spec.ts": {
+    "n": 2,
+    "seconds": 2.7
+   },
+   "home.spec.ts": {
+    "n": 4,
+    "seconds": 26.2
+   },
+   "ja.spec.ts": {
+    "n": 14,
+    "seconds": 31.9
+   },
+   "redirects.spec.ts": {
+    "n": 14,
+    "seconds": 0.2
+   },
+   "screenshots.spec.ts": {
+    "n": 1,
+    "seconds": 0
+   },
+   "start.spec.ts": {
+    "n": 1,
+    "seconds": 6.3
+   },
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 0
+   },
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 75.7
+   }
+  },
+  "wall": "exit=0 start=1793573075.869173818 end=1793573161.608237451"
+ },
+ "t1b-water": {
+  "name": "t1b-water",
+  "wallSeconds": 39.6,
+  "expected": 9,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 9,
+  "sumTestSeconds": 74.9,
+  "status": {
+   "passed": 9
+  },
+  "byFile": {
+   "water.spec.ts": {
+    "n": 9,
+    "seconds": 74.9
+   }
+  },
+  "wall": "exit=0 start=1793573162.985771416 end=1793573203.132616940"
+ },
+ "w": {
+  "name": "w",
+  "wallSeconds": 511.6,
+  "expected": 8,
+  "unexpected": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "workers": 2,
+  "tests": 8,
+  "sumTestSeconds": 1013.6,
+  "status": {
+   "passed": 8
+  },
+  "byFile": {
+   "water-full.spec.ts": {
+    "n": 8,
+    "seconds": 1013.6
+   }
+  },
+  "wall": "exit=0 start=1793571889.355128202 end=1793572401.521952315"
+ }
+}

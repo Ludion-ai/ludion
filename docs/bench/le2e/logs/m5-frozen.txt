@@ -1,0 +1,185 @@
+
+Running 9 tests using 2 workers
+
+  ✘  1 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/, light) (4.5s)
+  ✘  2 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/, dark) (5.0s)
+  ✘  3 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/start/, light) (2.6s)
+  ✘  4 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/start/, dark) (2.8s)
+  ✘  5 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/, light) (4.5s)
+  ✘  6 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/, dark) (4.9s)
+  ✘  7 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/start/, light) (2.7s)
+Home JavaScript: 6 file(s), 32.1 KB gzipped
+  ✓  9 [chromium] › e2e/water.spec.ts:76:1 › the home page's JavaScript stays within 60 KB gzipped (762ms)
+  ✘  8 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/start/, dark) (3.1s)
+
+
+  1) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/, light) ───────
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass. This reads
+      63 |       // the pixels: on some light pages every box keeps the same lowest value at every moment while the water moves.
+    > 64 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      65 |
+      66 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      67 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:64:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-light--chromium/error-context.md
+
+  2) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/, dark) ────────
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass. This reads
+      63 |       // the pixels: on some light pages every box keeps the same lowest value at every moment while the water moves.
+    > 64 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      65 |
+      66 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      67 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:64:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-dark--chromium/error-context.md
+
+  3) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/start/, light) ─
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass. This reads
+      63 |       // the pixels: on some light pages every box keeps the same lowest value at every moment while the water moves.
+    > 64 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      65 |
+      66 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      67 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:64:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-start-light--chromium/error-context.md
+
+  4) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/start/, dark) ──
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass. This reads
+      63 |       // the pixels: on some light pages every box keeps the same lowest value at every moment while the water moves.
+    > 64 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      65 |
+      66 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      67 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:64:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-start-dark--chromium/error-context.md
+
+  5) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/, light) ────
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass. This reads
+      63 |       // the pixels: on some light pages every box keeps the same lowest value at every moment while the water moves.
+    > 64 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      65 |
+      66 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      67 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:64:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-ja-light--chromium/error-context.md
+
+  6) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/, dark) ─────
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass. This reads
+      63 |       // the pixels: on some light pages every box keeps the same lowest value at every moment while the water moves.
+    > 64 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      65 |
+      66 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      67 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:64:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-ja-dark--chromium/error-context.md
+
+  7) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/start/, light) 
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass. This reads
+      63 |       // the pixels: on some light pages every box keeps the same lowest value at every moment while the water moves.
+    > 64 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      65 |
+      66 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      67 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:64:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-ja-start-light--chromium/error-context.md
+
+  8) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/start/, dark) 
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass. This reads
+      63 |       // the pixels: on some light pages every box keeps the same lowest value at every moment while the water moves.
+    > 64 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      65 |
+      66 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      67 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:64:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-ja-start-dark--chromium/error-context.md
+
+  8 failed
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/, light) ────────
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/, dark) ─────────
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/start/, light) ──
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/start/, dark) ───
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/, light) ─────
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/, dark) ──────
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/start/, light) 
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/start/, dark) 
+  1 passed (18.5s)

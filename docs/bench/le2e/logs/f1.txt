@@ -1,0 +1,13 @@
+
+Running 8 tests using 2 workers
+
+  ✓  1 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/, light) (11.6s)
+  ✓  2 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/, dark) (12.3s)
+  ✓  3 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/start/, light) (6.1s)
+  ✓  4 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/start/, dark) (6.5s)
+  ✓  5 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/ja/, light) (11.1s)
+  ✓  6 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/ja/, dark) (12.3s)
+  ✓  7 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/ja/start/, light) (7.0s)
+  ✓  8 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/ja/start/, dark) (6.2s)
+
+  8 passed (38.9s)

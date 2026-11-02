@@ -2,7 +2,9 @@
 
 What was copied: the plan 「Ludion 完成の定義：最終決定（11-02）」 (28,602 bytes), into docs/decisions/2026-11-02-definition-of-complete-final.md, with three lines added above it. Nothing else in Ludion changes in this PR.
 
-| Check, inside Docker (node:24.22.2-alpine, no network) | Result |
+The sha256, `cmp` and byte rows ran inside Docker (node:24.22.2-alpine, no network). The search behind the replacements row is a text search over the source file, run on the host; it runs no code from the file.
+
+| Check | Result |
 |---|---|
 | sha256 of the source file | 1e301f80a4b389bdc9623b4db7e912eff8fbfc7d97b2f1495b79f0a3a1b6c5c7 |
 | sha256 of the record from line 4 on (`tail -n +4`) | 1e301f80a4b389bdc9623b4db7e912eff8fbfc7d97b2f1495b79f0a3a1b6c5c7 |

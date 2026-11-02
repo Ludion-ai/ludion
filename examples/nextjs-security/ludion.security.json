@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "ecosystem": "npm",
+  "image": "node:24-slim",
+  "test": ["npm", "test"],
+  "timeout_seconds": 600
+}

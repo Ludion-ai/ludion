@@ -12,7 +12,7 @@ import { ADVISORY, BUNDLE_LIMIT, checkArtifact, closedWarnings, contentProblem, 
 import { changedManifest } from "../src/security/inventory.ts";
 import { lockEntries, lockEntryChanges, type Judgement } from "../src/security/judge.ts";
 import { registryManifest } from "../src/security/npm-facts.ts";
-import { recheckOldest } from "../src/security/oldest.ts";
+import { CLOSES_NOTHING, NAMES_WHAT_IT_DOES_NOT_CLOSE, recheckOldest } from "../src/security/oldest.ts";
 import { PKSA_ID } from "../src/security/packagist.ts";
 import { snapshot } from "../src/security/project.ts";
 import { commit, git } from "./git.ts";
@@ -461,15 +461,21 @@ describe("the PR job refuses an artifact the validation job would not write", { 
       return doc ? new Response(JSON.stringify(doc)) : new Response("", { status: 404 });
     };
     const lists = async (name: string, version: string) => ({ name, version, dependencies: name === "minimist" ? { dep: "^1.1.0" } : {} });
-    const check = (osv: Record<string, string[]> = { "minimist@1.2.5": ["GHSA-real-0001"] }, failing = false) => (input: Parameters<typeof recheckOldest>[0]) => recheckOldest({ ...input, fetchFn: registry(osv, failing) });
+    // The advisories minimistFix's receipt names, as OSV has them on the version moved from.
+    const named = ["GHSA-35jh-r3h4-6jhm", "CVE-2021-23337"];
+    const check = (osv: Record<string, string[]> = { "minimist@1.2.5": named }, failing = false) => (input: Parameters<typeof recheckOldest>[0]) => recheckOldest({ ...input, fetchFn: registry(osv, failing) });
     for (const [dep, oldest, outcome, why] of [
       ["1.1.0", check(), "opened", undefined],
       ["1.3.0", check(), "failed", "package-lock.json has dep@1.3.0 at node_modules/dep, where the oldest version in range for dep@^1.1.0 is 1.1.0"],
       // What the registry and OSV say now decides, not what the artifact does: OSV has since named the oldest, so 1.3.0 is right.
-      ["1.3.0", check({ "minimist@1.2.5": ["GHSA-real-0001"], "dep@1.1.0": ["GHSA-new-0001"] }), "opened", undefined],
-      ["1.1.0", check({ "minimist@1.2.5": ["GHSA-real-0001"], "dep@1.1.0": ["GHSA-new-0001"] }), "failed", "where the oldest version in range for dep@^1.1.0 is 1.3.0"],
+      ["1.3.0", check({ "minimist@1.2.5": named, "dep@1.1.0": ["GHSA-new-0001"] }), "opened", undefined],
+      ["1.1.0", check({ "minimist@1.2.5": named, "dep@1.1.0": ["GHSA-new-0001"] }), "failed", "where the oldest version in range for dep@^1.1.0 is 1.3.0"],
       // A read that fails refuses, and nothing is pushed.
       ["1.1.0", check(undefined, true), "failed", "the oldest versions could not be worked out"],
+      // pr-job-refuses-fix-with-no-closed-advisory: nothing is pushed for a fix that closes nothing, or whose receipt names what it does not close.
+      ["1.1.0", check({}), "failed", CLOSES_NOTHING],
+      ["1.1.0", check({ "minimist@1.2.5": named, "minimist@1.2.6": named }), "failed", CLOSES_NOTHING],
+      ["1.1.0", check({ "minimist@1.2.5": ["GHSA-35jh-r3h4-6jhm"] }), "failed", NAMES_WHAT_IT_DOES_NOT_CLOSE],
     ] as const) {
       const p = project(), s = minimistFix(p, fixedAt(dep), before), gh = github(p.origin);
       const result = await open(checkout(p.origin), artifact(p.work, s.receipt, s.refs, s.base), s.base, p.origin, gh, "refs/heads/main", { npmManifest: lists, oldest });
@@ -479,11 +485,13 @@ describe("the PR job refuses an artifact the validation job would not write", { 
     }
     // Only the registry's and OSV's hosts were asked, for names and versions and the IDs OSV returned.
     expect([...new Set(asked.map(u => new URL(u).hostname))].sort()).toEqual(["api.osv.dev", "registry.npmjs.org"]);
-    // A fix that brings in nothing but V reads nothing.
+    // A fix that brings in nothing but V reads only OSV, and is refused when it closes nothing.
     asked.length = 0;
     const lodash = (v: string) => JSON.stringify({ name: "app", lockfileVersion: 3, packages: { "": { name: "app", dependencies: { lodash: v } }, "node_modules/lodash": { version: v } } });
-    expect(await recheckOldest({ plan: [{ name: "lodash", from: "4.17.20", to: "4.17.21" }], beforeLock: lodash("4.17.20"), afterLock: lodash("4.17.21"), finalManifest: "{}", fetchFn: registry({}) })).toBeNull();
-    expect(asked).toEqual([]);
+    const lodashFix = { plan: [{ name: "lodash", from: "4.17.20", to: "4.17.21" }], beforeLock: lodash("4.17.20"), afterLock: lodash("4.17.21"), finalManifest: "{}" };
+    expect(await recheckOldest({ ...lodashFix, fetchFn: registry({ "lodash@4.17.20": ["GHSA-real-0001"] }) })).toBeNull();
+    expect([...new Set(asked.map(u => new URL(u).hostname))]).toEqual(["api.osv.dev"]);
+    expect(await recheckOldest({ ...lodashFix, fetchFn: registry({}) })).toContain(CLOSES_NOTHING);
   });
   it("forged transitive npm fixes (review 6518582507, B1 and N-a)", async () => {
     const { "node_modules/minimist": _gone, ...withoutMinimist } = MKDIRP;

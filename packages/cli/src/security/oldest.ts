@@ -424,18 +424,24 @@ export function notOldest(table: Pick<ResolutionTable, "answers" | "v">, beforeL
   return out;
 }
 
+/** Why the PR job refuses a fix that closes nothing: by OSV's records it is no security fix, whatever its receipt says. */
+export const CLOSES_NOTHING = "this fix closes no live advisory: on no change does OSV name an advisory, other than a withdrawn one, on the version moved from and not on the version moved to";
+/** Why the PR job refuses a fix whose receipt claims too much: the commit and the PR would say it fixes what it does not. */
+export const NAMES_WHAT_IT_DOES_NOT_CLOSE = "the receipt names an advisory the change does not close, by OSV's records, and the commit and the PR would say it is fixed";
+
 /**
- * The PR job's own reading (the decision, section 5). From the plan and lockfiles Ludion checked, the registry's metadata
- * and OSV, the table is worked out again and every new version held against it. The plan's V is the artifact's: it starts
+ * The PR job's own reading (the decision, section 5, and docs/decisions/2026-11-03-lvcheck-refuse-when-nothing-closes.md).
+ * First what the fix closes, from OSV and not from the receipt: on each change, the live advisories on the version moved
+ * from that do not name the version moved to, as the judge reads them. A fix that closes none is refused, and so is one
+ * whose receipt names, on a change, an advisory that change does not close, since the commit's "Fixes …" and the PR's
+ * Advisories are written from that list. Then, from the plan and lockfiles Ludion checked, the registry's metadata and
+ * OSV, the table is worked out again and every new version held against it. The plan's V is the artifact's: it starts
  * the walk and can move T, and nothing here holds that it is the smallest fixed version. The receipt's `resolution` is not
- * read. The fix's advisories are OSV's: those on the version moved from that do not name the version moved to, as the judge reads them.
- * Only names and versions, and back to OSV the IDs it returned, are sent, and no package's code is run. Returns why the
- * fix is refused, or null. A read that fails throws. A fix that brings in nothing new reads nothing.
+ * read. Only names and versions, and back to OSV the IDs it returned, are sent, and no package's code is run. Returns why
+ * the fix is refused, or null. A read that fails throws. A fix that brings in nothing new reads only OSV.
  */
-export async function recheckOldest(input: { plan: { name: string; from: string; to: string }[]; beforeLock: string; afterLock: string; finalManifest: string; fetchFn?: typeof fetch }): Promise<string | null> {
+export async function recheckOldest(input: { plan: { name: string; from: string; to: string; advisories?: string[] }[]; beforeLock: string; afterLock: string; finalManifest: string; fetchFn?: typeof fetch }): Promise<string | null> {
   const fetchFn = input.fetchFn ?? fetch;
-  const possible = notOldest({ answers: {}, v: Object.fromEntries(input.plan.map(c => [c.name, input.plan.filter(o => o.name === c.name).map(o => o.to)])) }, input.beforeLock, input.afterLock, input.finalManifest);
-  if (!possible.length) return null;
   const ids = await osvIds(input.plan.flatMap(c => [{ name: c.name, version: c.from }, { name: c.name, version: c.to }]), fetchFn);
   const records = new OsvClient(fetchFn), findings: Finding[] = [];
   const plan: Change[] = [];
@@ -451,6 +457,12 @@ export async function recheckOldest(input: { plan: { name: string; from: string;
     }
     plan.push({ name: change.name, from: change.from, to: change.to, advisories: live });
   }
+  const listed = (items: string[]) => `${items.slice(0, 3).map(plain).join(", ")}${items.length > 3 ? ` (${items.length - 3} more)` : ""}`;
+  if (!plan.some(c => c.advisories.length)) return `${CLOSES_NOTHING} (${listed(plan.map(c => `${c.name} ${c.from} -> ${c.to}`))}).`;
+  const unclosed = input.plan.flatMap((c, i) => (c.advisories ?? []).filter(id => !plan[i]!.advisories.includes(id)).map(id => `${id} on ${c.name} ${c.from} -> ${c.to}`));
+  if (unclosed.length) return `${NAMES_WHAT_IT_DOES_NOT_CLOSE} (${listed(unclosed)}).`;
+  const possible = notOldest({ answers: {}, v: Object.fromEntries(input.plan.map(c => [c.name, input.plan.filter(o => o.name === c.name).map(o => o.to)])) }, input.beforeLock, input.afterLock, input.finalManifest);
+  if (!possible.length) return null;
   const table = await resolveOldest({ plan, baseLock: input.beforeLock, finalManifest: input.finalManifest, findings, fetchFn });
   const wrong = notOldest(table, input.beforeLock, input.afterLock, input.finalManifest);
   if (!wrong.length) return null;

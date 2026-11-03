@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { closeSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, posix, resolve } from "node:path";
-import { runContainer, runDockerImageCommand } from "../../../sandbox/src/docker.ts";
+import { readSwapMax, runContainer, runDockerImageCommand } from "../../../sandbox/src/docker.ts";
 import { hash, imageReason, replaceImage, scanPhp, type Scan } from "./php.ts";
 import { scanNode } from "./node.ts";
 import { privateState, readConfig, regularFile, rootPath, snapshot } from "./project.ts";
@@ -17,6 +17,8 @@ export type Receipt = {
   scan: Scan; tree_hash: string; dockerfile_before: string; dockerfile_after: string | null;
   old_digest: string | null; new_digest: string | null;
   test: string[]; baseline_passed: boolean; candidate_passed: boolean; reason?: string;
+  /** What `cat` of memory.swap.max printed in a box with the flags and image of that side's test, "0" with swap off, or "unknown". The image's Dockerfile is the project's, which can replace `cat`. Recorded; nothing reads it. */
+  baseline_memory_swap_max?: string; candidate_memory_swap_max?: string;
   /** Exposure-time timestamps (UTC): the fix's official publication, the release lookup of this run, the branch. */
   fix_published_at: string | null; fix_published_note: string; found_at: string; applied_at: string | null;
   /** --apply: the update is one commit on base_commit, on its own branch. The working tree is not changed. */
@@ -47,7 +49,7 @@ function digestFrom(text: string, repository: keyof typeof RUNTIMES): string {
   return `${repository}@${digest.split("@")[1]!}`;
 }
 
-export async function patchProject(dir: string, apply: boolean, deps: { signal?: AbortSignal; fetchFn?: typeof fetch; command?: Command; testRun?: (name: string, image: string, command: readonly string[], timeoutMs: number) => Promise<void> } = {}): Promise<{ receipt: Receipt | null; path: string | null; scan: Scan }> {
+export async function patchProject(dir: string, apply: boolean, deps: { signal?: AbortSignal; fetchFn?: typeof fetch; command?: Command; testRun?: (name: string, image: string, command: readonly string[], timeoutMs: number) => Promise<void>; swapRead?: (name: string, image: string) => Promise<string> } = {}): Promise<{ receipt: Receipt | null; path: string | null; scan: Scan }> {
   const active = () => { if (deps.signal?.aborted) throw new Error("Update cancelled. No pending source change will be applied."); };
   active();
   const root = rootPath(dir), config = readConfig(root);
@@ -78,6 +80,8 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
     if (result.kind === "spawn_error") throw new Error(`Docker unavailable: ${result.message}`);
     if (result.timedOut || result.exitCode !== 0) throw new Error(result.timedOut ? "Validation timed out." : `Validation exited ${result.exitCode}: ${result.stderr.slice(-1000)}`);
   });
+  // A stand-in for the test has no box to read from.
+  const swapRead = deps.swapRead ?? (deps.testRun ? async () => "unknown" : readSwapMax);
   try {
     temporary = mkdtempSync(join(tmpdir(), "ludion-security-"));
     writeFileSync(lockFd, JSON.stringify({ id, pid: process.pid, started_at: receipt.started_at }));
@@ -114,6 +118,10 @@ export async function patchProject(dir: string, apply: boolean, deps: { signal?:
       await command(["build", "--network=none", "--pull=false", "--tag", image, "--file", join(temporary, config.dockerfile), temporary], 300_000);
       active();
       const imageId = await command(["image", "inspect", image, "--format", "{{.Id}}"], 15_000);
+      active();
+      // Before the probe and the test, so that a side that fails has it too.
+      const swapMax = await swapRead(`ludion-security-${id}-${label}-swap`, imageId);
+      if (label === "baseline") receipt.baseline_memory_swap_max = swapMax; else receipt.candidate_memory_swap_max = swapMax;
       active();
       const versionName = `ludion-security-${id}-${label}-runtime`;
       // Probe the built image as well as its base; a Dockerfile may replace the runtime's binary.

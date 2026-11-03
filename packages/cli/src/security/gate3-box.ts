@@ -306,6 +306,9 @@ main().catch(error => {
   const number = text => text === null || !/^\d+$/.test(text) ? null : Number(text);
   out.memory_peak_bytes = number(cgroup("memory.peak"));
   out.memory_swap_peak_bytes = number(cgroup("memory.swap.peak"));
+  // As the box says it, a number or max. Not readable or anything else is "unknown": no number is made up.
+  const swapMax = cgroup("memory.swap.max");
+  out.memory_swap_max = swapMax !== null && /^(?:\d{1,20}|max)$/.test(swapMax) ? swapMax : "unknown";
   const kills = /^oom_kill (\d+)$/m.exec(cgroup("memory.events") || "");
   out.memory_oom_kills = kills ? Number(kills[1]) : null;
   process.stdout.write("\n${RESULT_MARKER}" + JSON.stringify(out) + "\n", () => process.exit(0));

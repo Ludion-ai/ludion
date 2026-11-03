@@ -212,6 +212,20 @@ describe("dependency patch gates and recoverable application", () => {
     expect(result.receipt?.reason).toContain("digest is unavailable");
     expect(snapshot(root)).toBe(before);
   });
+  it("validation-result-records-swap-max: the baseline and each candidate, from the image each one's test runs in, and a test that fails has it too", async () => {
+    const reads: [string, string, string][] = [], tests: string[] = [];
+    const root = fixture(); commit(root);
+    const result = await patchDependencies(root, false, {
+      fetchFn: registry(), client: client(), command: fakeCommand(),
+      testRun: async (_name, image) => { tests.push(image); if (tests.length === 2) throw new Error("candidate test failure"); },
+      swapRead: async (name, image, tool) => { reads.push([name, image, tool]); return name.endsWith("candidate-1-swap") ? "unknown" : "0"; },
+    });
+    expect(reads.map(r => r[0].replace(/^ludion-check-[^-]+-[^-]+-[^-]+-[^-]+-[^-]+-/, ""))).toEqual(["baseline-swap", "candidate-1-swap"]);
+    expect(reads.map(r => r[1])).toEqual(tests);
+    expect(reads.map(r => r[2])).toEqual(["npm", "npm"]);
+    expect(result.receipt).toMatchObject({ baseline_memory_swap_max: "0", baseline_passed: true });
+    expect(result.receipt!.fixes[0]).toMatchObject({ candidate_memory_swap_max: "unknown", candidate_passed: false, outcome: "failed" });
+  });
   it.each([false, true])("commits both dependency files on the fix's own branch only under explicit policy (apply=%s)", async apply => {
     const root = fixture(), head = commit(root), before = snapshot(root);
     const tools: string[] = [];

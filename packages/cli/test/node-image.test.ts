@@ -294,6 +294,10 @@ describe("the Node.js image policy", () => {
 });
 
 describe("Node.js image patch, validated and applied as PHP's", () => {
+  it("patch-result-records-swap-max: each side of a Node.js image's patch", async () => {
+    const result = await patchProject(fixture(), false, { fetchFn, command, testRun: async () => {}, swapRead: async () => "0" });
+    expect(result.receipt).toMatchObject({ outcome: "validated", baseline_memory_swap_max: "0", candidate_memory_swap_max: "0" });
+  });
   it("pins the official node image by digest, probes the built image's node version, and commits only FROM on ludion/node/<version>", async () => {
     for (const apply of [false, true]) {
       const root = fixture(), head = git(root, "rev-parse", "HEAD"), before = snapshot(root), calls: string[][] = [], runs: string[][] = [];

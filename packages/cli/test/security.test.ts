@@ -281,6 +281,24 @@ describe("bounded patch application and evidence", () => {
     // A move with no newer security release is not counted at all (it has no advisory), whatever its dates.
     expect(phpFixPublished({ ...scan, security_releases: [] })).toMatchObject({ at: null, note: expect.stringContaining("Not counted") });
   });
+  it("patch-result-records-swap-max: each side, from the image its test runs in, in the saved receipt too", async () => {
+    const reads: [string, string][] = [], tested = new Set<string>();
+    const result = await patchProject(fixture(), false, {
+      fetchFn, command, testRun: async (_name, image) => { tested.add(image); },
+      swapRead: async (name, image) => { reads.push([name.replace(/^ludion-security-[^-]+-[^-]+-[^-]+-[^-]+-[^-]+-/, ""), image]); return name.endsWith("candidate-swap") ? "unknown" : "0"; },
+    });
+    expect(reads.map(r => r[0])).toEqual(["baseline-swap", "candidate-swap"]);
+    expect(new Set(reads.map(r => r[1]))).toEqual(tested);
+    expect(result.receipt).toMatchObject({ baseline_memory_swap_max: "0", candidate_memory_swap_max: "unknown", outcome: "validated" });
+    expect(JSON.parse(readFileSync(result.path!, "utf8"))).toMatchObject({ baseline_memory_swap_max: "0", candidate_memory_swap_max: "unknown" });
+  });
+  it("patch-result-records-swap-max: a side whose test fails has it, the side not reached does not, and a stand-in for the test makes up no number", async () => {
+    const failed = await patchProject(fixture(), false, { fetchFn, command, testRun: async () => { throw new Error("test failure"); }, swapRead: async () => "0" });
+    expect(failed.receipt).toMatchObject({ outcome: "failed", baseline_memory_swap_max: "0" });
+    expect(failed.receipt).not.toHaveProperty("candidate_memory_swap_max");
+    const standIn = await patchProject(fixture(), false, { fetchFn, command, testRun });
+    expect(standIn.receipt).toMatchObject({ baseline_memory_swap_max: "unknown", candidate_memory_swap_max: "unknown" });
+  });
   it.each([1, 2, 3, 4])("blocks an update when validation step %s fails", async failureAt => {
     const root = fixture(); let count = 0;
     const result = await patchProject(root, true, { fetchFn, command, testRun: async () => { if (++count === failureAt) throw new Error("test failure"); } });

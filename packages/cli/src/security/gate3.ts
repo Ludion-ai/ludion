@@ -6,7 +6,7 @@ import { randomUUID } from "node:crypto";
 import { cpSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve, sep } from "node:path";
-import { runContainer, runDockerImageCommand, type ContainerOutcome } from "../../../sandbox/src/docker.ts";
+import { runContainer, runDockerImageCommand, SWAP_MAX_TEXT, type ContainerOutcome } from "../../../sandbox/src/docker.ts";
 import { BOX_DRIVER, FREEZE_CLOCK, MAX_PAGES, RESULT_MARKER } from "./gate3-box.ts";
 
 /** Runs the crawl: Node.js and Chromium, pinned by digest. The image of the repository's own Playwright version. */
@@ -45,6 +45,8 @@ export type Gate3Run = {
   too_many_pages: boolean; pages: Gate3Page[]; seconds: number;
   /** The peak counts the page cache, so it reaches the box's limit without anything having run out. No verdict reads the peak or the swap. */
   memory_peak_bytes: number | null; memory_swap_peak_bytes: number | null;
+  /** The box's memory.swap.max as it reads it: "0" with swap off, or "unknown". Recorded; no verdict reads it. */
+  memory_swap_max: string;
   /** Read together, only on a run that failed to build or start, or a run of old that did not finish its crawl: whether the box ran out (`outOfBox`). */
   memory_oom_kills: number | null; tmp_min_free_bytes: number | null;
   /** How many lines of stderr held `heap out of memory` and `ENOSPC`, read with those two. Counts only: no line leaves the box. */
@@ -150,8 +152,9 @@ export function parseRun(stdout: string): Gate3Run | null {
     if (p.screenshot !== null && !isText(p.screenshot, HASH32)) return null;
   }
   for (const key of ["memory_peak_bytes", "memory_swap_peak_bytes", "memory_oom_kills", "tmp_min_free_bytes", "host_cpus"]) if (value[key] !== null && typeof value[key] !== "number") return null;
+  if (value.memory_swap_max !== "unknown" && !isText(value.memory_swap_max, SWAP_MAX_TEXT)) return null;
   for (const key of ["heap_out_lines", "enospc_lines"]) if (!Number.isInteger(value[key]) || value[key] < 0) return null;
-  return { heap_out_lines: value.heap_out_lines, enospc_lines: value.enospc_lines, build: stepOf(value.build), types: stepOf(value.types), start: stepOf(value.start), crawl: stepOf(value.crawl), tests: stepOf(value.tests), too_many_pages: value.too_many_pages, pages: value.pages.map(pageOf), seconds: value.seconds, memory_peak_bytes: value.memory_peak_bytes, memory_swap_peak_bytes: value.memory_swap_peak_bytes, memory_oom_kills: value.memory_oom_kills, tmp_min_free_bytes: value.tmp_min_free_bytes, host_cpus: value.host_cpus };
+  return { heap_out_lines: value.heap_out_lines, enospc_lines: value.enospc_lines, build: stepOf(value.build), types: stepOf(value.types), start: stepOf(value.start), crawl: stepOf(value.crawl), tests: stepOf(value.tests), too_many_pages: value.too_many_pages, pages: value.pages.map(pageOf), seconds: value.seconds, memory_peak_bytes: value.memory_peak_bytes, memory_swap_peak_bytes: value.memory_swap_peak_bytes, memory_swap_max: value.memory_swap_max, memory_oom_kills: value.memory_oom_kills, tmp_min_free_bytes: value.tmp_min_free_bytes, host_cpus: value.host_cpus };
 }
 
 const byPath = (run: Gate3Run) => new Map(run.pages.map(p => [p.path, p]));
@@ -342,7 +345,7 @@ export async function judgeGate3(input: Gate3Input, deps: Gate3Deps): Promise<Ga
       seconds[`image_${label}`] = elapsed(imageStarted);
       return command(["image", "inspect", tag, "--format", "{{.Id}}"], 15_000);
     };
-    /** One run in a fresh box. Null means no result could be read from it. */
+    /** One run in a fresh box, awaited: boxes run one at a time, so one judgement never holds more than one box's memory. Null means no result could be read from it. */
     const once = async (label: string, image: string): Promise<Gate3Run | null> => {
       const outcome = await box(`ludion-gate3-${id}-${label}`, image, ["node", "/ludion/driver.cjs"], BOX_TIMEOUT_MS);
       if (outcome.kind === "spawn_error") throw new Error(`Docker unavailable: ${outcome.message}`);

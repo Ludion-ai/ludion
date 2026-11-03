@@ -67,6 +67,6 @@ The product's code on LOLD's 24 examples, with the real npm 12.2.1, the real reg
 
 ## Open
 
-1. **"T ≤ push − wait".** Read with T as first sight, it conflicts with the plan's own count of fixes whose wait is over when the advisory appears. The decision's section 3 says what the product does instead; the receipt writes the literal comparison, and it stops nothing. This reading was decided on 2026-11-03 under the owner's delegation of wait judgments, so this item is no longer open.
+1. **"T ≤ push − wait".** Read with T as first sight, it conflicts with the plan's own count of fixes whose wait is over when the advisory appears. The decision's section 3 says what the product does instead; the receipt writes the literal comparison, and it stops nothing. This reading was decided on 2026-11-03, so this item is no longer open.
 2. **T** is a lower bound until first sight is recorded (another item of C12).
 3. **A range with nothing left** stops. Whether the other way goes in for those fixes is LSAMPLE's measurement (above).

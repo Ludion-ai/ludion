@@ -344,6 +344,13 @@ describe("two small cases of the PR job's check", () => {
     // Withdrawn, T is V's, the one version in range came after it, and nothing is left.
     expect(await recheckOldest({ ...input, fetchFn: world(true) })).toContain("is none");
   });
+  it("not-oldest-v-version: only V's exact version passes as V; another version of the fix's package is held to the table", () => {
+    const base = lockOf({ "node_modules/fixed": { version: "1.0.0" }, "node_modules/x": { version: "1.0.0" } });
+    const after = (nested: string) => lockOf({ "node_modules/fixed": { version: "2.0.0" }, "node_modules/x": { version: "1.0.0", dependencies: { fixed: ">=2.0.0" } }, "node_modules/x/node_modules/fixed": { version: nested } });
+    const held = { answers: {}, v: { fixed: ["2.0.0"] } };
+    expect(notOldest(held, base, after("2.0.0"), "{}")).toEqual([]);
+    expect(notOldest(held, base, after("3.5.0"), "{}")).toEqual([{ path: "node_modules/x/node_modules/fixed", name: "fixed", version: "3.5.0", requirements: ["fixed@>=2.0.0"], answers: [] }]);
+  });
   it("not-oldest-package-named-constructor: a package named as an object's own property gets a reason, not a TypeError", () => {
     const base = lockOf({ "node_modules/fixed": { version: "1.0.0" } });
     const after = lockOf({ "node_modules/fixed": { version: "1.0.1", dependencies: { constructor: "^1.0.0" } }, "node_modules/constructor": { version: "1.2.0" } });

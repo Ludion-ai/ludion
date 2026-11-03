@@ -1,6 +1,6 @@
 {
-  "total": 48,
-  "caught": 48,
+  "total": 49,
+  "caught": 49,
   "results": [
     {
       "what": "newest first instead of oldest",
@@ -262,13 +262,6 @@
       "head": "e2ec262"
     },
     {
-      "what": "an added path is not held to it",
-      "file": "oldest.ts",
-      "caught": true,
-      "by": "every new version is the answer for what loads it > not-oldest-added: an added copy is held to it too, and one nothing loads is refused",
-      "head": "e2ec262"
-    },
-    {
       "what": "the recheck stops at the first read of nothing new",
       "file": "oldest.ts",
       "caught": true,
@@ -337,6 +330,20 @@
       "caught": true,
       "by": "two small cases of the PR job's check > not-oldest-package-named-constructor: a package named as an object's own property gets a reason, not",
       "head": "later than e2ec262"
+    },
+    {
+      "what": "an added path is not held to it",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "every new version is the answer for what loads it > not-oldest-added: an added copy is held to it too, and one nothing loads is refused",
+      "head": "later than f7a22a9"
+    },
+    {
+      "what": "any version of the fix's package passes as V",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "two small cases of the PR job's check > not-oldest-v-version: only V's exact version passes as V; another version of the fix's package is he",
+      "head": "later than f7a22a9"
     }
   ]
 }

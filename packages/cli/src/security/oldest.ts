@@ -427,7 +427,7 @@ export function notOldest(table: Pick<ResolutionTable, "answers" | "v">, beforeL
 /**
  * The PR job's own reading (the decision, section 5). From the plan and lockfiles Ludion checked, the registry's metadata
  * and OSV, the table is worked out again and every new version held against it. The plan's V is the artifact's: it starts
- * the walk and sets T, and nothing here holds that it is the smallest fixed version. The receipt's `resolution` is not
+ * the walk and can move T, and nothing here holds that it is the smallest fixed version. The receipt's `resolution` is not
  * read. The fix's advisories are OSV's: those on the version moved from that do not name the version moved to, as the judge reads them.
  * Only names and versions, and back to OSV the IDs it returned, are sent, and no package's code is run. Returns why the
  * fix is refused, or null. A read that fails throws. A fix that brings in nothing new reads nothing.

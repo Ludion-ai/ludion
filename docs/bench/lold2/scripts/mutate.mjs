@@ -1,5 +1,5 @@
 // LOLD2: each check is broken in turn in the copy at /vol/app, and the tests must fail. Docker only, with no network.
-// Usage: node mutate.mjs <out.json> [first index] [index to stop before]
+// Usage: node mutate.mjs <out.json> [first index] [index to stop before], or node mutate.mjs --check, which runs nothing.
 import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 
@@ -43,7 +43,7 @@ const MUTATIONS = [
   ["the PR job does not work the oldest out again", L, "if (notOldest) throw new Error(`Not pushed: ${notOldest}`);", "", [DEL]],
   ["the PR job takes a failed read as no problem", L, "return `the oldest versions could not be worked out: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;", "return null;", [DEL]],
   ["a version need only be some answer of its name", O, "const answers = requirements.map(key => table.answers[key]?.version ?? null);", "const answers = Object.values(table.answers).filter(a => a.name === name).map(a => a.version);", [OLD, DEP]],
-  ["an added path is not held to it", O, "if (before.get(path)?.version === version && packageAt(path, before.get(path)) === name) continue;\n    if (table.v", "if (!before.has(path) || (before.get(path)?.version === version && packageAt(path, before.get(path)) === name)) continue;\n    if (table.v", [OLD]],
+  ["an added path is not held to it", O, "if (before.get(path)?.version === version && packageAt(path, before.get(path)) === name) continue;\n    if (isV(table.v", "if (!before.has(path) || (before.get(path)?.version === version && packageAt(path, before.get(path)) === name)) continue;\n    if (isV(table.v", [OLD]],
   ["a version locked elsewhere is not let through", O, "if (isV(table.v, name, version) || locked.has(`${name}@${version}`)) continue;", "if (isV(table.v, name, version)) continue;", [OLD]],
   ["V is not let through", O, "if (isV(table.v, name, version) || locked.has(`${name}@${version}`)) continue;", "if (locked.has(`${name}@${version}`)) continue;", [OLD, DEL]],
   ["the recheck stops at the first read of nothing new", O, "if (!possible.length) return null;\n  const ids", "if (possible.length) return null;\n  const ids", [OLD, DEL]],
@@ -56,8 +56,14 @@ const MUTATIONS = [
 MUTATIONS.push(
   ["a withdrawn advisory moves T in the recheck", O, "if (advisory.withdrawn) continue;\n", "", [OLD]],
   ["V is read by a plain lookup", O, "Object.hasOwn(v, name) && v[name]!.includes(version);", "!!v[name]?.includes(version);", [OLD]],
+  ["any version of the fix's package passes as V", O, "Object.hasOwn(v, name) && v[name]!.includes(version);", "Object.hasOwn(v, name);", [OLD]],
 );
 const results = [], [out, start = "0", end = String(MUTATIONS.length)] = process.argv.slice(2);
+if (out === "--check") {
+  const missing = MUTATIONS.filter(([, file, from]) => readFileSync(file, "utf8").split(from).length !== 2).map(([what]) => what);
+  console.log(JSON.stringify({ total: MUTATIONS.length, found_once: MUTATIONS.length - missing.length, missing, index_of_added_path: MUTATIONS.findIndex(([what]) => what === "an added path is not held to it") }));
+  process.exit(missing.length ? 1 : 0);
+}
 for (const [what, file, from, to, tests] of MUTATIONS.slice(Number(start), Number(end))) {
   const original = readFileSync(file, "utf8");
   if (original.split(from).length !== 2) { results.push({ what, file, caught: null, note: "the text to change is not there once" }); console.log(JSON.stringify(results.at(-1))); continue; }

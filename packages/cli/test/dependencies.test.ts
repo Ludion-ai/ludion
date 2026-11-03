@@ -4,6 +4,9 @@ import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { describe, expect, it, vi } from "vitest";
 import semver from "semver";
+import type { ContainerOutcome } from "../../sandbox/src/docker.ts";
+import { ACQUIRE_IMAGE, BOX_IMAGE } from "../src/security/gate3.ts";
+import { RESULT_MARKER } from "../src/security/gate3-box.ts";
 import { RESOLVER_SCRIPT, resolverScript } from "../src/security/oldest.ts";
 import { acquisitionPolicy, candidateTimeCap, changedPackages, compatible, fixesOf, NPM_FINAL_MANIFEST, patchDependencies, resolverDockerfile, unplannedRemovals, type FixReceipt } from "../src/security/dependency-patch.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl } from "../src/security/acquisition.ts";
@@ -1695,5 +1698,146 @@ describe("npm fixes take the oldest version in range", () => {
   it("patch-npm-only: Composer's container gets no table, and neither does a baseline", () => {
     expect(resolverDockerfile("composer", `composer@${DIGEST}`, true, false, [{ name: "a/b", from: "1.0.0", to: "1.0.1", advisories: [] }])).not.toContain("ludion-resolve");
     expect(resolverDockerfile("npm", `node@${DIGEST}`, false)).not.toContain("ludion-resolve");
+  });
+});
+
+describe("gate 3's comparison on npm fixes (docs/decisions/2026-11-03-gate3-called-from-patch.md)", () => {
+  const passed = { status: "passed", seconds: 1, exit: 0 };
+  /** One run as the box's driver prints it, with one page. */
+  const printed = (page: object = {}): ContainerOutcome => ({
+    kind: "exited", exitCode: 0, stderr: "", timedOut: false,
+    stdout: `${RESULT_MARKER}${JSON.stringify({ schema: 1, build: passed, types: passed, start: passed, crawl: passed, tests: passed, too_many_pages: false, pages: [{ path: "/", status: 200, exceptions: [], console: [], dom: ["aaaaaaaa"], screenshot: "0".repeat(32), ...page }], seconds: 2, memory_peak_bytes: 1, memory_swap_peak_bytes: 0, memory_swap_max: "0", memory_oom_kills: 0, tmp_min_free_bytes: 67_108_864, heap_out_lines: 0, enospc_lines: 0, host_cpus: 1 })}\n`,
+  });
+  const noResult: ContainerOutcome = { kind: "exited", exitCode: 1, stdout: "", stderr: "", timedOut: false };
+  /** A stand-in for gate 3's box: answers each run in turn, and calls `during` as it does. */
+  const boxes = (answers: ContainerOutcome[], during: () => void = () => {}) => {
+    const names: string[] = [];
+    return { names, box: async (name: string) => { names.push(name.replace(/^.*-(old-1|old-2|new-2|new)$/, "$1")); during(); return answers.shift()!; } };
+  };
+  /** The docker stand-in, recording what each of gate 3's builds was given. */
+  const gate3Docker = (fails: (args: string[]) => boolean = () => false) => {
+    const inner = fakeCommand(), acquired: Record<string, string> = {}, boxConfigs: string[] = [], boxHasEnv: boolean[] = [], calls: string[][] = [];
+    return {
+      acquired, boxConfigs, boxHasEnv, calls,
+      command: async (args: string[]) => {
+        calls.push(args);
+        if (fails(args)) throw new Error("Docker image command failed (1): no");
+        const tag = args[0] === "build" ? args[args.indexOf("--tag") + 1] ?? "" : "", context = args.at(-1)!;
+        const side = /^ludion-gate3-.*-(old|new)-acquired$/.exec(tag)?.[1];
+        if (side) acquired[side] = readFileSync(join(context, "manifests", "package-lock.json"), "utf8");
+        if (/^ludion-gate3-.*-box$/.test(tag)) { boxConfigs.push(readFileSync(join(context, "ludion", "config.json"), "utf8")); boxHasEnv.push(existsSync(join(context, "source", ".env"))); }
+        return inner(args);
+      },
+    };
+  };
+  /** A project with `next` in package.json, which gate 3's first form covers, and other dependencies as given. */
+  const nextProject = (others: Record<string, string> = { lodash: "4.17.20" }) => {
+    const root = fixture(), deps = { next: "15.5.6", ...others };
+    writeFileSync(join(root, "package.json"), JSON.stringify({ name: "test", dependencies: deps }));
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify(lockFor(deps)));
+    writeFileSync(join(root, ".gitignore"), ".env\n.ludion\n");
+    writeFileSync(join(root, ".env"), "SECRET=real\n");
+    writeFileSync(join(root, ".env.example"), "API_URL=https://real.example\n");
+    commit(root);
+    return root;
+  };
+  const branches = (root: string) => git(root, "branch", "--list", "ludion/*");
+  /** The fixture registry, which also knows the Next.js these projects lock. */
+  const withNext = (extra: Record<string, { created: string; versions: Record<string, string> }> = {}) => registry({ next: { created: "2016-10-25T00:00:00.000Z", versions: { "15.5.6": "2025-10-15T00:00:00.000Z" } }, ...extra });
+
+  it("gate3-called-from-patch: after the project's test and before the branch, old the project's lock, new the candidate's, and the result in the receipt", async () => {
+    const root = nextProject(), docker = gate3Docker(), order: string[] = [];
+    let branchesDuring = "not called";
+    const { names, box } = boxes([printed(), printed(), printed()], () => { order.push("gate 3"); branchesDuring = branches(root); });
+    const result = await patchDependencies(root, true, { fetchFn: withNext(), client: client(), command: docker.command, testRun: async () => { order.push("test"); }, gate3Box: box });
+    expect(order).toEqual(["test", "test", "gate 3", "gate 3", "gate 3"]);
+    expect(names).toEqual(["old-1", "old-2", "new"]);
+    // No branch existed while it ran, and the fix has its branch now.
+    expect(branchesDuring).toBe("");
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix).toMatchObject({ outcome: "applied", candidate_passed: true });
+    expect(branches(root)).toContain(fix.branch!);
+    expect(fix.gate3).toMatchObject({ verdict: "not_broken", specification_pages: 1 });
+    expect(fix.gate3!.limits.join(" ")).toContain("GET pages only");
+    expect(fix.gate3!.runs.map(r => r.label)).toEqual(["old-1", "old-2", "new"]);
+    // The receipt on disk has it too.
+    expect(JSON.parse(readFileSync(result.path!, "utf8")).fixes[0].gate3.verdict).toBe("not_broken");
+    expect(JSON.parse(docker.acquired.old!).packages["node_modules/lodash"].version).toBe("4.17.20");
+    expect(JSON.parse(docker.acquired.new!).packages["node_modules/lodash"].version).toBe("4.17.21");
+    // Its images are the pinned ones, and it removes what it built.
+    expect(docker.calls.filter(c => c[0] === "pull").map(c => c[1])).toEqual(expect.arrayContaining([BOX_IMAGE, ACQUIRE_IMAGE]));
+    expect(docker.calls.filter(c => c[0] === "image" && c[1] === "rm" && c[2]!.startsWith("ludion-gate3-"))).toHaveLength(4);
+  });
+  it("gate3-reads-env-example: it reaches the project's .env.example keys, which the run's own copy leaves out, and no .env", async () => {
+    const docker = gate3Docker();
+    await patchDependencies(nextProject(), false, { fetchFn: withNext(), client: client(), command: docker.command, testRun: async () => {}, gate3Box: boxes([printed(), printed(), printed()]).box });
+    expect(JSON.parse(docker.boxConfigs[0]!).env).toEqual({ API_URL: "http://127.0.0.1:9/" });
+    expect(docker.boxHasEnv).toEqual([false, false]);
+  });
+  it.each<[string, () => ContainerOutcome[], RegExp, string]>([
+    ["broken", () => [printed(), printed(), printed({ status: 500 })], /^Gate 3 stops this fix: \/ answered 500 on new and 200 on old\./, "broken"],
+    ["undecidable, no page on old", () => [printed({ status: 500 }), printed({ status: 500 })], /^Gate 3 cannot judge this fix, so it stops: .*no denominator/, "undecidable"],
+    ["undecidable, no result from a run", () => [noResult], /^Gate 3 cannot judge this fix, so it stops: The first run of old gave no result/, "undecidable"],
+    ["undecidable, on new", () => [printed(), printed(), printed({ screenshot: "2".repeat(32) })], /^Gate 3 cannot judge this fix, so it stops: .*screenshot differs/, "undecidable"],
+  ])("gate3-stops-the-fix: %s leaves no branch and says why", async (_name, answers, reason, verdict) => {
+    const root = nextProject();
+    const result = await patchDependencies(root, true, { fetchFn: withNext(), client: client(), command: gate3Docker().command, testRun: async () => {}, gate3Box: boxes(answers()).box });
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix).toMatchObject({ outcome: "failed", branch: null, commit: null, applied_at: null, candidate_passed: true, files: [] });
+    expect(fix.reason).toMatch(reason);
+    expect(fix.gate3?.verdict).toBe(verdict);
+    expect(result.receipt!.outcome).toBe("failed");
+    expect(branches(root)).toBe("");
+  });
+  it("gate3-stops-without-apply: a fix gate 3 stops is not validated either", async () => {
+    const result = await patchDependencies(nextProject(), false, { fetchFn: withNext(), client: client(), command: gate3Docker().command, testRun: async () => {}, gate3Box: boxes([printed(), printed(), printed({ status: 500 })]).box });
+    expect(result.receipt).toMatchObject({ outcome: "failed", fixes: [{ outcome: "failed" }] });
+  });
+  it.each<[string, (args: string[]) => boolean]>([
+    ["its browser image cannot be pulled", args => args[0] === "pull" && args[1] === BOX_IMAGE],
+    ["its dependencies cannot be acquired", args => args.some(a => /^ludion-gate3-.*-old-acquired$/.test(a)) && args[0] === "build"],
+  ])("gate3-docker-failure-stops: a fix stops when %s, with no silent pass", async (_name, fails) => {
+    const root = nextProject();
+    const result = await patchDependencies(root, true, { fetchFn: withNext(), client: client(), command: gate3Docker(fails).command, testRun: async () => {}, gate3Box: boxes([]).box });
+    expect(result.receipt!.fixes[0]).toMatchObject({ outcome: "failed", branch: null, gate3: { verdict: "undecidable" }, reason: expect.stringContaining("Gate 3 cannot judge this fix, so it stops") });
+    expect(branches(root)).toBe("");
+  });
+  it("gate3-not-covered: a project without Next.js goes on as before, on its own test alone, starts no box of gate 3, and its receipt says so", async () => {
+    const root = fixture(); commit(root);
+    const docker = gate3Docker(), { names, box } = boxes([]);
+    const result = await patchDependencies(root, true, { fetchFn: withNext(), client: client(), command: docker.command, testRun: async () => {}, gate3Box: box });
+    const fix = result.receipt!.fixes[0]!;
+    expect(fix.outcome).toBe("applied");
+    expect(fix.reason).toBeUndefined();
+    expect(fix.gate3).toMatchObject({ verdict: "undecidable", undecidable_reasons: ["not_covered"], runs: [] });
+    expect(fix.gate3!.undecidable[0]).toContain("covers only Next.js projects");
+    expect(names).toEqual([]);
+    expect(docker.calls.flat().filter(a => a === BOX_IMAGE || a === ACQUIRE_IMAGE || a.startsWith("ludion-gate3-"))).toEqual([]);
+  });
+  it("gate3-one-fix-at-a-time: what it stops is that fix alone, and each fix has its own judgement", async () => {
+    const osv = new OsvClient(async (url, init) => {
+      if (String(url).includes("/vulns/")) return response(Object.values(VULNERABLE).find(a => String(url).endsWith(`/${a.id}`)));
+      return response({ results: JSON.parse(String(init?.body)).queries.map((q: any) => VULNERABLE[`${q.package.name}@${q.version}`] ? { vulns: [{ id: VULNERABLE[`${q.package.name}@${q.version}`]!.id }] } : {}) });
+    });
+    const root = nextProject({ lodash: "4.17.20", minimist: "1.2.5" }), { names, box } = boxes([printed(), printed(), printed({ status: 500 }), printed(), printed(), printed()]);
+    const result = await patchDependencies(root, true, { fetchFn: withNext({ minimist: MINIMIST_RELEASES }), client: osv, command: gate3Docker().command, testRun: async () => {}, gate3Box: box });
+    expect(result.receipt?.fixes.map(f => [f.package, f.outcome, f.gate3?.verdict])).toEqual([["lodash", "failed", "broken"], ["minimist", "applied", "not_broken"]]);
+    expect(result.receipt?.outcome).toBe("partial");
+    expect(names).toEqual(["old-1", "old-2", "new", "old-1", "old-2", "new"]);
+  });
+  it("gate3-project-changed: a project that changes while gate 3 runs gets no branch", async () => {
+    const root = nextProject();
+    const { box } = boxes([printed(), printed(), printed()], () => writeFileSync(join(root, "app.tsx"), "changed\n"));
+    const result = await patchDependencies(root, true, { fetchFn: withNext(), client: client(), command: gate3Docker().command, testRun: async () => {}, gate3Box: box });
+    expect(result.receipt!.fixes[0]).toMatchObject({ outcome: "failed", branch: null, reason: "Project changed during validation; no dependency file was updated.", gate3: { verdict: "not_broken" } });
+    expect(branches(root)).toBe("");
+  });
+  it("gate3-after-the-test: a candidate whose test fails never reaches gate 3", async () => {
+    const { names, box } = boxes([]);
+    let tests = 0;
+    const result = await patchDependencies(nextProject(), true, { fetchFn: withNext(), client: client(), command: gate3Docker().command, testRun: async () => { if (++tests === 2) throw new Error("candidate test failure"); }, gate3Box: box });
+    expect(result.receipt!.fixes[0]).toMatchObject({ outcome: "failed", reason: "candidate test failure" });
+    expect(result.receipt!.fixes[0]!.gate3).toBeUndefined();
+    expect(names).toEqual([]);
   });
 });

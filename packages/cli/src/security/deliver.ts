@@ -70,6 +70,8 @@ export type CheckedFix = {
   /** The commit message `patch --apply` writes for this fix, rebuilt from checked fields; the commit must carry exactly it. */
   branch: string; commit: string; subject: string; message: string; tree: string; files: { path: string; after_hash: string }[];
   fix_published_at: string | null; found_at: string; applied_at: string; verdict: (typeof VERDICTS)[number] | null;
+  /** npm: gate 3's comparison, by the receipt: its verdict, or that the project is one it does not cover. */
+  gate3?: "not_broken" | "not_covered";
   /**
    * An image move with no newer security release (docs/decisions/2026-10-31-limgv-image-newest-built-release.md): the end
    * of its 72-hour wait, from the receipt's scan. Absent for every other fix.
@@ -150,6 +152,18 @@ function policyAt(top: string, prefix: string, base: string): { ecosystem: Ecosy
   return { ecosystem, dockerfile: null, allowed: [...MANIFESTS[ecosystem]] };
 }
 
+/**
+ * What an npm fix's receipt says of gate 3. This job runs no project code, so it cannot run gate 3 again: as with the
+ * tests, it holds the receipt to what `patch` applies (docs/decisions/2026-11-03-gate3-called-from-patch.md).
+ */
+function gate3OfReceipt(value: unknown, pkg: string): "not_broken" | "not_covered" {
+  if (value === undefined) refuse(`the npm fix of ${pkg} is applied without gate 3's result.`);
+  const result = object(value, "A fix's gate 3 result");
+  if (result.verdict === "not_broken") return "not_broken";
+  if (result.verdict === "undecidable" && isDeepStrictEqual(result.undecidable_reasons, ["not_covered"])) return "not_covered";
+  return refuse(`the npm fix of ${pkg} is applied with a gate 3 result that stops it.`);
+}
+
 /** The receipt's applied fixes, each field checked. Fixes not applied are only counted. */
 function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, prefix: string, base: string): Omit<CheckedArtifact, "base"> {
   if (value === null) return { id: null, ecosystem: null, fixes: [], notApplied: {} };
@@ -212,9 +226,10 @@ function checkedReceipt(value: unknown, policy: ReturnType<typeof policyAt>, pre
     const judgement = f.judgement === undefined ? null : object(f.judgement, "A fix's judgement");
     const verdict = judgement === null ? null : VERDICTS.find(v => v === judgement.verdict) ?? refuse("a fix's judgement has no known verdict.");
     if (policy.ecosystem === "npm" && verdict !== "ready_except_build") refuse(`the npm fix of ${pkg} is applied without the judge's ready_except_build.`);
+    const gate3 = policy.ecosystem === "npm" ? gate3OfReceipt(f.gate3, pkg) : undefined;
     const subject = `ludion: ${pkg} ${changes.map(c => `${c.from} -> ${c.to}`).join(", ")} (${policy.ecosystem})`;
     const fix: CheckedFix = {
-      package: pkg, changes, files, verdict, subject, tree: "",
+      package: pkg, changes, files, verdict, subject, tree: "", ...(gate3 ? { gate3 } : {}),
       branch: text(f.branch, /^ludion\/[A-Za-z0-9._/-]+$/, "A fix's branch"), commit: text(f.commit, SHA, "A fix's commit"),
       // dependency-patch.ts's message.
       message: `${subject}\n\nFixes ${[...new Set(changes.flatMap(c => c.advisories))].join(", ")}.\n\nLudion receipt ${id}: the project's test passed on ${base.slice(0, 12)} and on this change alone, offline in Docker.\nSource dependency files only; production was not changed.\n`,
@@ -713,6 +728,8 @@ export function pullRequestBody(artifact: CheckedArtifact, fix: CheckedFix): str
       : newest
         ? `- ${IMAGES[ecosystem as keyof typeof IMAGES].label} image updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check. This move's 72-hour wait is the validation job's, by its receipt.`
         : `- ${isImage(ecosystem) ? `${IMAGES[ecosystem].label} image` : ecosystem === "composer" ? "Composer" : "Maven"} updates do not go through Ludion's judge: no provenance, publisher, install-script, deprecation or withdrawal check, and no wait.`,
+    ...(fix.gate3 === "not_broken" ? [`- By the validation job's receipt, gate 3's comparison of the base and this change, each built, started and crawled offline in Docker: ${code("not_broken")}. It sees GET pages only: API routes, Server Actions and dynamic routes are not touched, nothing behind a login is seen, and no button or form is pressed.`]
+      : fix.gate3 === "not_covered" ? [`- Gate 3's comparison of the base and this change did not run: its first form covers only projects with ${code("next")} in package.json. Here only the project's own test command stands for gate 3.`] : []),
     "",
     "**Not checked**",
     "",

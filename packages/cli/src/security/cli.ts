@@ -4,6 +4,7 @@ import { parseArgs } from "node:util";
 import { setTimeout as delay } from "node:timers/promises";
 import { patchProject } from "./patch.ts";
 import { patchDependencies } from "./dependency-patch.ts";
+import { gate3Refusal, notCovered } from "./gate3.ts";
 import { detectEcosystems, DEFAULT_IMAGES, textFile, type Ecosystem } from "./inventory.ts";
 import { found, scanProject, securityMove } from "./scan.ts";
 import { CONFIG, DEFAULT_CONFIG, DEFAULT_NODE_CONFIG, MAVEN_REFUSAL, readConfig, regularFile, rootPath } from "./project.ts";
@@ -101,6 +102,8 @@ export async function securityCli(command: string, args: string[]): Promise<numb
           const line = [fix.reason === `Gate 2 stops this fix: ${choice.note}` ? "" : plain(choice.note), choice.skipped.length > 1 ? `Passed over: ${choice.skipped.map(s => `${s.version} (${plain(s.reason)})`).join(", ")}.` : ""].filter(Boolean).join(" ");
           if (line) console.log(`    ${line}`);
         }
+        // A fix gate 3 stopped has this in its reason.
+        if (fix.gate3 && !gate3Refusal(fix.gate3)) console.log(notCovered(fix.gate3) ? `    Gate 3's comparison of old and new did not run: ${plain(fix.gate3.undecidable[0] ?? "")}` : `    Gate 3's comparison of old and new: ${fix.gate3.verdict}, on GET pages only; the receipt has its limits.`);
       }
       else if (result.receipt.branch) console.log(`  Branch: ${result.receipt.branch}`);
       console.log(`Receipt: ${result.path}\nSource update only${values.apply ? ", on branches; the working tree was not changed" : ""}. Production deployment was not changed.`);

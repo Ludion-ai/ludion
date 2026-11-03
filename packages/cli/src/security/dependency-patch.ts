@@ -13,6 +13,7 @@ import { dependencyFixPublished } from "./exposure.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl, type ArchiveEvidence } from "./acquisition.ts";
 import { releaseIdentity, type Judgement } from "./judge.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
+import { gate3Refusal, judgeGate3, type Gate3Deps, type Gate3Result } from "./gate3.ts";
 import { registryFacts } from "./npm-facts.ts";
 import { nextFix, type VersionChoice } from "./next-fix.ts";
 import { fixResolution, noAnswerIn, noAnswerReason, notOldest, RESOLVER_FOLDER, RESOLVER_SCRIPT, RESOLVER_TABLE, resolutionAssert, resolveOldest, resolverScript, tableFile, unneededMoves, type FixResolution, type ResolutionTable } from "./oldest.ts";
@@ -65,12 +66,14 @@ export type FixReceipt = {
   version_choice?: VersionChoice[];
   /** npm: T, the version each requirement got, and the asserts on the diff (docs/decisions/2026-11-03-oldest-resolution-in-product.md). */
   resolution?: FixResolution;
+  /** npm: gate 3's comparison of old and new, with its limits. Reason `not_covered` alone means it did not run, and only the project's test stands for gate 3 (docs/decisions/2026-11-03-gate3-called-from-patch.md). */
+  gate3?: Gate3Result;
   reason?: string;
 };
 export type PackageChange = { name: string; from: string[]; to: string[] };
 /** The final manifest beside the pinned one in the npm candidate context (see resolverDockerfile). */
 export const NPM_FINAL_MANIFEST = "ludion-final-package.json";
-type Dependencies = { client?: OsvClient; fetchFn?: typeof fetch; signal?: AbortSignal; command?: typeof runDockerImageCommand; testRun?: (name: string, image: string, command: readonly string[], timeoutMs: number, tool: Tool) => Promise<void>; swapRead?: (name: string, image: string, tool: Tool) => Promise<string> };
+type Dependencies = { client?: OsvClient; fetchFn?: typeof fetch; signal?: AbortSignal; command?: typeof runDockerImageCommand; testRun?: (name: string, image: string, command: readonly string[], timeoutMs: number, tool: Tool) => Promise<void>; swapRead?: (name: string, image: string, tool: Tool) => Promise<string>; gate3Box?: Gate3Deps["box"] };
 
 /** Packages whose set of installed versions differs between two inventories, sorted by name. */
 export function changedPackages(before: Inventory, after: Inventory): PackageChange[] {
@@ -529,6 +532,14 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         if (!files.length) throw new Error("No dependency file changed.");
         fix.candidate_image = await test(label, candidate.exported, candidate.installedCache, value => { fix.candidate_memory_swap_max = value; });
         fix.candidate_passed = true;
+        // Gate 3's comparison, once the project's own test has passed on this fix. What it stops is this fix alone. It takes
+        // the project, not the copy in `source`, which has no .env.example; the check below sees a project that changed meanwhile.
+        if (ecosystem === "npm") {
+          const sides = (folder: string) => ({ manifest: textFile(folder, "package.json"), lock: textFile(folder, "package-lock.json") });
+          const gate3 = fix.gate3 = await judgeGate3({ dir: root, old: sides(source), new: sides(candidate.exported) }, { policy: manifests => acquisitionPolicy(manifests, "npm"), snapshot, command, ...(deps.gate3Box ? { box: deps.gate3Box } : {}) }); active();
+          const refusal = gate3Refusal(gate3);
+          if (refusal) throw new Error(refusal);
+        }
         if (snapshot(root) !== receipt.tree_hash) throw new Error("Project changed during validation; no dependency file was updated.");
         fix.files = files.map(f => ({ path: f.path, before_hash: hash(f.before), after_hash: hash(f.after) }));
         fix.outcome = "validated";

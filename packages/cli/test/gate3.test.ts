@@ -9,7 +9,7 @@ import { runInNewContext, Script } from "node:vm";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { ContainerOutcome } from "../../sandbox/src/docker.ts";
 import { acquisitionPolicy, resolverDockerfile } from "../src/security/dependency-patch.ts";
-import { acquireDockerfile, ACQUIRE_IMAGE, BOX_IMAGE, boxDockerfile, compareRuns, dummyEnv, judgeGate3, parseRun, specificationPages, TMP_NEARLY_FULL_BYTES, UNDECIDABLE_REASONS, undecidableCounts, type Gate3Page, type Gate3Run, type StepStatus, type UndecidableReason } from "../src/security/gate3.ts";
+import { acquireDockerfile, ACQUIRE_IMAGE, BOX_IMAGE, boxDockerfile, compareRuns, dummyEnv, gate3Refusal, judgeGate3, notCovered, parseRun, specificationPages, TMP_NEARLY_FULL_BYTES, UNDECIDABLE_REASONS, undecidableCounts, type Gate3Page, type Gate3Run, type StepStatus, type UndecidableReason } from "../src/security/gate3.ts";
 import { BOX_DRIVER, FREEZE_CLOCK, MAX_PAGES, RESULT_MARKER } from "../src/security/gate3-box.ts";
 import { snapshot } from "../src/security/project.ts";
 
@@ -19,6 +19,31 @@ const page = (path: string, over: Partial<Gate3Page> = {}): Gate3Page => ({ path
 const run = (pages: Gate3Page[], over: Partial<Gate3Run> = {}): Gate3Run => ({ build: passed, types: passed, start: passed, crawl: passed, tests: passed, too_many_pages: false, pages, seconds: 2, memory_peak_bytes: 1, memory_swap_peak_bytes: 0, memory_swap_max: "0", memory_oom_kills: 0, tmp_min_free_bytes: 40 * 1_048_576, heap_out_lines: 0, enospc_lines: 0, host_cpus: 16, ...over });
 const failed = { status: "failed" as StepStatus, seconds: 1 }, timedOut = { status: "timed_out" as StepStatus, seconds: 1 };
 const old = () => run([page("/"), page("/about")]);
+
+describe("what `ludion patch` does with a verdict (docs/decisions/2026-11-03-gate3-called-from-patch.md)", () => {
+  const comparison = compareRuns(old(), old(), old());
+  it("not_broken does not stop a fix", () => expect(gate3Refusal(comparison)).toBeNull());
+  it("broken stops it, with its reasons, and says how many more are in the receipt", () => {
+    expect(gate3Refusal({ ...comparison, verdict: "broken", broken: ["One."] })).toBe("Gate 3 stops this fix: One.");
+    expect(gate3Refusal({ ...comparison, verdict: "broken", broken: ["1", "2", "3", "4", "5", "6", "7"] })).toBe("Gate 3 stops this fix: 1 2 3 4 5 (2 more in the receipt)");
+  });
+  it("broken wins, whatever the undecidable reasons beside it, not_covered included", () => {
+    expect(gate3Refusal({ ...comparison, verdict: "broken", broken: ["One."], undecidable: ["Other."], undecidable_reasons: ["not_covered"] })).toBe("Gate 3 stops this fix: One.");
+  });
+  it.each(UNDECIDABLE_REASONS.filter(reason => reason !== "not_covered"))("undecidable for %s stops it", reason => {
+    expect(gate3Refusal({ ...comparison, verdict: "undecidable", undecidable: ["Why."], undecidable_reasons: [reason] })).toBe("Gate 3 cannot judge this fix, so it stops: Why.");
+  });
+  it("only not_covered alone goes on: beside another reason it stops, and with no reason named it stops", () => {
+    const covered = { ...comparison, verdict: "undecidable" as const, undecidable: ["Why."] };
+    expect(notCovered({ ...covered, undecidable_reasons: ["not_covered"] })).toBe(true);
+    expect(gate3Refusal({ ...covered, undecidable_reasons: ["not_covered"] })).toBeNull();
+    expect(notCovered({ ...covered, undecidable_reasons: ["not_covered", "old_failed"] })).toBe(false);
+    expect(gate3Refusal({ ...covered, undecidable_reasons: ["not_covered", "old_failed"] })).toContain("cannot judge");
+    expect(notCovered({ ...covered, undecidable_reasons: [] })).toBe(false);
+    expect(gate3Refusal({ ...covered, undecidable_reasons: [] })).toContain("cannot judge");
+    expect(notCovered({ ...comparison, undecidable_reasons: ["not_covered"] })).toBe(false);
+  });
+});
 
 describe("the definition's table", () => {
   it("not_broken: everything compared is the same", () => {

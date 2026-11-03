@@ -60,6 +60,20 @@ describe("ludion patch, a fix's version choice", () => {
     expect(out).toContain(`    ${NOTE}`);
     expect(times(out.join("\n"), NOTE)).toBe(1);
   });
+  it("says what gate 3's comparison said of a fix that goes on, and nothing more for one it stopped, whose reason says it", async () => {
+    const said = (verdict: string, reasons: string[], undecidable: string[]) => ({ verdict, broken: [], undecidable, undecidable_reasons: reasons }) as unknown as FixReceipt["gate3"];
+    state.fixes = [fix({ outcome: "validated", gate3: said("not_broken", [], []) })];
+    await securityCli("patch", ["--dir", project()]);
+    expect(out).toContain("    Gate 3's comparison of old and new: not_broken, on GET pages only; the receipt has its limits.");
+    out.length = 0;
+    state.fixes = [fix({ outcome: "validated", gate3: said("undecidable", ["not_covered"], ["old's package.json has no next dependency: this first form covers only Next.js projects."]) })];
+    await securityCli("patch", ["--dir", project()]);
+    expect(out).toContain("    Gate 3's comparison of old and new did not run: old's package.json has no next dependency: this first form covers only Next.js projects.");
+    out.length = 0;
+    state.fixes = [fix({ reason: "Gate 3 cannot judge this fix, so it stops: No page.", gate3: said("undecidable", ["no_denominator"], ["No page."]) })];
+    await securityCli("patch", ["--dir", project()]);
+    expect(out.filter(line => line.includes("comparison"))).toEqual([]);
+  });
   it("prints a fix's second choice's note when its reason carries only the first's", async () => {
     const second = "3.10.2 cannot be used (no longer listed). No other 3.x version fixes it, and this fix stops.";
     state.fixes = [fix({

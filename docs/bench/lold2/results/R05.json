@@ -3,7 +3,7 @@
   "package": "@angular/platform-server 20.2.4 -> 20.3.0",
   "lold_outcome": "stopped_no_allowed",
   "t": "2025-09-10T21:56:01.000Z",
-  "table_seconds": 3.313,
+  "table_seconds": 3.45,
   "table_requirements": 9,
   "table_without_answer": [
     {

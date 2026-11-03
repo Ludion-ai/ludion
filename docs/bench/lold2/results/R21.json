@@ -3,7 +3,7 @@
   "package": "next-auth 4.24.11 -> 4.24.12",
   "lold_outcome": "built",
   "t": "2025-10-29T10:43:57.000Z",
-  "table_seconds": 21.82,
+  "table_seconds": 22.65,
   "table_requirements": 25,
   "table_without_answer": [
     {
@@ -59,10 +59,12 @@
         "version": "4.24.12",
         "role": "v",
         "published_at": "2025-10-27T23:08:44.311Z",
-        "age_hours": 8906
+        "age_hours": 8906.8
       }
     ]
   },
+  "not_oldest": [],
+  "pr_job_recheck": null,
   "outcome": "built",
   "resolution_answers": [
     {

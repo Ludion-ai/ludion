@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { candidateRefusal, judgeNpmCandidate } from "/vol/app/packages/cli/src/security/candidate-judge.ts";
-import { fixResolution, noAnswerIn, noAnswerReason, resolutionAssert, resolveOldest, resolverScript, tableFile, unneededMoves } from "/vol/app/packages/cli/src/security/oldest.ts";
+import { fixResolution, noAnswerIn, noAnswerReason, notOldest, recheckOldest, resolutionAssert, resolveOldest, resolverScript, tableFile, unneededMoves } from "/vol/app/packages/cli/src/security/oldest.ts";
 import { lockEntries, newUnmetRequirements } from "/vol/app/packages/cli/src/security/judge.ts";
 
 const repo = "/vol/app", lold = join(repo, "docs/bench/lold");
@@ -97,7 +97,10 @@ async function one(example) {
     for (const c of judgement.changes) published.set(`${c.name}@${c.to}`, await table.publishedAt(c.name, c.to));
     const assert = resolutionAssert({ table, changes: judgement.changes, waitHours: judgement.wait_hours, pushedAt: new Date(), published: (name, version) => published.get(`${name}@${version}`) });
     row.assert = { t: assert.t, resolved_at: assert.resolved_at, wait_hours: assert.wait_hours, youngest: assert.youngest, wait_until: assert.wait_until, t_before_push_less_wait: assert.t_before_push_less_wait, waits: assert.waits, problems: assert.problems, versions: assert.versions };
-    const passes = !row.unneeded_moves.length && !row.new_unmet.length && !assert.problems.length;
+    // What the PR job reads: this lockfile against the table it works out itself, with OSV's advisories and their times.
+    row.not_oldest = notOldest(table, baseLock, afterLock, `${JSON.stringify(final, null, 2)}\n`);
+    row.pr_job_recheck = await recheckOldest({ plan, beforeLock: baseLock, afterLock, finalManifest: `${JSON.stringify(final, null, 2)}\n` });
+    const passes = !row.unneeded_moves.length && !row.new_unmet.length && !assert.problems.length && !row.not_oldest.length;
     row.outcome = passes ? "built" : "failed";
   } catch (error) { row.outcome = "failed"; row.failure = `judge: ${String(error.message).slice(0, 500)}`; }
   row.resolution_answers = fixResolution(table, row.assert?.versions?.map(v => ({ name: v.name, to: v.version })) ?? []).answers.map(a => ({ requirement: a.requirement, version: a.version, role: a.role, published_at: a.published_at, excluded: a.excluded }));

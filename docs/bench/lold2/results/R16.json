@@ -3,7 +3,7 @@
   "package": "mcp-server-kubernetes 2.9.7 -> 2.9.8",
   "lold_outcome": "stopped_no_allowed",
   "t": "2025-12-03T20:44:45.000Z",
-  "table_seconds": 22.711,
+  "table_seconds": 22.546,
   "table_requirements": 107,
   "table_without_answer": [
     {

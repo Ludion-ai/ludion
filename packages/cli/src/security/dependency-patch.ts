@@ -15,7 +15,7 @@ import { releaseIdentity, type Judgement } from "./judge.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { registryFacts } from "./npm-facts.ts";
 import { nextFix, type VersionChoice } from "./next-fix.ts";
-import { fixResolution, noAnswerIn, noAnswerReason, RESOLVER_FOLDER, RESOLVER_SCRIPT, RESOLVER_TABLE, resolutionAssert, resolveOldest, resolverScript, tableFile, unneededMoves, type FixResolution, type ResolutionTable } from "./oldest.ts";
+import { fixResolution, noAnswerIn, noAnswerReason, notOldest, RESOLVER_FOLDER, RESOLVER_SCRIPT, RESOLVER_TABLE, resolutionAssert, resolveOldest, resolverScript, tableFile, unneededMoves, type FixResolution, type ResolutionTable } from "./oldest.ts";
 import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type ReleaseIdentity, type Releases, type TimeCap } from "./time-cap.ts";
 
 /**
@@ -210,7 +210,7 @@ export function acquisitionPolicy(root: string, ecosystem: Ecosystem): void {
 const NPM_FLAGS = ["--ignore-scripts", "--no-audit", "--no-fund", "--allow-git=none", "--allow-remote=none", "--allow-file=none", "--allow-directory=none", "--registry=https://registry.npmjs.org"];
 
 /**
- * The candidate moves only the planned packages (docs/design.md: the smallest fix, nothing else). npm: a lockfile-only
+ * The candidate moves the planned packages, and what they need (docs/design.md: the smallest fix). npm: a lockfile-only
  * install from the pinned manifest records exactly the fixed versions, and every other version it needs from the table
  * of oldest versions (oldest.ts), a second one from the final manifest keeps them, then `npm ci` installs that lockfile.
  * Composer: `update` of the planned packages at their fixed versions, with --minimal-changes. Planned names and versions
@@ -515,7 +515,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         const unfixable = after.blocked.filter(b => b.startsWith(`${fix.package}@`) || !scan.blocked.includes(b));
         if (left.length || unfixable.length || after.inventory.limitations.length) throw new Error(`Candidate still contains known advisory findings or incomplete inventory${left.length ? ` (${left.slice(0, 5).join(", ")})` : ""}; no source change was made.`);
         // After OSV's re-scan, whose reason says more about a version with a record, and before any test runs.
-        const landing = fix.resolution?.assert?.problems ?? [];
+        const landing = [...(fix.resolution?.assert?.problems ?? []), ...(table ? notOldest(table, textFile(source, "package-lock.json"), textFile(candidate.exported, "package-lock.json"), textFile(candidate.exported, "package.json")).map(w => `${w.name}@${w.version} at ${w.path} is not the table's answer for what loads it (${w.requirements.join(", ") || "nothing"}).`) : [])];
         if (landing.length) throw new Error(`The asserts on the oldest versions stop this fix: ${landing.slice(0, 5).join(" ")}`);
         const files = MANIFESTS[ecosystem].map(path => ({ path, before: textFile(source, path), after: textFile(candidate.exported, path) })).filter(f => f.before !== f.after);
         if (!files.length) throw new Error("No dependency file changed.");

@@ -3,7 +3,7 @@
   "package": "@vitejs/plugin-rsc 0.5.6 -> 0.5.7",
   "lold_outcome": "built",
   "t": "2025-12-12T16:41:08.000Z",
-  "table_seconds": 20.524,
+  "table_seconds": 20.341,
   "table_requirements": 21,
   "table_without_answer": [
     {
@@ -47,7 +47,7 @@
         "version": "0.5.7",
         "role": "v",
         "published_at": "2025-12-12T00:25:14.587Z",
-        "age_hours": 7824.7
+        "age_hours": 7825.4
       },
       {
         "path": "node_modules/es-module-lexer",
@@ -55,10 +55,12 @@
         "version": "2.0.0",
         "role": "oldest",
         "published_at": "2025-12-07T08:37:02.250Z",
-        "age_hours": 7936.5
+        "age_hours": 7937.2
       }
     ]
   },
+  "not_oldest": [],
+  "pr_job_recheck": null,
   "outcome": "built",
   "resolution_answers": [
     {

@@ -54,6 +54,18 @@ They run in the product, on the diff as npm wrote it, not on the table, and thei
 
 - The oldest version is not shown to work. Gate 3 stays as it is, and this record adds no check to it.
 - It does not decide what to do with a range with nothing left, beyond stopping: that stays the owner's (LOLD, "What it needs next").
-- The PR job does not work the table out again. It holds what section 2 says about a moved path and, through the judge, the age of every version at push; that a moved version is the oldest is checked by `ludion patch` only, in the validation job.
+- The PR job works the table out again itself, and refuses a fix when a version it brings in, other than V or a version the base locks, is not the answer for what loads it (added below). It does not hold that V is the smallest fixed version; that is as it was on main.
 - `ludion judge`, on an existing update such as a Dependabot PR, is unchanged: it does not say whether a version is the oldest.
 - pnpm, yarn and bun locks.
+
+## Added on 2026-11-03, after the first result
+
+This section was added after the product's first result was seen. It changes no number and no line in section 4.
+
+**What changed.** Section 5 said: "The PR job does not work the table out again. It holds what section 2 says about a moved path and, through the judge, the age of every version at push; that a moved version is the oldest is checked by `ludion patch` only, in the validation job." It now says what the PR job does.
+
+**Why.** An audit of the first head found that section 2 loosens a check in the job Ludion trusts, while the check that makes up for it ran only in the job Ludion does not. The PR job reads the artifact as untrusted data, and `fixes[].resolution` is in the artifact. Before this, a forged artifact could put any version in range at a path V's requirement moves, including a malicious one that lies dormant past the wait and passes the judge.
+
+**What the PR job does now.** For a fix that brings in a version other than V or one the base locks, moved or added, it calls the same `resolveOldest` as section 2, reading only the registry's metadata and OSV. It takes the fix's advisories from OSV (those on the version moved from that do not name the version moved to), not from the receipt. It refuses the fix unless each such version is the table's answer for a requirement of a package that loads it, by Node's lookup, or for one of the project's `overrides`. A read that fails refuses the fix. No package's code runs, and only names and versions, and back to OSV the IDs it returned, are sent.
+
+**One thing stricter than section 3, c.** That says the version must be an answer the table gave "for that package". The check above is per requirement, and `ludion patch` now holds it too: a version the table gives for another range of the name is not an answer for this one.

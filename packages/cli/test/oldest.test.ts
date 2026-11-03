@@ -6,7 +6,7 @@ import { createContext, runInContext } from "node:vm";
 import { describe, expect, it } from "vitest";
 import type { Change } from "../src/security/inventory.ts";
 import type { Finding } from "../src/security/osv.ts";
-import { fixResolution, noAnswerIn, noAnswerReason, RECEIPT_ANSWERS, registryRequirement, REQUIREMENT_LIMIT, requirementsOf, resolutionAssert, resolutionTime, resolveOldest, resolverScript, tableFile, unneededMoves, type ResolutionTable } from "../src/security/oldest.ts";
+import { fixResolution, noAnswerIn, noAnswerReason, notOldest, RECEIPT_ANSWERS, recheckOldest, registryRequirement, REQUIREMENT_LIMIT, requirementsOf, resolutionAssert, resolutionTime, resolveOldest, resolverScript, tableFile, unneededMoves, type ResolutionTable } from "../src/security/oldest.ts";
 
 type Doc = { time: Record<string, unknown>; versions: Record<string, any> };
 const recorded = (name: string): Doc => JSON.parse(readFileSync(new URL(`fixtures/oldest-packuments/${name}.json`, import.meta.url), "utf8"));
@@ -276,6 +276,58 @@ describe("a version already locked does not move while it satisfies the range", 
   it("moves-nothing: the fix's own path, an unchanged path and a flag change are not moves", () => {
     const after = { "node_modules/fixed": { version: "1.0.1", dependencies: { dep: "^1.0.0" } }, "node_modules/dep": { version: "1.0.0", dev: true }, "node_modules/stay": { version: "1.0.0", dependencies: { dep: "^1.0.0" } } };
     expect(unneededMoves(lockOf(base), lockOf(after), plan)).toEqual([]);
+  });
+});
+
+describe("every new version is the answer for what loads it", () => {
+  const answers = (rows: Record<string, string | null>): ResolutionTable["answers"] => Object.fromEntries(Object.entries(rows).map(([requirement, version]) => [requirement, { requirement, name: requirement.slice(0, requirement.lastIndexOf("@")), version, role: version ? "oldest" : null, published_at: null, passed_over: [], excluded: { in_range: 1, no_time: 0, after_t: 0, withdrawn: 0, deprecated: 0, advisory: 0 } }]));
+  const table = (rows: Record<string, string | null>) => ({ answers: answers(rows), v: { fixed: ["1.0.1"] } });
+  const base = lockOf({ "node_modules/fixed": { version: "1.0.0", dependencies: { dep: "^1.0.0" } }, "node_modules/dep": { version: "1.0.0" }, "node_modules/kept": { version: "3.0.0" } });
+  const fixed = (dep: string, extra: Record<string, unknown> = {}, range = "^1.1.0") => lockOf({ "node_modules/fixed": { version: "1.0.1", dependencies: { dep: range } }, "node_modules/dep": { version: dep }, "node_modules/kept": { version: "3.0.0" }, ...extra });
+  it("not-oldest-reads-the-loader's-range: the answer for the range that loads it passes; a later version, or another range's answer, does not", () => {
+    const t = table({ "dep@^1.1.0": "1.1.0", "dep@^1.2.0": "1.2.0" });
+    expect(notOldest(t, base, fixed("1.1.0"), "{}")).toEqual([]);
+    expect(notOldest(t, base, fixed("1.3.0"), "{}")).toEqual([{ path: "node_modules/dep", name: "dep", version: "1.3.0", requirements: ["dep@^1.1.0"], answers: ["1.1.0"] }]);
+    expect(notOldest(t, base, fixed("1.2.0"), "{}")).toEqual([expect.objectContaining({ version: "1.2.0", answers: ["1.1.0"] })]);
+    // Nothing allowed, or not in the table at all: no answer takes it.
+    expect(notOldest(table({ "dep@^1.1.0": null }), base, fixed("1.1.0"), "{}")).toEqual([expect.objectContaining({ answers: [] })]);
+    expect(notOldest(table({}), base, fixed("1.1.0"), "{}")).toEqual([expect.objectContaining({ requirements: ["dep@^1.1.0"], answers: [] })]);
+  });
+  it("not-oldest-added: an added copy is held to it too, and one nothing loads is refused", () => {
+    const t = table({ "dep@^1.1.0": "1.1.0", "new@^2.0.0": "2.0.0" });
+    const lock = (version: string) => lockOf({ "node_modules/fixed": { version: "1.0.1", dependencies: { dep: "^1.1.0", new: "^2.0.0" } }, "node_modules/dep": { version: "1.1.0" }, "node_modules/kept": { version: "3.0.0" }, "node_modules/new": { version } });
+    expect(notOldest(t, base, lock("2.0.0"), "{}")).toEqual([]);
+    expect(notOldest(t, base, lock("2.5.0"), "{}")).toEqual([expect.objectContaining({ path: "node_modules/new", version: "2.5.0" })]);
+    expect(notOldest(t, base, fixed("1.1.0", { "node_modules/stray": { version: "1.0.0" } }), "{}")).toEqual([{ path: "node_modules/stray", name: "stray", version: "1.0.0", requirements: [], answers: [] }]);
+  });
+  it("not-oldest-allows: V, a version the base locks, a path that did not change, an alias's target, and a project's override", () => {
+    const t = table({ "dep@^1.1.0": "1.1.0", "real@^1.0.0": "1.0.0", "over@2.0.0": "2.0.0" });
+    expect(notOldest(t, base, fixed("1.1.0", { "node_modules/x/node_modules/fixed": { version: "1.0.1" } }), "{}").filter(w => w.name === "fixed")).toEqual([]);
+    expect(notOldest(t, base, fixed("1.1.0", { "node_modules/copy/node_modules/kept": { version: "3.0.0" } }), "{}")).toEqual([]);
+    const alias = lockOf({ "node_modules/fixed": { version: "1.0.1", dependencies: { dep: "^1.1.0", mine: "npm:real@^1.0.0" } }, "node_modules/dep": { version: "1.1.0" }, "node_modules/kept": { version: "3.0.0" }, "node_modules/mine": { name: "real", version: "1.0.0" } });
+    expect(notOldest(t, base, alias, "{}")).toEqual([]);
+    // An alias of another package gets that package's answer, not one for the name at the path.
+    const swapped = lockOf({ "node_modules/fixed": { version: "1.0.1", dependencies: { dep: "^1.1.0", mine: "npm:real@^1.0.0" } }, "node_modules/dep": { version: "1.1.0" }, "node_modules/kept": { version: "3.0.0" }, "node_modules/mine": { name: "other", version: "1.0.0" } });
+    expect(notOldest(t, base, swapped, "{}")).toEqual([expect.objectContaining({ name: "other", requirements: [] })]);
+    const over = lockOf({ "node_modules/fixed": { version: "1.0.1", dependencies: { dep: "^1.1.0", over: "^1.0.0" } }, "node_modules/dep": { version: "1.1.0" }, "node_modules/kept": { version: "3.0.0" }, "node_modules/over": { version: "2.0.0" } });
+    expect(notOldest(t, base, over, JSON.stringify({ overrides: { over: "2.0.0" } }))).toEqual([]);
+    expect(notOldest(t, base, over, "{}")).toEqual([expect.objectContaining({ name: "over" })]);
+  });
+  it("not-oldest-t-from-osv: the PR job takes the fix's advisories from OSV, not from anything the artifact says", async () => {
+    // V 2.0.0 was published in 2022. A version of dep from 2023 is the only one in range. OSV's advisory, from 2024, moves T past it.
+    const docs = { fixed: doc({ "1.0.0": "2020-01-01T00:00:00.000Z", "2.0.0": "2022-01-01T00:00:00.000Z" }, { "2.0.0": { dependencies: { dep: "^1.1.0" } } }), dep: doc({ "1.1.0": "2023-01-01T00:00:00.000Z" }) };
+    const before = lockOf({ "node_modules/fixed": { version: "1.0.0" } }), after = lockOf({ "node_modules/fixed": { version: "2.0.0", dependencies: { dep: "^1.1.0" } }, "node_modules/dep": { version: "1.1.0" } });
+    const input = { plan: [{ name: "fixed", from: "1.0.0", to: "2.0.0" }], beforeLock: before, afterLock: after, finalManifest: "{}" };
+    const world = (published: string | null, osv: Record<string, string[]> = { "fixed@1.0.0": ["GHSA-a-0001"] }): typeof fetch => async (url, init) => {
+      const u = decodeURIComponent(String(url));
+      if (u.startsWith("https://api.osv.dev/v1/vulns/")) return json({ id: u.split("/").at(-1), affected: [], aliases: [], ...(published ? { published } : {}) });
+      return fetchOf({ docs, osv })(url, init);
+    };
+    expect(await recheckOldest({ ...input, fetchFn: world("2024-01-01T00:00:00Z") })).toBeNull();
+    // No such advisory time: T is V's, the one version is after it, and nothing is left.
+    expect(await recheckOldest({ ...input, fetchFn: world(null) })).toContain("is none");
+    // An advisory that also names the version moved to is not one the fix closes, so it does not move T.
+    expect(await recheckOldest({ ...input, fetchFn: world("2024-01-01T00:00:00Z", { "fixed@1.0.0": ["GHSA-a-0001"], "fixed@2.0.0": ["GHSA-a-0001"] }) })).toContain("is none");
   });
 });
 

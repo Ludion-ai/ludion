@@ -3,7 +3,7 @@
   "package": "@sentry/nestjs 8.48.0 -> 8.49.0",
   "lold_outcome": "stopped_no_allowed",
   "t": "2025-01-28T20:37:26.000Z",
-  "table_seconds": 14.945,
+  "table_seconds": 13.148,
   "table_requirements": 77,
   "table_without_answer": [
     {

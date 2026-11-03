@@ -1631,6 +1631,18 @@ describe("npm fixes take the oldest version in range", () => {
     expect(fix?.reason).toContain("helper@1.2.0 at node_modules/helper is not a version the table");
     expect(tests.count).toBe(1);
   });
+  it("patch-answer-per-requirement: a version the table gives for another range of the name is no answer for what loads it", async () => {
+    // lodash's optional dependency requires helper ^1.2.0, so the table has 1.2.0 too; npm's lockfile has no opt, and helper 1.2.0 loaded for ^1.1.0.
+    const manifest = needs("^1.1.0", (name, version) => name === "lodash" && version === "4.17.21" ? { optionalDependencies: { opt: "^1.0.0" } } : name === "opt" ? { dependencies: { helper: "^1.2.0" } } : {});
+    const tests = { count: 0 }, seen: { table?: Record<string, unknown> } = {};
+    const result = await run(npm("^1.1.0", "1.2.0", undefined, seen), registry({ helper: HELPER, opt: { created: "2015-01-01T00:00:00.000Z", versions: { "1.0.0": "2015-01-01T00:00:00.000Z" } } }, manifest), tests);
+    expect(seen.table).toMatchObject({ "helper@^1.1.0": "1.1.0", "helper@^1.2.0": "1.2.0" });
+    const fix = result.receipt?.fixes[0];
+    expect(fix?.resolution?.assert?.problems).toEqual([]);
+    expect(fix).toMatchObject({ outcome: "failed", branch: null, candidate_passed: false });
+    expect(fix?.reason).toContain("helper@1.2.0 at node_modules/helper is not the table's answer for what loads it (helper@^1.1.0)");
+    expect(tests.count).toBe(1);
+  });
   it("patch-keeps-locked: a version that still satisfies the range and moves stops the fix", async () => {
     const result = await run(npm("^1.0.0", "1.1.0"), registry({ helper: HELPER }, needs("^1.0.0")));
     expect(result.receipt?.fixes[0]?.reason).toContain("moved packages that were not planned (helper@1.0.0)");

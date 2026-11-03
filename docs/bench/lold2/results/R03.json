@@ -3,7 +3,7 @@
   "package": "next 15.5.6 -> 15.5.7",
   "lold_outcome": "built",
   "t": "2025-12-03T19:07:11.000Z",
-  "table_seconds": 4.501,
+  "table_seconds": 4.503,
   "table_requirements": 22,
   "table_without_answer": [
     {
@@ -59,7 +59,7 @@
         "version": "15.5.7",
         "role": "oldest",
         "published_at": "2025-12-03T15:26:12.822Z",
-        "age_hours": 8025.6
+        "age_hours": 8026.3
       },
       {
         "path": "node_modules/@next/swc-darwin-arm64",
@@ -67,7 +67,7 @@
         "version": "15.5.7",
         "role": "oldest",
         "published_at": "2025-12-03T15:24:28.388Z",
-        "age_hours": 8025.6
+        "age_hours": 8026.4
       },
       {
         "path": "node_modules/@next/swc-darwin-x64",
@@ -75,7 +75,7 @@
         "version": "15.5.7",
         "role": "oldest",
         "published_at": "2025-12-03T15:24:28.836Z",
-        "age_hours": 8025.6
+        "age_hours": 8026.4
       },
       {
         "path": "node_modules/@next/swc-linux-arm64-gnu",
@@ -83,7 +83,7 @@
         "version": "15.5.7",
         "role": "oldest",
         "published_at": "2025-12-03T15:24:41.883Z",
-        "age_hours": 8025.6
+        "age_hours": 8026.4
       },
       {
         "path": "node_modules/@next/swc-linux-arm64-musl",
@@ -91,7 +91,7 @@
         "version": "15.5.7",
         "role": "oldest",
         "published_at": "2025-12-03T15:24:42.572Z",
-        "age_hours": 8025.6
+        "age_hours": 8026.4
       },
       {
         "path": "node_modules/@next/swc-linux-x64-gnu",
@@ -99,7 +99,7 @@
         "version": "15.5.7",
         "role": "oldest",
         "published_at": "2025-12-03T15:24:58.096Z",
-        "age_hours": 8025.6
+        "age_hours": 8026.4
       },
       {
         "path": "node_modules/@next/swc-linux-x64-musl",
@@ -107,7 +107,7 @@
         "version": "15.5.7",
         "role": "oldest",
         "published_at": "2025-12-03T15:24:58.926Z",
-        "age_hours": 8025.6
+        "age_hours": 8026.4
       },
       {
         "path": "node_modules/@next/swc-win32-arm64-msvc",
@@ -115,7 +115,7 @@
         "version": "15.5.7",
         "role": "oldest",
         "published_at": "2025-12-03T15:25:09.744Z",
-        "age_hours": 8025.6
+        "age_hours": 8026.4
       },
       {
         "path": "node_modules/@next/swc-win32-x64-msvc",
@@ -123,7 +123,7 @@
         "version": "15.5.7",
         "role": "oldest",
         "published_at": "2025-12-03T15:25:13.908Z",
-        "age_hours": 8025.6
+        "age_hours": 8026.4
       },
       {
         "path": "node_modules/next",
@@ -131,10 +131,12 @@
         "version": "15.5.7",
         "role": "v",
         "published_at": "2025-12-03T15:26:07.201Z",
-        "age_hours": 8025.6
+        "age_hours": 8026.3
       }
     ]
   },
+  "not_oldest": [],
+  "pr_job_recheck": null,
   "outcome": "built",
   "resolution_answers": [
     {

@@ -3,7 +3,7 @@
   "package": "@sentry/nextjs 8.48.0 -> 8.49.0",
   "lold_outcome": "stopped_no_allowed",
   "t": "2025-01-28T20:37:26.000Z",
-  "table_seconds": 84.255,
+  "table_seconds": 79.29,
   "table_requirements": 589,
   "table_without_answer": [
     {

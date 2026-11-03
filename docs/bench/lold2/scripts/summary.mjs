@@ -22,6 +22,8 @@ const summary = {
   unneeded_moves: built.reduce((sum, r) => sum + r.unneeded_moves.length, 0),
   new_unmet: built.reduce((sum, r) => sum + r.new_unmet.length, 0),
   assert_problems: built.reduce((sum, r) => sum + r.assert.problems.length, 0),
+  not_oldest: built.reduce((sum, r) => sum + r.not_oldest.length, 0),
+  pr_job_recheck_refused: built.filter(r => r.pr_job_recheck).map(r => [r.id, r.pr_job_recheck]),
   npm_ci_dry_run_not_zero: built.filter(r => r.npm_ci_dry_run !== 0).map(r => r.id),
   npm_ls_problems: built.filter(r => r.npm_ls_problems !== 0).map(r => [r.id, r.npm_ls_problems]),
   lock_changed_by_npm_install: built.filter(r => !r.lock_unchanged || r.npm_install_again !== 0).map(r => r.id),

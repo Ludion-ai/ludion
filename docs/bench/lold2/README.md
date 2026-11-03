@@ -6,7 +6,7 @@ The definitions are in docs/decisions/2026-11-03-oldest-resolution-in-product.md
 
 | Path | What it is |
 |---|---|
-| `scripts/run.mjs` | The product's `resolveOldest`, script, `unneededMoves`, judge and asserts on LOLD's 24 examples, with the real npm 12.2.1, the real registry and the real OSV. The one difference from the product: the script starts the npm in `/vol/npm12` rather than the image's global one |
+| `scripts/run.mjs` | The product's `resolveOldest`, script, `unneededMoves`, `notOldest`, `recheckOldest`, judge and asserts on LOLD's 24 examples, with the real npm 12.2.1, the real registry and the real OSV. The one difference from the product: the script starts the npm in `/vol/npm12` rather than the image's global one |
 | `scripts/context.mjs` | Writes the Docker build context `ludion patch` writes for one fix, to build the real Dockerfile |
 | `scripts/summary.mjs` | Counts from `results/`, with no network |
 | `scripts/mutate.mjs` | Breaks each check in turn in the Docker volume's copy; the tests must fail |
@@ -23,4 +23,6 @@ docker run --rm --user node --cap-drop ALL --memory 4g -e HOME=/vol/home -v <wor
 docker run --rm --user node --cap-drop ALL --memory 4g --network none -e HOME=/vol/home -v <worktree>:/w:ro -v <volume>:/vol -w /vol/app node:24 node /w/docs/bench/lold2/scripts/mutate.mjs /vol/lold2/mutations.json
 ```
 
-The registry and OSV change every day, so a later run can differ. In an earlier run of the same day, R11 failed on `api.osv.dev answered HTTP 503` and passed when run again; the fix's reason said so, and `results/` holds the later whole run, in which no such failure came.
+The registry and OSV change every day, so a later run can differ. `run.mjs` has no retry: in the run behind `results/`, R09 failed on `api.osv.dev answered HTTP 503` and passed when run again, and `results/` holds the later run. That run took two sittings, since the first stopped at its time limit after 16 examples. In an earlier run of the same day, R11 failed the same way.
+
+`mutate.mjs` takes a first index and an index to stop before, since the whole list is longer than one sitting. `mutations.json` is the two parts of its last run put together.

@@ -3,7 +3,7 @@
   "package": "@react-native-community/cli-server-api 19.1.1 -> 19.1.2",
   "lold_outcome": "stopped_no_allowed",
   "t": "2025-11-05T21:56:39.769Z",
-  "table_seconds": 13.469,
+  "table_seconds": 10.14,
   "table_requirements": 117,
   "table_without_answer": [
     {

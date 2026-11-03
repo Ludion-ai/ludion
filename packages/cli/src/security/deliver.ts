@@ -8,7 +8,7 @@ import { publicArchiveUrl } from "./acquisition.ts";
 import { fixBranchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { registryManifest } from "./npm-facts.ts";
-import { unneededMoves } from "./oldest.ts";
+import { recheckOldest, unneededMoves } from "./oldest.ts";
 import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
 import { DECLARED, lockEntries, lockKey, newUnmetRequirements, readLock, requiredNames, requireName, resolveFrom, type Judgement, type LockEntry } from "./judge.ts";
 import semver from "semver";
@@ -450,6 +450,21 @@ async function npmAgain(top: string, prefix: string, base: string, fix: CheckedF
   }
 }
 
+/**
+ * npm: every version the fix brings in, other than its own, is the oldest in range now, worked out here from the registry's
+ * metadata and OSV (oldest.ts, recheckOldest), not read from the receipt. npmLockProblem lets a path move when a requirement
+ * needs it; this is what holds the version it moves to, so a forged artifact cannot pick a later one in range. A read that
+ * fails refuses the fix. No package's code runs (docs/decisions/2026-11-03-oldest-resolution-in-product.md, section 5).
+ */
+async function oldestAgain(top: string, prefix: string, base: string, fix: CheckedFix, check: typeof recheckOldest): Promise<string | null> {
+  try {
+    const read = (rev: string, name: string) => git(top, ["cat-file", "blob", `${rev}:${prefix}${name}`]).stdout;
+    return await check({ plan: fix.changes, beforeLock: read(base, "package-lock.json"), afterLock: read(fix.commit, "package-lock.json"), finalManifest: read(fix.commit, "package.json") });
+  } catch (error) {
+    return `the oldest versions could not be worked out: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;
+  }
+}
+
 /** composer.lock: why it says more than the fix, or null. See contentProblem. */
 function composerLockProblem(old: string | null, now: string | null, fix: CheckedFix): string | null {
   if (old === null || now === null) return "composer.lock is missing.";
@@ -870,7 +885,7 @@ async function imageAgain(top: string, prefix: string, fix: CheckedFix, reposito
  * The PR job: checks the artifact, then for each fix, unless a PR from its branch exists, pushes the branch (never moving
  * one that exists at another commit) and opens one PR into the default branch. A fix that fails stops no other.
  */
-export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; npmManifest?: (name: string, version: string) => Promise<Record<string, unknown> | null>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; nodeDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
+export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; npmManifest?: (name: string, version: string) => Promise<Record<string, unknown> | null>; oldest?: typeof recheckOldest; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; nodeDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(options.repo)) throw new Error("--repo must be owner/name.");
   if (!/^https:\/\/[A-Za-z0-9.-]+(?::\d+)?(\/[A-Za-z0-9._/-]*)?$/.test(options.api) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(options.api)) throw new Error("--api must be an https URL.");
   const api: Api = { url: options.api.replace(/\/$/, ""), token: options.token, fetchFn: options.fetchFn ?? fetch };
@@ -911,10 +926,12 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
         }
       }
       // The lockfile's content, which only the registry can confirm: each moved or added entry's requirements as the
-      // registry lists them, then the judge again, here, on the base and this commit.
+      // registry lists them, each new version the oldest in range, then the judge again, here, on the base and this commit.
       if (checked.ecosystem === "npm") {
         const problem = await npmAgain(top, prefix, checked.base, fix, options.npmManifest ?? ((name, version) => registryManifest(name, version)));
         if (problem) throw new Error(`Not pushed: ${problem}`);
+        const notOldest = await oldestAgain(top, prefix, checked.base, fix, options.oldest ?? recheckOldest);
+        if (notOldest) throw new Error(`Not pushed: ${notOldest}`);
         const refusal = await judgeAgain(top, prefix, checked.base, fix, options.judgeNpm ?? ((before, after) => judgeNpmCandidate(before, after)));
         if (refusal) throw new Error(`Not pushed: the judge was run again on this commit's lockfile. ${refusal}`);
       }

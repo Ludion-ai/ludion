@@ -3,7 +3,7 @@
   "package": "lodash 4.17.20 -> 4.17.21",
   "lold_outcome": "built",
   "t": "2021-02-20T16:42:16.891Z",
-  "table_seconds": 0.043,
+  "table_seconds": 0.052,
   "table_requirements": 1,
   "table_without_answer": [],
   "moved_non_v": 0,
@@ -34,10 +34,12 @@
         "version": "4.17.21",
         "role": "v",
         "published_at": "2021-02-20T15:42:16.891Z",
-        "age_hours": 49953.4
+        "age_hours": 49954.3
       }
     ]
   },
+  "not_oldest": [],
+  "pr_job_recheck": null,
   "outcome": "built",
   "resolution_answers": [
     {

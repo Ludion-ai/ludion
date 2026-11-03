@@ -3,7 +3,7 @@
   "package": "@finos/git-proxy 1.19.1 -> 1.19.2",
   "lold_outcome": "built",
   "t": "2025-07-30T16:40:40.000Z",
-  "table_seconds": 56.183,
+  "table_seconds": 56.903,
   "table_requirements": 333,
   "table_without_answer": [
     {
@@ -335,7 +335,7 @@
         "version": "0.25.6",
         "role": "oldest",
         "published_at": "2025-07-07T16:58:55.400Z",
-        "age_hours": 11600.1
+        "age_hours": 11600.9
       },
       {
         "path": "node_modules/@esbuild/darwin-x64",
@@ -343,7 +343,7 @@
         "version": "0.25.6",
         "role": "oldest",
         "published_at": "2025-07-07T16:58:55.105Z",
-        "age_hours": 11600.1
+        "age_hours": 11600.9
       },
       {
         "path": "node_modules/@esbuild/linux-x64",
@@ -351,7 +351,7 @@
         "version": "0.25.6",
         "role": "oldest",
         "published_at": "2025-07-07T16:59:21.121Z",
-        "age_hours": 11600.1
+        "age_hours": 11600.9
       },
       {
         "path": "node_modules/@esbuild/win32-x64",
@@ -359,7 +359,7 @@
         "version": "0.25.6",
         "role": "oldest",
         "published_at": "2025-07-07T16:58:30.837Z",
-        "age_hours": 11600.1
+        "age_hours": 11600.9
       },
       {
         "path": "node_modules/@finos/git-proxy",
@@ -367,10 +367,12 @@
         "version": "1.19.2",
         "role": "v",
         "published_at": "2025-07-30T15:20:11.050Z",
-        "age_hours": 11049.8
+        "age_hours": 11050.5
       }
     ]
   },
+  "not_oldest": [],
+  "pr_job_recheck": null,
   "outcome": "built",
   "resolution_answers": [
     {

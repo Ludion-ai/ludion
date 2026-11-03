@@ -1,5 +1,5 @@
 // LOLD2: each check is broken in turn in the copy at /vol/app, and the tests must fail. Docker only, with no network.
-// Usage: node mutate.mjs <out.json>
+// Usage: node mutate.mjs <out.json> [first index] [index to stop before]
 import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 
@@ -27,7 +27,7 @@ const MUTATIONS = [
   ["a version after T passes the assert", O, 'if (role === "oldest" && at > t) problems.push(', "if (false) problems.push(", [OLD]],
   ["no publish time passes the assert", O, "problems.push(`${id} at ${c.path} has no publish time, so its age cannot be checked.`); continue;", "continue;", [OLD]],
   ["the resolution time is T alone", O, "const resolved = Math.min(t, pushed - wait);", "const resolved = t;", [OLD]],
-  ["a move needs no reason", O, "if (!loaders(is, after, path).some(loader => takes(loader.spec, name, from) === false)) problems.push(move);", "", [OLD, DEL]],
+  ["a move needs no reason", O, "if (!loadersOf(is, after, path).some(loader => takes(loader.spec, name, from) === false)) problems.push(move);", "", [OLD, DEL]],
   ["a loader that cannot be read counts as a reason", O, "takes(loader.spec, name, from) === false)", "takes(loader.spec, name, from) !== true)", [OLD]],
   ["a removal needs no reason", O, "if (!had.length || had.some(({ at }) => at === \"\" || after.get(at)?.version === was[at]?.version)) problems.push(move);", "", [OLD, DEP]],
   ["another package at the path is a move", O, "if (now && packageAt(path, now) !== name) { problems.push(move); continue; }", "", [OLD]],
@@ -39,12 +39,22 @@ const MUTATIONS = [
   ["patch gives npm no table", D, "if (plan && table) {", "if (false) {", [DEP]],
   ["npm's own install runs in place of the table's", D, 'text += run(["node", RESOLVER_SCRIPT]);\n      text += run(["cp", NPM_FINAL_MANIFEST, "package.json"]);', 'text += run(["npm", "install", "--package-lock-only", ...npmFlags]);\n      text += run(["cp", NPM_FINAL_MANIFEST, "package.json"]);', [DEP]],
   ["a failure's reason is not read from npm's error", D, "if (!key) throw error;", "throw error;", [DEP]],
+  ["patch does not hold versions to what loads them", D, "...(table ? notOldest(", "...(false ? notOldest(", [DEP]],
+  ["the PR job does not work the oldest out again", L, "if (notOldest) throw new Error(`Not pushed: ${notOldest}`);", "", [DEL]],
+  ["the PR job takes a failed read as no problem", L, "return `the oldest versions could not be worked out: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;", "return null;", [DEL]],
+  ["a version need only be some answer of its name", O, "const answers = requirements.map(key => table.answers[key]?.version ?? null);", "const answers = Object.values(table.answers).filter(a => a.name === name).map(a => a.version);", [OLD, DEP]],
+  ["an added path is not held to it", O, "if (before.get(path)?.version === version && packageAt(path, before.get(path)) === name) continue;\n    if (table.v", "if (!before.has(path) || (before.get(path)?.version === version && packageAt(path, before.get(path)) === name)) continue;\n    if (table.v", [OLD]],
+  ["a version locked elsewhere is not let through", O, "if (table.v[name]?.includes(version) || locked.has(`${name}@${version}`)) continue;", "if (table.v[name]?.includes(version)) continue;", [OLD]],
+  ["V is not let through", O, "if (table.v[name]?.includes(version) || locked.has(`${name}@${version}`)) continue;", "if (locked.has(`${name}@${version}`)) continue;", [OLD, DEL]],
+  ["the recheck stops at the first read of nothing new", O, "if (!possible.length) return null;\n  const ids", "if (possible.length) return null;\n  const ids", [OLD, DEL]],
+  ["the recheck finds nothing wrong", O, "if (!wrong.length) return null;", "return null;", [DEL]],
+  ["the recheck's advisories include what still names V", O, "const closed = (ids.get(`${change.name}@${change.from}`) ?? []).filter(id => !after.has(id));", "const closed = ids.get(`${change.name}@${change.from}`) ?? [];", [OLD]],
   ["the PR job does not check moves", L, "if (unneeded.length) return", "if (false) return", [DEL]],
   ["the PR job takes moves nothing reaches", L, "if (strayMoves.length) return", "if (false) return", [DEL]],
   ["the PR job takes any other change as a move", L, 'if (kinds.get(path) !== "install" || before.link || after.link || before.version === after.version) return', "if (false) return", [DEL]],
 ];
-const results = [];
-for (const [what, file, from, to, tests] of MUTATIONS) {
+const results = [], [out, start = "0", end = String(MUTATIONS.length)] = process.argv.slice(2);
+for (const [what, file, from, to, tests] of MUTATIONS.slice(Number(start), Number(end))) {
   const original = readFileSync(file, "utf8");
   if (original.split(from).length !== 2) { results.push({ what, file, caught: null, note: "the text to change is not there once" }); console.log(JSON.stringify(results.at(-1))); continue; }
   writeFileSync(file, original.replace(from, () => to));
@@ -54,5 +64,5 @@ for (const [what, file, from, to, tests] of MUTATIONS) {
   results.push({ what, file: file.split("/").at(-1), caught: run.status !== 0, by: failed });
   console.log(JSON.stringify(results.at(-1)));
 }
-writeFileSync(process.argv[2], `${JSON.stringify({ total: results.length, caught: results.filter(r => r.caught).length, results }, null, 2)}\n`);
+writeFileSync(out, `${JSON.stringify({ total: results.length, caught: results.filter(r => r.caught).length, results }, null, 2)}\n`);
 console.log(`caught ${results.filter(r => r.caught).length} of ${results.length}`);

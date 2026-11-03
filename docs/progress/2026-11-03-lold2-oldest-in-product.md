@@ -9,6 +9,7 @@ The first item of C12. Definitions: docs/decisions/2026-11-03-oldest-resolution-
 - **Stopping.** When nothing is left and npm's run fails on it, the fix stops with the requirement and the counts, and `fixes[].resolution.stopped_no_allowed` is true. No newer or excluded version is taken.
 - **The asserts,** on the diff as npm wrote it, in `fixes[].resolution.assert`: each version's age against the judge's wait, with the youngest setting the line; every version other than V, a locked one or V's same release published at or before T; every version one the table gave. A failure stops that fix.
 - **What may move.** npm's `unplannedRemovals` check, and the PR job's refusal of any other entry that moves, stopped every fix whose V needs a sibling at a higher version. Both now read `unneededMoves`: a path moves only when a package that loads it no longer takes its old version, and goes away only when all that loaded it has moved or gone. Composer keeps `unplannedRemovals`. In the PR job, a moved entry must be reached from the planned paths and is compared with the registry, as an added one is.
+- **The PR job works the oldest out again.** That loosened check would otherwise rest on the validation job alone, whose artifact the PR job treats as untrusted (an audit of the first head found this; the decision's added section says what changed). `recheckOldest` calls the same `resolveOldest` from the registry's metadata and OSV, taking the advisories from OSV rather than the receipt, and `notOldest` refuses a fix when a version it brings in, other than V or one the base locks, is not the answer for a requirement of what loads it. `ludion patch` holds the same check. It runs no package's code, and sends only names and versions, and back to OSV the IDs it returned.
 
 Nothing here changes the wait table or a gate's numeric criteria.
 
@@ -25,10 +26,11 @@ No test leaves the machine. They read packument copies recorded on 2026-11-03 (p
 | A locked version does not move | `oldest-keeps-locked`, `moves-forced`, `moves-unneeded`, `moves-removed`, `patch-keeps-locked` |
 | The youngest version sets the line | `assert-youngest-sets-the-line`, `patch-waits`, `patch-age-assert` |
 | The resolution time, a push too early, the landing version | `assert-resolution-time`, `assert-push-too-early`, `assert-landing`, `assert-landing-stops`, `patch-landing` |
+| The PR job refuses a forged later version | `pr-job-rechecks-moved-version-is-oldest`, `not-oldest-reads-the-loader's-range`, `not-oldest-added`, `not-oldest-allows`, `not-oldest-t-from-osv`, `patch-answer-per-requirement` |
 
-Counts, in Docker with no network, on the tree of this record: `npm run typecheck` passes, `npm run build` passes, and `npm test` gives 50 files and 2,329 tests passed, with 1 file and 30 tests skipped. New: 33 in packages/cli/test/oldest.test.ts, 11 in dependencies.test.ts, and 1 in deliver.test.ts, whose existing test of npm's lockfile rule also has new cases for a moved entry. One existing expectation changed: the order of the resolver's steps in dependencies.test.ts names the new script.
+Counts, in Docker with no network, on the tree of this record: `npm run typecheck` passes, `npm run build` passes, and `npm test` gives 50 files and 2,335 tests passed, with 1 file and 30 tests skipped. New: 37 in packages/cli/test/oldest.test.ts, 12 in dependencies.test.ts, and 2 in deliver.test.ts, whose existing test of npm's lockfile rule also has new cases for a moved entry. One existing expectation changed: the order of the resolver's steps in dependencies.test.ts names the new script.
 
-**Mutations:** 36 of 36 caught (docs/bench/lold2/mutations.json), each a check broken in turn with the tests then run. On the first run 34 of 36: one mutation's text did not match, and the age assert's stop was never reached because the judge's own wait comes first. `patch-age-assert` now holds it, by a registry whose answer changes between the two reads.
+**Mutations:** 46 of 46 caught (docs/bench/lold2/mutations.json), each a check broken in turn with the tests then run. On the first run of the first head's 36, 34: one mutation's text did not match, and the age assert's stop was never reached because the judge's own wait comes first. `patch-age-assert` now holds it, by a registry whose answer changes between the two reads.
 
 ## The real run
 
@@ -43,6 +45,7 @@ The product's code on LOLD's 24 examples, with the real npm 12.2.1, the real reg
 
 - **Every outcome** is the same as LOLD's, in all 24.
 - **In the 13 built:** 40 versions moved; 0 unneeded moves, 0 requirements left unmet, 0 assert problems; `npm ci --dry-run` exits 0, `npm ls` reports no problem, and `npm install --package-lock-only` exits 0 and leaves each lockfile byte for byte the same.
+- **The PR job's check on the 13 built:** `notOldest` found 0, and `recheckOldest`, with its own table and OSV's advisories and times, refused 0, so no real lockfile here was refused by it. In the 24 examples this run took two sittings: the first stopped at its time limit after 16, on which R09 failed with `api.osv.dev answered HTTP 503`, and the rest, with R09 again, ran next.
 - **The judge on the 13 built:** 9 `ready_except_build`, 4 `stop`. In three (R01, R03, R04) V itself is deprecated today, which is hindsight: the real command's next-fix rule looks at that before the candidate, and this run does not run it. **In one (R19) a version this rule chose is what stops it:** gate 1 stops `create-hash` going down from 1.2.0 to 1.1.3 at a new nested path, and `hash-base` and `ripemd160` the same way, since pbkdf2 3.1.3 requires a lower range than the copies already locked. Whether the judge stops npm's normal lockfile for R19 too was not run. Gate 1 is unchanged.
 - **The table:** 1 to 589 requirements, and 0.04 to 84 seconds to write.
 
@@ -53,7 +56,9 @@ The product's code on LOLD's 24 examples, with the real npm 12.2.1, the real reg
 - **A whole `ludion patch` run was not done** with the new code: its steps ran as above, and the command itself ran with a stand-in for Docker in the tests. No run on GitHub either.
 - **That the oldest version works.** Gate 3 is as it was. A project's own tests are all that run on it, as for any fix.
 - **A rate.** LOLD's examples were chosen for having a new or changed range, with each base one dependency taken when new, and with today's advisories and deprecations rather than T's.
-- **The PR job works out no table,** so a forged artifact whose moved version is not the oldest but is in range, old enough and passes the judge is not refused there. The validation job holds this.
+- **That V itself is the smallest fixed version, in the PR job.** It takes V from the receipt, checked against the lockfile and the branch name, as it did on main. A forged artifact that names a later V is still held only by the judge, the wait and the checks on what V requires.
+- **A version the base locks** can be placed at a moved path without being the answer for what loads it: it brings in no new code, and the judge still reads it.
+- **How long the PR job's check takes on a large fix.** Writing the table took up to 84 seconds here, and it now runs in the PR job too, whose time limit is 15 minutes. A job that runs out fails, and nothing is pushed for the fixes it did not reach.
 
 ## The two lines
 

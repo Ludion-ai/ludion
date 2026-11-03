@@ -3,7 +3,7 @@
   "package": "react-server-dom-webpack 19.1.1 -> 19.1.2",
   "lold_outcome": "built",
   "t": "2025-12-03T19:07:39.000Z",
-  "table_seconds": 6.641,
+  "table_seconds": 6.166,
   "table_requirements": 10,
   "table_without_answer": [
     {
@@ -47,7 +47,7 @@
         "version": "19.2.0",
         "role": "oldest",
         "published_at": "2025-10-01T21:38:32.757Z",
-        "age_hours": 9531.4
+        "age_hours": 9532.1
       },
       {
         "path": "node_modules/react-dom",
@@ -55,7 +55,7 @@
         "version": "19.2.0",
         "role": "oldest",
         "published_at": "2025-10-01T21:38:42.388Z",
-        "age_hours": 9531.4
+        "age_hours": 9532.1
       },
       {
         "path": "node_modules/react-server-dom-webpack",
@@ -63,7 +63,7 @@
         "version": "19.1.2",
         "role": "v",
         "published_at": "2025-12-03T15:32:24.004Z",
-        "age_hours": 8025.5
+        "age_hours": 8026.2
       },
       {
         "path": "node_modules/scheduler",
@@ -71,10 +71,12 @@
         "version": "0.27.0",
         "role": "oldest",
         "published_at": "2025-10-01T21:39:15.208Z",
-        "age_hours": 9531.4
+        "age_hours": 9532.1
       }
     ]
   },
+  "not_oldest": [],
+  "pr_job_recheck": null,
   "outcome": "built",
   "resolution_answers": [
     {

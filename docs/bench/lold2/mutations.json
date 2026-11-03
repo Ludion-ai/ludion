@@ -1,6 +1,6 @@
 {
-  "total": 36,
-  "caught": 36,
+  "total": 46,
+  "caught": 46,
   "results": [
     {
       "what": "newest first instead of oldest",
@@ -199,6 +199,66 @@
       "file": "dependency-patch.ts",
       "caught": true,
       "by": "npm fixes take the oldest version in range > patch-nothing-left: npm's run fails on a requirement with nothing allowed, and the fix stops wi"
+    },
+    {
+      "what": "patch does not hold versions to what loads them",
+      "file": "dependency-patch.ts",
+      "caught": true,
+      "by": "npm fixes take the oldest version in range > patch-answer-per-requirement: a version the table gives for another range of the name is no ans"
+    },
+    {
+      "what": "the PR job does not work the oldest out again",
+      "file": "deliver.ts",
+      "caught": true,
+      "by": "the PR job refuses an artifact the validation job would not write > pr-job-rechecks-moved-version-is-oldest: a forged artifact that moves a "
+    },
+    {
+      "what": "the PR job takes a failed read as no problem",
+      "file": "deliver.ts",
+      "caught": true,
+      "by": "the PR job refuses an artifact the validation job would not write > pr-job-rechecks-moved-version-is-oldest: a forged artifact that moves a "
+    },
+    {
+      "what": "a version need only be some answer of its name",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "every new version is the answer for what loads it > not-oldest-reads-the-loader's-range: the answer for the range that loads it passes; a la"
+    },
+    {
+      "what": "an added path is not held to it",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "every new version is the answer for what loads it > not-oldest-added: an added copy is held to it too, and one nothing loads is refused"
+    },
+    {
+      "what": "a version locked elsewhere is not let through",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "every new version is the answer for what loads it > not-oldest-allows: V, a version the base locks, a path that did not change, an alias's t"
+    },
+    {
+      "what": "V is not let through",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the PR job refuses an artifact the validation job would not write > pr-job-rechecks-moved-version-is-oldest: a forged artifact that moves a "
+    },
+    {
+      "what": "the recheck stops at the first read of nothing new",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the PR job refuses an artifact the validation job would not write > pr-job-rechecks-moved-version-is-oldest: a forged artifact that moves a "
+    },
+    {
+      "what": "the recheck finds nothing wrong",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the PR job refuses an artifact the validation job would not write > pr-job-rechecks-moved-version-is-oldest: a forged artifact that moves a "
+    },
+    {
+      "what": "the recheck's advisories include what still names V",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "every new version is the answer for what loads it > not-oldest-t-from-osv: the PR job takes the fix's advisories from OSV, not from anything"
     },
     {
       "what": "the PR job does not check moves",

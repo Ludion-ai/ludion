@@ -3,7 +3,7 @@
   "package": "@node-saml/node-saml 5.0.1 -> 5.1.0",
   "lold_outcome": "built",
   "t": "2025-07-25T14:08:50.000Z",
-  "table_seconds": 2.205,
+  "table_seconds": 1.903,
   "table_requirements": 23,
   "table_without_answer": [
     {
@@ -59,7 +59,7 @@
         "version": "5.1.0",
         "role": "v",
         "published_at": "2025-07-21T23:28:29.433Z",
-        "age_hours": 11257.6
+        "age_hours": 11258.4
       },
       {
         "path": "node_modules/xml-crypto",
@@ -67,10 +67,12 @@
         "version": "6.1.2",
         "role": "oldest",
         "published_at": "2025-04-24T18:06:21.759Z",
-        "age_hours": 13375
+        "age_hours": 13375.8
       }
     ]
   },
+  "not_oldest": [],
+  "pr_job_recheck": null,
   "outcome": "built",
   "resolution_answers": [
     {

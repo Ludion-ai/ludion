@@ -376,6 +376,84 @@ export function resolutionAssert(input: { table: ResolutionTable; changes: { pat
 /** A path that changed without need; `to` is null when it went away. */
 export type UnneededMove = { path: string; name: string; from: string; to: string | null };
 
+const installs = (lock: Record<string, any>) => new Map(Object.entries(lock).filter(([path, item]) => path !== "" && isObject(item) && lockKey(path, item) === "install" && !item.link));
+const packageAt = (path: string, item: Record<string, any>): string => typeof item.name === "string" ? item.name : requireName(path);
+/** Each package in a lock that loads `path` for the name at its end, by Node's lookup, with the spec it writes. An optional peer is not one. */
+function loadersOf(lock: Record<string, any>, map: Map<string, any>, path: string): { at: string; spec: unknown }[] {
+  const name = requireName(path), target = map.get(path), out: { at: string; spec: unknown }[] = [];
+  for (const [at, item] of Object.entries(lock)) {
+    if (!isObject(item) || item.link || (at !== "" && lockKey(at, item) !== "install")) continue;
+    const meta = isObject(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {};
+    const groups = at === "" ? ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"] : ["dependencies", "optionalDependencies", "peerDependencies"];
+    for (const group of groups) {
+      if (!isObject(item[group]) || !Object.hasOwn(item[group], name)) continue;
+      if (group === "peerDependencies" && Object.hasOwn(meta, name) && meta[name]?.optional === true) continue;
+      if (resolveFrom(map, at ? `${at}/` : "", name) === target) out.push({ at, spec: item[group][name] });
+    }
+  }
+  return out;
+}
+
+/** A version the fix brings in that no package loading it would get from the table. */
+export type NotOldest = { path: string; name: string; version: string; requirements: string[]; answers: string[] };
+
+/**
+ * Versions in the diff that are not the table's answer for a requirement of a package that loads them: every path that
+ * moved or was added, other than V and a version the base already locks, which brings in no new code. Per requirement, so
+ * a version the table gives for another range of the name is no answer here. Read in `ludion patch` and, from a table it
+ * works out itself, in the PR job.
+ */
+export function notOldest(table: Pick<ResolutionTable, "answers" | "v">, beforeLock: string, afterLock: string, finalManifest: string): NotOldest[] {
+  const was = readLock(beforeLock), is = readLock(afterLock), before = installs(was), after = installs(is);
+  const locked = new Set([...before].map(([path, item]) => `${packageAt(path, item)}@${item.version}`));
+  const overrides = overridden(JSON.parse(finalManifest).overrides);
+  const out: NotOldest[] = [];
+  for (const [path, item] of after) {
+    const name = packageAt(path, item), version = String(item.version);
+    if (before.get(path)?.version === version && packageAt(path, before.get(path)) === name) continue;
+    if (table.v[name]?.includes(version) || locked.has(`${name}@${version}`)) continue;
+    const requirements = [...new Set([
+      ...loadersOf(is, after, path).map(loader => registryRequirement(requireName(path), loader.spec)).filter((r): r is Requirement => !!r && r.name === name),
+      ...overrides.filter(r => r.name === name),
+    ].map(keyOf))];
+    const answers = requirements.map(key => table.answers[key]?.version ?? null);
+    if (!answers.includes(version)) out.push({ path, name, version, requirements, answers: answers.filter((a): a is string => a !== null) });
+  }
+  return out;
+}
+
+/**
+ * The PR job's own reading (the decision, section 5): nothing in the artifact counts. From the lockfiles Ludion checked,
+ * the registry's metadata and OSV alone, the table is worked out again and every new version held against it. The fix's
+ * advisories are OSV's: those on the version moved from that do not name the version moved to, as the judge reads them.
+ * Only names and versions, and back to OSV the IDs it returned, are sent, and no package's code is run. Returns why the
+ * fix is refused, or null. A read that fails throws. A fix that brings in nothing new reads nothing.
+ */
+export async function recheckOldest(input: { plan: { name: string; from: string; to: string }[]; beforeLock: string; afterLock: string; finalManifest: string; fetchFn?: typeof fetch }): Promise<string | null> {
+  const fetchFn = input.fetchFn ?? fetch;
+  const possible = notOldest({ answers: {}, v: Object.fromEntries(input.plan.map(c => [c.name, input.plan.filter(o => o.name === c.name).map(o => o.to)])) }, input.beforeLock, input.afterLock, input.finalManifest);
+  if (!possible.length) return null;
+  const ids = await osvIds(input.plan.flatMap(c => [{ name: c.name, version: c.from }, { name: c.name, version: c.to }]), fetchFn);
+  const records = new OsvClient(fetchFn), findings: Finding[] = [];
+  const plan: Change[] = [];
+  for (const change of input.plan) {
+    const after = new Set(ids.get(`${change.name}@${change.to}`) ?? []);
+    const closed = (ids.get(`${change.name}@${change.from}`) ?? []).filter(id => !after.has(id));
+    const live: string[] = [];
+    for (const id of closed) {
+      const advisory = await records.advisory(id);
+      if (advisory.withdrawn) continue;
+      live.push(id);
+      findings.push({ package: { ecosystem: "npm", name: change.name, version: change.from, direct: false }, advisory });
+    }
+    plan.push({ name: change.name, from: change.from, to: change.to, advisories: live });
+  }
+  const table = await resolveOldest({ plan, baseLock: input.beforeLock, finalManifest: input.finalManifest, findings, fetchFn });
+  const wrong = notOldest(table, input.beforeLock, input.afterLock, input.finalManifest);
+  if (!wrong.length) return null;
+  return `package-lock.json has ${wrong.slice(0, 3).map(w => `${plain(w.name)}@${plain(w.version)} at ${plain(w.path)}, where the oldest version in range for ${plain(w.requirements.join(", ")) || "no requirement"} is ${plain(w.answers.join(", ")) || "none"}`).join("; ")}${wrong.length > 3 ? ` (${wrong.length - 3} more)` : ""}.`;
+}
+
 /** Whether a spec takes a version; null when it is not a semver range (a tag, Git, a URL), so it cannot be shown either way. */
 function takes(rawSpec: unknown, name: string, version: string): boolean | null {
   const requirement = registryRequirement(name, rawSpec);
@@ -392,24 +470,7 @@ function takes(rawSpec: unknown, name: string, version: string): boolean | null 
  */
 export function unneededMoves(beforeLock: string, afterLock: string, plan: { name: string; from: string }[]): UnneededMove[] {
   const was = readLock(beforeLock), is = readLock(afterLock);
-  const installs = (lock: Record<string, any>) => new Map(Object.entries(lock).filter(([path, item]) => path !== "" && isObject(item) && lockKey(path, item) === "install" && !item.link));
   const before = installs(was), after = installs(is);
-  const packageAt = (path: string, item: Record<string, any>) => typeof item.name === "string" ? item.name : requireName(path);
-  /** Each package in a lock that loads `path` for the name at its end, by Node's lookup, with the spec it writes. */
-  const loaders = (lock: Record<string, any>, map: Map<string, any>, path: string) => {
-    const name = requireName(path), target = map.get(path), out: { at: string; spec: unknown }[] = [];
-    for (const [at, item] of Object.entries(lock)) {
-      if (!isObject(item) || item.link || (at !== "" && lockKey(at, item) !== "install")) continue;
-      const meta = isObject(item.peerDependenciesMeta) ? item.peerDependenciesMeta : {};
-      const groups = at === "" ? ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"] : ["dependencies", "optionalDependencies", "peerDependencies"];
-      for (const group of groups) {
-        if (!isObject(item[group]) || !Object.hasOwn(item[group], name)) continue;
-        if (group === "peerDependencies" && Object.hasOwn(meta, name) && meta[name]?.optional === true) continue;
-        if (resolveFrom(map, at ? `${at}/` : "", name) === target) out.push({ at, spec: item[group][name] });
-      }
-    }
-    return out;
-  };
   const planned = (path: string, item: Record<string, any>) => plan.some(change => change.name === packageAt(path, item) && change.from === item.version);
   const problems: UnneededMove[] = [];
   for (const [path, item] of before) {
@@ -420,11 +481,11 @@ export function unneededMoves(beforeLock: string, afterLock: string, plan: { nam
     // Another package at this path is no move of this one.
     if (now && packageAt(path, now) !== name) { problems.push(move); continue; }
     if (now) {
-      if (!loaders(is, after, path).some(loader => takes(loader.spec, name, from) === false)) problems.push(move);
+      if (!loadersOf(is, after, path).some(loader => takes(loader.spec, name, from) === false)) problems.push(move);
       continue;
     }
     // Gone: only when something loaded it, and everything that did has moved or gone too. The project itself stays.
-    const had = loaders(was, before, path);
+    const had = loadersOf(was, before, path);
     if (!had.length || had.some(({ at }) => at === "" || after.get(at)?.version === was[at]?.version)) problems.push(move);
   }
   return problems;

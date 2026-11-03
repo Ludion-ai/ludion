@@ -54,6 +54,8 @@ logs/receipt-run1.json, from run 1's `ludion-fixes` artifact 13220367427 (unzipp
 
 scripts/lines.jq (jq 1.7.1 in Docker, no network) on the saved JSON gives logs/lines.json. Lists of PRs: logs/pulls-P0.json, logs/pulls-after-run1.json, logs/pulls-after-run2.json. Branches: logs/branches-before.json, logs/branches-after-run1.json, logs/branches-after-run2.json. Main: logs/main-after-run1.txt, logs/main-after-run2.txt.
 
+**The three lists of PRs are edited:** logs/pulls-P0.json, logs/pulls-after-run1.json and logs/pulls-after-run2.json have PR 7's `body` replaced by `[removed: operational text not for the public record]`, because that PR's text belongs to a private repository's operation and not to a public record (scripts/remove-pr7-body.jq, in Docker). Every other field is what GitHub answered, compared in Docker; the files are now in jq's compact form. No number here read that value: scripts/lines.jq on the edited lists gives what logs/lines.json holds, byte for byte after its first line, which is a line of the session's memory check.
+
 | Line | Result | From logs/lines.json |
 |---|---|---|
 | 1: 1 PR on the first run | **Passes** | New PRs `[8]`; base main; head under `ludion/npm-ltrial/`; github-actions[bot]; one parent, run 1's head; only files under the folder; 1 applied fix, lodash; pull-request job success |
@@ -69,4 +71,4 @@ Each job's duration rounded up to a whole minute, skipped jobs 0: run 1: 27 s, 3
 
 ## Memory (the session's rule)
 
-logs/memory.txt has `available` before each container this lane started through its helper (14,758 to 14,958 MB; the line for 3,072 MB is 3,840). `memory.peak`: the build 1,134,891,008 bytes (logs/build-session.txt); unzipping the artifact 5,693,440; the records tests in Docker 526,864,384 and 351,367,168. The jq and actionlint containers have no shell step to read it, so theirs are not known (limits 256 MB).
+logs/memory.txt has `available` before each container this lane started through its helper, up to the first commit of these records (14,758 to 14,958 MB; the line for 3,072 MB is 3,840). `memory.peak`: the build 1,134,891,008 bytes (logs/build-session.txt); unzipping the artifact 5,693,440; the records tests in Docker 526,864,384 and 351,367,168. The jq and actionlint containers have no shell step to read it, so theirs are not known (limits 256 MB).

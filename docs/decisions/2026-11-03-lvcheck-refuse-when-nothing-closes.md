@@ -1,6 +1,6 @@
 # 2026-11-03 — The PR job refuses an npm fix that closes no live advisory, or whose receipt names one it does not close (LVCHECK, first step)
 
-Decided on 2026-11-03 at 15:54 JST, and committed before the code that does it. The wait table and every gate's numeric criteria are not changed. Composer, Maven and the official images are not touched.
+Decided on 2026-11-03 at 15:54 JST: read `closed` before the early return, refuse a fix when no change closes a live advisory, and write the PR's Advisories from that result. Refusing a name that is not closed, rather than rewriting the row (item 3 and "The two lines people read" below), is how this piece of work carries out the last of those, chosen at about 17:20 JST on the same day, for the reason given there. Committed before the code that does it. The wait table and every gate's numeric criteria are not changed. Composer, Maven and the official images are not touched.
 
 ## Why, and why before 2026-11-30
 

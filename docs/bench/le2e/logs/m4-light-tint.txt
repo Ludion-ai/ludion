@@ -1,0 +1,206 @@
+
+Running 9 tests using 2 workers
+
+Worst contrast over the water (/, dark), lowest first:
+  span.focus-bracket 2: 5.09 (needs 4.5)
+  span.file: 7.65 (needs 4.5)
+  p: 7.70 (needs 4.5)
+  span.flow-arrow: 7.70 (needs 4.5)
+  span.focus-bracket: 7.79 (needs 4.5)
+  p.scene-caption: 7.84 (needs 4.5)
+  a.scroll-cue: 7.84 (needs 4.5)
+  span 4: 7.84 (needs 4.5)
+  ✓  1 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/, dark) (11.8s)
+Worst contrast over the water (/, light), lowest first:
+  p: 2.78 (needs 4.5)
+  span.file: 4.34 (needs 4.5)
+  span.flow-arrow: 5.07 (needs 4.5)
+  span.focus-bracket 2: 5.37 (needs 4.5)
+  span.focus-bracket: 6.69 (needs 4.5)
+  p.scene-caption: 6.69 (needs 4.5)
+  a.scroll-cue: 6.69 (needs 4.5)
+  span 4: 6.69 (needs 4.5)
+  ✘  2 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/, light) (13.2s)
+Worst contrast over the water (/start/, light), lowest first:
+  p.wiring: 2.78 (needs 4.5)
+  span.step-detail 3: 2.78 (needs 4.5)
+  span.step-detail 2: 2.85 (needs 4.5)
+  p.where: 3.12 (needs 4.5)
+  p.coverage: 3.12 (needs 4.5)
+  p.intro: 3.15 (needs 4.5)
+  span.step-detail: 3.15 (needs 4.5)
+  h2 2: 4.74 (needs 4.5)
+  ✘  3 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/start/, light) (6.6s)
+Worst contrast over the water (/start/, dark), lowest first:
+  p.where: 7.48 (needs 4.5)
+  span.step-detail: 7.48 (needs 4.5)
+  p.intro: 7.52 (needs 4.5)
+  span.step-detail 2: 7.56 (needs 4.5)
+  span.step-detail 3: 7.65 (needs 4.5)
+  p.wiring: 7.70 (needs 4.5)
+  p.coverage: 7.74 (needs 4.5)
+  h2 2: 7.84 (needs 4.5)
+  ✓  4 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/start/, dark) (5.9s)
+Worst contrast over the water (/ja/, dark), lowest first:
+  span.focus-bracket 2: 5.09 (needs 4.5)
+  p: 7.70 (needs 4.5)
+  span.flow-arrow: 7.70 (needs 4.5)
+  span.file: 7.70 (needs 4.5)
+  span.focus-bracket: 7.84 (needs 4.5)
+  p.scene-caption: 7.84 (needs 4.5)
+  a.scroll-cue: 7.84 (needs 4.5)
+  span 4: 7.84 (needs 4.5)
+  ✓  6 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/, dark) (11.6s)
+Worst contrast over the water (/ja/, light), lowest first:
+  p: 2.78 (needs 4.5)
+  span.file: 4.51 (needs 4.5)
+  span.flow-arrow: 5.26 (needs 4.5)
+  span.focus-bracket 2: 5.42 (needs 4.5)
+  span.focus-bracket: 6.69 (needs 4.5)
+  p.scene-caption: 6.69 (needs 4.5)
+  a.scroll-cue: 6.69 (needs 4.5)
+  span 4: 6.69 (needs 4.5)
+  ✘  5 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/, light) (12.7s)
+Worst contrast over the water (/ja/start/, light), lowest first:
+  p.wiring: 2.78 (needs 4.5)
+  span.step-detail 3: 2.78 (needs 4.5)
+  span.step-detail 2: 2.85 (needs 4.5)
+  p.coverage: 3.01 (needs 4.5)
+  p.intro: 3.15 (needs 4.5)
+  span.step-detail: 3.15 (needs 4.5)
+  p.where: 3.26 (needs 4.5)
+  h2 2: 4.51 (needs 4.5)
+  ✘  7 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/start/, light) (6.9s)
+Worst contrast over the water (/ja/start/, dark), lowest first:
+  p.where: 7.48 (needs 4.5)
+  span.step-detail: 7.48 (needs 4.5)
+  p.intro: 7.52 (needs 4.5)
+  span.step-detail 2: 7.56 (needs 4.5)
+  p.wiring: 7.70 (needs 4.5)
+  span.step-detail 3: 7.70 (needs 4.5)
+  p.coverage: 7.74 (needs 4.5)
+  h2 2: 7.84 (needs 4.5)
+  ✓  8 [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/start/, dark) (6.0s)
+Home JavaScript: 6 file(s), 32.1 KB gzipped
+  ✓  9 [chromium] › e2e/water.spec.ts:76:1 › the home page's JavaScript stays within 60 KB gzipped (711ms)
+
+
+  1) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/, light) ───────
+
+    Error: text whose background got too close to its color
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 4
+
+    - Array []
+    + Array [
+    +   "p: 2.78 (needs 4.5)",
+    +   "span.file: 4.34 (needs 4.5)",
+    + ]
+
+      68 |       console.log(`Worst contrast over the water (${url}, ${colorScheme}), lowest first:\n  ${lowest.join("\n  ")}`);
+      69 |       const failing = boxes.filter((b) => worst.get(b.name)! < thresholdOf(b));
+    > 70 |       expect(failing.map((b) => report[boxes.indexOf(b)]), "text whose background got too close to its color").toEqual([]);
+         |                                                                                                                ^
+      71 |       await context.close();
+      72 |     });
+      73 |   }
+        at /w/e2e/water.spec.ts:70:112
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-light--chromium/error-context.md
+
+  2) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/start/, light) ─
+
+    Error: text whose background got too close to its color
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 9
+
+    - Array []
+    + Array [
+    +   "p.intro: 3.15 (needs 4.5)",
+    +   "p.where: 3.12 (needs 4.5)",
+    +   "p.wiring: 2.78 (needs 4.5)",
+    +   "span.step-detail: 3.15 (needs 4.5)",
+    +   "span.step-detail 2: 2.85 (needs 4.5)",
+    +   "span.step-detail 3: 2.78 (needs 4.5)",
+    +   "p.coverage: 3.12 (needs 4.5)",
+    + ]
+
+      68 |       console.log(`Worst contrast over the water (${url}, ${colorScheme}), lowest first:\n  ${lowest.join("\n  ")}`);
+      69 |       const failing = boxes.filter((b) => worst.get(b.name)! < thresholdOf(b));
+    > 70 |       expect(failing.map((b) => report[boxes.indexOf(b)]), "text whose background got too close to its color").toEqual([]);
+         |                                                                                                                ^
+      71 |       await context.close();
+      72 |     });
+      73 |   }
+        at /w/e2e/water.spec.ts:70:112
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-start-light--chromium/error-context.md
+
+  3) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/, light) ────
+
+    Error: text whose background got too close to its color
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "p: 2.78 (needs 4.5)",
+    + ]
+
+      68 |       console.log(`Worst contrast over the water (${url}, ${colorScheme}), lowest first:\n  ${lowest.join("\n  ")}`);
+      69 |       const failing = boxes.filter((b) => worst.get(b.name)! < thresholdOf(b));
+    > 70 |       expect(failing.map((b) => report[boxes.indexOf(b)]), "text whose background got too close to its color").toEqual([]);
+         |                                                                                                                ^
+      71 |       await context.close();
+      72 |     });
+      73 |   }
+        at /w/e2e/water.spec.ts:70:112
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-ja-light--chromium/error-context.md
+
+  4) [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/start/, light) 
+
+    Error: text whose background got too close to its color
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 9
+
+    - Array []
+    + Array [
+    +   "p.intro: 3.15 (needs 4.5)",
+    +   "p.where: 3.26 (needs 4.5)",
+    +   "p.wiring: 2.78 (needs 4.5)",
+    +   "span.step-detail: 3.15 (needs 4.5)",
+    +   "span.step-detail 2: 2.85 (needs 4.5)",
+    +   "span.step-detail 3: 2.78 (needs 4.5)",
+    +   "p.coverage: 3.01 (needs 4.5)",
+    + ]
+
+      68 |       console.log(`Worst contrast over the water (${url}, ${colorScheme}), lowest first:\n  ${lowest.join("\n  ")}`);
+      69 |       const failing = boxes.filter((b) => worst.get(b.name)! < thresholdOf(b));
+    > 70 |       expect(failing.map((b) => report[boxes.indexOf(b)]), "text whose background got too close to its color").toEqual([]);
+         |                                                                                                                ^
+      71 |       await context.close();
+      72 |     });
+      73 |   }
+        at /w/e2e/water.spec.ts:70:112
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-ja-start-light--chromium/error-context.md
+
+  4 failed
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/, light) ────────
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/start/, light) ──
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/, light) ─────
+    [chromium] › e2e/water.spec.ts:12:5 › text over the water keeps its contrast (/ja/start/, light) 
+  5 passed (40.5s)

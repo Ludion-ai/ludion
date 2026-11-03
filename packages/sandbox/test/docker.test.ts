@@ -75,6 +75,10 @@ describe("security test container arguments", () => {
     expect(args.join(" ")).toContain(LIMITS_AFTER_MEMORY.join(" "));
     expect(flag(args, "--mount").concat(flag(args, "--volume"), flag(args, "-v"))).toEqual([]);
   });
+  it("gate3-box-has-no-swap: gate 3's own box asks for npm's flags, since without the tool it would get another size", () => {
+    const gate3 = readFileSync(new URL("../../cli/src/security/gate3.ts", import.meta.url), "utf8");
+    expect(gate3).toContain('deps.box ?? ((name, image, argv, timeoutMs) => runContainer(name, image, argv, timeoutMs, "npm"))');
+  });
   it("leave Composer's, Maven's and the official images' boxes as they were", () => {
     for (const tool of ["composer", "maven", undefined] as const) {
       const args = runArgs("n", IMAGE, ["sh"], tool);

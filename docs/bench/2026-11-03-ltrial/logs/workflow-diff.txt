@@ -1,0 +1,34 @@
+0a1,2
+> # LTRIAL (Ludion-ai/ludion docs/decisions/2026-11-03-ltrial-two-runs.md): action/patch-workflow.yml at 3d143fe2a17bf06d9c03292b3bfe57e1b3178617 with the action's
+> # pin (branch ludion-action-3d143fe, built from that commit; not a release), dir, name, and no schedule (workflow_dispatch only).
+21c23
+< name: ludion
+---
+> name: ludion-ltrial
+24,25d25
+<   schedule:
+<     - cron: "23 */6 * * *"
+50c50
+<         uses: Ludion-ai/ludion@0000000000000000000000000000000000000000 # a release commit's SHA; none exists yet
+---
+>         uses: Ludion-ai/ludion-trial@a0fbdef417cd89d450c3997a997d9e2754de621e # branch ludion-action-3d143fe: built from Ludion-ai/ludion 3d143fe; not a release
+53c53
+<           dir: .
+---
+>           dir: npm-ltrial
+72c72
+<         uses: Ludion-ai/ludion@0000000000000000000000000000000000000000 # a release commit's SHA; none exists yet
+---
+>         uses: Ludion-ai/ludion-trial@a0fbdef417cd89d450c3997a997d9e2754de621e # branch ludion-action-3d143fe: built from Ludion-ai/ludion 3d143fe; not a release
+75c75
+<           dir: .
+---
+>           dir: npm-ltrial
+92c92
+<       - uses: Ludion-ai/ludion@0000000000000000000000000000000000000000 # a release commit's SHA; none exists yet
+---
+>       - uses: Ludion-ai/ludion-trial@a0fbdef417cd89d450c3997a997d9e2754de621e # branch ludion-action-3d143fe: built from Ludion-ai/ludion 3d143fe; not a release
+95c95
+<           dir: .
+---
+>           dir: npm-ltrial

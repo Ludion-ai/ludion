@@ -1,0 +1,1038 @@
+{
+  "schema": 2,
+  "id": "14b5d144-e027-4052-893c-b63d0128fdee",
+  "ecosystem": "npm",
+  "scope": "dependency_files_only_not_deployed",
+  "started_at": "2026-11-03T09:49:24.397Z",
+  "finished_at": "2026-11-03T09:49:47.603Z",
+  "outcome": "applied",
+  "tree_hash": "7ee8dfb757dff34b278f0c5d968259eba2aba3dba766d2e4bee7d2ec0320687d",
+  "config_hash": "e55273c15c74bb619a5e25ad12cd33b9fcb9fc7d18bc9586885a06d58d0be2ca",
+  "before": {
+    "schema": 1,
+    "checked_at": "2026-11-03T09:49:24.388Z",
+    "source": "https://osv.dev",
+    "sources": [
+      "https://osv.dev"
+    ],
+    "status": "vulnerabilities_found",
+    "inventory": {
+      "ecosystem": "npm",
+      "files": [
+        "package.json",
+        "package-lock.json"
+      ],
+      "scope": "locked_dependencies",
+      "packages": [
+        {
+          "ecosystem": "npm",
+          "name": "lodash",
+          "version": "4.17.20",
+          "direct": true
+        }
+      ],
+      "limitations": []
+    },
+    "findings": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "lodash",
+          "version": "4.17.20",
+          "direct": true
+        },
+        "advisory": {
+          "id": "GHSA-29mw-wpgm-hmr9",
+          "summary": "Regular Expression Denial of Service (ReDoS) in lodash",
+          "aliases": [
+            "CVE-2020-28500"
+          ],
+          "affected": [
+            {
+              "package": {
+                "name": "lodash",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.17.21"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/01/GHSA-29mw-wpgm-hmr9/GHSA-29mw-wpgm-hmr9.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-es",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash-es"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.17.21"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/01/GHSA-29mw-wpgm-hmr9/GHSA-29mw-wpgm-hmr9.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash.trimend",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash.trimend"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "last_affected": "4.5.1"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/01/GHSA-29mw-wpgm-hmr9/GHSA-29mw-wpgm-hmr9.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash.trim",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash.trim"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "last_affected": "4.5.1"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/01/GHSA-29mw-wpgm-hmr9/GHSA-29mw-wpgm-hmr9.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-rails",
+                "ecosystem": "RubyGems",
+                "purl": "pkg:gem/lodash-rails"
+              },
+              "ranges": [
+                {
+                  "type": "ECOSYSTEM",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.17.21"
+                    }
+                  ]
+                }
+              ],
+              "versions": [
+                "4.0.0",
+                "4.11.2",
+                "4.12.0",
+                "4.13.1",
+                "4.14.1",
+                "4.15.0",
+                "4.16.1",
+                "4.16.3",
+                "4.16.4",
+                "4.16.6",
+                "4.17.10",
+                "4.17.11",
+                "4.17.14",
+                "4.17.15",
+                "4.17.2",
+                "4.17.4",
+                "4.17.5",
+                "4.3.0",
+                "4.5.1",
+                "4.6.1"
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/01/GHSA-29mw-wpgm-hmr9/GHSA-29mw-wpgm-hmr9.json"
+              }
+            }
+          ],
+          "published": "2022-01-06T20:30:46Z"
+        }
+      },
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "lodash",
+          "version": "4.17.20",
+          "direct": true
+        },
+        "advisory": {
+          "id": "GHSA-35jh-r3h4-6jhm",
+          "summary": "Command Injection in lodash",
+          "aliases": [
+            "CVE-2021-23337"
+          ],
+          "affected": [
+            {
+              "package": {
+                "name": "lodash",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "0"
+                    },
+                    {
+                      "fixed": "4.17.21"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2021/05/GHSA-35jh-r3h4-6jhm/GHSA-35jh-r3h4-6jhm.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-es",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash-es"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "0"
+                    },
+                    {
+                      "fixed": "4.17.21"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2021/05/GHSA-35jh-r3h4-6jhm/GHSA-35jh-r3h4-6jhm.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash.template",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash.template"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "0"
+                    },
+                    {
+                      "last_affected": "4.5.0"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2021/05/GHSA-35jh-r3h4-6jhm/GHSA-35jh-r3h4-6jhm.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-template",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash-template"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "0"
+                    },
+                    {
+                      "last_affected": "1.0.0"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2021/05/GHSA-35jh-r3h4-6jhm/GHSA-35jh-r3h4-6jhm.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-rails",
+                "ecosystem": "RubyGems",
+                "purl": "pkg:gem/lodash-rails"
+              },
+              "ranges": [
+                {
+                  "type": "ECOSYSTEM",
+                  "events": [
+                    {
+                      "introduced": "0"
+                    },
+                    {
+                      "fixed": "4.17.21"
+                    }
+                  ]
+                }
+              ],
+              "versions": [
+                "0.10.0",
+                "0.7.0",
+                "0.8.1",
+                "0.8.2",
+                "0.9.0",
+                "0.9.1",
+                "0.9.2",
+                "1.0.0.rc.1",
+                "1.0.0.rc.2",
+                "1.0.0.rc.3",
+                "1.0.1",
+                "1.1.0",
+                "1.1.1",
+                "1.2.0",
+                "1.2.1",
+                "1.3.1",
+                "2.0.0",
+                "2.1.0",
+                "2.2.0",
+                "2.2.1",
+                "2.3.0",
+                "2.4.0",
+                "2.4.1",
+                "3.1.0",
+                "3.10.0",
+                "3.10.1",
+                "3.2.0",
+                "3.3.0",
+                "3.3.1",
+                "3.3.1.1",
+                "3.4.0",
+                "3.5.0",
+                "3.6.0",
+                "3.7.0",
+                "3.9.3",
+                "4.0.0",
+                "4.11.2",
+                "4.12.0",
+                "4.13.1",
+                "4.14.1",
+                "4.15.0",
+                "4.16.1",
+                "4.16.3",
+                "4.16.4",
+                "4.16.6",
+                "4.17.10",
+                "4.17.11",
+                "4.17.14",
+                "4.17.15",
+                "4.17.2",
+                "4.17.4",
+                "4.17.5",
+                "4.3.0",
+                "4.5.1",
+                "4.6.1"
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2021/05/GHSA-35jh-r3h4-6jhm/GHSA-35jh-r3h4-6jhm.json"
+              }
+            }
+          ],
+          "published": "2021-05-06T16:05:51Z"
+        }
+      },
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "lodash",
+          "version": "4.17.20",
+          "direct": true
+        },
+        "advisory": {
+          "id": "GHSA-f23m-r3pf-42rh",
+          "summary": "lodash vulnerable to Prototype Pollution via array path bypass in `_.unset` and `_.omit`",
+          "aliases": [
+            "CVE-2026-2950"
+          ],
+          "affected": [
+            {
+              "package": {
+                "name": "lodash",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "0"
+                    },
+                    {
+                      "fixed": "4.18.0"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "last_known_affected_version_range": "<= 4.17.23",
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-f23m-r3pf-42rh/GHSA-f23m-r3pf-42rh.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-es",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash-es"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "0"
+                    },
+                    {
+                      "fixed": "4.18.0"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "last_known_affected_version_range": "<= 4.17.23",
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-f23m-r3pf-42rh/GHSA-f23m-r3pf-42rh.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-amd",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash-amd"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "0"
+                    },
+                    {
+                      "fixed": "4.18.0"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "last_known_affected_version_range": "<= 4.17.23",
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-f23m-r3pf-42rh/GHSA-f23m-r3pf-42rh.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash.unset",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash.unset"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.18.0"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-f23m-r3pf-42rh/GHSA-f23m-r3pf-42rh.json"
+              }
+            }
+          ],
+          "published": "2026-04-01T23:50:27Z"
+        }
+      },
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "lodash",
+          "version": "4.17.20",
+          "direct": true
+        },
+        "advisory": {
+          "id": "GHSA-r5fr-rjxr-66jc",
+          "summary": "lodash vulnerable to Code Injection via `_.template` imports key names",
+          "aliases": [
+            "CVE-2026-4800"
+          ],
+          "affected": [
+            {
+              "package": {
+                "name": "lodash",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.18.0"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "last_known_affected_version_range": "<= 4.17.23",
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-es",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash-es"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.18.0"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json",
+                "last_known_affected_version_range": "<= 4.17.23"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-amd",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash-amd"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.18.0"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "last_known_affected_version_range": "<= 4.17.23",
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash.template",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash.template"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.18.0"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/04/GHSA-r5fr-rjxr-66jc/GHSA-r5fr-rjxr-66jc.json"
+              }
+            }
+          ],
+          "published": "2026-04-01T23:51:12Z"
+        }
+      },
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "lodash",
+          "version": "4.17.20",
+          "direct": true
+        },
+        "advisory": {
+          "id": "GHSA-xxjr-mmjv-4gpg",
+          "summary": "Lodash has Prototype Pollution Vulnerability in `_.unset` and `_.omit` functions",
+          "aliases": [
+            "CVE-2025-13465"
+          ],
+          "affected": [
+            {
+              "package": {
+                "name": "lodash",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.17.23"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "last_known_affected_version_range": "<= 4.17.22",
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/01/GHSA-xxjr-mmjv-4gpg/GHSA-xxjr-mmjv-4gpg.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash.unset",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash.unset"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "last_affected": "4.5.2"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/01/GHSA-xxjr-mmjv-4gpg/GHSA-xxjr-mmjv-4gpg.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-es",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash-es"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.17.23"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "last_known_affected_version_range": "<= 4.17.22",
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/01/GHSA-xxjr-mmjv-4gpg/GHSA-xxjr-mmjv-4gpg.json"
+              }
+            },
+            {
+              "package": {
+                "name": "lodash-amd",
+                "ecosystem": "npm",
+                "purl": "pkg:npm/lodash-amd"
+              },
+              "ranges": [
+                {
+                  "type": "SEMVER",
+                  "events": [
+                    {
+                      "introduced": "4.0.0"
+                    },
+                    {
+                      "fixed": "4.17.23"
+                    }
+                  ]
+                }
+              ],
+              "database_specific": {
+                "last_known_affected_version_range": "<= 4.17.22",
+                "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/01/GHSA-xxjr-mmjv-4gpg/GHSA-xxjr-mmjv-4gpg.json"
+              }
+            }
+          ],
+          "published": "2026-01-21T23:01:22Z"
+        }
+      }
+    ],
+    "plan": [
+      {
+        "name": "lodash",
+        "from": "4.17.20",
+        "to": "4.18.0",
+        "advisories": [
+          "GHSA-29mw-wpgm-hmr9",
+          "GHSA-35jh-r3h4-6jhm",
+          "GHSA-f23m-r3pf-42rh",
+          "GHSA-r5fr-rjxr-66jc",
+          "GHSA-xxjr-mmjv-4gpg"
+        ]
+      }
+    ],
+    "blocked": [],
+    "note": "Known advisories for the recorded package inventory only. No match is not a security guarantee. Across its commands, Ludion sends package names and versions to OSV (api.osv.dev), and back to OSV the IDs of the advisories it returned; for npm, to the npm registry (registry.npmjs.org); for Composer, to Packagist (packagist.org, repo.packagist.org), and the archive URLs in composer.lock, which name each package's repository and commit, to their hosts (api.github.com, codeload.github.com, github.com, bitbucket.org); for Maven, to Maven Central (repo.maven.apache.org). For PHP Docker it sends the PHP branch to PHP's release list (www.php.net), and for Node.js Docker it downloads Node.js's release index (nodejs.org) whole; for both it sends the image tag (library/php or library/node) to Docker Hub (auth.docker.io, registry-1.docker.io), and Docker pulls the images Ludion builds in from Docker Hub. It downloads CISA's catalog of exploited vulnerabilities (www.cisa.gov) and the EPSS list (epss.empiricalsecurity.com) whole, rather than sending them CVE IDs. `ludion deliver open` pushes each fix's commit to the project's own GitHub repository and opens its PR there; no other source is sent. Major-version fixes, unresolved inventory and unsupported builds require review."
+  },
+  "tool_image": "node:24-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c",
+  "baseline_image": "sha256:29e32a02094debf1e8297e7433275366c5a2097c02caa2524b1fff7b099e646d",
+  "baseline_passed": true,
+  "test": [
+    "node",
+    "--test",
+    "tests/smoke.test.cjs"
+  ],
+  "base_commit": "3faf98650ccb001cb38a9465edd8fd7a08618020",
+  "fixes": [
+    {
+      "package": "lodash",
+      "changes": [
+        {
+          "name": "lodash",
+          "from": "4.17.20",
+          "to": "4.18.1",
+          "advisories": [
+            "GHSA-29mw-wpgm-hmr9",
+            "GHSA-35jh-r3h4-6jhm",
+            "GHSA-f23m-r3pf-42rh",
+            "GHSA-r5fr-rjxr-66jc",
+            "GHSA-xxjr-mmjv-4gpg"
+          ]
+        }
+      ],
+      "outcome": "applied",
+      "fix_published_at": "2026-04-01T21:01:20.458Z",
+      "fix_published_note": "registry.npmjs.org's publish time of the fixed version. The smallest fixed version was passed over (version_choice); this is the latest publish time among the fix's planned versions, the version taken included.",
+      "found_at": "2026-11-03T09:49:24.388Z",
+      "applied_at": "2026-11-03T09:49:47.603Z",
+      "branch": "ludion/npm-ltrial/npm/lodash-4.18.1-8451466ef948",
+      "commit": "d94f806d7c3b9f1644695c5f1fc42cdc692fe8ed",
+      "candidate_image": "sha256:52ff47fff650cb1e1d5eae5b3932aba7935eccecde296153e5a8310f118a7d8b",
+      "candidate_passed": true,
+      "after": {
+        "schema": 1,
+        "checked_at": "2026-11-03T09:49:46.393Z",
+        "source": "https://osv.dev",
+        "sources": [
+          "https://osv.dev"
+        ],
+        "status": "no_known_vulnerabilities",
+        "inventory": {
+          "ecosystem": "npm",
+          "files": [
+            "package.json",
+            "package-lock.json"
+          ],
+          "scope": "locked_dependencies",
+          "packages": [
+            {
+              "ecosystem": "npm",
+              "name": "lodash",
+              "version": "4.18.1",
+              "direct": true
+            }
+          ],
+          "limitations": []
+        },
+        "findings": [],
+        "plan": [],
+        "blocked": [],
+        "note": "Known advisories for the recorded package inventory only. No match is not a security guarantee. Across its commands, Ludion sends package names and versions to OSV (api.osv.dev), and back to OSV the IDs of the advisories it returned; for npm, to the npm registry (registry.npmjs.org); for Composer, to Packagist (packagist.org, repo.packagist.org), and the archive URLs in composer.lock, which name each package's repository and commit, to their hosts (api.github.com, codeload.github.com, github.com, bitbucket.org); for Maven, to Maven Central (repo.maven.apache.org). For PHP Docker it sends the PHP branch to PHP's release list (www.php.net), and for Node.js Docker it downloads Node.js's release index (nodejs.org) whole; for both it sends the image tag (library/php or library/node) to Docker Hub (auth.docker.io, registry-1.docker.io), and Docker pulls the images Ludion builds in from Docker Hub. It downloads CISA's catalog of exploited vulnerabilities (www.cisa.gov) and the EPSS list (epss.empiricalsecurity.com) whole, rather than sending them CVE IDs. `ludion deliver open` pushes each fix's commit to the project's own GitHub repository and opens its PR there; no other source is sent. Major-version fixes, unresolved inventory and unsupported builds require review."
+      },
+      "files": [
+        {
+          "path": "package.json",
+          "before_hash": "5f06b60108f7dab73b1302c174fa144eb2380c642cc0585f9d453b80a58ea3b4",
+          "after_hash": "5fa332b92a56a4da6c419dea9597c28d1aa84b96d607ee7c13104d798aa9f8fe"
+        },
+        {
+          "path": "package-lock.json",
+          "before_hash": "a8c770712e9ba4df86a4494e7c7e236661d2dca2813e3eae4b06c6a7d4e51fa0",
+          "after_hash": "7dac095b0c83ab886b28fdb4c5265c77c81a89cf7c9e8d26be2a60d9dc7c9d5a"
+        }
+      ],
+      "version_choice": [
+        {
+          "package": "lodash",
+          "smallest": "4.18.0",
+          "chosen": "4.18.1",
+          "skipped": [
+            {
+              "version": "4.18.0",
+              "reason": "deprecated: Bad release. Please use lodash@4.17.21 instead."
+            }
+          ],
+          "publisher_check": {
+            "version": "4.18.1",
+            "smallest": {
+              "publisher": "jdalton",
+              "provenance": null
+            },
+            "candidate": {
+              "publisher": "jdalton",
+              "provenance": null
+            },
+            "result": "publisher",
+            "detail": "The same publisher account: 4.18.0 has no provenance and was published by the npm account jdalton; 4.18.1 has no provenance and was published by the npm account jdalton."
+          },
+          "note": "The smallest fixed version lodash@4.18.0 cannot be used (deprecated: Bad release. Please use lodash@4.17.21 instead.). 4.18.1 is the next smallest 4.x version the registry lists that is not deprecated and that no OSV record names, so it is taken instead. The same publisher account: 4.18.0 has no provenance and was published by the npm account jdalton; 4.18.1 has no provenance and was published by the npm account jdalton."
+        }
+      ],
+      "resolution": {
+        "t": "2026-04-01T21:01:20.458Z",
+        "t_note": "The later of V's registry publish time and the earliest OSV publish time of the fix's advisories. The time of first sight is not recorded; this is a lower bound on it.",
+        "requirements": 1,
+        "answers": [
+          {
+            "requirement": "lodash@4.18.1",
+            "name": "lodash",
+            "version": "4.18.1",
+            "role": "v",
+            "published_at": "2026-04-01T21:01:20.458Z",
+            "passed_over": [],
+            "excluded": {
+              "in_range": 0,
+              "no_time": 0,
+              "after_t": 0,
+              "withdrawn": 0,
+              "deprecated": 0,
+              "advisory": 0
+            }
+          }
+        ],
+        "stopped_no_allowed": false,
+        "assert": {
+          "t": "2026-04-01T21:01:20.458Z",
+          "pushed_at": "2026-11-03T09:49:46.287Z",
+          "wait_hours": 72,
+          "resolved_at": "2026-04-01T21:01:20.458Z",
+          "t_before_push_less_wait": true,
+          "youngest": "lodash@4.18.1",
+          "wait_until": "2026-04-04T21:01:20.458Z",
+          "versions": [
+            {
+              "path": "node_modules/lodash",
+              "name": "lodash",
+              "version": "4.18.1",
+              "role": "v",
+              "published_at": "2026-04-01T21:01:20.458Z",
+              "age_hours": 5172.8
+            }
+          ],
+          "waits": [],
+          "problems": []
+        }
+      },
+      "changed_packages": [
+        {
+          "name": "lodash",
+          "from": [
+            "4.17.20"
+          ],
+          "to": [
+            "4.18.1"
+          ]
+        }
+      ],
+      "time_cap": {
+        "t": "2026-04-01T21:01:20.458Z",
+        "targets": [
+          "lodash@4.18.1"
+        ],
+        "after_t": [],
+        "same_release": [],
+        "young": [],
+        "undecidable": [],
+        "wait_hours": 168
+      },
+      "judgement": {
+        "schema": 1,
+        "judged_at": "2026-11-03T09:49:44.776Z",
+        "verdict": "ready_except_build",
+        "urgency": "high",
+        "wait_hours": 72,
+        "newest_publish": "2026-04-01T21:01:20.458Z",
+        "wait_until": "2026-04-04T21:01:20.458Z",
+        "changes": [
+          {
+            "path": "node_modules/lodash",
+            "name": "lodash",
+            "from": "4.17.20",
+            "to": "4.18.1",
+            "dev": false,
+            "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.18.1.tgz",
+            "integrity": "sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==",
+            "replaced": null
+          }
+        ],
+        "fixes": [
+          {
+            "id": "GHSA-29mw-wpgm-hmr9",
+            "package": "lodash",
+            "from": "4.17.20",
+            "to": "4.18.1",
+            "aliases": [
+              "CVE-2020-28500"
+            ],
+            "severity": "MODERATE",
+            "kev": false,
+            "epss": 0.07336,
+            "epss_date": "2026-11-02T12:00:30Z"
+          },
+          {
+            "id": "GHSA-35jh-r3h4-6jhm",
+            "package": "lodash",
+            "from": "4.17.20",
+            "to": "4.18.1",
+            "aliases": [
+              "CVE-2021-23337"
+            ],
+            "severity": "HIGH",
+            "kev": false,
+            "epss": 0.21333,
+            "epss_date": "2026-11-02T12:00:30Z"
+          },
+          {
+            "id": "GHSA-f23m-r3pf-42rh",
+            "package": "lodash",
+            "from": "4.17.20",
+            "to": "4.18.1",
+            "aliases": [
+              "CVE-2026-2950"
+            ],
+            "severity": "MODERATE",
+            "kev": false,
+            "epss": 0.00337,
+            "epss_date": "2026-11-02T12:00:30Z"
+          },
+          {
+            "id": "GHSA-r5fr-rjxr-66jc",
+            "package": "lodash",
+            "from": "4.17.20",
+            "to": "4.18.1",
+            "aliases": [
+              "CVE-2026-4800"
+            ],
+            "severity": "HIGH",
+            "kev": false,
+            "epss": 0.02808,
+            "epss_date": "2026-11-02T12:00:30Z"
+          },
+          {
+            "id": "GHSA-xxjr-mmjv-4gpg",
+            "package": "lodash",
+            "from": "4.17.20",
+            "to": "4.18.1",
+            "aliases": [
+              "CVE-2025-13465"
+            ],
+            "severity": "MODERATE",
+            "kev": false,
+            "epss": 0.01823,
+            "epss_date": "2026-11-02T12:00:30Z"
+          }
+        ],
+        "findings": [
+          {
+            "gate": 1,
+            "effect": "info",
+            "message": "Every changed version counts as production, as in `ludion judge` (docs/decisions/2026-10-29-every-change-counts-as-production.md)."
+          },
+          {
+            "gate": 2,
+            "package": "lodash",
+            "effect": "extend",
+            "message": "lodash@4.18.1 was published by jdalton, 4.17.20 by bnjmnt4n."
+          }
+        ],
+        "exposure": {
+          "fix_published_at": "2026-04-01T21:01:20.458Z",
+          "detected_at": "2026-11-03T09:49:44.776Z"
+        },
+        "time_cap": {
+          "t": "2026-04-01T21:01:20.458Z",
+          "targets": [
+            "lodash@4.18.1"
+          ],
+          "after_t": [],
+          "same_release": [],
+          "young": [],
+          "undecidable": [],
+          "wait_hours": 24
+        },
+        "not_checked": [
+          "Gate 3 (build and tests of old and new versions) is not run by the judge v0.",
+          "Obfuscated code and new network or process calls in the changed code are not inspected.",
+          "Gate 1's OS, SAPI and configuration conditions are not matched, and production and dev-only dependencies are not told apart: every changed version counts as production.",
+          "Provenance is read from the registry's attestation record and must name the version and its tarball hash; its Sigstore signature and certificate are not verified here, so provenance (its repository, workflow and commit, and the same-release exception that relies on it) rests on the registry's checks at publish time.",
+          "The GitHub repository id and event in a provenance statement are written by npm from the build's environment variables, which the publishing workflow can set; Ludion has not established that the registry matches them against the signing certificate. A re-registered repository name whose publisher writes the old id and an allowed event passes these checks and is caught only by the wait and the re-query.",
+          "A hijacked publisher account with no provenance change is caught only by the wait and the re-query when it ends; the re-query happens only when the judge is run again after the wait (nothing schedules it yet).",
+          "A v2 lockfile's npm 6 `dependencies` tree is read to check that it says the same as `packages`, and both are read to check that the change leaves no requirement unmet that the base met (the project's `overrides` count in `packages`). This reading has been checked against locks npm 7.10.0, 8.19.4, 9.8.1, 10.8.2, 11.19.1 and 12.2.1 wrote (with nested copies, aliases, workspaces, local folders, `overrides`, `--legacy-peer-deps` and bundled entries) and against npm 12.2.1's own report on them and on one-change variants, not against other npm versions' locks.",
+          "A dependency newly required by a package (nothing satisfied it before) is not compared when it lands on a copy that was already installed; that copy's own advisories are not reported for it."
+        ]
+      }
+    }
+  ]
+}

@@ -65,7 +65,7 @@ function receiptFor(base: string, made: string, lock = FIXED, pkg = PKG_FIXED): 
         outcome: "applied", branch: BRANCH, commit: made, candidate_passed: true,
         files: [{ path: "package.json", before_hash: sha256(PKG), after_hash: sha256(pkg) }, { path: "package-lock.json", before_hash: sha256(LOCK), after_hash: sha256(lock) }],
         fix_published_at: "2021-02-20T15:42:16.891Z", fix_published_note: "registry", found_at: "2026-10-30T01:00:00.000Z", applied_at: "2026-10-30T01:05:00.000Z",
-        judgement: { verdict: "ready_except_build" },
+        judgement: { verdict: "ready_except_build" }, gate3: { verdict: "undecidable", undecidable_reasons: ["not_covered"] },
       },
       { package: "minimist", changes: [{ name: "minimist", from: "1.2.5", to: "1.2.6", advisories: ["GHSA-xvch-5gv4-984h"] }], outcome: "failed", branch: null, commit: null, candidate_passed: false, files: [], reason: "The judge's wait is not over" },
     ],
@@ -177,6 +177,17 @@ describe("the validation job packs the applied fixes", { timeout: 30_000 }, () =
 });
 
 describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
+  it("says gate 3's verdict and its limit when the comparison ran", async () => {
+    const { work, origin, base } = project(), fix = applied(work);
+    (fix.receipt as { fixes: Record<string, unknown>[] }).fixes[0]!.gate3 = { verdict: "not_broken", undecidable_reasons: [] };
+    const out = artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base), gh = github(origin);
+    await open(checkout(origin), out, base, origin, gh);
+    const body = String(gh.opened[0]!.body);
+    expect(body).toContain("gate 3's comparison of the base and this change, each built, started and crawled offline in Docker: `not_broken`");
+    expect(body).toContain("GET pages only");
+    expect(body).not.toContain("did not run");
+    expect(body).not.toMatch(/passed the four gates/);
+  });
   it("pushes the checked commit to its branch and opens one PR; the next run opens none", async () => {
     const { work, origin, base } = project(), fix = applied(work);
     const out = artifact(work, fix.receipt, [`refs/heads/${BRANCH}`], base), dir = checkout(origin), gh = github(origin);
@@ -189,6 +200,9 @@ describe("the PR job opens one PR per fix", { timeout: 30_000 }, () => {
     const body = String(gh.opened[0]!.body);
     for (const part of ["`lodash` (npm)", "`4.17.20` → `4.17.21`", "`GHSA-35jh-r3h4-6jhm`, `CVE-2021-23337`", "`2021-02-20T15:42:16.891Z`", "`2026-10-30T01:00:00.000Z`", "`2026-10-30T01:05:00.000Z`", `\`${ID}\``, "`ready_except_build`", "in both jobs", "not all four gates", "Ludion does not merge this PR"]) expect(body).toContain(part);
     expect(body).not.toMatch(/passed the four gates|minimist/);
+    // This fixture's project has no Next.js, so the PR says the comparison did not run, and no verdict.
+    expect(body).toContain("Gate 3's comparison of the base and this change did not run");
+    expect(body).not.toContain("`not_broken`");
     // The next scheduled run validates the same fix again; its PR is open, so nothing is pushed or opened.
     const again = await open(checkout(origin), out, base, origin, gh);
     expect(again.deliveries).toEqual([{ package: "lodash", branch: BRANCH, outcome: "open_pr_exists", pr: 100 }]);
@@ -658,6 +672,11 @@ describe("the PR job refuses an artifact the validation job would not write", { 
       [(f: Record<string, unknown>, _r: Record<string, unknown>) => { f.judgement = { verdict: "wait" }; }, "without the judge's ready_except_build"],
       [(f: Record<string, unknown>, _r: Record<string, unknown>) => { f.candidate_passed = false; }, "whose tests did not pass"],
       [(_f: Record<string, unknown>, r: Record<string, unknown>) => { r.base_commit = "c".repeat(40); }, "base_commit is not the commit this run checked out"],
+      [(f: Record<string, unknown>, _r: Record<string, unknown>) => { delete f.gate3; }, "applied without gate 3's result"],
+      [(f: Record<string, unknown>, _r: Record<string, unknown>) => { f.gate3 = "not_broken"; }, "A fix's gate 3 result"],
+      [(f: Record<string, unknown>, _r: Record<string, unknown>) => { f.gate3 = { verdict: "broken", undecidable_reasons: [] }; }, "a gate 3 result that stops it"],
+      [(f: Record<string, unknown>, _r: Record<string, unknown>) => { f.gate3 = { verdict: "undecidable", undecidable_reasons: ["old_failed"] }; }, "a gate 3 result that stops it"],
+      [(f: Record<string, unknown>, _r: Record<string, unknown>) => { f.gate3 = { verdict: "undecidable", undecidable_reasons: ["not_covered", "old_failed"] }; }, "a gate 3 result that stops it"],
     ] as const) {
       await refused(p => {
         const fix = applied(p.work), receipt = fix.receipt as { fixes: Record<string, unknown>[] };

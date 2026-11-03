@@ -1,6 +1,6 @@
 // Gate 3's new type, a first form (docs/decisions/2026-11-02-gate-3-type-definition.md): the old version is the
 // specification. One project, its lockfile before and after a fix: build, types, start, a crawl of every GET page and the
-// tests, old twice and new once (twice when it fails to build or start), each in packages/sandbox's box. Nothing calls this from `ludion patch` yet (docs/status.md).
+// tests, old twice and new once (twice when it fails to build or start), each in packages/sandbox's box. npm's `ludion patch` calls this on each fix (dependency-patch.ts).
 // This file imports only Node.js's own modules and Ludion's, no package: its heavy check needs Docker's socket, and is for C4's VM, or CI, not a PC.
 import { randomUUID } from "node:crypto";
 import { cpSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -9,7 +9,7 @@ import { join, resolve, sep } from "node:path";
 import { runContainer, runDockerImageCommand, SWAP_MAX_TEXT, type ContainerOutcome } from "../../../sandbox/src/docker.ts";
 import { BOX_DRIVER, FREEZE_CLOCK, MAX_PAGES, RESULT_MARKER } from "./gate3-box.ts";
 
-/** Runs the crawl: Node.js and Chromium, pinned by digest. The image of the repository's own Playwright version. */
+/** Runs the crawl: Node.js and Chromium, pinned by digest. The image of the repository's own Playwright version. Docker pulls it from https://mcr.microsoft.com (the scan note names the host). */
 export const BOX_IMAGE = "mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27";
 /** Acquires dependencies, on a network, from the manifests alone. */
 export const ACQUIRE_IMAGE = "node:24@sha256:e7add2a490bb17d97b485b8641bd88455fff7839ade0f5eba493c3508124d413";
@@ -285,6 +285,16 @@ export function undecidableCounts(results: readonly Pick<Comparison, "verdict" |
   const counts = Object.fromEntries(UNDECIDABLE_REASONS.map(reason => [reason, 0])) as Record<UndecidableReason, number>;
   for (const result of results) if (result.verdict === "undecidable") for (const reason of new Set(result.undecidable_reasons)) counts[reason]++;
   return counts;
+}
+
+/** A project this first form does not cover: the comparison did not run, and says nothing about the fix. */
+export const notCovered = (result: Pick<Comparison, "verdict" | "undecidable_reasons">): boolean => result.verdict === "undecidable" && result.undecidable_reasons.length > 0 && result.undecidable_reasons.every(reason => reason === "not_covered");
+
+/** Why `ludion patch` must not go on with a fix, or null when gate 3 does not stop it (docs/decisions/2026-11-03-gate3-called-from-patch.md). */
+export function gate3Refusal(result: Comparison): string | null {
+  if (result.verdict === "not_broken" || notCovered(result)) return null;
+  const reasons = result.verdict === "broken" ? result.broken : result.undecidable;
+  return `Gate 3 ${result.verdict === "broken" ? "stops this fix" : "cannot judge this fix, so it stops"}: ${reasons.slice(0, 5).join(" ")}${reasons.length > 5 ? ` (${reasons.length - 5} more in the receipt)` : ""}`;
 }
 
 const emptyComparison = (sentence: string, reason: UndecidableReason, notes: string[] = []): Comparison => ({ verdict: "undecidable", broken: [], undecidable: [sentence], undecidable_reasons: [reason], notes, specification_pages: 0, broken_on_both: 0, pages: [] });

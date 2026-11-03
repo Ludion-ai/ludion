@@ -1,0 +1,255 @@
+{
+  "id": "R19",
+  "package": "pbkdf2 3.1.2 -> 3.1.3",
+  "lold_outcome": "built",
+  "t": "2025-06-23T22:41:50.000Z",
+  "table_seconds": 3.526,
+  "table_requirements": 28,
+  "table_without_answer": [
+    {
+      "requirement": "sha.js@^2.4.11",
+      "reason": "nothing is left in range: 2 in range, 1 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "sha.js@^2.4.0",
+      "reason": "nothing is left in range: 13 in range, 1 published after T, 1 withdrawn, 0 deprecated, 11 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 13,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 11
+      }
+    },
+    {
+      "requirement": "sha.js@^2.4.8",
+      "reason": "nothing is left in range: 5 in range, 1 published after T, 0 withdrawn, 0 deprecated, 4 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 4
+      }
+    }
+  ],
+  "moved_non_v": 5,
+  "path_moved": 0,
+  "path_added": 5,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "stop",
+  "refusal": "The judge stops the candidate: gate 1: create-hash goes down from 1.2.0 to 1.1.3 at node_modules/pbkdf2/node_modules/create-hash. gate 1: hash-base goes down from 3.1.0 to 2.0.0 at node_modules/pbkdf2/node_modules/hash-base. gate 1: ripemd160 goes down from 2.0.2 to 2.0.1 at node_modules/pbkdf2/node_modules/ripemd160.",
+  "assert": {
+    "t": "2025-06-23T22:41:50.000Z",
+    "resolved_at": "2025-06-23T22:41:50.000Z",
+    "wait_hours": 72,
+    "youngest": "pbkdf2@3.1.3",
+    "wait_until": "2025-06-23T20:37:58.779Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/pbkdf2/node_modules/create-hash",
+        "name": "create-hash",
+        "version": "1.1.3",
+        "role": "oldest",
+        "published_at": "2017-05-11T13:10:18.358Z",
+        "age_hours": 83100
+      },
+      {
+        "path": "node_modules/pbkdf2/node_modules/hash-base",
+        "name": "hash-base",
+        "version": "2.0.0",
+        "role": "oldest",
+        "published_at": "2016-04-07T06:46:43.395Z",
+        "age_hours": 92682.4
+      },
+      {
+        "path": "node_modules/pbkdf2/node_modules/hash-base",
+        "name": "hash-base",
+        "version": "2.0.0",
+        "role": "oldest",
+        "published_at": "2016-04-07T06:46:43.395Z",
+        "age_hours": 92682.4
+      },
+      {
+        "path": "node_modules/isarray",
+        "name": "isarray",
+        "version": "2.0.5",
+        "role": "oldest",
+        "published_at": "2019-07-08T13:21:22.377Z",
+        "age_hours": 64187.8
+      },
+      {
+        "path": "node_modules/pbkdf2",
+        "name": "pbkdf2",
+        "version": "3.1.3",
+        "role": "v",
+        "published_at": "2025-06-20T20:37:58.779Z",
+        "age_hours": 12004.5
+      },
+      {
+        "path": "node_modules/pbkdf2/node_modules/ripemd160",
+        "name": "ripemd160",
+        "version": "2.0.1",
+        "role": "oldest",
+        "published_at": "2016-06-22T13:25:58.036Z",
+        "age_hours": 90851.7
+      },
+      {
+        "path": "node_modules/to-buffer",
+        "name": "to-buffer",
+        "version": "1.2.0",
+        "role": "oldest",
+        "published_at": "2025-06-17T22:28:11.124Z",
+        "age_hours": 12074.7
+      }
+    ]
+  },
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "pbkdf2@3.1.3",
+      "version": "3.1.3",
+      "role": "v",
+      "published_at": "2025-06-20T20:37:58.779Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "ripemd160@=2.0.1",
+      "version": "2.0.1",
+      "role": "oldest",
+      "published_at": "2016-06-22T13:25:58.036Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "to-buffer@^1.2.0",
+      "version": "1.2.0",
+      "role": "oldest",
+      "published_at": "2025-06-17T22:28:11.124Z",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "create-hash@~1.1.3",
+      "version": "1.1.3",
+      "role": "oldest",
+      "published_at": "2017-05-11T13:10:18.358Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "hash-base@^2.0.0",
+      "version": "2.0.0",
+      "role": "oldest",
+      "published_at": "2016-04-07T06:46:43.395Z",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "isarray@^2.0.5",
+      "version": "2.0.5",
+      "role": "oldest",
+      "published_at": "2019-07-08T13:21:22.377Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "sha.js@^2.4.11",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "sha.js@^2.4.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 13,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 11
+      }
+    },
+    {
+      "requirement": "sha.js@^2.4.8",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 4
+      }
+    }
+  ]
+}

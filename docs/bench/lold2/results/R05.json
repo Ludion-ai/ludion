@@ -1,0 +1,49 @@
+{
+  "id": "R05",
+  "package": "@angular/platform-server 20.2.4 -> 20.3.0",
+  "lold_outcome": "stopped_no_allowed",
+  "t": "2025-09-10T21:56:01.000Z",
+  "table_seconds": 3.313,
+  "table_requirements": 9,
+  "table_without_answer": [
+    {
+      "requirement": "@angular/core@20.3.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@angular/common@20.3.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@angular/compiler@20.3.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    }
+  ],
+  "outcome": "stopped_no_allowed",
+  "no_answer": "@angular/common@20.3.0",
+  "reason": "No allowed version for @angular/common@20.3.0: nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time. This fix stops: no newer or excluded version is taken."
+}

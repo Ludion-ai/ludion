@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { describe, expect, it, vi } from "vitest";
 import semver from "semver";
+import { RESOLVER_SCRIPT, resolverScript } from "../src/security/oldest.ts";
 import { acquisitionPolicy, candidateTimeCap, changedPackages, compatible, fixesOf, NPM_FINAL_MANIFEST, patchDependencies, resolverDockerfile, unplannedRemovals, type FixReceipt } from "../src/security/dependency-patch.ts";
 import { acquisitionPom, localComposerLock, MAVEN_SETTINGS, publicArchiveUrl } from "../src/security/acquisition.ts";
 import { changedManifest, inventory, mavenGraph, parsePom, raisedRequirement, type Inventory } from "../src/security/inventory.ts";
@@ -677,11 +678,14 @@ describe("the smallest fix (docs/design.md)", () => {
   it("resolves npm and Composer candidates for the planned packages only, never a blanket update", () => {
     const npm = resolverDockerfile("npm", `node@${DIGEST}`, true, false, [fix("lodash", "4.17.20", "4.17.21")]);
     expect(npm).not.toContain('"update"');
-    const steps = [...npm.matchAll(/^RUN (\[.*\])$/gm)].map(m => JSON.parse(m[1]!) as string[]).filter(a => a[0] === "npm" || a[0] === "cp" || a[0] === "rm");
+    const steps = [...npm.matchAll(/^RUN (\[.*\])$/gm)].map(m => JSON.parse(m[1]!) as string[]).filter(a => a[0] === "npm" || a[0] === "cp" || a[0] === "rm" || (a[0] === "node" && a[1] !== "-e"));
+    // The two lockfile-only installs are npm's own, through the script that answers from the table of oldest versions.
     expect(steps.map(a => a.slice(0, 3))).toEqual([
-      ["npm", "install", "--global"], ["npm", "install", "--package-lock-only"], ["cp", NPM_FINAL_MANIFEST, "package.json"],
-      ["npm", "install", "--package-lock-only"], ["rm", NPM_FINAL_MANIFEST], ["npm", "ci", "--ignore-scripts"],
+      ["npm", "install", "--global"], ["node", RESOLVER_SCRIPT], ["cp", NPM_FINAL_MANIFEST, "package.json"],
+      ["node", RESOLVER_SCRIPT], ["rm", NPM_FINAL_MANIFEST], ["npm", "ci", "--ignore-scripts"],
     ]);
+    expect(resolverDockerfile("npm", `node@${DIGEST}`, false)).not.toContain(RESOLVER_SCRIPT);
+    for (const flag of ["--package-lock-only", "--ignore-scripts", "--allow-git=none", "--allow-remote=none", "--allow-file=none", "--allow-directory=none"]) expect(resolverScript(["--ignore-scripts", "--allow-git=none", "--allow-remote=none", "--allow-file=none", "--allow-directory=none"])).toContain(flag);
     expect(resolverDockerfile("npm", `node@${DIGEST}`, false)).not.toContain("--package-lock-only");
     const composer = resolverDockerfile("composer", `composer@${DIGEST}`, true, false, [fix("symfony/http-foundation", "5.4.0", "5.4.54")]);
     expect(composer).toContain('"composer","update","--with-dependencies","--minimal-changes"');
@@ -1546,5 +1550,124 @@ describe("the next smallest fix's publisher check (docs/decisions/2026-10-30-nex
     // Registry text is made one line of at most 200 characters.
     const odd = { publisher: `eve\n${"x".repeat(300)}`, provenance: null };
     expect(comparePublishers("1.0.0", odd, "1.0.1", { publisher: "alice", provenance: null }).detail).toContain(`the npm account ${`eve ${"x".repeat(300)}`.slice(0, 200)};`);
+  });
+});
+
+// The oldest version in range, through a whole run (docs/decisions/2026-11-03-oldest-resolution-in-product.md). lodash
+// 4.17.21 needs helper at a higher version than the one locked; the registry and npm's container are stand-ins.
+describe("npm fixes take the oldest version in range", () => {
+  const HELPER = { created: "2015-01-01T00:00:00.000Z", versions: { "1.0.0": "2015-01-01T00:00:00.000Z", "1.1.0": "2016-01-01T00:00:00.000Z", "1.2.0": "2017-01-01T00:00:00.000Z" } };
+  const needs = (range: string, extra: (name: string, version: string) => object = () => ({})) => (name: string, version: string) => ({ ...(name === "lodash" ? { dependencies: { helper: version === "4.17.21" ? range : "^1.0.0" } } : {}), ...extra(name, version) });
+  const entry = (name: string, version: string, more: object = {}) => ({ version, resolved: `https://registry.npmjs.org/${name}/-/${name}-${version}.tgz`, integrity: integrityOf(name, version), ...more });
+  const project = () => {
+    const root = fixture();
+    writeFileSync(join(root, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": { dependencies: { lodash: "4.17.20" } }, "node_modules/lodash": entry("lodash", "4.17.20", { dependencies: { helper: "^1.0.0" } }), "node_modules/helper": entry("helper", "1.0.0") } }));
+    commit(root);
+    return root;
+  };
+  /** npm's container: the candidate's lockfile has lodash at 4.17.21 requiring `range`, and helper at `helper`. `fail` makes its build fail with that text. */
+  const npm = (range: string, helper: string, fail?: string, seen?: { table?: Record<string, unknown>; script?: string; dockerfile?: string }) => {
+    const command = fakeCommand();
+    return async (args: string[]) => {
+      if (args.includes("resolve") && args.some(a => a.includes("candidate-1"))) {
+        const context = args.at(-1)!;
+        if (seen) { seen.table = JSON.parse(readFileSync(join(context, "ludion-resolve/table.json"), "utf8")); seen.script = readFileSync(join(context, "ludion-resolve/install.cjs"), "utf8"); seen.dockerfile = readFileSync(join(context, "Dockerfile"), "utf8"); }
+        if (fail) throw new Error(`Docker image command failed (1): ${fail}`);
+      }
+      const output = await command(args), out = args.find(a => a.startsWith("type=local,dest="))?.slice("type=local,dest=".length);
+      if (out?.endsWith("candidate-1-export")) writeFileSync(join(out, "package-lock.json"), JSON.stringify({ lockfileVersion: 3, packages: { "": { dependencies: { lodash: "4.17.21" } }, "node_modules/lodash": entry("lodash", "4.17.21", { dependencies: { helper: range } }), "node_modules/helper": entry("helper", helper) } }));
+      return output;
+    };
+  };
+  const run = (command: (args: string[]) => Promise<string>, fetchFn: typeof fetch, tests: { count: number } = { count: 0 }) => patchDependencies(project(), true, { fetchFn, client: client(), command, testRun: async () => { tests.count++; } });
+
+  it("patch-takes-oldest: the table goes to npm's container, helper moves to the oldest in range, and the receipt says so", async () => {
+    const seen: { table?: Record<string, unknown>; script?: string; dockerfile?: string } = {};
+    const result = await run(npm("^1.1.0", "1.1.0", undefined, seen), registry({ helper: HELPER }, needs("^1.1.0")));
+    const fix = result.receipt?.fixes[0];
+    expect(fix?.reason).toBeUndefined();
+    expect(fix?.outcome).toBe("applied");
+    expect(seen.table).toEqual({ "lodash@4.17.21": "4.17.21", "helper@^1.1.0": "1.1.0" });
+    expect(seen.script).toContain('"--ignore-scripts"');
+    expect(seen.script).toContain('"--allow-remote=none"');
+    expect(seen.dockerfile).toContain("COPY --chown=65534:65534 ludion-resolve/ /opt/ludion-resolve/");
+    expect(fix?.resolution).toMatchObject({ t: "2021-02-20T15:42:16.891Z", stopped_no_allowed: false, assert: { problems: [], waits: [], youngest: "lodash@4.17.21", t_before_push_less_wait: true } });
+    expect(fix?.resolution?.assert?.versions.map(v => [v.name, v.version, v.role])).toEqual(expect.arrayContaining([["lodash", "4.17.21", "v"], ["helper", "1.1.0", "oldest"]]));
+    expect(fix?.resolution?.answers.find(a => a.name === "helper")).toMatchObject({ version: "1.1.0", role: "oldest", excluded: { in_range: 2 } });
+  });
+  it("patch-next-oldest: a version OSV names or the registry deprecates gives way to the next one, in the table npm gets", async () => {
+    const seen: { table?: Record<string, unknown> } = {};
+    const fetchFn = registry({ helper: HELPER }, needs("^1.1.0", (name, version) => name === "helper" && version === "1.1.0" ? { deprecated: "do not use" } : {}));
+    await run(npm("^1.1.0", "1.2.0", undefined, seen), fetchFn);
+    expect(seen.table?.["helper@^1.1.0"]).toBe("1.2.0");
+  });
+  it("patch-nothing-left: npm's run fails on a requirement with nothing allowed, and the fix stops with why, untested and with no branch", async () => {
+    const tests = { count: 0 }, seen: { table?: Record<string, unknown> } = {};
+    const fetchFn = registry({ helper: HELPER }, needs("^1.1.0", (name, version) => name === "helper" && version !== "1.0.0" ? { deprecated: "do not use" } : {}));
+    const result = await run(npm("^1.1.0", "1.1.0", "#13 1.5 npm error LUDION_NO_ANSWER helper@^1.1.0 (nothing allowed)\n", seen), fetchFn, tests);
+    const fix = result.receipt?.fixes[0];
+    expect(seen.table?.["helper@^1.1.0"]).toBeNull();
+    expect(fix).toMatchObject({ outcome: "failed", branch: null, commit: null, candidate_passed: false });
+    expect(fix?.reason).toContain("No allowed version for helper@^1.1.0: nothing is left in range: 2 in range, 0 published after T, 0 withdrawn, 2 deprecated");
+    expect(fix?.reason).toContain("no newer or excluded version is taken");
+    expect(fix?.resolution).toMatchObject({ stopped_no_allowed: true, no_answer: "helper@^1.1.0" });
+    expect(tests.count).toBe(1); // The baseline's alone.
+  });
+  it("patch-not-in-table: a question the table does not hold stops the fix, and is not counted as nothing left", async () => {
+    const result = await run(npm("^1.1.0", "1.1.0", "npm error LUDION_NO_ANSWER surprise@^2.0.0 (not in the table)"), registry({ helper: HELPER }, needs("^1.1.0")));
+    const fix = result.receipt?.fixes[0];
+    expect(fix).toMatchObject({ outcome: "failed", resolution: { stopped_no_allowed: false, no_answer: "surprise@^2.0.0" } });
+    expect(fix?.reason).toContain("does not hold");
+  });
+  it("patch-other-failure: any other failure of npm's run keeps its own reason, and is no stop of this kind", async () => {
+    const result = await run(npm("^1.1.0", "1.1.0", "npm error code ERESOLVE"), registry({ helper: HELPER }, needs("^1.1.0")));
+    expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "failed", reason: expect.stringContaining("ERESOLVE"), resolution: { stopped_no_allowed: false } });
+  });
+  it("patch-landing: a version npm wrote that the table did not give stops the fix before any test of it", async () => {
+    const tests = { count: 0 };
+    const result = await run(npm("^1.1.0", "1.2.0"), registry({ helper: HELPER }, needs("^1.1.0")), tests);
+    const fix = result.receipt?.fixes[0];
+    expect(fix).toMatchObject({ outcome: "failed", branch: null, candidate_passed: false });
+    expect(fix?.reason).toContain("helper@1.2.0 at node_modules/helper is not a version the table");
+    expect(tests.count).toBe(1);
+  });
+  it("patch-keeps-locked: a version that still satisfies the range and moves stops the fix", async () => {
+    const result = await run(npm("^1.0.0", "1.1.0"), registry({ helper: HELPER }, needs("^1.0.0")));
+    expect(result.receipt?.fixes[0]?.reason).toContain("moved packages that were not planned (helper@1.0.0)");
+  });
+  it("patch-waits: the diff's youngest version sets the line: too young at this push, the fix has no branch and says until when", async () => {
+    const recent = new Date(Date.now() - 3_600_000).toISOString(), older = new Date(Date.now() - 2 * 3_600_000).toISOString();
+    const fetchFn = registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": recent } }, helper: { ...HELPER, versions: { ...HELPER.versions, "1.1.0": older, "1.2.0": older } } }, needs("^1.1.0"));
+    const result = await run(npm("^1.1.0", "1.1.0"), fetchFn);
+    const fix = result.receipt?.fixes[0], assert = fix?.resolution?.assert;
+    expect(fix).toMatchObject({ outcome: "failed", branch: null });
+    expect(fix?.reason).toContain("wait is not over");
+    expect(assert).toMatchObject({ youngest: "lodash@4.17.21", wait_until: new Date(Date.parse(recent) + assert!.wait_hours * 3_600_000).toISOString(), problems: [] });
+    expect(assert?.waits).toEqual(expect.arrayContaining([expect.stringContaining("lodash@4.17.21"), expect.stringContaining("helper@1.1.0")]));
+  });
+  it("patch-age-assert: the assert stops a fix on its own when the judge's later read says the wait is over", async () => {
+    // The registry's answer changes between the table's read and the judge's: the table saw V published an hour ago.
+    let before = true;
+    const recent = new Date(Date.now() - 3_600_000).toISOString();
+    const young = registry({ lodash: { created: "2012-04-23T16:37:11.912Z", versions: { "4.17.20": "2020-08-13T16:53:54.152Z", "4.17.21": recent } }, helper: HELPER }, needs("^1.1.0")), old = registry({ helper: HELPER }, needs("^1.1.0"));
+    const command = npm("^1.1.0", "1.1.0");
+    const result = await run(async args => { if (args.includes("resolve") && args.some(a => a.includes("candidate-1"))) before = false; return command(args); }, (url, init) => (before ? young : old)(url, init));
+    const fix = result.receipt?.fixes[0];
+    expect(fix?.judgement?.verdict).toBe("ready_except_build");
+    expect(fix).toMatchObject({ outcome: "failed", branch: null, candidate_passed: false });
+    expect(fix?.reason).toContain(`Not applied before ${fix?.resolution?.assert?.wait_until}`);
+    expect(fix?.reason).toContain("lodash@4.17.21");
+  });
+  it("patch-read-fails: a lookup the table needs that fails stops the fix before npm's container", async () => {
+    const seen: string[] = [], base = registry({ helper: HELPER }, needs("^1.1.0"));
+    const fetchFn: typeof fetch = async (url, init) => String(url) === "https://api.osv.dev/v1/querybatch" ? new Response("", { status: 503 }) : base(url, init);
+    const command = npm("^1.1.0", "1.1.0");
+    const result = await run(async args => { if (args.includes("resolve")) seen.push(args.at(-1)!); return command(args); }, fetchFn);
+    expect(result.receipt?.fixes[0]).toMatchObject({ outcome: "failed", reason: expect.stringContaining("HTTP 503") });
+    expect(seen.filter(context => context.includes("candidate"))).toEqual([]);
+  });
+  it("patch-npm-only: Composer's container gets no table, and neither does a baseline", () => {
+    expect(resolverDockerfile("composer", `composer@${DIGEST}`, true, false, [{ name: "a/b", from: "1.0.0", to: "1.0.1", advisories: [] }])).not.toContain("ludion-resolve");
+    expect(resolverDockerfile("npm", `node@${DIGEST}`, false)).not.toContain("ludion-resolve");
   });
 });

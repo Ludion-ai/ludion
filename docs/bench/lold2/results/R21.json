@@ -1,0 +1,111 @@
+{
+  "id": "R21",
+  "package": "next-auth 4.24.11 -> 4.24.12",
+  "lold_outcome": "built",
+  "t": "2025-10-29T10:43:57.000Z",
+  "table_seconds": 21.82,
+  "table_requirements": 25,
+  "table_without_answer": [
+    {
+      "requirement": "uuid@^8.3.2",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "next@^12.2.5 || ^13 || ^14 || ^15 || ^16",
+      "reason": "nothing is left in range: 241 in range, 57 published after T, 0 withdrawn, 143 deprecated, 41 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 241,
+        "no_time": 0,
+        "after_t": 57,
+        "withdrawn": 0,
+        "deprecated": 143,
+        "advisory": 41
+      }
+    }
+  ],
+  "moved_non_v": 0,
+  "path_moved": 0,
+  "path_added": 0,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "ready_except_build",
+  "refusal": null,
+  "assert": {
+    "t": "2025-10-29T10:43:57.000Z",
+    "resolved_at": "2025-10-29T10:43:57.000Z",
+    "wait_hours": 144,
+    "youngest": "next-auth@4.24.12",
+    "wait_until": "2025-11-02T23:08:44.311Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/next-auth",
+        "name": "next-auth",
+        "version": "4.24.12",
+        "role": "v",
+        "published_at": "2025-10-27T23:08:44.311Z",
+        "age_hours": 8906
+      }
+    ]
+  },
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "next-auth@4.24.12",
+      "version": "4.24.12",
+      "role": "v",
+      "published_at": "2025-10-27T23:08:44.311Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "uuid@^8.3.2",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "next@^12.2.5 || ^13 || ^14 || ^15 || ^16",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 241,
+        "no_time": 0,
+        "after_t": 57,
+        "withdrawn": 0,
+        "deprecated": 143,
+        "advisory": 41
+      }
+    }
+  ]
+}

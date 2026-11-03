@@ -1,0 +1,102 @@
+{
+  "id": "R01",
+  "package": "react-server-dom-turbopack 19.2.1 -> 19.2.2",
+  "lold_outcome": "built",
+  "t": "2025-12-11T22:36:08.000Z",
+  "table_seconds": 1.629,
+  "table_requirements": 7,
+  "table_without_answer": [],
+  "moved_non_v": 2,
+  "path_moved": 2,
+  "path_added": 0,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "stop",
+  "refusal": "The judge stops the candidate: gate 2: react-server-dom-turbopack@19.2.2 is deprecated: High Security Vulnerability in React Server Components gate 1: react-server-dom-turbopack@19.2.2 has known advisories that 19.2.1 did not have: GHSA-7gmr-mq3h-m5h9.",
+  "assert": {
+    "t": "2025-12-11T22:36:08.000Z",
+    "resolved_at": "2025-12-11T22:36:08.000Z",
+    "wait_hours": 24,
+    "youngest": "react-server-dom-turbopack@19.2.2",
+    "wait_until": "2025-12-12T20:02:16.204Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/react",
+        "name": "react",
+        "version": "19.2.2",
+        "role": "oldest",
+        "published_at": "2025-12-11T20:02:00.544Z",
+        "age_hours": 7829
+      },
+      {
+        "path": "node_modules/react-dom",
+        "name": "react-dom",
+        "version": "19.2.2",
+        "role": "oldest",
+        "published_at": "2025-12-11T20:02:08.367Z",
+        "age_hours": 7829
+      },
+      {
+        "path": "node_modules/react-server-dom-turbopack",
+        "name": "react-server-dom-turbopack",
+        "version": "19.2.2",
+        "role": "v",
+        "published_at": "2025-12-11T20:02:16.204Z",
+        "age_hours": 7829
+      }
+    ]
+  },
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "react-server-dom-turbopack@19.2.2",
+      "version": "19.2.2",
+      "role": "v",
+      "published_at": "2025-12-11T20:02:16.204Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "react@^19.2.2",
+      "version": "19.2.2",
+      "role": "oldest",
+      "published_at": "2025-12-11T20:02:00.544Z",
+      "excluded": {
+        "in_range": 10,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "react-dom@^19.2.2",
+      "version": "19.2.2",
+      "role": "oldest",
+      "published_at": "2025-12-11T20:02:08.367Z",
+      "excluded": {
+        "in_range": 10,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ]
+}

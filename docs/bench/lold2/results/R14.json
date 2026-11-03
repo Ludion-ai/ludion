@@ -1,0 +1,797 @@
+{
+  "id": "R14",
+  "package": "@finos/git-proxy 1.19.1 -> 1.19.2",
+  "lold_outcome": "built",
+  "t": "2025-07-30T16:40:40.000Z",
+  "table_seconds": 56.183,
+  "table_requirements": 333,
+  "table_without_answer": [
+    {
+      "requirement": "uuid@^11.0.0",
+      "reason": "nothing is left in range: 8 in range, 1 published after T, 0 withdrawn, 0 deprecated, 7 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 7
+      }
+    },
+    {
+      "requirement": "axios@^1.6.0",
+      "reason": "nothing is left in range: 50 in range, 12 published after T, 1 withdrawn, 0 deprecated, 37 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 50,
+        "no_time": 0,
+        "after_t": 12,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 37
+      }
+    },
+    {
+      "requirement": "lodash@^4.17.21",
+      "reason": "nothing is left in range: 4 in range, 1 published after T, 0 withdrawn, 1 deprecated, 2 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 2
+      }
+    },
+    {
+      "requirement": "moment@^2.29.4",
+      "reason": "nothing is left in range: 4 in range, 1 published after T, 0 withdrawn, 0 deprecated, 3 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    },
+    {
+      "requirement": "nodemailer@^6.6.1",
+      "reason": "nothing is left in range: 34 in range, 0 published after T, 0 withdrawn, 0 deprecated, 34 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 34,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 34
+      }
+    },
+    {
+      "requirement": "simple-git@^3.25.0",
+      "reason": "nothing is left in range: 17 in range, 3 published after T, 0 withdrawn, 0 deprecated, 14 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 17,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 14
+      }
+    },
+    {
+      "requirement": "@material-ui/core@^4.11.0",
+      "reason": "nothing is left in range: 10 in range, 0 published after T, 0 withdrawn, 10 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 10,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 10,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "qs@6.13.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "proxy-addr@~2.0.7",
+      "reason": "nothing is left in range: 2 in range, 1 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "body-parser@1.20.3",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "path-to-regexp@0.1.12",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "diff@^7.0.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "elliptic@^6.6.1",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "shell-quote@^1.8.1",
+      "reason": "nothing is left in range: 8 in range, 2 published after T, 0 withdrawn, 0 deprecated, 6 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 6
+      }
+    },
+    {
+      "requirement": "jws@^3.2.2",
+      "reason": "nothing is left in range: 2 in range, 1 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "on-headers@~1.0.2",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "react-router@6.28.2",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@remix-run/router@1.21.1",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@material-ui/core@^4.0.0",
+      "reason": "nothing is left in range: 57 in range, 0 published after T, 0 withdrawn, 57 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 57,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 57,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "activedirectory2@^2.1.0",
+      "reason": "nothing is left in range: 2 in range, 0 published after T, 0 withdrawn, 2 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 2,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "ip-address@^9.0.5",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "mkdirp@0.3.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "bn.js@^4.0.0",
+      "reason": "nothing is left in range: 42 in range, 3 published after T, 0 withdrawn, 0 deprecated, 39 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 42,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 39
+      }
+    },
+    {
+      "requirement": "glob@^10.2.2",
+      "reason": "nothing is left in range: 30 in range, 0 published after T, 0 withdrawn, 30 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 30,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 30,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "minimatch@^9.0.0",
+      "reason": "nothing is left in range: 10 in range, 0 published after T, 0 withdrawn, 0 deprecated, 10 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 10,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 10
+      }
+    }
+  ],
+  "moved_non_v": 4,
+  "path_moved": 4,
+  "path_added": 0,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "ready_except_build",
+  "refusal": null,
+  "assert": {
+    "t": "2025-07-30T16:40:40.000Z",
+    "resolved_at": "2025-07-30T16:40:40.000Z",
+    "wait_hours": 72,
+    "youngest": "@finos/git-proxy@1.19.2",
+    "wait_until": "2025-08-02T15:20:11.050Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/@esbuild/darwin-arm64",
+        "name": "@esbuild/darwin-arm64",
+        "version": "0.25.6",
+        "role": "oldest",
+        "published_at": "2025-07-07T16:58:55.400Z",
+        "age_hours": 11600.1
+      },
+      {
+        "path": "node_modules/@esbuild/darwin-x64",
+        "name": "@esbuild/darwin-x64",
+        "version": "0.25.6",
+        "role": "oldest",
+        "published_at": "2025-07-07T16:58:55.105Z",
+        "age_hours": 11600.1
+      },
+      {
+        "path": "node_modules/@esbuild/linux-x64",
+        "name": "@esbuild/linux-x64",
+        "version": "0.25.6",
+        "role": "oldest",
+        "published_at": "2025-07-07T16:59:21.121Z",
+        "age_hours": 11600.1
+      },
+      {
+        "path": "node_modules/@esbuild/win32-x64",
+        "name": "@esbuild/win32-x64",
+        "version": "0.25.6",
+        "role": "oldest",
+        "published_at": "2025-07-07T16:58:30.837Z",
+        "age_hours": 11600.1
+      },
+      {
+        "path": "node_modules/@finos/git-proxy",
+        "name": "@finos/git-proxy",
+        "version": "1.19.2",
+        "role": "v",
+        "published_at": "2025-07-30T15:20:11.050Z",
+        "age_hours": 11049.8
+      }
+    ]
+  },
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "@finos/git-proxy@1.19.2",
+      "version": "1.19.2",
+      "role": "v",
+      "published_at": "2025-07-30T15:20:11.050Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@esbuild/linux-x64@0.25.6",
+      "version": "0.25.6",
+      "role": "oldest",
+      "published_at": "2025-07-07T16:59:21.121Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@esbuild/win32-x64@0.25.6",
+      "version": "0.25.6",
+      "role": "oldest",
+      "published_at": "2025-07-07T16:58:30.837Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@esbuild/darwin-x64@^0.25.6",
+      "version": "0.25.6",
+      "role": "oldest",
+      "published_at": "2025-07-07T16:58:55.105Z",
+      "excluded": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@esbuild/darwin-arm64@^0.25.6",
+      "version": "0.25.6",
+      "role": "oldest",
+      "published_at": "2025-07-07T16:58:55.400Z",
+      "excluded": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "uuid@^11.0.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 7
+      }
+    },
+    {
+      "requirement": "axios@^1.6.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 50,
+        "no_time": 0,
+        "after_t": 12,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 37
+      }
+    },
+    {
+      "requirement": "lodash@^4.17.21",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 2
+      }
+    },
+    {
+      "requirement": "moment@^2.29.4",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    },
+    {
+      "requirement": "nodemailer@^6.6.1",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 34,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 34
+      }
+    },
+    {
+      "requirement": "simple-git@^3.25.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 17,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 14
+      }
+    },
+    {
+      "requirement": "@material-ui/core@^4.11.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 10,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 10,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "qs@6.13.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "proxy-addr@~2.0.7",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "body-parser@1.20.3",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "path-to-regexp@0.1.12",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "diff@^7.0.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "elliptic@^6.6.1",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "shell-quote@^1.8.1",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 6
+      }
+    },
+    {
+      "requirement": "jws@^3.2.2",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "on-headers@~1.0.2",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "react-router@6.28.2",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@remix-run/router@1.21.1",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@material-ui/core@^4.0.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 57,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 57,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "activedirectory2@^2.1.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 2,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "ip-address@^9.0.5",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "mkdirp@0.3.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "bn.js@^4.0.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 42,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 39
+      }
+    },
+    {
+      "requirement": "glob@^10.2.2",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 30,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 30,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "minimatch@^9.0.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 10,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 10
+      }
+    }
+  ]
+}

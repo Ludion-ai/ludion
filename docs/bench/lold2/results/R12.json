@@ -1,0 +1,102 @@
+{
+  "id": "R12",
+  "package": "multer 2.0.0 -> 2.0.1",
+  "lold_outcome": "built",
+  "t": "2025-06-05T01:09:35.000Z",
+  "table_seconds": 2.166,
+  "table_requirements": 20,
+  "table_without_answer": [],
+  "moved_non_v": 2,
+  "path_moved": 2,
+  "path_added": 0,
+  "path_removed": 3,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "ready_except_build",
+  "refusal": null,
+  "assert": {
+    "t": "2025-06-05T01:09:35.000Z",
+    "resolved_at": "2025-06-05T01:09:35.000Z",
+    "wait_hours": 72,
+    "youngest": "multer@2.0.1",
+    "wait_until": "2025-06-06T16:30:49.895Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/concat-stream",
+        "name": "concat-stream",
+        "version": "2.0.0",
+        "role": "oldest",
+        "published_at": "2018-12-21T14:22:15.876Z",
+        "age_hours": 68962.7
+      },
+      {
+        "path": "node_modules/multer",
+        "name": "multer",
+        "version": "2.0.1",
+        "role": "v",
+        "published_at": "2025-06-03T16:30:49.895Z",
+        "age_hours": 12416.6
+      },
+      {
+        "path": "node_modules/readable-stream",
+        "name": "readable-stream",
+        "version": "3.0.2",
+        "role": "oldest",
+        "published_at": "2018-08-20T08:15:38.545Z",
+        "age_hours": 71920.8
+      }
+    ]
+  },
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "multer@2.0.1",
+      "version": "2.0.1",
+      "role": "v",
+      "published_at": "2025-06-03T16:30:49.895Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "concat-stream@^2.0.0",
+      "version": "2.0.0",
+      "role": "oldest",
+      "published_at": "2018-12-21T14:22:15.876Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "readable-stream@^3.0.2",
+      "version": "3.0.2",
+      "role": "oldest",
+      "published_at": "2018-08-20T08:15:38.545Z",
+      "excluded": {
+        "in_range": 14,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ]
+}

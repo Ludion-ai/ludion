@@ -1,0 +1,181 @@
+{
+  "id": "R11",
+  "package": "@sentry/nestjs 8.48.0 -> 8.49.0",
+  "lold_outcome": "stopped_no_allowed",
+  "t": "2025-01-28T20:37:26.000Z",
+  "table_seconds": 14.945,
+  "table_requirements": 77,
+  "table_without_answer": [
+    {
+      "requirement": "@nestjs/core@^8.0.0 || ^9.0.0 || ^10.0.0",
+      "reason": "nothing is left in range: 124 in range, 0 published after T, 0 withdrawn, 0 deprecated, 124 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 124,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 124
+      }
+    },
+    {
+      "requirement": "@nestjs/common@^8.0.0 || ^9.0.0 || ^10.0.0",
+      "reason": "nothing is left in range: 124 in range, 7 published after T, 0 withdrawn, 0 deprecated, 117 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 124,
+        "no_time": 0,
+        "after_t": 7,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 117
+      }
+    },
+    {
+      "requirement": "@opentelemetry/core@^1.29.0",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 0 deprecated, 3 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    },
+    {
+      "requirement": "@opentelemetry/sdk-trace-base@^1.29.0",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 3 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 3,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-pg@0.49.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-knex@0.43.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-mysql@0.44.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-mysql2@0.44.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-tedious@0.17.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-mongoose@0.45.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/sdk-trace-base@^1.22",
+      "reason": "nothing is left in range: 12 in range, 0 published after T, 0 withdrawn, 12 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 12,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 12,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@opentelemetry/core@1.30.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/core@^1.8.0",
+      "reason": "nothing is left in range: 32 in range, 0 published after T, 0 withdrawn, 0 deprecated, 32 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 32,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 32
+      }
+    },
+    {
+      "requirement": "@opentelemetry/core@1.29.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    }
+  ],
+  "outcome": "stopped_no_allowed",
+  "no_answer": "@opentelemetry/core@^1.29.0",
+  "reason": "No allowed version for @opentelemetry/core@^1.29.0: nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 0 deprecated, 3 named by OSV, 0 with no publish time. This fix stops: no newer or excluded version is taken."
+}

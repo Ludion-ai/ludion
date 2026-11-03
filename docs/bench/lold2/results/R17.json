@@ -1,0 +1,133 @@
+{
+  "id": "R17",
+  "package": "@webrecorder/wabac 2.23.10 -> 2.23.11",
+  "lold_outcome": "built",
+  "t": "2025-09-10T17:13:45.000Z",
+  "table_seconds": 10.246,
+  "table_requirements": 92,
+  "table_without_answer": [
+    {
+      "requirement": "js-yaml@^4.1.0",
+      "reason": "nothing is left in range: 6 in range, 1 published after T, 0 withdrawn, 0 deprecated, 5 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 5
+      }
+    },
+    {
+      "requirement": "fast-xml-parser@^4.4.1",
+      "reason": "nothing is left in range: 9 in range, 0 published after T, 0 withdrawn, 0 deprecated, 9 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 9,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 9
+      }
+    }
+  ],
+  "moved_non_v": 1,
+  "path_moved": 1,
+  "path_added": 0,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "ready_except_build",
+  "refusal": null,
+  "assert": {
+    "t": "2025-09-10T17:13:45.000Z",
+    "resolved_at": "2025-09-10T17:13:45.000Z",
+    "wait_hours": 72,
+    "youngest": "@webrecorder/wabac@2.23.11",
+    "wait_until": "2025-09-07T17:47:54.605Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/@webrecorder/wabac",
+        "name": "@webrecorder/wabac",
+        "version": "2.23.11",
+        "role": "v",
+        "published_at": "2025-09-04T17:47:54.605Z",
+        "age_hours": 10183.3
+      },
+      {
+        "path": "node_modules/warcio",
+        "name": "warcio",
+        "version": "2.4.5",
+        "role": "oldest",
+        "published_at": "2025-09-04T01:51:15.868Z",
+        "age_hours": 10199.3
+      }
+    ]
+  },
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "@webrecorder/wabac@2.23.11",
+      "version": "2.23.11",
+      "role": "v",
+      "published_at": "2025-09-04T17:47:54.605Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "warcio@^2.4.5",
+      "version": "2.4.5",
+      "role": "oldest",
+      "published_at": "2025-09-04T01:51:15.868Z",
+      "excluded": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "js-yaml@^4.1.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 5
+      }
+    },
+    {
+      "requirement": "fast-xml-parser@^4.4.1",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 9,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 9
+      }
+    }
+  ]
+}

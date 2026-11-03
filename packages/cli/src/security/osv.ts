@@ -11,7 +11,7 @@ export function comparableVersion(version: string, ecosystem: Ecosystem): string
   return semver.valid(version);
 }
 
-export type Advisory = { id: string; summary: string; aliases: string[]; affected: { package: { ecosystem: string; name: string }; ranges?: { type?: string; events?: { fixed?: string }[] }[]; database_specific?: unknown }[]; withdrawn?: string };
+export type Advisory = { id: string; summary: string; aliases: string[]; affected: { package: { ecosystem: string; name: string }; ranges?: { type?: string; events?: { fixed?: string }[] }[]; database_specific?: unknown }[]; withdrawn?: string; published?: string };
 export type Finding = { package: Package; advisory: Advisory };
 export type DependencyScan = {
   schema: 1; checked_at: string; source: "https://osv.dev";
@@ -154,7 +154,7 @@ export class OsvClient {
     if (item.id !== id || !Array.isArray(item.affected)) throw new Error("Incomplete OSV advisory record.");
     if (item.withdrawn !== undefined && (typeof item.withdrawn !== "string" || !Number.isFinite(Date.parse(item.withdrawn)))) throw new Error("Invalid OSV withdrawal timestamp.");
     for (const affected of item.affected) if (typeof affected?.package?.name !== "string" || typeof affected?.package?.ecosystem !== "string" || (affected.ranges !== undefined && !Array.isArray(affected.ranges))) throw new Error("Invalid affected package in OSV record.");
-    const advisory: Advisory = { id, summary: String(item.summary ?? id).replace(/[\x00-\x1f\x7f]/g, " ").slice(0, 500), aliases: Array.isArray(item.aliases) ? item.aliases.filter((s: unknown) => typeof s === "string" && s.length < 200) : [], affected: item.affected, ...(typeof item.withdrawn === "string" ? { withdrawn: item.withdrawn } : {}) };
+    const advisory: Advisory = { id, summary: String(item.summary ?? id).replace(/[\x00-\x1f\x7f]/g, " ").slice(0, 500), aliases: Array.isArray(item.aliases) ? item.aliases.filter((s: unknown) => typeof s === "string" && s.length < 200) : [], affected: item.affected, ...(typeof item.withdrawn === "string" ? { withdrawn: item.withdrawn } : {}), ...(typeof item.published === "string" && Number.isFinite(Date.parse(item.published)) ? { published: item.published } : {}) };
     this.cache.set(id, advisory); return advisory;
   }
   async scan(inventory: Inventory): Promise<DependencyScan> {

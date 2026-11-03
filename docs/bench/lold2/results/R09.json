@@ -1,0 +1,289 @@
+{
+  "id": "R09",
+  "package": "snowflake-sdk 2.0.1 -> 2.0.2",
+  "lold_outcome": "stopped_no_allowed",
+  "t": "2025-01-29T18:42:26.000Z",
+  "table_seconds": 38.527,
+  "table_requirements": 293,
+  "table_without_answer": [
+    {
+      "requirement": "glob@^10.0.0",
+      "reason": "nothing is left in range: 34 in range, 0 published after T, 0 withdrawn, 34 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 34,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 34,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "toml@^3.0.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "uuid@^8.3.2",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "axios@^1.7.7",
+      "reason": "nothing is left in range: 34 in range, 20 published after T, 1 withdrawn, 0 deprecated, 13 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 34,
+        "no_time": 0,
+        "after_t": 20,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 13
+      }
+    },
+    {
+      "requirement": "bn.js@^5.2.1",
+      "reason": "nothing is left in range: 5 in range, 3 published after T, 0 withdrawn, 0 deprecated, 2 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 2
+      }
+    },
+    {
+      "requirement": "moment@^2.29.4",
+      "reason": "nothing is left in range: 4 in range, 1 published after T, 0 withdrawn, 0 deprecated, 3 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    },
+    {
+      "requirement": "fast-xml-parser@^4.2.5",
+      "reason": "nothing is left in range: 20 in range, 0 published after T, 0 withdrawn, 0 deprecated, 20 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 20,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 20
+      }
+    },
+    {
+      "requirement": "jws@^3.2.2",
+      "reason": "nothing is left in range: 2 in range, 1 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@smithy/config-resolver@^4.0.0",
+      "reason": "nothing is left in range: 61 in range, 48 published after T, 0 withdrawn, 1 deprecated, 12 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 61,
+        "no_time": 0,
+        "after_t": 48,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 12
+      }
+    },
+    {
+      "requirement": "uuid@^8.0.0",
+      "reason": "nothing is left in range: 6 in range, 0 published after T, 0 withdrawn, 6 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 6,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "fast-xml-parser@^4.4.1",
+      "reason": "nothing is left in range: 9 in range, 0 published after T, 0 withdrawn, 0 deprecated, 9 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 9,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 9
+      }
+    },
+    {
+      "requirement": "bn.js@^4.0.0",
+      "reason": "nothing is left in range: 42 in range, 3 published after T, 0 withdrawn, 0 deprecated, 39 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 42,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 39
+      }
+    },
+    {
+      "requirement": "fast-xml-parser@4.4.1",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "uuid@^9.0.1",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "fast-xml-parser@^4.3.2",
+      "reason": "nothing is left in range: 15 in range, 0 published after T, 0 withdrawn, 0 deprecated, 15 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 15,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 15
+      }
+    },
+    {
+      "requirement": "uuid@^8.3.0",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 3 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 3,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "form-data@^4.0.0",
+      "reason": "nothing is left in range: 7 in range, 1 published after T, 0 withdrawn, 0 deprecated, 6 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 6
+      }
+    },
+    {
+      "requirement": "uuid@^9.0.0",
+      "reason": "nothing is left in range: 2 in range, 0 published after T, 0 withdrawn, 2 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 2,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "jws@^4.0.0",
+      "reason": "nothing is left in range: 2 in range, 1 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@tootallnate/once@2",
+      "reason": "nothing is left in range: 2 in range, 1 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "form-data@^2.5.0",
+      "reason": "nothing is left in range: 7 in range, 1 published after T, 0 withdrawn, 1 deprecated, 5 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 5
+      }
+    },
+    {
+      "requirement": "form-data@^3.0.0",
+      "reason": "nothing is left in range: 6 in range, 1 published after T, 0 withdrawn, 0 deprecated, 5 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 5
+      }
+    },
+    {
+      "requirement": "@tootallnate/once@1",
+      "reason": "nothing is left in range: 4 in range, 0 published after T, 0 withdrawn, 0 deprecated, 4 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 4
+      }
+    }
+  ],
+  "outcome": "stopped_no_allowed",
+  "no_answer": "@smithy/config-resolver@^4.0.0",
+  "reason": "No allowed version for @smithy/config-resolver@^4.0.0: nothing is left in range: 61 in range, 48 published after T, 0 withdrawn, 1 deprecated, 12 named by OSV, 0 with no publish time. This fix stops: no newer or excluded version is taken."
+}

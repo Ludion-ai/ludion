@@ -380,9 +380,9 @@ describe("the PR job refuses an artifact the validation job would not write", { 
    * minimist, and a fix commit whose package-lock.json has `packages` (package.json does not change).
    */
   const MKDIRP = { "": { name: "app", dependencies: { lodash: "4.17.20", mkdirp: "0.5.5" } }, "node_modules/lodash": { version: "4.17.20" }, "node_modules/minimist": { version: "1.2.5" }, "node_modules/mkdirp": { version: "0.5.5", dependencies: { minimist: "^1.2.5" } } };
-  function minimistFix(p: ReturnType<typeof project>, packages: Record<string, unknown>) {
+  function minimistFix(p: ReturnType<typeof project>, packages: Record<string, unknown>, baseEntries: Record<string, unknown> = MKDIRP) {
     const text = (packages: Record<string, unknown>) => `${JSON.stringify({ name: "app", lockfileVersion: 3, packages }, null, 2)}\n`;
-    const pkg = `${JSON.stringify({ name: "app", dependencies: { lodash: "4.17.20", mkdirp: "0.5.5" } })}\n`, before = text(MKDIRP), lock = text(packages);
+    const pkg = `${JSON.stringify({ name: "app", dependencies: { lodash: "4.17.20", mkdirp: "0.5.5" } })}\n`, before = text(baseEntries), lock = text(packages);
     writeFileSync(join(p.work, "package.json"), pkg); writeFileSync(join(p.work, "package-lock.json"), before);
     git(p.work, "add", "-A"); git(p.work, "commit", "-qm", "mkdirp"); git(p.work, "push", "-q", p.origin, "HEAD:refs/heads/main");
     const base = git(p.work, "rev-parse", "HEAD"), branch = fixBranchName("", "npm", "minimist", ["1.2.6"]);
@@ -425,6 +425,21 @@ describe("the PR job refuses an artifact the validation job would not write", { 
     const p = project(), s = minimistFix(p, { ...MKDIRP, "node_modules/minimist": { version: "1.2.6" } }), gh = github(p.origin);
     const result = await open(checkout(p.origin), artifact(p.work, s.receipt, s.refs, s.base), s.base, p.origin, gh);
     expect(result.deliveries).toMatchObject([{ package: "minimist", branch: s.branch, outcome: "opened" }]);
+  });
+  it("a fix that needs a sibling at a higher version is opened, and the moved entry is what the registry lists (the oldest version's decision, section 2)", async () => {
+    const before = { ...MKDIRP, "node_modules/minimist": { version: "1.2.5", dependencies: { dep: "^1.0.0" } }, "node_modules/dep": { version: "1.0.0" } };
+    const after = { ...MKDIRP, "node_modules/minimist": { version: "1.2.6", dependencies: { dep: "^1.1.0" } }, "node_modules/dep": { version: "1.1.0" } };
+    const lists = (requires: Record<string, string>) => async (name: string, version: string) => ({ name, version, ...(name === "minimist" ? { dependencies: { dep: "^1.1.0" } } : { dependencies: requires }) });
+    for (const [manifest, outcome, why] of [
+      [lists({}), "opened", undefined],
+      // The moved entry declares what the registry does not list, as an added one would.
+      [lists({ "is-number": "^7.0.0" }), "failed", "package-lock.json's dependencies for dep@1.1.0 (node_modules/dep) is not what the registry lists"],
+    ] as const) {
+      const p = project(), s = minimistFix(p, after, before), gh = github(p.origin);
+      const result = await open(checkout(p.origin), artifact(p.work, s.receipt, s.refs, s.base), s.base, p.origin, gh, "refs/heads/main", { npmManifest: manifest });
+      expect(result.deliveries[0]).toMatchObject({ outcome, ...(why ? { reason: expect.stringContaining(why) } : {}) });
+      expect(gh.opened).toHaveLength(outcome === "opened" ? 1 : 0);
+    }
   });
   it("forged transitive npm fixes (review 6518582507, B1 and N-a)", async () => {
     const { "node_modules/minimist": _gone, ...withoutMinimist } = MKDIRP;
@@ -952,6 +967,22 @@ describe("the policy at the base decides what a fix may change, and what it may 
     // The lock is tied to the receipt's change, by install path (reviews 6516135819, N2, and 6518582507, N-a): the base
     // has the package at `from` at a path, the fix has it at `to` at that path and nowhere at `from`; an entry's own name
     // does not count. A transitive fix (package.json does not change), as the reviews forged it: minimist 1.2.5 -> 1.2.6.
+    // A sibling moves only when the fixed version needs it to (docs/decisions/2026-11-03-oldest-resolution-in-product.md, section 2).
+    const withSibling = files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20", dependencies: { dep: "^1.0.0" } }, "node_modules/dep": { version: "1.0.0" } }) });
+    const siblingFix = (packages: Record<string, unknown>) => files({ "package.json": fixedPkg, "package-lock.json": npmLock(packages) });
+    expect(contentProblem("npm", fix, withSibling, siblingFix({ "node_modules/lodash": { version: "4.17.21", dependencies: { dep: "^1.1.0" } }, "node_modules/dep": { version: "1.1.0" } }))).toBeNull();
+    expect(contentProblem("npm", fix, withSibling, siblingFix({ "node_modules/lodash": { version: "4.17.21", dependencies: { dep: "^1.0.0" } }, "node_modules/dep": { version: "1.1.0" } }))).toContain("changes node_modules/dep (1.0.0 -> 1.1.0), which this fix does not plan");
+    // Going away: the fixed version no longer requires it.
+    expect(contentProblem("npm", fix, withSibling, siblingFix({ "node_modules/lodash": { version: "4.17.21" } }))).toBeNull();
+    // A move of what another package, which stays, keeps loading is refused when that package does not take the new version.
+    const shared = { name: "app", dependencies: { lodash: "^4.17.20", stay: "1.0.0" } };
+    const sharedBase = files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20", dependencies: { dep: "^1.0.0" } }, "node_modules/dep": { version: "1.0.0" }, "node_modules/stay": { version: "1.0.0", dependencies: { dep: "1.0.0" } } }, shared) });
+    expect(contentProblem("npm", fix, sharedBase, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21", dependencies: { dep: "^1.1.0" } }, "node_modules/dep": { version: "1.1.0" }, "node_modules/stay": { version: "1.0.0", dependencies: { dep: "1.0.0" } } }, shared) }))).toContain("requires dep 1.0.0");
+    // A move the fix's own paths do not reach: stay needs it, and stay is not the fix's.
+    const unreached = files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20" }, "node_modules/dep": { version: "1.0.0" }, "node_modules/stay": { version: "1.0.0", dependencies: { dep: "^1.1.0" } } }, shared) });
+    expect(contentProblem("npm", fix, unreached, files({ "package.json": fixedPkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.21" }, "node_modules/dep": { version: "1.1.0" }, "node_modules/stay": { version: "1.0.0", dependencies: { dep: "^1.1.0" } } }, shared) }))).toContain("moves node_modules/dep, which no package the fix moves or adds requires");
+    // The same version with something else changed is no move.
+    expect(contentProblem("npm", fix, withSibling, siblingFix({ "node_modules/lodash": { version: "4.17.21", dependencies: { dep: "^1.0.0" } }, "node_modules/dep": { version: "1.0.0", resolved: "https://example.org/dep.tgz" } }))).toContain("changes node_modules/dep (1.0.0 -> 1.0.0)");
     const transitive = fixOf("minimist", "1.2.5", "1.2.6", ["package.json", "package-lock.json"]);
     const lockOf = (packages: Record<string, unknown>, root?: Record<string, unknown>) => files({ "package.json": pkg, "package-lock.json": npmLock({ "node_modules/lodash": { version: "4.17.20" }, ...packages }, root) });
     const vulnerable = lockOf({ "node_modules/minimist": { version: "1.2.5" } });

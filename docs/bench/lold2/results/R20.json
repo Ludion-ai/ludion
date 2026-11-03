@@ -1,0 +1,25 @@
+{
+  "id": "R20",
+  "package": "glob 11.0.3 -> 11.1.0",
+  "lold_outcome": "stopped_no_allowed",
+  "t": "2025-11-17T17:38:56.000Z",
+  "table_seconds": 4.487,
+  "table_requirements": 35,
+  "table_without_answer": [
+    {
+      "requirement": "minimatch@^10.1.1",
+      "reason": "nothing is left in range: 10 in range, 0 published after T, 0 withdrawn, 0 deprecated, 10 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 10,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 10
+      }
+    }
+  ],
+  "outcome": "stopped_no_allowed",
+  "no_answer": "minimatch@^10.1.1",
+  "reason": "No allowed version for minimatch@^10.1.1: nothing is left in range: 10 in range, 0 published after T, 0 withdrawn, 0 deprecated, 10 named by OSV, 0 with no publish time. This fix stops: no newer or excluded version is taken."
+}

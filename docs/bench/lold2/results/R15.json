@@ -1,0 +1,133 @@
+{
+  "id": "R15",
+  "package": "@node-saml/node-saml 5.0.1 -> 5.1.0",
+  "lold_outcome": "built",
+  "t": "2025-07-25T14:08:50.000Z",
+  "table_seconds": 2.205,
+  "table_requirements": 23,
+  "table_without_answer": [
+    {
+      "requirement": "@xmldom/xmldom@^0.8.10",
+      "reason": "nothing is left in range: 6 in range, 1 published after T, 0 withdrawn, 5 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 5,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@xmldom/xmldom@^0.8.5",
+      "reason": "nothing is left in range: 11 in range, 1 published after T, 0 withdrawn, 10 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 10,
+        "advisory": 0
+      }
+    }
+  ],
+  "moved_non_v": 1,
+  "path_moved": 1,
+  "path_added": 0,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "ready_except_build",
+  "refusal": null,
+  "assert": {
+    "t": "2025-07-25T14:08:50.000Z",
+    "resolved_at": "2025-07-25T14:08:50.000Z",
+    "wait_hours": 24,
+    "youngest": "@node-saml/node-saml@5.1.0",
+    "wait_until": "2025-07-22T23:28:29.433Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/@node-saml/node-saml",
+        "name": "@node-saml/node-saml",
+        "version": "5.1.0",
+        "role": "v",
+        "published_at": "2025-07-21T23:28:29.433Z",
+        "age_hours": 11257.6
+      },
+      {
+        "path": "node_modules/xml-crypto",
+        "name": "xml-crypto",
+        "version": "6.1.2",
+        "role": "oldest",
+        "published_at": "2025-04-24T18:06:21.759Z",
+        "age_hours": 13375
+      }
+    ]
+  },
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "@node-saml/node-saml@5.1.0",
+      "version": "5.1.0",
+      "role": "v",
+      "published_at": "2025-07-21T23:28:29.433Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "xml-crypto@^6.1.2",
+      "version": "6.1.2",
+      "role": "oldest",
+      "published_at": "2025-04-24T18:06:21.759Z",
+      "excluded": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@xmldom/xmldom@^0.8.10",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 5,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@xmldom/xmldom@^0.8.5",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 10,
+        "advisory": 0
+      }
+    }
+  ]
+}

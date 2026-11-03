@@ -15,6 +15,7 @@ import { releaseIdentity, type Judgement } from "./judge.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { registryFacts } from "./npm-facts.ts";
 import { nextFix, type VersionChoice } from "./next-fix.ts";
+import { fixResolution, noAnswerIn, noAnswerReason, RESOLVER_FOLDER, RESOLVER_SCRIPT, RESOLVER_TABLE, resolutionAssert, resolveOldest, resolverScript, tableFile, unneededMoves, type FixResolution, type ResolutionTable } from "./oldest.ts";
 import { composerVersion, npmReleases, packagistReleases, renderTimeCap, timeCap, type ReleaseIdentity, type Releases, type TimeCap } from "./time-cap.ts";
 
 /**
@@ -58,6 +59,8 @@ export type FixReceipt = {
    * whose smallest has a MAL- record (malicious), with no later version looked at.
    */
   version_choice?: VersionChoice[];
+  /** npm: T, the version each requirement got, and the asserts on the diff (docs/decisions/2026-11-03-oldest-resolution-in-product.md). */
+  resolution?: FixResolution;
   reason?: string;
 };
 export type PackageChange = { name: string; from: string[]; to: string[] };
@@ -80,7 +83,8 @@ export function changedPackages(before: Inventory, after: Inventory): PackageCha
 
 /**
  * Baseline package versions that the candidate no longer has although no planned fix replaces them. A smallest-fix
- * candidate may add packages (a fixed version's new dependencies) but must not move anything else.
+ * candidate may add packages (a fixed version's new dependencies) but must not move anything else. Composer's check;
+ * npm's is oldest.ts's unneededMoves, by install path, since a fixed version can need a sibling to move.
  */
 export function unplannedRemovals(before: Inventory, after: Inventory, plan: Change[]): string[] {
   const kept = new Set(after.packages.map(p => `${p.name}\0${p.version}`));
@@ -202,11 +206,15 @@ export function acquisitionPolicy(root: string, ecosystem: Ecosystem): void {
   }
 }
 
+/** The acquisition flags of every npm command in the resolver's container. */
+const NPM_FLAGS = ["--ignore-scripts", "--no-audit", "--no-fund", "--allow-git=none", "--allow-remote=none", "--allow-file=none", "--allow-directory=none", "--registry=https://registry.npmjs.org"];
+
 /**
  * The candidate moves only the planned packages (docs/design.md: the smallest fix, nothing else). npm: a lockfile-only
- * install from the pinned manifest records exactly the fixed versions, a second one from the final manifest keeps them,
- * then `npm ci` installs that lockfile. Composer: `update` of the planned packages at their fixed versions, with
- * --minimal-changes. Planned names and versions are inventory coordinates, never options.
+ * install from the pinned manifest records exactly the fixed versions, and every other version it needs from the table
+ * of oldest versions (oldest.ts), a second one from the final manifest keeps them, then `npm ci` installs that lockfile.
+ * Composer: `update` of the planned packages at their fixed versions, with --minimal-changes. Planned names and versions
+ * are inventory coordinates, never options.
  */
 export function resolverDockerfile(ecosystem: Ecosystem, image: string, candidate: boolean, inventoryOnly = false, plan: Change[] = []): string {
   const run = (args: string[]) => `RUN ${JSON.stringify(args)}\n`;
@@ -217,19 +225,20 @@ export function resolverDockerfile(ecosystem: Ecosystem, image: string, candidat
       if (!/^\d/.test(change.to)) throw new Error("Planned fixed versions must start with a digit.");
     }
   }
-  const npmFlags = ["--ignore-scripts", "--no-audit", "--no-fund", "--allow-git=none", "--allow-remote=none", "--allow-file=none", "--allow-directory=none", "--registry=https://registry.npmjs.org"];
+  const npmFlags = NPM_FLAGS;
   let text = `FROM ${image} AS resolve\nUSER root\nRUN mkdir -p /app /opt/ludion-m2 && chown -R 65534:65534 /app /opt/ludion-m2\nWORKDIR /app\nENV HOME=/tmp COMPOSER_HOME=/tmp/composer MAVEN_CONFIG=/tmp/maven NPM_CONFIG_CACHE=/tmp/npm\n`;
   if (ecosystem === "npm") {
     text += run(["npm", "install", "--global", "npm@12.2.1", "--ignore-scripts", "--no-audit", "--no-fund", "--registry=https://registry.npmjs.org"]);
     text += run(["chown", "-R", "65534:65534", "/tmp/npm"]);
   }
+  if (ecosystem === "npm" && candidate) text += `COPY --chown=65534:65534 ${RESOLVER_FOLDER}/ /opt/${RESOLVER_FOLDER}/\n`;
   text += "COPY --chown=65534:65534 manifests/ ./\nUSER 65534:65534\n";
   if (ecosystem === "npm") {
     text += run(["node", "-e", "if(require('/usr/local/lib/node_modules/npm/package.json').version!=='12.2.1')process.exit(1)"]);
     if (candidate) {
-      text += run(["npm", "install", "--package-lock-only", ...npmFlags]);
+      text += run(["node", RESOLVER_SCRIPT]);
       text += run(["cp", NPM_FINAL_MANIFEST, "package.json"]);
-      text += run(["npm", "install", "--package-lock-only", ...npmFlags]);
+      text += run(["node", RESOLVER_SCRIPT]);
       text += run(["rm", NPM_FINAL_MANIFEST]);
     }
     text += run(["npm", "ci", ...npmFlags]);
@@ -382,10 +391,15 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
       receipt.tool_image = `${requested.split("@")[0]}@${String(resolved).split("@")[1]}`;
     }
     /** Acquire one side's dependencies: the baseline (no plan) or one fix's candidate. */
-    const acquire = async (label: string, plan: Change[] | null) => {
+    const acquire = async (label: string, plan: Change[] | null, table?: ResolutionTable) => {
       active();
       const context = join(temp, label), manifests = join(context, "manifests"), exported = join(temp, `${label}-export`);
       mkdirSync(manifests, { recursive: true }); mkdirSync(exported);
+      if (plan && table) {
+        mkdirSync(join(context, RESOLVER_FOLDER));
+        writeFileSync(join(context, RESOLVER_FOLDER, "install.cjs"), resolverScript(NPM_FLAGS));
+        writeFileSync(join(context, RESOLVER_FOLDER, RESOLVER_TABLE), tableFile(table));
+      }
       for (const file of MANIFESTS[ecosystem]) writeFileSync(join(manifests, file), textFile(source, file));
       let finalManifest = "";
       if (plan) {
@@ -454,11 +468,25 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         const published = await dependencyFixPublished(ecosystem, fix.changes, deps.fetchFn); active();
         fix.fix_published_at = published.at; fix.fix_published_note = published.note;
         if (fix.fix_published_at && fix.version_choice?.some(c => c.chosen)) fix.fix_published_note += " The smallest fixed version was passed over (version_choice); this is the latest publish time among the fix's planned versions, the version taken included.";
-        const label = `candidate-${index + 1}`, candidate = await acquire(label, fix.changes);
+        const label = `candidate-${index + 1}`;
+        // npm: the version every requirement gets, from metadata alone, before anything is resolved in the container.
+        const table = ecosystem === "npm" ? await resolveOldest({ plan: fix.changes, baseLock: textFile(source, "package-lock.json"), finalManifest: changedManifest(source, ecosystem, fix.changes), findings: scan.findings, ...(deps.fetchFn ? { fetchFn: deps.fetchFn } : {}) }) : undefined;
+        if (table) fix.resolution = fixResolution(table);
+        active();
+        let candidate: Awaited<ReturnType<typeof acquire>>;
+        try { candidate = await acquire(label, fix.changes, table); }
+        catch (error) {
+          const key = table && noAnswerIn(error instanceof Error ? error.message : String(error));
+          if (!key) throw error;
+          const { reason, stopped_no_allowed } = noAnswerReason(table!, key);
+          fix.resolution = { ...fix.resolution!, stopped_no_allowed, no_answer: key };
+          throw new Error(reason);
+        }
         if (candidate.archives.length) fix.archives = candidate.archives;
         fix.changed_packages = changedPackages(baseline.inventory, candidate.inventory);
         if (ecosystem !== "maven") {
-          const moved = unplannedRemovals(baseline.inventory, candidate.inventory, fix.changes);
+          // npm: a version already locked moves only when a package that loads it no longer takes it. Composer: nothing else moves.
+          const moved = ecosystem === "npm" ? unneededMoves(textFile(source, "package-lock.json"), textFile(candidate.exported, "package-lock.json"), fix.changes).map(m => `${m.name}@${m.from}`) : unplannedRemovals(baseline.inventory, candidate.inventory, fix.changes);
           if (moved.length) throw new Error(`The candidate also moved packages that were not planned (${moved.slice(0, 10).join(", ")}${moved.length > 10 ? ", ..." : ""}); that needs review.`);
           const cap = fix.time_cap = await candidateTimeCap(ecosystem, baseline.inventory, candidate.inventory, fix.changes, deps.fetchFn); active();
           if (cap.undecidable.length) throw new Error(`The time cap could not be checked: ${cap.undecidable.slice(0, 5).join(" ")}`);
@@ -466,8 +494,16 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
           // The judge on this fix alone: the change from the project's lockfile to this fix's candidate, whose folder the
           // branch commit's files are read from. A refusal stops only this fix.
           if (ecosystem === "npm") {
-            const refusal = candidateRefusal(fix.judgement = await judgeNpmCandidate(source, candidate.exported, deps.fetchFn)); active();
+            const judgement = fix.judgement = await judgeNpmCandidate(source, candidate.exported, deps.fetchFn); active();
+            // The asserts on the diff as npm wrote it: the versions' ages at this moment, and the versions against the table.
+            const published = new Map<string, string | null>();
+            for (const c of judgement.changes) published.set(`${c.name}@${c.to}`, await table!.publishedAt(c.name, c.to));
+            active();
+            const assert = resolutionAssert({ table: table!, changes: judgement.changes, waitHours: judgement.wait_hours, pushedAt: new Date(), published: (name, version) => published.get(`${name}@${version}`) });
+            fix.resolution = { ...fixResolution(table!, judgement.changes), assert };
+            const refusal = candidateRefusal(judgement);
             if (refusal) throw new Error(refusal);
+            if (assert.waits.length) throw new Error(`Not applied before ${assert.wait_until}: ${assert.waits.slice(0, 5).join(" ")} Run the patch again after it.`);
           }
         }
         compatible(baseline.inventory, candidate.inventory);
@@ -478,6 +514,9 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         const left = after.findings.filter(f => f.package.name === fix.package || !versioned.has(findingId(f))).map(findingId);
         const unfixable = after.blocked.filter(b => b.startsWith(`${fix.package}@`) || !scan.blocked.includes(b));
         if (left.length || unfixable.length || after.inventory.limitations.length) throw new Error(`Candidate still contains known advisory findings or incomplete inventory${left.length ? ` (${left.slice(0, 5).join(", ")})` : ""}; no source change was made.`);
+        // After OSV's re-scan, whose reason says more about a version with a record, and before any test runs.
+        const landing = fix.resolution?.assert?.problems ?? [];
+        if (landing.length) throw new Error(`The asserts on the oldest versions stop this fix: ${landing.slice(0, 5).join(" ")}`);
         const files = MANIFESTS[ecosystem].map(path => ({ path, before: textFile(source, path), after: textFile(candidate.exported, path) })).filter(f => f.before !== f.after);
         if (!files.length) throw new Error("No dependency file changed.");
         fix.candidate_image = await test(label, candidate.exported, candidate.installedCache);

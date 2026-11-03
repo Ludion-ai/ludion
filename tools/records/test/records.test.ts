@@ -192,6 +192,156 @@ describe("the rule on recording a review", () => {
   });
 });
 
+describe("C2's count (docs/decisions/2026-11-03-c2-upper-limit-chains.md)", () => {
+  const RECORD = "docs/decisions/2026-11-03-c2-upper-limit-chains.md";
+  const record = read(RECORD);
+
+  // Section 1's rule. No code on main computes n; the replay's code for it belongs to C12's fix.
+  type Version = { name: string; version: string; published: string; falseReport?: boolean; aliases?: string[] };
+  const SEVEN_DAYS = 7 * 24 * 3_600_000;
+  // Line 7 as section 6 amends it. "Where there is none" is read here for the pair: no alias joins these two.
+  const sameAttack = (a: Version, b: Version) => (a.aliases ?? []).some(alias => (b.aliases ?? []).includes(alias))
+    || (a.name === b.name && Math.abs(Date.parse(a.published) - Date.parse(b.published)) <= SEVEN_DAYS);
+  /** Puts together the parts that have versions of one attack, directly or through another part. */
+  const joinAttacks = (parts: Version[][]) => {
+    let out: Version[][] = [];
+    for (const part of parts) {
+      const joined = out.filter(other => other.some(a => part.some(b => sameAttack(a, b))));
+      out = [...out.filter(other => !joined.includes(other)), [...joined.flat(), ...part]];
+    }
+    return out;
+  };
+  const chains = (versions: Version[]) => {
+    const out: Version[][] = [];
+    let last = -Infinity;
+    for (const v of [...versions].sort((a, b) => Date.parse(a.published) - Date.parse(b.published))) {
+      const at = Date.parse(v.published);
+      if (at - last > SEVEN_DAYS) out.push([]);
+      out.at(-1)!.push(v);
+      last = at;
+    }
+    return joinAttacks(out);
+  };
+  const attacks = (versions: Version[]) => joinAttacks(versions.map(v => [v]));
+  const nOf = (versions: Version[]) => chains(versions).filter(chain => chain.some(v => !v.falseReport)).length;
+  const limit = (n: number) => 1 - 0.05 ** (1 / n);
+
+  const WAVE = ["ansi-regex@6.2.1", "ansi-styles@6.2.2", "chalk@5.6.1", "color-convert@3.1.1", "color-name@2.0.1", "color-string@2.1.1", "color@5.0.1", "debug@4.4.2", "error-ex@1.3.3", "has-ansi@6.0.1", "is-arrayish@0.3.3", "simple-swizzle@0.2.3", "slice-ansi@7.1.1", "strip-ansi@7.1.1", "supports-color@10.2.1", "supports-hyperlinks@4.1.1", "wrap-ansi@9.0.1"];
+
+  it("c2-wave-is-one-attack: the 17 versions of 2025-09-08/09 on watched names make one chain, so n = 1", () => {
+    const watched = JSON.parse(read("tools/shadow/watched.json")).names as Record<string, string[]>;
+    const rows = JSON.parse(read("docs/bench/2026-10-28-judge-backtest/malicious.json")).rows as (Version & { id: string })[];
+    const wave = rows.filter(r => /^2025-09-0[89]T/.test(r.published) && Object.hasOwn(watched, r.name));
+    expect(wave.map(r => `${r.name}@${r.version}`).sort()).toEqual(WAVE);
+    expect(new Set(wave.map(r => r.id)).size).toBe(17);
+    expect(chains(wave).length).toBe(1);
+    expect(nOf(wave)).toBe(1);
+    // The record's two numbers: 95% with n = 1, and 16.2% if the same versions were 17 units.
+    expect(limit(1)).toBeCloseTo(0.95, 10);
+    expect(record).toContain("n = 1 gives 95%");
+    expect(limit(17)).toBeCloseTo(0.162, 3);
+    expect(record).toContain("a limit of 16.2%");
+  });
+
+  it("c2-wave-is-one-attack: the record states the rule, and a chain breaks only on a gap over 7 days", () => {
+    const at = (ms: number, falseReport = false): Version => ({ name: "p", version: String(ms), published: new Date(Date.UTC(2025, 0, 1) + ms).toISOString(), falseReport });
+    const DAY = 24 * 3_600_000;
+    expect(flat(record)).toContain("**n is the number of chains.**");
+    expect(flat(record)).toContain("Two neighbours whose publish times are at most 7 days apart are in the same chain");
+    expect(flat(record)).toContain("A chain made only of false-report candidates is not counted in n.");
+    expect(flat(record)).toContain("The 7 days do not change after results are seen.");
+    expect(record.toLowerCase()).not.toContain("campaign");
+    // A chain, not a span: 12 days in steps of 6 is one chain. Exactly 7 days joins; a millisecond more does not.
+    expect(nOf([at(12 * DAY), at(0), at(6 * DAY)])).toBe(1);
+    expect(nOf([at(30 * DAY), at(0)])).toBe(2);
+    expect(nOf([at(0), at(7 * DAY)])).toBe(1);
+    expect(nOf([at(0), at(7 * DAY + 1)])).toBe(2);
+    // False-report candidates alone are not in n. In a chain with a counted version, they stay in it and can join two.
+    expect(nOf([at(0, true), at(DAY, true)])).toBe(0);
+    expect(nOf([at(0, true), at(30 * DAY)])).toBe(1);
+    expect(nOf([at(0), at(6 * DAY, true), at(12 * DAY)])).toBe(1);
+    expect(nOf([])).toBe(0);
+  });
+
+  it("c2-n-is-at-most-k: versions of one attack are in one chain, so a chain is a union of attacks and n <= k", () => {
+    expect(flat(record)).toContain("Versions that line 7 makes one attack are also in the same chain.");
+    expect(flat(record)).toContain("Attacks are joined by the OSV alias; where there is none, the same package within 7 days.");
+    const on = (day: number, name: string, aliases: string[] = [], falseReport = false): Version => ({ name, version: `${day}`, published: new Date(Date.UTC(2025, 0, 1 + day)).toISOString(), aliases, falseReport });
+    // The case the sentence closes: one attack through an alias, 30 days apart, was 2 chains and k = 1.
+    const apart = [on(0, "p", ["A"]), on(30, "q", ["A"])];
+    expect([nOf(apart), attacks(apart).length]).toEqual([1, 1]);
+    // No alias: two attacks, whether the package is the same or not.
+    expect([nOf([on(0, "p"), on(30, "q")]), attacks([on(0, "p"), on(30, "q")]).length]).toEqual([2, 2]);
+    expect([nOf([on(0, "p"), on(30, "p")]), attacks([on(0, "p"), on(30, "p")]).length]).toEqual([2, 2]);
+    // An attack that spans another stays apart from it: the join goes by attack, not by the time between.
+    const spans = [on(0, "p", ["A"]), on(15, "r"), on(30, "q", ["A"])];
+    expect([nOf(spans), attacks(spans).length]).toEqual([2, 2]);
+    // Candidates alone are in k and not in n (line 6, section 1), so n can be smaller than k.
+    const candidates = [on(0, "p", [], true), on(30, "q")];
+    expect([nOf(candidates), attacks(candidates).length]).toEqual([1, 2]);
+
+    // Every set of up to 3 versions over these values, the alias pair [A, B] joining through a third version.
+    const options = [0, 6, 30].flatMap(day => ["p", "q"].flatMap(name => [[], ["A"], ["B"], ["A", "B"]].flatMap(aliases => [false, true].map(fr => on(day, name, aliases, fr)))));
+    const check = (versions: Version[]) => {
+      const inChains = chains(versions), inAttacks = attacks(versions);
+      for (const attack of inAttacks) if (inChains.filter(chain => attack.some(v => chain.includes(v))).length !== 1) return false;
+      return nOf(versions) <= inAttacks.length && inChains.flat().length === versions.length && inAttacks.flat().length === versions.length;
+    };
+    let tried = 0;
+    expect(check([])).toBe(true);
+    for (const a of options) {
+      expect(check([a])).toBe(true);
+      for (const b of options) {
+        if (!check([a, b])) throw new Error(JSON.stringify([a, b]));
+        for (const c of options) {
+          tried++;
+          if (!check([a, b, c])) throw new Error(JSON.stringify([a, b, c]));
+        }
+      }
+    }
+    expect(tried).toBe(48 ** 3);
+  });
+
+  /** What is wrong with section 4 of a record, given the text of each file it cites. Empty when nothing is. */
+  function missLineProblems(text: string, readCited: (path: string) => string): string[] {
+    const out: string[] = [];
+    if (!text.includes("`<attack>: missed in <row> (<share> of fixes, <fixes in the row>/<all fixes>, <file:line>);")) out.push("the miss line has no row or no share");
+    const rows = new Map<string, RegExpExecArray>();
+    for (const line of text.split("\n")) {
+      const m = /^\| (exploited|high|normal) \| (\d+) \| (\d+) \| (\d+\.\d)% \| (\S+):(\d+) \|$/.exec(line);
+      if (m) rows.set(m[1]!, m);
+    }
+    const names = ["exploited", "high", "normal"];
+    for (const row of names) if (!rows.has(row)) out.push(`no share for the row ${row}`);
+    if (out.length) return out;
+    const total = names.reduce((sum, row) => sum + Number(rows.get(row)![2]), 0);
+    for (const row of names) {
+      const [, , fixes, all, share, path, line] = rows.get(row)!;
+      if (Number(all) !== total) out.push(`${row}: ${all} is not the sum of the rows, ${total}`);
+      if (share !== (100 * Number(fixes) / Number(all)).toFixed(1)) out.push(`${row}: ${share}% is not ${fixes}/${all}`);
+      const cited = readCited(path!).split("\n")[Number(line) - 1] ?? "";
+      if (!cited.startsWith(`| ${row[0]!.toUpperCase()}${row.slice(1)} | ${fixes} |`)) out.push(`${row}: ${path}:${line} does not say ${fixes}`);
+    }
+    return out;
+  }
+
+  it("c2-miss-names-its-row: the one line of a miss has the row and its share, and each share agrees with the line it cites", () => {
+    expect(missLineProblems(record, read)).toEqual([]);
+    const fixes = JSON.parse(read("docs/bench/2026-10-28-backtest-v4/fixes-v4.json")).by_urgency;
+    expect(fixes).toEqual({ exploited: 8, high: 34, normal: 158, low: 0 });
+  });
+
+  it("c2-miss-names-its-row: fails a miss line with no share, a missing row, a wrong share or a wrong citation", () => {
+    const swap = (from: string, to: string) => { expect(record).toContain(from); return record.split(from).join(to); };
+    expect(missLineProblems(swap("(<share> of fixes, ", "("), read)).toEqual(["the miss line has no row or no share"]);
+    expect(missLineProblems(swap("missed in <row> (", "missed ("), read)).toEqual(["the miss line has no row or no share"]);
+    expect(missLineProblems(swap("| high | 34 | 200 | 17.0% |", "| high | 34 | 200 |"), read)).toEqual(["no share for the row high"]);
+    expect(missLineProblems(swap("| 4.0% |", "| 5.0% |"), read)).toEqual(["exploited: 5.0% is not 8/200"]);
+    expect(missLineProblems(swap("README.md:57", "README.md:58"), read)).toEqual(["normal: docs/bench/2026-10-28-backtest-v4/README.md:58 does not say 158"]);
+    expect(missLineProblems(swap("| 158 | 200 |", "| 158 | 300 |"), read)).toEqual(["normal: 300 is not the sum of the rows, 200", "normal: 79.0% is not 158/300"]);
+  });
+});
+
 describe("test.yml", () => {
   it("fails a PR whose base is not main, before anything else runs", () => {
     const yml = read(".github/workflows/test.yml");

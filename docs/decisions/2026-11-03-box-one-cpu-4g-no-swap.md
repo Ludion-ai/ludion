@@ -12,7 +12,7 @@ Every box that runs an npm project's code, validation's in `patch` for npm, vali
 - `--memory-swap` equal to `--memory` turns swap off. The CPU stays at the 1 it was.
 - The value is in one place, `PROJECT_BOX_MEMORY` in packages/sandbox/src/docker.ts. It is no argument: a caller cannot change it.
 - Composer's and Maven's boxes do not change, since they are outside v1's scope. They stay at `--cpus 1 --memory 512m`.
-- **The box of an official image's patch is included (added 2026-11-03, about 16:1x JST).** The first form of this PR left the box in packages/cli/src/security/patch.ts at 512 MiB. The decision's words 「npm のプロジェクトのコードを動かす箱は全部」 were then read as including it, since it runs a Node.js image project's test. That one box also runs PHP's official images, and it takes no tool, so a PHP image's patch gets the same size. The decision gave its reason for npm projects, and no figure has been measured for PHP. v1 does not fix official images, so this changes no box a v1 user's project runs in.
+- **The box of an official image's patch is included (added 2026-11-03, about 16:1x JST).** The first form of this PR left the box in packages/cli/src/security/patch.ts at 512 MiB. The decision's words 「npm のプロジェクトのコードを動かす箱は全部」 were then read as including it, since it runs a Node.js image project's test. That one box also runs PHP's official images, and it takes no tool, so a PHP image's patch gets the same size. The decision gave its reason for npm projects, and no figure has been measured for PHP. v1 does not fix official images.
 - No other part of the isolation changes: no network, a read-only root, no capabilities, a non-root user, the process limit and the /tmp of 64 MiB.
 - Gate 3 runs its boxes in order, one at a time (`once` in packages/cli/src/security/gate3.ts). The product keeps to this.
 - The earlier figure of a box of 4 vCPU and 14 GB is withdrawn. It was a number nobody had measured.
@@ -27,7 +27,7 @@ The decision as written, word for word:
 
 ## Why 4 GiB
 
-A small, ordinary application passes at 1 GiB with no swap, 3 of 3 runs (`memory.peak` 948 to 1,004 MB, page cache included). A real project is heavier, which is a guess and has not been measured. So the box takes four times that as room.
+The decision's reason is that a small, ordinary application passes at 1 GiB with no swap. That measurement is not in this repository, so nothing here shows it. A real project is heavier, which is a guess and has not been measured. So the box takes four times that as room.
 
 GitHub's standard runners have 2 vCPU and 8 GB on a private repository, and 4 vCPU and 16 GB on a public one. A box of 4 GiB, one at a time, fits on a private repository's runner too.
 
@@ -37,17 +37,17 @@ If, in LSAMPLE's trial of Next.js projects, more than 10% run out of what the bo
 
 ## What the result records
 
-Each run's result has the value of `/sys/fs/cgroup/memory.swap.max` in the box, as the box says it: `0` with swap off, or `max`, or another number. When it cannot be read, or holds anything else, it says `unknown`, and no number is made up. Nothing decides on it.
+Each run's result has what was read from `/sys/fs/cgroup/memory.swap.max`: `0` with swap off, or `max`, or another number. When it cannot be read, or holds anything else, it says `unknown`, and Ludion makes up no number. Nothing decides on it. Below is what each field is, and who can change it.
 
 - Gate 3: `memory_swap_max` in each run, read by the driver in the same box.
-- Validation (npm): `baseline_memory_swap_max` and `candidate_memory_swap_max` in the receipt. They are read in a box of their own, with the same flags and the same image as the test, just before it, because the test is the project's own command and is not changed to read it. So they say what a box of these flags has, not what that one run's box had.
-- Validation (an official image's patch, PHP's or Node.js's): `baseline_memory_swap_max` and `candidate_memory_swap_max` in the receipt, read the same way, before that side's version check and test.
+- Validation (npm): `baseline_memory_swap_max` and `candidate_memory_swap_max` in the receipt. They are read in a box of their own, with the same flags and the same image as the test, just before it, because the test is the project's own command and is not changed to read it. So they are what `cat` in that image printed in a box of these flags, not a reading of the test's own box. The image comes from Ludion's own Dockerfile. No way to replace `cat` there has been found, and that is not shown to be impossible.
+- Validation (an official image's patch, PHP's or Node.js's): `baseline_memory_swap_max` and `candidate_memory_swap_max` in the receipt, read in a box of their own the same way, before that side's version check and test. They are what `cat` in the project's image printed, and that image's Dockerfile is the project's, which can replace `cat`. So a receipt can say `0` in a box that has swap.
 
 A candidate's code runs in gate 3's box, so like every figure printed there this one is what the box printed (the Limits in docs/decisions/2026-11-02-gate-3-type-definition.md).
 
 ## What this is not
 
-- A box of 4 GiB has not been run on a real project: the figures above are for the small application at 1 GiB. Gate 3's measurements so far (docs/progress/2026-11-02-lg3-gate-3-type.md) were at 512 MiB with swap, and they stay as they were measured.
+- A box of 4 GiB has not been run on a real project: the reason above is about a small application at 1 GiB. Gate 3's measurements so far (docs/progress/2026-11-02-lg3-gate-3-type.md) were at 512 MiB with swap, and they stay as they were measured.
 - It raises a resource limit, so the PR is a protected PR that the owner merges. Turning swap off is the stricter side; 4 GiB is the looser one.
 
 ## Checks

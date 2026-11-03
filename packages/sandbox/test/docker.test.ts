@@ -249,7 +249,7 @@ describe("reading memory.swap.max", () => {
 });
 
 describe("findDocker", () => {
-  const root =mkdtempSync(join(tmpdir(), "ludion-find-"));
+  const root = mkdtempSync(join(tmpdir(), "ludion-find-"));
   const folder = (name: string) => { const dir = join(root, name); mkdirSync(dir, { recursive: true }); return dir; };
   const docker = (dir: string, mode = 0o755) => { const file = join(dir, "docker"); writeFileSync(file, ""); chmodSync(file, mode); return file; };
   afterAll(() => rmSync(root, { recursive: true, force: true }));

@@ -175,8 +175,8 @@ export function runContainer(name: string, image: string, command: readonly stri
 }
 
 /**
- * The value of memory.swap.max in a box with these flags, from this image: one `cat` in a box of its own, so that the
- * project's test runs exactly as it is configured. "unknown" when it cannot be read, and no failure here stops anything.
+ * What the image's own `cat` of memory.swap.max prints in a box with these flags, one box of its own, so that the project's
+ * test runs exactly as it is configured. "unknown" when it cannot be read, and no failure here stops anything.
  */
 export async function readSwapMax(name: string, image: string, tool?: Tool): Promise<string> {
   try {

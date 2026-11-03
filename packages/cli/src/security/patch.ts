@@ -17,7 +17,7 @@ export type Receipt = {
   scan: Scan; tree_hash: string; dockerfile_before: string; dockerfile_after: string | null;
   old_digest: string | null; new_digest: string | null;
   test: string[]; baseline_passed: boolean; candidate_passed: boolean; reason?: string;
-  /** memory.swap.max in a box with the flags and image of that side's test, "0" with swap off, or "unknown". Recorded; nothing reads it. */
+  /** What `cat` of memory.swap.max printed in a box with the flags and image of that side's test, "0" with swap off, or "unknown". The image's Dockerfile is the project's, which can replace `cat`. Recorded; nothing reads it. */
   baseline_memory_swap_max?: string; candidate_memory_swap_max?: string;
   /** Exposure-time timestamps (UTC): the fix's official publication, the release lookup of this run, the branch. */
   fix_published_at: string | null; fix_published_note: string; found_at: string; applied_at: string | null;

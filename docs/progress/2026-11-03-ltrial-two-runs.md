@@ -21,7 +21,7 @@ Minutes: 4 (3 + 1). No permission was added, and no setting, secret, PAT or App 
 - **The oldest version being chosen.** lodash has no dependencies, so the table held one requirement, V itself, with the role `v`. No answer had the role `oldest`, `reused_base` or `same_release`, and no entry moved or was added beside the fix. So the part of LOLD2's path that picks and checks another package's version did not run in this whole-path run: the resolver's table was written and read, and the PR job's `notOldest` had nothing to compare.
 - **The PR job's answer to an existing PR.** Run 2's check job answered `work=false` (`every due fix is fixed by an open Ludion PR (npm:lodash #8)`), so `patch` and `pull-request` were skipped, as the definitions expected. What `deliver open` does when the PR exists was not reached.
 - **A schedule, CI on the PR, or a merge.** Both runs were by hand, and PR #8 has 0 check runs. Its `ci` run 41614240851 is `action_required` with no jobs, and was not approved.
-- **Another commit, a real project, a rate.** One owned example, two runs. Nothing runs this again: it is a hand-run record, not a check that fails. C6's table counts it as that, for this version and SHA.
+- **Another commit, a real project, a rate.** One owned example, two runs. Nothing runs this again: it is a hand-run record, not a check that fails. A hand-run record counts in C6's table only on the SHA that ships, and 3d143fe ships to nobody, so the table shows this one as `not yet` and the row is not met. It has to be run again on the commit users are given.
 - **A fix that waits or fails.** The fix passed on the first run; its version is seven months old.
 
 ## Other things seen

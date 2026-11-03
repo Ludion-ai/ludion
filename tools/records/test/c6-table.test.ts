@@ -1,7 +1,7 @@
 // C6's table of rule and check (docs/status.md; docs/decisions/2026-11-02-definition-of-complete-final.md, C6): every row
 // says when its rule first applies, a row that names its check names a file that is there and the tests it quotes are in
-// that file, a row is one of three kinds (a check that runs, a hand-run record, no check) and no kind passes as another,
-// and every rule of CLAUDE.md's "Ludion must not become the attack path" has a row. Also here: the two rows whose
+// that file, a row is one of four kinds (a check that runs, a hand-run record on the SHA that ships, one not yet on it, no
+// check), the last two are not met and no kind passes as another, and every rule of CLAUDE.md's "Ludion must not become the attack path" has a row. Also here: the two rows whose
 // check is a search of the source text, pr-mode-has-no-merge-call and pr-job-pushes-only-its-branch, and the line of
 // action.yml that writing-job-cli-is-in-the-action reads.
 import { readdirSync, readFileSync, statSync } from "node:fs";
@@ -16,20 +16,23 @@ const HEADER = "| Check | Rule | 効く時 | Test |";
 const EFFECTS = ["PR モード", "自動マージ"];
 const NOT_YET = ["Not written", "未実装"];
 const HAND_RUN_OPENS = "Hand-run record";
-/** A hand-run record's Test cell: the record, then the version and the full SHA the run was at. */
-const HAND_RUN = /^Hand-run record \(one run, version and SHA\): `([^`]+)`, ludion-ai (\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?), ([0-9a-f]{40})$/;
+// A hand-run record's Test cell: the record, then the version and the full SHA the run was at. It counts for its row only
+// when that SHA is the commit users are given; until then the cell says "not yet", and the row is not met.
+const RECORD_AT = "`([^`]+)`, ludion-ai (\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.]+)?), ([0-9a-f]{40})$";
+const HAND_RUN = new RegExp(`^Hand-run record \\(once, on the SHA that ships\\): ${RECORD_AT}`);
+const HAND_RUN_NOT_SHIPPED = new RegExp(`^Hand-run record \\(once, on the SHA that ships\\): not yet; last run at another SHA: ${RECORD_AT}`);
 
-type Kind = "check" | "hand_run" | "none";
-/** The kind a Test cell says it is, by its form alone; null when it is none of the three. */
+type Kind = "check" | "hand_run" | "hand_run_not_shipped" | "none";
+/** The kind a Test cell says it is, by its form alone; null when it is none of the four. A hand-run cell of no known form is the side that is not met. */
 function kindOf(test: string): Kind | null {
   if (NOT_YET.includes(test)) return "none";
-  if (test.startsWith(HAND_RUN_OPENS)) return "hand_run";
+  if (test.startsWith(HAND_RUN_OPENS)) return HAND_RUN.test(test) ? "hand_run" : "hand_run_not_shipped";
   return test.startsWith("`") ? "check" : null;
 }
 
 /** The rows of each kind, given the text of docs/status.md. */
 function rowsByKind(status: string): Record<Kind | "other", string[]> {
-  const out: Record<Kind | "other", string[]> = { check: [], hand_run: [], none: [], other: [] };
+  const out: Record<Kind | "other", string[]> = { check: [], hand_run: [], hand_run_not_shipped: [], none: [], other: [] };
   for (const row of tableLines(status) ?? []) {
     const [check = "", , , test = ""] = cells(row);
     out[kindOf(test) ?? "other"].push(check);
@@ -37,9 +40,27 @@ function rowsByKind(status: string): Record<Kind | "other", string[]> {
   return out;
 }
 
+/** The rows that keep the release's condition unmet, whatever else the table says. */
+const rowsNotMet = (status: string) => { const kinds = rowsByKind(status); return [...kinds.none, ...kinds.hand_run_not_shipped, ...kinds.other]; };
+
+/**
+ * What is wrong with how the table's rows are counted. No commit ships yet, so no row can say it ran on one. When one does,
+ * or a row's record is added, these lists change in the same PR, so the choice is seen in review; the test does not show
+ * that a SHA is the one that ships.
+ */
+function kindProblems(status: string): string[] {
+  const kinds = rowsByKind(status), out: string[] = [];
+  const same = (name: string, found: string[], expected: string[]) => { if (found.join() !== expected.join()) out.push(`${name}: ${found.join() || "none"}`); };
+  same("not one of the kinds", kinds.other, []);
+  same("on the SHA that ships", kinds.hand_run, []);
+  same("not yet on the SHA that ships", kinds.hand_run_not_shipped, ["`real-run-opens-one-pr-and-no-second`"]);
+  if (!kinds.check.length) out.push("no row has a check");
+  return out;
+}
+
 /** What is wrong with a hand-run record's Test cell: the form, the record's place, that it is there, and that it names both. */
 function handRunProblems(check: string, test: string, exists: (path: string) => boolean, text: (path: string) => string): string[] {
-  const match = HAND_RUN.exec(test);
+  const match = HAND_RUN.exec(test) ?? HAND_RUN_NOT_SHIPPED.exec(test);
   if (!match) return [`${check}: not a hand-run record's form: "${test}"`];
   const [, path, version, sha] = match as unknown as [string, string, string, string];
   if (!/^docs\/progress\/[^/]+\.md$/.test(path)) return [`${check}: a hand-run record is under docs/progress/, not at ${path}`];
@@ -68,7 +89,7 @@ function problems(status: string, exists: (path: string) => boolean = isFile, te
     if (seen.has(check)) out.push(`${check}: twice`);
     seen.add(check);
     if (!EFFECTS.includes(effect)) out.push(`${check}: 効く時 is "${effect}"`);
-    if (kindOf(test) === "hand_run") { out.push(...handRunProblems(check, test, exists, text)); continue; }
+    if (test.startsWith(HAND_RUN_OPENS)) { out.push(...handRunProblems(check, test, exists, text)); continue; }
     // `a.ts` ("a test"; "another"); `b.ts` ("a third"): each file, and the names after it up to the next file.
     const parts = test.split("`"), paths = test.startsWith("`") ? parts.filter((_, i) => i % 2 === 1) : [];
     // A file under docs/ is a record, which nothing runs: written as a check it would count as one.
@@ -168,42 +189,71 @@ describe("C6's table (docs/status.md)", () => {
     expect(problems(table(secondGone), path => path === "x.ts", () => 'it("a test", () => {});')).toEqual(['`a`: test is "`x.ts` ("a test"); `gone.ts` ("a test")"']);
   });
 
-  it("c6-row-kinds: every row is a check that runs, a hand-run record or no check, and the hand-run records are these", () => {
-    const kinds = rowsByKind(status);
-    expect(kinds.other).toEqual([]);
-    expect(kinds.check.length + kinds.hand_run.length + kinds.none.length).toBe(tableLines(status)!.length);
-    expect(kinds.check.length).toBeGreaterThan(0);
-    expect(kinds.none.length).toBeGreaterThan(0);
-    // A new hand-run record is a choice to count a row on one run: it changes this list, so it is seen.
-    expect(kinds.hand_run).toEqual(["`real-run-opens-one-pr-and-no-second`"]);
+  it("c6-row-kinds: every row is one of the kinds, none is on the SHA that ships, and the record at another SHA is not met", () => {
+    expect(kindProblems(status)).toEqual([]);
+    const notMet = rowsNotMet(status);
+    expect(notMet).toContain("`real-run-opens-one-pr-and-no-second`");
+    expect(rowsByKind(status).check).not.toContain("`real-run-opens-one-pr-and-no-second`");
+    expect(notMet).toEqual(expect.arrayContaining(rowsByKind(status).none));
   });
 
-  it("c6-row-kinds: counts the three kinds apart, and a hand-run record is not a check", () => {
+  it("c6-row-kinds: the state C6 aims for, with no row saying Not written or 未実装, passes", () => {
+    const goal = status.replace(/\| (?:Not written|未実装) \|$/gm, "| `tools/records/test/c6-table.test.ts` |");
+    expect(rowsByKind(goal).none).toEqual([]);
+    expect(problems(goal)).toEqual([]);
+    expect(kindProblems(goal)).toEqual([]);
+    expect(rowsNotMet(goal)).toEqual(["`real-run-opens-one-pr-and-no-second`"]);
+  });
+
+  it("c6-row-kinds: counts the kinds apart, and a hand-run record is not a check", () => {
     const SHA = "3d143fe2a17bf06d9c03292b3bfe57e1b3178617";
     const RECORD = "docs/progress/x.md";
-    const cell = (path = RECORD, version = "0.3.0-preview.1", sha = SHA) => `Hand-run record (one run, version and SHA): \`${path}\`, ludion-ai ${version}, ${sha}`;
+    const cell = (path = RECORD, version = "0.3.0-preview.1", sha = SHA) => `Hand-run record (once, on the SHA that ships): \`${path}\`, ludion-ai ${version}, ${sha}`;
+    const notShipped = (path = RECORD, version = "0.3.0-preview.1", sha = SHA) => `Hand-run record (once, on the SHA that ships): not yet; last run at another SHA: \`${path}\`, ludion-ai ${version}, ${sha}`;
     const table = (...tests: string[]) => [HEADER, "|---|---|---|---|", ...tests.map((test, i) => `| \`r${i}\` | rule | PR モード | ${test} |`), ""].join("\n");
     const named = `Run at \`${SHA}\` (ludion-ai 0.3.0-preview.1, from the build).`;
     const held = (test: string, text = named, exists = (path: string) => path === RECORD || path === "x.ts") => problems(table(test), exists, () => text);
 
-    expect(rowsByKind(table("`x.ts`", cell(), "Not written", "未実装", "`y.ts` (a case); `z.ts`", "Passes"))).toEqual({
-      check: ["`r0`", "`r4`"], hand_run: ["`r1`"], none: ["`r2`", "`r3`"], other: ["`r5`"],
+    const mixed = table("`x.ts`", cell(), "Not written", "未実装", "`y.ts` (a case); `z.ts`", "Passes", notShipped(), `Hand-run record: \`${RECORD}\``);
+    expect(rowsByKind(mixed)).toEqual({
+      check: ["`r0`", "`r4`"], hand_run: ["`r1`"], hand_run_not_shipped: ["`r6`", "`r7`"], none: ["`r2`", "`r3`"], other: ["`r5`"],
     });
+    // On the SHA that ships counts; not yet on it does not, like no check. A hand-run cell of no known form is on the side that is not met.
+    expect(rowsNotMet(mixed)).toEqual(["`r2`", "`r3`", "`r6`", "`r7`", "`r5`"]);
+
+    // How the rows are counted: a row said to be on the SHA that ships, with none shipping yet, a row gone from the list, and another added.
+    const row = "`real-run-opens-one-pr-and-no-second`";
+    const rows = (...lines: [string, string][]) => [HEADER, "|---|---|---|---|", ...lines.map(([name, test]) => `| ${name} | rule | PR モード | ${test} |`), ""].join("\n");
+    expect(kindProblems(rows([row, notShipped()], ["`a`", "`x.ts`"]))).toEqual([]);
+    expect(kindProblems(rows([row, cell()], ["`a`", "`x.ts`"]))).toEqual([`on the SHA that ships: ${row}`, "not yet on the SHA that ships: none"]);
+    expect(kindProblems(rows([row, "Not written"], ["`a`", "`x.ts`"]))).toEqual(["not yet on the SHA that ships: none"]);
+    expect(kindProblems(rows([row, notShipped()], ["`a`", notShipped()], ["`b`", "`x.ts`"]))).toEqual([`not yet on the SHA that ships: ${row},\`a\``]);
+    expect(kindProblems(rows([row, notShipped()], ["`a`", "Passes"], ["`b`", "`x.ts`"]))).toEqual(["not one of the kinds: `a`"]);
+    expect(kindProblems(rows([row, notShipped()], ["`a`", "Not written"]))).toEqual(["no row has a check"]);
 
     expect(held(cell())).toEqual([]);
+    expect(held(notShipped())).toEqual([]);
     expect(held("`x.ts`")).toEqual([]);
-    // The record is gone, or is not where a record is.
-    expect(held(cell("docs/progress/gone.md"))).toEqual(["`r0`: the record docs/progress/gone.md is not there"]);
-    expect(held(cell("x.ts"))).toEqual(["`r0`: a hand-run record is under docs/progress/, not at x.ts"]);
-    expect(held(cell("docs/progress/a/x.md"))).toEqual(["`r0`: a hand-run record is under docs/progress/, not at docs/progress/a/x.md"]);
-    // The version or the SHA is missing from the cell, or is not in that form.
+    // The record is gone, or is not where a record is, whichever the form.
+    for (const form of [cell, notShipped]) {
+      expect(held(form("docs/progress/gone.md"))).toEqual(["`r0`: the record docs/progress/gone.md is not there"]);
+      expect(held(form("x.ts"))).toEqual(["`r0`: a hand-run record is under docs/progress/, not at x.ts"]);
+      expect(held(form("docs/progress/a/x.md"))).toEqual(["`r0`: a hand-run record is under docs/progress/, not at docs/progress/a/x.md"]);
+      expect(held(form(), `Run at \`${SHA}\`.`)).toEqual(["`r0`: the record docs/progress/x.md does not name 0.3.0-preview.1"]);
+    }
+    // The version or the SHA is missing from the cell, or is not in that form; the words of an earlier form do not pass.
     for (const test of [
-      `Hand-run record (one run, version and SHA): \`${RECORD}\``,
-      `Hand-run record (one run, version and SHA): \`${RECORD}\`, ${SHA}`,
-      `Hand-run record (one run, version and SHA): \`${RECORD}\`, ludion-ai 0.3.0-preview.1`,
+      `Hand-run record (once, on the SHA that ships): \`${RECORD}\``,
+      `Hand-run record (once, on the SHA that ships): \`${RECORD}\`, ${SHA}`,
+      `Hand-run record (once, on the SHA that ships): \`${RECORD}\`, ludion-ai 0.3.0-preview.1`,
+      `Hand-run record (once, on the SHA that ships): not yet; last run at another SHA: \`${RECORD}\``,
+      `Hand-run record (once, on the SHA that ships): not yet`,
+      `Hand-run record (one run, version and SHA): \`${RECORD}\`, ludion-ai 0.3.0-preview.1, ${SHA}`,
       cell(RECORD, "main"),
       cell(RECORD, "0.3.0-preview.1", SHA.slice(0, 7)),
       cell(RECORD, "0.3.0-preview.1", SHA.toUpperCase()),
+      notShipped(RECORD, "main"),
+      notShipped(RECORD, "0.3.0-preview.1", SHA.slice(0, 7)),
       `Hand-run record: \`${RECORD}\`, ludion-ai 0.3.0-preview.1, ${SHA}`,
       `${cell()} and more`,
     ]) expect(held(test)).toEqual([`\`r0\`: not a hand-run record's form: "${test}"`]);
@@ -214,7 +264,7 @@ describe("C6's table (docs/status.md)", () => {
     // A record written as a check does not count as one, in any place in the cell, and "hand-run" in another case is no kind.
     expect(held(`\`${RECORD}\``)).toEqual([`\`r0\`: ${RECORD} is a record, not a check`]);
     expect(held(`\`x.ts\`; \`${RECORD}\``)).toEqual([`\`r0\`: ${RECORD} is a record, not a check`]);
-    expect(held(`hand-run record (one run, version and SHA): \`${RECORD}\`, ludion-ai 0.3.0-preview.1, ${SHA}`)).toEqual([`\`r0\`: test is "hand-run record (one run, version and SHA): \`${RECORD}\`, ludion-ai 0.3.0-preview.1, ${SHA}"`]);
+    expect(held(`hand-run record (once, on the SHA that ships): \`${RECORD}\`, ludion-ai 0.3.0-preview.1, ${SHA}`)).toEqual([`\`r0\`: test is "hand-run record (once, on the SHA that ships): \`${RECORD}\`, ludion-ai 0.3.0-preview.1, ${SHA}"`]);
   });
 
   it("c6-row-has-effect-column: a row's 効く時 is not changed unnoticed", () => {

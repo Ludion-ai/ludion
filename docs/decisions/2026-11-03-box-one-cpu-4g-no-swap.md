@@ -4,14 +4,15 @@ Decided 2026-11-02 23:37 JST. Written here on 2026-11-03, in the PR that makes i
 
 ## The decision
 
-Every box that runs an npm project's code, validation's and gate 3's, is:
+Every box that runs an npm project's code, validation's in `patch` for npm, validation's in `patch` for an official image and gate 3's, is:
 
 `--cpus 1 --memory 4g --memory-swap 4g`
 
 - It is the same in the product, in LSAMPLE and in C4.
 - `--memory-swap` equal to `--memory` turns swap off. The CPU stays at the 1 it was.
-- The value is in one place, `NPM_BOX_MEMORY` in packages/sandbox/src/docker.ts. It is no argument: a caller cannot change it.
-- Composer's and Maven's boxes do not change, since they are outside v1's scope. Nor does the box of an official image's patch (patch.ts), which is neither of the two boxes this decision names: all of these stay at `--cpus 1 --memory 512m`.
+- The value is in one place, `PROJECT_BOX_MEMORY` in packages/sandbox/src/docker.ts. It is no argument: a caller cannot change it.
+- Composer's and Maven's boxes do not change, since they are outside v1's scope. They stay at `--cpus 1 --memory 512m`.
+- **The box of an official image's patch is included (added 2026-11-03, about 16:1x JST).** The first form of this PR left the box in packages/cli/src/security/patch.ts at 512 MiB. The decision's words 「npm のプロジェクトのコードを動かす箱は全部」 were then read as including it, since it runs a Node.js image project's test. That one box also runs PHP's official images, and it takes no tool, so a PHP image's patch gets the same size. The decision gave its reason for npm projects, and no figure has been measured for PHP. v1 does not fix official images, so this changes no box a v1 user's project runs in.
 - No other part of the isolation changes: no network, a read-only root, no capabilities, a non-root user, the process limit and the /tmp of 64 MiB.
 - Gate 3 runs its boxes in order, one at a time (`once` in packages/cli/src/security/gate3.ts). The product keeps to this.
 - The earlier figure of a box of 4 vCPU and 14 GB is withdrawn. It was a number nobody had measured.
@@ -40,6 +41,7 @@ Each run's result has the value of `/sys/fs/cgroup/memory.swap.max` in the box, 
 
 - Gate 3: `memory_swap_max` in each run, read by the driver in the same box.
 - Validation (npm): `baseline_memory_swap_max` and `candidate_memory_swap_max` in the receipt. They are read in a box of their own, with the same flags and the same image as the test, just before it, because the test is the project's own command and is not changed to read it. So they say what a box of these flags has, not what that one run's box had.
+- Validation (an official image's patch, PHP's or Node.js's): `baseline_memory_swap_max` and `candidate_memory_swap_max` in the receipt, read the same way, before that side's version check and test.
 
 A candidate's code runs in gate 3's box, so like every figure printed there this one is what the box printed (the Limits in docs/decisions/2026-11-02-gate-3-type-definition.md).
 
@@ -50,4 +52,4 @@ A candidate's code runs in gate 3's box, so like every figure printed there this
 
 ## Checks
 
-`packages/sandbox/test/docker.test.ts`: `gate3-box-has-no-swap`, `box-size-is-one-number`, and that the other boxes are unchanged. `packages/cli/test/gate3.test.ts`: `gate3-result-records-swap-max`, `gate3-boxes-one-at-a-time`. `packages/cli/test/dependencies.test.ts`: `validation-result-records-swap-max`.
+`packages/sandbox/test/docker.test.ts`: `gate3-box-has-no-swap`, `patch-box-has-no-swap`, `box-size-is-one-number`, and that Composer's and Maven's boxes are unchanged. `packages/cli/test/gate3.test.ts`: `gate3-result-records-swap-max`, `gate3-boxes-one-at-a-time`. `packages/cli/test/dependencies.test.ts`: `validation-result-records-swap-max`. `packages/cli/test/security.test.ts` and `packages/cli/test/node-image.test.ts`: `patch-result-records-swap-max`.

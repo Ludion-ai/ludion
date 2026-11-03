@@ -4,7 +4,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSyn
 import { tmpdir } from "node:os";
 import { isAbsolute, join, relative } from "node:path";
 import { afterAll, beforeAll } from "vitest";
-import { dockerCwd, findDocker, findProgram, NPM_BOX_MEMORY, readSwapMax, runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
+import { dockerCwd, findDocker, findProgram, PROJECT_BOX_MEMORY, readSwapMax, runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
 
 // The module takes no spawn parameter (a caller could otherwise rewrite the argv), so tests replace node's spawn.
 const current = vi.hoisted(() => ({ spawn: undefined as unknown as (cmd: string, args: readonly string[], options: unknown) => unknown }));
@@ -13,9 +13,9 @@ vi.mock("node:child_process", () => ({ spawn: (cmd: string, args: readonly strin
 const IMAGE = `sha256:${"a".repeat(64)}`;
 const ISOLATION = ["--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "65534:65534"];
 const LIMITS_AFTER_MEMORY = ["--pids-limit", "256", "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m"];
-const HARDENED = [...ISOLATION, "--cpus", "1", "--memory", "512m", ...LIMITS_AFTER_MEMORY];
-// Written out, not read from NPM_BOX_MEMORY: this list is what the box must be.
-const NPM_HARDENED = [...ISOLATION, "--cpus", "1", "--memory", "4g", "--memory-swap", "4g", ...LIMITS_AFTER_MEMORY];
+// Written out, not read from PROJECT_BOX_MEMORY: this list is what the box must be.
+const HARDENED = [...ISOLATION, "--cpus", "1", "--memory", "4g", "--memory-swap", "4g", ...LIMITS_AFTER_MEMORY];
+const COMPOSER_MAVEN_HARDENED = [...ISOLATION, "--cpus", "1", "--memory", "512m", ...LIMITS_AFTER_MEMORY];
 const flag = (args: readonly string[], name: string) => args.filter((_, i) => args[i - 1] === name);
 
 type FakeChild = EventEmitter & { stdout: EventEmitter; stderr: EventEmitter; kill: () => boolean };
@@ -53,14 +53,14 @@ describe("security test container arguments", () => {
   it("add only fixed container scratch directories and HOME=/tmp for a package manager", () => {
     const scratch = "rw,noexec,nosuid,nodev,size=32m,mode=1777";
     expect(runArgs("n", IMAGE, ["npm", "test"], "npm")).toEqual([
-      "run", "--rm", "--name", "n", ...NPM_HARDENED, "--tmpfs", `/app/node_modules/.vite:${scratch}`, "--tmpfs", `/app/node_modules/.vite-temp:${scratch}`,
+      "run", "--rm", "--name", "n", ...HARDENED, "--tmpfs", `/app/node_modules/.vite:${scratch}`, "--tmpfs", `/app/node_modules/.vite-temp:${scratch}`,
       "--env", "HOME=/tmp", "--entrypoint", "npm", IMAGE, "test",
     ]);
     expect(runArgs("n", IMAGE, ["php", "t.php"], "composer")).toEqual([
-      "run", "--rm", "--name", "n", ...HARDENED, "--tmpfs", `/app/.phpunit.cache:${scratch}`, "--env", "HOME=/tmp", "--entrypoint", "php", IMAGE, "t.php",
+      "run", "--rm", "--name", "n", ...COMPOSER_MAVEN_HARDENED, "--tmpfs", `/app/.phpunit.cache:${scratch}`, "--env", "HOME=/tmp", "--entrypoint", "php", IMAGE, "t.php",
     ]);
     expect(runArgs("n", IMAGE, ["mvn", "verify"], "maven")).toEqual([
-      "run", "--rm", "--name", "n", ...HARDENED, "--tmpfs", "/app/target:rw,noexec,nosuid,nodev,size=256m,mode=1777", "--env", "HOME=/tmp", "--entrypoint", "mvn", IMAGE, "verify",
+      "run", "--rm", "--name", "n", ...COMPOSER_MAVEN_HARDENED, "--tmpfs", "/app/target:rw,noexec,nosuid,nodev,size=256m,mode=1777", "--env", "HOME=/tmp", "--entrypoint", "mvn", IMAGE, "verify",
     ]);
     expect(() => runArgs("n", IMAGE, ["sh"], "pip" as "npm")).toThrow("Unsupported security test tool");
     expect(() => runArgs("n", IMAGE, ["sh"], "--privileged" as "npm")).toThrow("Unsupported security test tool");
@@ -79,8 +79,19 @@ describe("security test container arguments", () => {
     const gate3 = readFileSync(new URL("../../cli/src/security/gate3.ts", import.meta.url), "utf8");
     expect(gate3).toContain('deps.box ?? ((name, image, argv, timeoutMs) => runContainer(name, image, argv, timeoutMs, "npm"))');
   });
-  it("leave Composer's, Maven's and the official images' boxes as they were", () => {
-    for (const tool of ["composer", "maven", undefined] as const) {
+  it("patch-box-has-no-swap: an official image's patch, PHP's or Node.js's, has the same box, with no scratch folders or HOME added", () => {
+    const args = runArgs("n", IMAGE, ["node", "tests/smoke.js"]);
+    expect(args).toEqual(["run", "--rm", "--name", "n", ...HARDENED, "--entrypoint", "node", IMAGE, "tests/smoke.js"]);
+    expect(flag(args, "--cpus")).toEqual(["1"]);
+    expect(flag(args, "--memory")).toEqual(["4g"]);
+    expect(flag(args, "--memory-swap")).toEqual(["4g"]);
+    // That box is the one patch.ts asks for: no tool, so a tool put there would give it another size or other folders.
+    const patch = readFileSync(new URL("../../cli/src/security/patch.ts", import.meta.url), "utf8");
+    expect(patch).toContain("await runContainer(name, image, command, timeoutMs);");
+    expect(patch).toContain("await run(name, imageId, config.test, config.timeout_seconds * 1000);");
+  });
+  it("leave Composer's and Maven's boxes as they were", () => {
+    for (const tool of ["composer", "maven"] as const) {
       const args = runArgs("n", IMAGE, ["sh"], tool);
       expect(flag(args, "--cpus")).toEqual(["1"]);
       expect(flag(args, "--memory")).toEqual(["512m"]);
@@ -90,7 +101,7 @@ describe("security test container arguments", () => {
   it("box-size-is-one-number: the decision, gate 3's definition, the constant and the arguments say the same", () => {
     const args = runArgs("n", IMAGE, ["sh"], "npm");
     const flags = args.slice(args.indexOf("--cpus"), args.indexOf("--pids-limit")).join(" ");
-    expect(flags).toBe(`--cpus 1 --memory ${NPM_BOX_MEMORY} --memory-swap ${NPM_BOX_MEMORY}`);
+    expect(flags).toBe(`--cpus 1 --memory ${PROJECT_BOX_MEMORY} --memory-swap ${PROJECT_BOX_MEMORY}`);
     for (const path of ["2026-11-03-box-one-cpu-4g-no-swap.md", "2026-11-02-gate-3-type-definition.md"]) {
       expect(readFileSync(new URL(`../../../docs/decisions/${path}`, import.meta.url), "utf8")).toContain(`\`${flags}\``);
     }
@@ -207,6 +218,11 @@ describe("reading memory.swap.max", () => {
     const { calls } = fakeSpawn((_args, child) => queueMicrotask(() => { child.stdout.emit("data", "0\n"); child.emit("close", 0); }));
     await expect(readSwapMax("x", IMAGE, "npm")).resolves.toBe("0");
     expect(calls.map(c => c.args)).toEqual([runArgs("x", IMAGE, ["cat", "/sys/fs/cgroup/memory.swap.max"], "npm")]);
+  });
+  it("reads it in an official image's box, with no tool", async () => {
+    const { calls } = fakeSpawn((_args, child) => queueMicrotask(() => { child.stdout.emit("data", "0\n"); child.emit("close", 0); }));
+    await expect(readSwapMax("x", IMAGE)).resolves.toBe("0");
+    expect(calls.map(c => c.args)).toEqual([runArgs("x", IMAGE, ["cat", "/sys/fs/cgroup/memory.swap.max"])]);
   });
   it("keeps a number or max as it is", async () => {
     fakeSpawn((_args, child) => queueMicrotask(() => { child.stdout.emit("data", "max\n"); child.emit("close", 0); }));

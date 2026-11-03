@@ -1,6 +1,7 @@
 // C6's table of rule and check (docs/status.md; docs/decisions/2026-11-02-definition-of-complete-final.md, C6): every row
 // says when its rule first applies, a row that names its check names a file that is there and the tests it quotes are in
-// that file, and every rule of CLAUDE.md's "Ludion must not become the attack path" has a row. Also here: the two rows whose
+// that file, a row is one of three kinds (a check that runs, a hand-run record, no check) and no kind passes as another,
+// and every rule of CLAUDE.md's "Ludion must not become the attack path" has a row. Also here: the two rows whose
 // check is a search of the source text, pr-mode-has-no-merge-call and pr-job-pushes-only-its-branch, and the line of
 // action.yml that writing-job-cli-is-in-the-action reads.
 import { readdirSync, readFileSync, statSync } from "node:fs";
@@ -14,6 +15,38 @@ const cells = (line: string) => line.replace(/^\|\s*/, "").replace(/\s*\|\s*$/, 
 const HEADER = "| Check | Rule | 効く時 | Test |";
 const EFFECTS = ["PR モード", "自動マージ"];
 const NOT_YET = ["Not written", "未実装"];
+const HAND_RUN_OPENS = "Hand-run record";
+/** A hand-run record's Test cell: the record, then the version and the full SHA the run was at. */
+const HAND_RUN = /^Hand-run record \(one run, version and SHA\): `([^`]+)`, ludion-ai (\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?), ([0-9a-f]{40})$/;
+
+type Kind = "check" | "hand_run" | "none";
+/** The kind a Test cell says it is, by its form alone; null when it is none of the three. */
+function kindOf(test: string): Kind | null {
+  if (NOT_YET.includes(test)) return "none";
+  if (test.startsWith(HAND_RUN_OPENS)) return "hand_run";
+  return test.startsWith("`") ? "check" : null;
+}
+
+/** The rows of each kind, given the text of docs/status.md. */
+function rowsByKind(status: string): Record<Kind | "other", string[]> {
+  const out: Record<Kind | "other", string[]> = { check: [], hand_run: [], none: [], other: [] };
+  for (const row of tableLines(status) ?? []) {
+    const [check = "", , , test = ""] = cells(row);
+    out[kindOf(test) ?? "other"].push(check);
+  }
+  return out;
+}
+
+/** What is wrong with a hand-run record's Test cell: the form, the record's place, that it is there, and that it names both. */
+function handRunProblems(check: string, test: string, exists: (path: string) => boolean, text: (path: string) => string): string[] {
+  const match = HAND_RUN.exec(test);
+  if (!match) return [`${check}: not a hand-run record's form: "${test}"`];
+  const [, path, version, sha] = match as unknown as [string, string, string, string];
+  if (!/^docs\/progress\/[^/]+\.md$/.test(path)) return [`${check}: a hand-run record is under docs/progress/, not at ${path}`];
+  if (!exists(path)) return [`${check}: the record ${path} is not there`];
+  const words = text(path).split(/[\s`(),;:]+/);
+  return [version, sha].filter(word => !words.includes(word)).map(word => `${check}: the record ${path} does not name ${word}`);
+}
 
 /** The table's lines after its header and separator, or null when no table has the 効く時 column. */
 function tableLines(status: string): string[] | null {
@@ -35,9 +68,13 @@ function problems(status: string, exists: (path: string) => boolean = isFile, te
     if (seen.has(check)) out.push(`${check}: twice`);
     seen.add(check);
     if (!EFFECTS.includes(effect)) out.push(`${check}: 効く時 is "${effect}"`);
+    if (kindOf(test) === "hand_run") { out.push(...handRunProblems(check, test, exists, text)); continue; }
     // `a.ts` ("a test"; "another"); `b.ts` ("a third"): each file, and the names after it up to the next file.
     const parts = test.split("`"), paths = test.startsWith("`") ? parts.filter((_, i) => i % 2 === 1) : [];
-    if (paths.length ? !paths.every(exists) : !NOT_YET.includes(test)) out.push(`${check}: test is "${test}"`);
+    // A file under docs/ is a record, which nothing runs: written as a check it would count as one.
+    const record = paths.find(path => path.startsWith("docs/"));
+    if (record) out.push(`${check}: ${record} is a record, not a check`);
+    else if (paths.length ? !paths.every(exists) : !NOT_YET.includes(test)) out.push(`${check}: test is "${test}"`);
     else parts.forEach((path, i) => {
       if (i % 2 === 1) for (const [, name] of (parts[i + 1] ?? "").matchAll(/"([^"]+)"/g)) if (!text(path).includes(name!)) out.push(`${check}: "${name}" is not in ${path}`);
     });
@@ -131,6 +168,55 @@ describe("C6's table (docs/status.md)", () => {
     expect(problems(table(secondGone), path => path === "x.ts", () => 'it("a test", () => {});')).toEqual(['`a`: test is "`x.ts` ("a test"); `gone.ts` ("a test")"']);
   });
 
+  it("c6-row-kinds: every row is a check that runs, a hand-run record or no check, and the hand-run records are these", () => {
+    const kinds = rowsByKind(status);
+    expect(kinds.other).toEqual([]);
+    expect(kinds.check.length + kinds.hand_run.length + kinds.none.length).toBe(tableLines(status)!.length);
+    expect(kinds.check.length).toBeGreaterThan(0);
+    expect(kinds.none.length).toBeGreaterThan(0);
+    // A new hand-run record is a choice to count a row on one run: it changes this list, so it is seen.
+    expect(kinds.hand_run).toEqual(["`real-run-opens-one-pr-and-no-second`"]);
+  });
+
+  it("c6-row-kinds: counts the three kinds apart, and a hand-run record is not a check", () => {
+    const SHA = "3d143fe2a17bf06d9c03292b3bfe57e1b3178617";
+    const RECORD = "docs/progress/x.md";
+    const cell = (path = RECORD, version = "0.3.0-preview.1", sha = SHA) => `Hand-run record (one run, version and SHA): \`${path}\`, ludion-ai ${version}, ${sha}`;
+    const table = (...tests: string[]) => [HEADER, "|---|---|---|---|", ...tests.map((test, i) => `| \`r${i}\` | rule | PR モード | ${test} |`), ""].join("\n");
+    const named = `Run at \`${SHA}\` (ludion-ai 0.3.0-preview.1, from the build).`;
+    const held = (test: string, text = named, exists = (path: string) => path === RECORD || path === "x.ts") => problems(table(test), exists, () => text);
+
+    expect(rowsByKind(table("`x.ts`", cell(), "Not written", "未実装", "`y.ts` (a case); `z.ts`", "Passes"))).toEqual({
+      check: ["`r0`", "`r4`"], hand_run: ["`r1`"], none: ["`r2`", "`r3`"], other: ["`r5`"],
+    });
+
+    expect(held(cell())).toEqual([]);
+    expect(held("`x.ts`")).toEqual([]);
+    // The record is gone, or is not where a record is.
+    expect(held(cell("docs/progress/gone.md"))).toEqual(["`r0`: the record docs/progress/gone.md is not there"]);
+    expect(held(cell("x.ts"))).toEqual(["`r0`: a hand-run record is under docs/progress/, not at x.ts"]);
+    expect(held(cell("docs/progress/a/x.md"))).toEqual(["`r0`: a hand-run record is under docs/progress/, not at docs/progress/a/x.md"]);
+    // The version or the SHA is missing from the cell, or is not in that form.
+    for (const test of [
+      `Hand-run record (one run, version and SHA): \`${RECORD}\``,
+      `Hand-run record (one run, version and SHA): \`${RECORD}\`, ${SHA}`,
+      `Hand-run record (one run, version and SHA): \`${RECORD}\`, ludion-ai 0.3.0-preview.1`,
+      cell(RECORD, "main"),
+      cell(RECORD, "0.3.0-preview.1", SHA.slice(0, 7)),
+      cell(RECORD, "0.3.0-preview.1", SHA.toUpperCase()),
+      `Hand-run record: \`${RECORD}\`, ludion-ai 0.3.0-preview.1, ${SHA}`,
+      `${cell()} and more`,
+    ]) expect(held(test)).toEqual([`\`r0\`: not a hand-run record's form: "${test}"`]);
+    // The record does not name what the cell says. A longer version or SHA that holds it is not the same one.
+    expect(held(cell(), `Run at \`${SHA}\`.`)).toEqual(["`r0`: the record docs/progress/x.md does not name 0.3.0-preview.1"]);
+    expect(held(cell(), "ludion-ai 0.3.0-preview.1.")).toEqual(["`r0`: the record docs/progress/x.md does not name 0.3.0-preview.1", `\`r0\`: the record docs/progress/x.md does not name ${SHA}`]);
+    expect(held(cell(RECORD, "0.3.0"), named)).toEqual(["`r0`: the record docs/progress/x.md does not name 0.3.0"]);
+    // A record written as a check does not count as one, in any place in the cell, and "hand-run" in another case is no kind.
+    expect(held(`\`${RECORD}\``)).toEqual([`\`r0\`: ${RECORD} is a record, not a check`]);
+    expect(held(`\`x.ts\`; \`${RECORD}\``)).toEqual([`\`r0\`: ${RECORD} is a record, not a check`]);
+    expect(held(`hand-run record (one run, version and SHA): \`${RECORD}\`, ludion-ai 0.3.0-preview.1, ${SHA}`)).toEqual([`\`r0\`: test is "hand-run record (one run, version and SHA): \`${RECORD}\`, ludion-ai 0.3.0-preview.1, ${SHA}"`]);
+  });
+
   it("c6-row-has-effect-column: a row's 効く時 is not changed unnoticed", () => {
     const effect = Object.fromEntries((tableLines(status) ?? []).map(cells).map(([check, , value]) => [check, value]));
     expect(effect).toMatchObject({
@@ -167,6 +253,7 @@ describe("C6's table (docs/status.md)", () => {
       "`cve-ids-not-sent`": "PR モード",
       "`only-returned-ids-go-back-to-osv`": "PR モード",
       "`no-source-or-usage-sent`": "PR モード",
+      "`real-run-opens-one-pr-and-no-second`": "PR モード",
     });
   });
 });

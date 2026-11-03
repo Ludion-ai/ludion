@@ -1,6 +1,6 @@
 # LTRIAL: two runs of the whole path on ludion-trial (2026-11-03)
 
-Definitions, committed before the runs: docs/decisions/2026-11-03-ltrial-two-runs.md (80a5ec3). Details and raw data: docs/bench/2026-11-03-ltrial/README.md. The code is Ludion-ai/ludion main `3d143fe2a17bf06d9c03292b3bfe57e1b3178617`, built in Docker and placed only on a branch of the private repository Ludion-ai/ludion-trial. Times are UTC.
+Definitions, committed before the runs: docs/decisions/2026-11-03-ltrial-two-runs.md (80a5ec3). Details and raw data: docs/bench/2026-11-03-ltrial/README.md. The code is Ludion-ai/ludion main `3d143fe2a17bf06d9c03292b3bfe57e1b3178617` (ludion-ai 0.3.0-preview.1, as docs/bench/2026-11-03-ltrial/logs/build-cli.txt gives it), built in Docker and placed only on a branch of the private repository Ludion-ai/ludion-trial. Times are UTC.
 
 ## Result
 
@@ -21,7 +21,7 @@ Minutes: 4 (3 + 1). No permission was added, and no setting, secret, PAT or App 
 - **The oldest version being chosen.** lodash has no dependencies, so the table held one requirement, V itself, with the role `v`. No answer had the role `oldest`, `reused_base` or `same_release`, and no entry moved or was added beside the fix. So the part of LOLD2's path that picks and checks another package's version did not run in this whole-path run: the resolver's table was written and read, and the PR job's `notOldest` had nothing to compare.
 - **The PR job's answer to an existing PR.** Run 2's check job answered `work=false` (`every due fix is fixed by an open Ludion PR (npm:lodash #8)`), so `patch` and `pull-request` were skipped, as the definitions expected. What `deliver open` does when the PR exists was not reached.
 - **A schedule, CI on the PR, or a merge.** Both runs were by hand, and PR #8 has 0 check runs. Its `ci` run 41614240851 is `action_required` with no jobs, and was not approved.
-- **Another commit, a real project, a rate.** One owned example, two runs. Nothing runs this again: it is a record, not a check that fails.
+- **Another commit, a real project, a rate.** One owned example, two runs. Nothing runs this again: it is a hand-run record, not a check that fails. C6's table counts it as that, for this version and SHA.
 - **A fix that waits or fails.** The fix passed on the first run; its version is seven months old.
 
 ## Other things seen

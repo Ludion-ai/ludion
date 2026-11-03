@@ -1,7 +1,8 @@
 // C6's table of rule and check (docs/status.md; docs/decisions/2026-11-02-definition-of-complete-final.md, C6): every row
 // says when its rule first applies, a row that names its check names a file that is there and the tests it quotes are in
 // that file, and every rule of CLAUDE.md's "Ludion must not become the attack path" has a row. Also here: the two rows whose
-// check is a search of the source text, pr-mode-has-no-merge-call and pr-job-pushes-only-its-branch.
+// check is a search of the source text, pr-mode-has-no-merge-call and pr-job-pushes-only-its-branch, and the line of
+// action.yml that writing-job-cli-is-in-the-action reads.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -34,9 +35,12 @@ function problems(status: string, exists: (path: string) => boolean = isFile, te
     if (seen.has(check)) out.push(`${check}: twice`);
     seen.add(check);
     if (!EFFECTS.includes(effect)) out.push(`${check}: 効く時 is "${effect}"`);
-    const path = /^`([^`]+)`/.exec(test)?.[1];
-    if (path ? !exists(path) : !NOT_YET.includes(test)) out.push(`${check}: test is "${test}"`);
-    else if (path) for (const [, name] of test.matchAll(/"([^"]+)"/g)) if (!text(path).includes(name!)) out.push(`${check}: "${name}" is not in ${path}`);
+    // `a.ts` ("a test"; "another"); `b.ts` ("a third"): each file, and the names after it up to the next file.
+    const parts = test.split("`"), paths = test.startsWith("`") ? parts.filter((_, i) => i % 2 === 1) : [];
+    if (paths.length ? !paths.every(exists) : !NOT_YET.includes(test)) out.push(`${check}: test is "${test}"`);
+    else parts.forEach((path, i) => {
+      if (i % 2 === 1) for (const [, name] of (parts[i + 1] ?? "").matchAll(/"([^"]+)"/g)) if (!text(path).includes(name!)) out.push(`${check}: "${name}" is not in ${path}`);
+    });
   }
   return out;
 }
@@ -121,6 +125,10 @@ describe("C6's table (docs/status.md)", () => {
     const held = (...rows: string[]) => problems(table(...rows), () => true, () => 'it("a test", () => {});');
     expect(held('| `a` | rule | PR モード | `x.ts` ("a test") |')).toEqual([]);
     expect(held('| `a` | rule | PR モード | `x.ts` ("a test"; "gone") |')).toEqual(['`a`: "gone" is not in x.ts']);
+    expect(held('| `a` | rule | PR モード | `x.ts` ("a test"); `y.ts` ("a test") |')).toEqual([]);
+    expect(held('| `a` | rule | PR モード | `x.ts` ("a test"); `y.ts` ("gone") |')).toEqual(['`a`: "gone" is not in y.ts']);
+    const secondGone = '| `a` | rule | PR モード | `x.ts` ("a test"); `gone.ts` ("a test") |';
+    expect(problems(table(secondGone), path => path === "x.ts", () => 'it("a test", () => {});')).toEqual(['`a`: test is "`x.ts` ("a test"); `gone.ts` ("a test")"']);
   });
 
   it("c6-row-has-effect-column: a row's 効く時 is not changed unnoticed", () => {
@@ -134,6 +142,7 @@ describe("C6's table (docs/status.md)", () => {
       "`candidate-cache-not-read-from-main`": "PR モード",
       "`public-sentences-match-scope`": "PR モード",
       "`c6-table-has-every-rule`": "PR モード",
+      "`c6-no-row-without-check`": "PR モード",
       "`action-does-not-comment-on-dependabot-pr`": "PR モード",
       "`pr-mode-has-no-merge-call`": "PR モード",
       "`pr-changes-no-workflow-file`": "PR モード",
@@ -251,6 +260,17 @@ describe("pr-mode-has-no-merge-call", () => {
       "gh repo sync",
       "uses: owner/some-action@abc",
     ]) expect([form, mergeCalls(form)]).toEqual([form, []]);
+  });
+});
+
+describe("the step of mode pull-request that holds the token", () => {
+  const steps = read("action.yml").split(/\n    - /).slice(1);
+
+  it("writing-job-cli-is-in-the-action: takes its CLI from the action's own path, not from the project", () => {
+    const holding = steps.filter(step => step.includes("github.token") && step.includes("deliver open"));
+    expect(holding).toHaveLength(1);
+    expect(holding[0]).toContain('node "$CLI" deliver open');
+    expect(holding[0]!.split("\n").filter(line => /^\s*CLI:/.test(line)).map(line => line.trim())).toEqual(["CLI: ${{ github.action_path }}/packages/cli/dist/cli.js"]);
   });
 });
 

@@ -6,7 +6,8 @@ import { createContext, runInContext } from "node:vm";
 import { describe, expect, it } from "vitest";
 import type { Change } from "../src/security/inventory.ts";
 import type { Finding } from "../src/security/osv.ts";
-import { fixResolution, noAnswerIn, noAnswerReason, notOldest, RECEIPT_ANSWERS, recheckOldest, registryRequirement, REQUIREMENT_LIMIT, requirementsOf, resolutionAssert, resolutionTime, resolveOldest, resolverScript, tableFile, unneededMoves, type ResolutionTable } from "../src/security/oldest.ts";
+import { pullRequestBody, type CheckedArtifact, type CheckedFix } from "../src/security/deliver.ts";
+import { CLOSES_NOTHING, fixResolution, NAMES_WHAT_IT_DOES_NOT_CLOSE, noAnswerIn, noAnswerReason, notOldest, RECEIPT_ANSWERS, recheckOldest, registryRequirement, REQUIREMENT_LIMIT, requirementsOf, resolutionAssert, resolutionTime, resolveOldest, resolverScript, tableFile, unneededMoves, type ResolutionTable } from "../src/security/oldest.ts";
 
 type Doc = { time: Record<string, unknown>; versions: Record<string, any> };
 const recorded = (name: string): Doc => JSON.parse(readFileSync(new URL(`fixtures/oldest-packuments/${name}.json`, import.meta.url), "utf8"));
@@ -320,14 +321,15 @@ describe("every new version is the answer for what loads it", () => {
     const input = { plan: [{ name: "fixed", from: "1.0.0", to: "2.0.0" }], beforeLock: before, afterLock: after, finalManifest: "{}" };
     const world = (published: string | null, osv: Record<string, string[]> = { "fixed@1.0.0": ["GHSA-a-0001"] }): typeof fetch => async (url, init) => {
       const u = decodeURIComponent(String(url));
-      if (u.startsWith("https://api.osv.dev/v1/vulns/")) return json({ id: u.split("/").at(-1), affected: [], aliases: [], ...(published ? { published } : {}) });
+      // GHSA-b-0002 gives no time, so only GHSA-a-0001 can move T.
+      if (u.startsWith("https://api.osv.dev/v1/vulns/")) return json({ id: u.split("/").at(-1), affected: [], aliases: [], ...(published && !u.endsWith("GHSA-b-0002") ? { published } : {}) });
       return fetchOf({ docs, osv })(url, init);
     };
     expect(await recheckOldest({ ...input, fetchFn: world("2024-01-01T00:00:00Z") })).toBeNull();
     // No such advisory time: T is V's, the one version is after it, and nothing is left.
     expect(await recheckOldest({ ...input, fetchFn: world(null) })).toContain("is none");
-    // An advisory that also names the version moved to is not one the fix closes, so it does not move T.
-    expect(await recheckOldest({ ...input, fetchFn: world("2024-01-01T00:00:00Z", { "fixed@1.0.0": ["GHSA-a-0001"], "fixed@2.0.0": ["GHSA-a-0001"] }) })).toContain("is none");
+    // An advisory that also names the version moved to is not one the fix closes, so it does not move T, though the fix closes another.
+    expect(await recheckOldest({ ...input, fetchFn: world("2024-01-01T00:00:00Z", { "fixed@1.0.0": ["GHSA-a-0001", "GHSA-b-0002"], "fixed@2.0.0": ["GHSA-a-0001"] }) })).toContain("is none");
   });
 });
 
@@ -335,10 +337,12 @@ describe("two small cases of the PR job's check", () => {
   const docs = { fixed: doc({ "1.0.0": "2020-01-01T00:00:00.000Z", "2.0.0": "2022-01-01T00:00:00.000Z" }, { "2.0.0": { dependencies: { dep: "^1.1.0" } } }), dep: doc({ "1.1.0": "2023-01-01T00:00:00.000Z" }) };
   const input = { plan: [{ name: "fixed", from: "1.0.0", to: "2.0.0" }], beforeLock: lockOf({ "node_modules/fixed": { version: "1.0.0" } }), afterLock: lockOf({ "node_modules/fixed": { version: "2.0.0", dependencies: { dep: "^1.1.0" } }, "node_modules/dep": { version: "1.1.0" } }), finalManifest: "{}" };
   it("not-oldest-withdrawn-record: an advisory OSV marks withdrawn does not move T", async () => {
+    // GHSA-b-0002 stays live and gives no time, so the fix closes something and only GHSA-a-0001 can move T.
     const world = (withdrawn: boolean): typeof fetch => async (url, init) => {
       const u = decodeURIComponent(String(url));
+      if (u.endsWith("GHSA-b-0002")) return json({ id: "GHSA-b-0002", affected: [], aliases: [] });
       if (u.startsWith("https://api.osv.dev/v1/vulns/")) return json({ id: u.split("/").at(-1), affected: [], aliases: [], published: "2024-01-01T00:00:00Z", ...(withdrawn ? { withdrawn: "2024-02-01T00:00:00Z" } : {}) });
-      return fetchOf({ docs, osv: { "fixed@1.0.0": ["GHSA-a-0001"] } })(url, init);
+      return fetchOf({ docs, osv: { "fixed@1.0.0": ["GHSA-a-0001", "GHSA-b-0002"] } })(url, init);
     };
     expect(await recheckOldest({ ...input, fetchFn: world(false) })).toBeNull();
     // Withdrawn, T is V's, the one version in range came after it, and nothing is left.
@@ -357,6 +361,82 @@ describe("two small cases of the PR job's check", () => {
     expect(notOldest({ answers: {}, v: { fixed: ["1.0.1"] } }, base, after, "{}")).toEqual([{ path: "node_modules/constructor", name: "constructor", version: "1.2.0", requirements: ["constructor@^1.0.0"], answers: [] }]);
     const table: ResolutionTable = { t: FIX_AT, t_note: "", answers: {}, v: { fixed: ["1.0.1"] }, locked: new Set(), publishedAt: async () => null };
     expect(resolutionAssert({ table, changes: [{ path: "node_modules/constructor", name: "constructor", to: "1.2.0" }], waitHours: 12, pushedAt: new Date("2026-07-01T00:00:00Z"), published: () => "2021-01-01T00:00:00Z" }).problems).toEqual([expect.stringContaining("is not a version the table")]);
+  });
+});
+
+describe("what a fix closes, in the PR job (docs/decisions/2026-11-03-lvcheck-refuse-when-nothing-closes.md)", () => {
+  const A = "GHSA-2222-2222-2222", B = "GHSA-3333-3333-3333", C = "GHSA-4444-4444-4444";
+  const lock = (packages: Record<string, unknown>) => lockOf(packages, { name: "app", dependencies: { fixed: "^1.0.0" } });
+  const only = (v: string) => lock({ "node_modules/fixed": { version: v } });
+  const input = (advisories?: string[]) => ({ plan: [{ name: "fixed", from: "1.0.0", to: "1.0.1", ...(advisories ? { advisories } : {}) }], beforeLock: only("1.0.0"), afterLock: only("1.0.1"), finalManifest: "{}" });
+  /** What the PR says, for a fix as the PR job checked it. */
+  const advisoriesRow = (advisories: string[]) => {
+    const fix: CheckedFix = { package: "fixed", changes: [{ name: "fixed", from: "1.0.0", to: "1.0.1", advisories }], branch: "ludion/x", commit: "a".repeat(40), subject: "", message: "", tree: "", files: [], fix_published_at: null, found_at: "2026-01-01T00:00:00Z", applied_at: "2026-01-01T00:00:00Z", verdict: "ready_except_build" };
+    const artifact: CheckedArtifact = { id: "receipt", ecosystem: "npm", base: "b".repeat(40), fixes: [fix], notApplied: {} };
+    return pullRequestBody(artifact, fix).split("\n").find(line => line.startsWith("| Advisories |"));
+  };
+
+  it("oldest-refuses-when-no-change-closes-a-live-advisory: nothing named, named on both sides, or only withdrawn is refused", async () => {
+    const check = (osv: Record<string, string[]>, withdrawn?: string[]) => recheckOldest({ ...input(), fetchFn: fetchOf({ docs: {}, osv, ...(withdrawn ? { withdrawn } : {}) }) });
+    for (const refused of [await check({}), await check({ "fixed@1.0.0": [A], "fixed@1.0.1": [A] }), await check({ "fixed@1.0.0": [A] }, [A])]) {
+      expect(refused).toContain(CLOSES_NOTHING);
+      expect(refused).toContain("fixed 1.0.0 -> 1.0.1");
+    }
+    expect(await check({ "fixed@1.0.0": [A] })).toBeNull();
+    // An advisory on the version moved to alone is no fix either.
+    expect(await check({ "fixed@1.0.1": [A] })).toContain(CLOSES_NOTHING);
+  });
+  it("oldest-refuses-when-no-change-closes-a-live-advisory: a sibling named as the fix, with a forged later version, is refused before any table", async () => {
+    // Named as the fix, dep moves to the version a forger wants. Before, nothing else was new, so nothing was read at all.
+    const plan = [{ name: "dep", from: "1.0.0", to: "1.3.0", advisories: [A] }];
+    const urls: string[] = [], world = fetchOf({ docs: { dep: doc({ "1.0.0": "2020-01-01T00:00:00.000Z", "1.3.0": "2021-01-01T00:00:00.000Z" }) }, osv: { "fixed@1.0.0": [A] } });
+    const fetchFn: typeof fetch = (url, init) => { urls.push(String(url)); return world(url, init); };
+    const refused = await recheckOldest({ plan, beforeLock: lock({ "node_modules/dep": { version: "1.0.0" } }), afterLock: lock({ "node_modules/dep": { version: "1.3.0" } }), finalManifest: "{}", fetchFn });
+    expect(refused).toContain(CLOSES_NOTHING);
+    expect(urls).toEqual(["https://api.osv.dev/v1/querybatch"]);
+  });
+  it("oldest-refuses-when-no-change-closes-a-live-advisory: a read that fails throws, so the PR job refuses; it never goes on unread", async () => {
+    await expect(recheckOldest({ ...input([A]), fetchFn: fetchOf({ docs: {}, failing: "https://api.osv.dev/v1/querybatch" }) })).rejects.toThrow("HTTP 503");
+    await expect(recheckOldest({ ...input([A]), fetchFn: fetchOf({ docs: {}, osv: { "fixed@1.0.0": [A] }, failing: "https://api.osv.dev/v1/vulns/" }) })).rejects.toThrow("503");
+  });
+  it("pr-advisories-from-closed-only: a name the change does not close refuses the fix, so none reaches the commit or the PR", async () => {
+    const check = (osv: Record<string, string[]>, withdrawn?: string[]) => recheckOldest({ ...input([A, B]), fetchFn: fetchOf({ docs: {}, osv, ...(withdrawn ? { withdrawn } : {}) }) });
+    for (const refused of [
+      // B is named nowhere, is still on the version moved to, or is withdrawn.
+      await check({ "fixed@1.0.0": [A] }),
+      await check({ "fixed@1.0.0": [A, B], "fixed@1.0.1": [B] }),
+      await check({ "fixed@1.0.0": [A, B] }, [B]),
+    ]) {
+      expect(refused).toContain(NAMES_WHAT_IT_DOES_NOT_CLOSE);
+      expect(refused).toContain(`${B} on fixed 1.0.0 -> 1.0.1`);
+      expect(refused).not.toContain(A);
+    }
+    // A name closed only by the other change of the fix is not closed by this one.
+    const two = { ...input(), plan: [{ name: "fixed", from: "1.0.0", to: "1.0.1", advisories: [A, B] }, { name: "fixed", from: "2.0.0", to: "2.0.1", advisories: [] }] };
+    expect(await recheckOldest({ ...two, fetchFn: fetchOf({ docs: {}, osv: { "fixed@1.0.0": [A], "fixed@2.0.0": [B] } }) })).toContain(`${B} on fixed 1.0.0 -> 1.0.1`);
+    // The IDs are cut to three, with how many more.
+    const many = [A, B, C, "GHSA-5555-5555-5555", "GHSA-6666-6666-6666", "GHSA-7777-7777-7777"];
+    expect(await recheckOldest({ ...input(many), fetchFn: fetchOf({ docs: {}, osv: { "fixed@1.0.0": ["GHSA-7777-7777-7777"] } }) })).toContain("(2 more)");
+  });
+  it("pr-advisories-from-closed-only: what passes is all the PR lists; what the change closes and the receipt does not name is not added", async () => {
+    const osv = { "fixed@1.0.0": [A, B, C], "fixed@1.0.1": [C] };
+    expect(await recheckOldest({ ...input([A, B]), fetchFn: fetchOf({ docs: {}, osv }) })).toBeNull();
+    expect(advisoriesRow([A, B])).toBe(`| Advisories | \`${A}\`, \`${B}\` |`);
+    expect(await recheckOldest({ ...input([A]), fetchFn: fetchOf({ docs: {}, osv }) })).toBeNull();
+    expect(advisoriesRow([A])).toBe(`| Advisories | \`${A}\` |`);
+    // C is still on the version moved to: naming it refuses.
+    expect(await recheckOldest({ ...input([A, C]), fetchFn: fetchOf({ docs: {}, osv }) })).toContain(`${C} on fixed 1.0.0 -> 1.0.1`);
+  });
+  it("closes-goes-on-as-before: when the fix closes a live advisory, the oldest versions are held as they were", async () => {
+    const docs = { fixed: doc({ "1.0.0": "2020-01-01T00:00:00.000Z", "1.0.1": FIX_AT }, { "1.0.1": { dependencies: { dep: "^1.1.0" } } }), dep: doc({ "1.1.0": "2021-01-01T00:00:00.000Z", "1.3.0": "2022-01-01T00:00:00.000Z" }) };
+    const moved = (dep: string) => ({ ...input([A]), afterLock: lock({ "node_modules/fixed": { version: "1.0.1", dependencies: { dep: "^1.1.0" } }, "node_modules/dep": { version: dep } }) });
+    const fetchFn = fetchOf({ docs, osv: { "fixed@1.0.0": [A] } });
+    expect(await recheckOldest({ ...input([A]), fetchFn })).toBeNull();
+    expect(await recheckOldest({ ...moved("1.1.0"), fetchFn })).toBeNull();
+    expect(await recheckOldest({ ...moved("1.3.0"), fetchFn })).toContain("package-lock.json has dep@1.3.0 at node_modules/dep, where the oldest version in range for dep@^1.1.0 is 1.1.0");
+    // One change that closes is enough for the fix to go on: the other names nothing, so nothing false is written.
+    const two = { ...input(), plan: [{ name: "fixed", from: "1.0.0", to: "1.0.1", advisories: [A] }, { name: "fixed", from: "2.0.0", to: "2.0.1", advisories: [] }] };
+    expect(await recheckOldest({ ...two, fetchFn })).toBeNull();
   });
 });
 

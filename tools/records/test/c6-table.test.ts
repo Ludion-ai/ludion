@@ -272,13 +272,14 @@ describe("pr-job-pushes-only-its-branch", () => {
     expect(shipped).toEqual(expect.arrayContaining([DELIVER, TIME_CAP, "action/patch.sh", "action.yml"]));
     const found = Object.fromEntries(shipped.map(path => [path, pushCalls(read(path)).sort()]).filter(([, calls]) => calls!.length));
     expect(found).toEqual({
-      // The call, and the words "git push" in the comment above it and in its error message.
-      [DELIVER]: ['"push"', "git push", "git push"],
+      // The call, the GET that reads an earlier run's branch, and the words "git push" in the call's comment and error message.
+      [DELIVER]: ['"push"', "/git/commits", "git push", "git push"],
       // Not a call: the GitHub events a package may be published from.
       [TIME_CAP]: ['"push"'],
     });
     expect(read(TIME_CAP)).toContain('PUBLISH_EVENTS = ["push", "release", "workflow_dispatch"]');
     const deliver = read(DELIVER);
+    expect(deliver).toContain('call(api, "GET", `/repos/${options.repo}/git/commits/${remoteCommit}`)');
     expect(deliver).toContain('"push", "--no-verify", "--porcelain", remote, `${commit}:refs/heads/${branch}`]');
     expect(deliver).toContain('!/^ludion\\/[A-Za-z0-9._/-]+$/.test(branch)) throw new Error("Only a fix commit goes to a ludion/ branch.")');
     expect(deliver).toContain("if (!remoteSha) push(top, options.remote, fix.commit, fix.branch, options.token);");

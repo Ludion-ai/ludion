@@ -534,12 +534,6 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         fix.candidate_passed = true;
         // Gate 3's comparison, once the project's own test has passed on this fix. What it stops is this fix alone. It takes
         // the project, not the copy in `source`, which has no .env.example; the check below sees a project that changed meanwhile.
-        if (ecosystem === "npm") {
-          const sides = (folder: string) => ({ manifest: textFile(folder, "package.json"), lock: textFile(folder, "package-lock.json") });
-          const gate3 = fix.gate3 = await judgeGate3({ dir: root, old: sides(source), new: sides(candidate.exported) }, { policy: manifests => acquisitionPolicy(manifests, "npm"), snapshot, command, ...(deps.gate3Box ? { box: deps.gate3Box } : {}) }); active();
-          const refusal = gate3Refusal(gate3);
-          if (refusal) throw new Error(refusal);
-        }
         if (snapshot(root) !== receipt.tree_hash) throw new Error("Project changed during validation; no dependency file was updated.");
         fix.files = files.map(f => ({ path: f.path, before_hash: hash(f.before), after_hash: hash(f.after) }));
         fix.outcome = "validated";

@@ -25,4 +25,4 @@ docker run --rm --user node --cap-drop ALL --memory 4g --network none -e HOME=/v
 
 The registry and OSV change every day, so a later run can differ. `run.mjs` has no retry: in the run behind `results/`, R09 failed on `api.osv.dev answered HTTP 503` and passed when run again, and `results/` holds the later run. That run took two sittings, since the first stopped at its time limit after 16 examples. In an earlier run of the same day, R11 failed the same way.
 
-`mutate.mjs` takes a first index and an index to stop before, since the whole list is longer than one sitting. `mutations.json` is the two parts of its last run put together.
+`mutate.mjs` takes a first index and an index to stop before, since the whole list is longer than one sitting. `mutations.json` puts the parts of its runs together: 44 entries from the tree at e2ec262, and 4 (two new, two whose text changed) from the later head, each with `head` saying which.

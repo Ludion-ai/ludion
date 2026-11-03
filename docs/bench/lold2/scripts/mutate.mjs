@@ -44,8 +44,8 @@ const MUTATIONS = [
   ["the PR job takes a failed read as no problem", L, "return `the oldest versions could not be worked out: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;", "return null;", [DEL]],
   ["a version need only be some answer of its name", O, "const answers = requirements.map(key => table.answers[key]?.version ?? null);", "const answers = Object.values(table.answers).filter(a => a.name === name).map(a => a.version);", [OLD, DEP]],
   ["an added path is not held to it", O, "if (before.get(path)?.version === version && packageAt(path, before.get(path)) === name) continue;\n    if (table.v", "if (!before.has(path) || (before.get(path)?.version === version && packageAt(path, before.get(path)) === name)) continue;\n    if (table.v", [OLD]],
-  ["a version locked elsewhere is not let through", O, "if (table.v[name]?.includes(version) || locked.has(`${name}@${version}`)) continue;", "if (table.v[name]?.includes(version)) continue;", [OLD]],
-  ["V is not let through", O, "if (table.v[name]?.includes(version) || locked.has(`${name}@${version}`)) continue;", "if (locked.has(`${name}@${version}`)) continue;", [OLD, DEL]],
+  ["a version locked elsewhere is not let through", O, "if (isV(table.v, name, version) || locked.has(`${name}@${version}`)) continue;", "if (isV(table.v, name, version)) continue;", [OLD]],
+  ["V is not let through", O, "if (isV(table.v, name, version) || locked.has(`${name}@${version}`)) continue;", "if (locked.has(`${name}@${version}`)) continue;", [OLD, DEL]],
   ["the recheck stops at the first read of nothing new", O, "if (!possible.length) return null;\n  const ids", "if (possible.length) return null;\n  const ids", [OLD, DEL]],
   ["the recheck finds nothing wrong", O, "if (!wrong.length) return null;", "return null;", [DEL]],
   ["the recheck's advisories include what still names V", O, "const closed = (ids.get(`${change.name}@${change.from}`) ?? []).filter(id => !after.has(id));", "const closed = ids.get(`${change.name}@${change.from}`) ?? [];", [OLD]],
@@ -53,6 +53,10 @@ const MUTATIONS = [
   ["the PR job takes moves nothing reaches", L, "if (strayMoves.length) return", "if (false) return", [DEL]],
   ["the PR job takes any other change as a move", L, 'if (kinds.get(path) !== "install" || before.link || after.link || before.version === after.version) return', "if (false) return", [DEL]],
 ];
+MUTATIONS.push(
+  ["a withdrawn advisory moves T in the recheck", O, "if (advisory.withdrawn) continue;\n", "", [OLD]],
+  ["V is read by a plain lookup", O, "Object.hasOwn(v, name) && v[name]!.includes(version);", "!!v[name]?.includes(version);", [OLD]],
+);
 const results = [], [out, start = "0", end = String(MUTATIONS.length)] = process.argv.slice(2);
 for (const [what, file, from, to, tests] of MUTATIONS.slice(Number(start), Number(end))) {
   const original = readFileSync(file, "utf8");

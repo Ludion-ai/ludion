@@ -452,9 +452,9 @@ async function npmAgain(top: string, prefix: string, base: string, fix: CheckedF
 
 /**
  * npm: every version the fix brings in, other than its own, is the oldest in range now, worked out here from the registry's
- * metadata and OSV (oldest.ts, recheckOldest), not read from the receipt. npmLockProblem lets a path move when a requirement
- * needs it; this is what holds the version it moves to, so a forged artifact cannot pick a later one in range. A read that
- * fails refuses the fix. No package's code runs (docs/decisions/2026-11-03-oldest-resolution-in-product.md, section 5).
+ * metadata and OSV (oldest.ts, recheckOldest), from the fix's V as the receipt names it. npmLockProblem lets a path move
+ * when a requirement needs it; this is what holds the version it moves to, so under a given V a forged artifact cannot pick
+ * a later one in range. It does not hold that V is the smallest fixed version. A read that fails refuses the fix. No package's code runs (docs/decisions/2026-11-03-oldest-resolution-in-product.md, section 5).
  */
 async function oldestAgain(top: string, prefix: string, base: string, fix: CheckedFix, check: typeof recheckOldest): Promise<string | null> {
   try {

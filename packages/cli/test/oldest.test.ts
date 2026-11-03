@@ -331,6 +331,28 @@ describe("every new version is the answer for what loads it", () => {
   });
 });
 
+describe("two small cases of the PR job's check", () => {
+  const docs = { fixed: doc({ "1.0.0": "2020-01-01T00:00:00.000Z", "2.0.0": "2022-01-01T00:00:00.000Z" }, { "2.0.0": { dependencies: { dep: "^1.1.0" } } }), dep: doc({ "1.1.0": "2023-01-01T00:00:00.000Z" }) };
+  const input = { plan: [{ name: "fixed", from: "1.0.0", to: "2.0.0" }], beforeLock: lockOf({ "node_modules/fixed": { version: "1.0.0" } }), afterLock: lockOf({ "node_modules/fixed": { version: "2.0.0", dependencies: { dep: "^1.1.0" } }, "node_modules/dep": { version: "1.1.0" } }), finalManifest: "{}" };
+  it("not-oldest-withdrawn-record: an advisory OSV marks withdrawn does not move T", async () => {
+    const world = (withdrawn: boolean): typeof fetch => async (url, init) => {
+      const u = decodeURIComponent(String(url));
+      if (u.startsWith("https://api.osv.dev/v1/vulns/")) return json({ id: u.split("/").at(-1), affected: [], aliases: [], published: "2024-01-01T00:00:00Z", ...(withdrawn ? { withdrawn: "2024-02-01T00:00:00Z" } : {}) });
+      return fetchOf({ docs, osv: { "fixed@1.0.0": ["GHSA-a-0001"] } })(url, init);
+    };
+    expect(await recheckOldest({ ...input, fetchFn: world(false) })).toBeNull();
+    // Withdrawn, T is V's, the one version in range came after it, and nothing is left.
+    expect(await recheckOldest({ ...input, fetchFn: world(true) })).toContain("is none");
+  });
+  it("not-oldest-package-named-constructor: a package named as an object's own property gets a reason, not a TypeError", () => {
+    const base = lockOf({ "node_modules/fixed": { version: "1.0.0" } });
+    const after = lockOf({ "node_modules/fixed": { version: "1.0.1", dependencies: { constructor: "^1.0.0" } }, "node_modules/constructor": { version: "1.2.0" } });
+    expect(notOldest({ answers: {}, v: { fixed: ["1.0.1"] } }, base, after, "{}")).toEqual([{ path: "node_modules/constructor", name: "constructor", version: "1.2.0", requirements: ["constructor@^1.0.0"], answers: [] }]);
+    const table: ResolutionTable = { t: FIX_AT, t_note: "", answers: {}, v: { fixed: ["1.0.1"] }, locked: new Set(), publishedAt: async () => null };
+    expect(resolutionAssert({ table, changes: [{ path: "node_modules/constructor", name: "constructor", to: "1.2.0" }], waitHours: 12, pushedAt: new Date("2026-07-01T00:00:00Z"), published: () => "2021-01-01T00:00:00Z" }).problems).toEqual([expect.stringContaining("is not a version the table")]);
+  });
+});
+
 describe("the script in the resolver's container", () => {
   /** The script with npm's modules replaced: `real` records what npm's own manifest function would be asked. */
   function load(table: Record<string, string | null>) {

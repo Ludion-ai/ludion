@@ -121,6 +121,8 @@ export function requirementsOf(manifest: Record<string, any>): Requirement[] {
 }
 
 const keyOf = (r: Requirement) => `${r.name}@${r.spec}`;
+/** Is this version V? By own key: a package may be named `constructor`. */
+const isV = (v: Record<string, string[]>, name: string, version: string) => Object.hasOwn(v, name) && v[name]!.includes(version);
 
 /** Every string a project's `overrides` gives a package: npm asks about these in place of the range the requirer writes. */
 function overridden(overrides: unknown, parent?: string): Requirement[] {
@@ -354,7 +356,7 @@ export function resolutionAssert(input: { table: ResolutionTable; changes: { pat
   let youngest: { id: string; at: number } | null = null;
   for (const c of input.changes) {
     const id = `${c.name}@${c.to}`;
-    const role = input.table.v[c.name]?.includes(c.to) ? "v" : answers.find(a => a.name === c.name && a.version === c.to)?.role ?? (input.table.locked.has(id) ? "reused_base" : null);
+    const role = isV(input.table.v, c.name, c.to) ? "v" : answers.find(a => a.name === c.name && a.version === c.to)?.role ?? (input.table.locked.has(id) ? "reused_base" : null);
     const raw = input.published(c.name, c.to), at = time(raw);
     versions.push({ path: c.path, name: c.name, version: c.to, role, published_at: Number.isFinite(at) ? new Date(at).toISOString() : null, age_hours: Number.isFinite(at) ? Math.round((pushed - at) / HOUR * 10) / 10 : null });
     if (role === null) problems.push(`${id} at ${c.path} is not a version the table of oldest versions gave for ${c.name}.`);
@@ -411,7 +413,7 @@ export function notOldest(table: Pick<ResolutionTable, "answers" | "v">, beforeL
   for (const [path, item] of after) {
     const name = packageAt(path, item), version = String(item.version);
     if (before.get(path)?.version === version && packageAt(path, before.get(path)) === name) continue;
-    if (table.v[name]?.includes(version) || locked.has(`${name}@${version}`)) continue;
+    if (isV(table.v, name, version) || locked.has(`${name}@${version}`)) continue;
     const requirements = [...new Set([
       ...loadersOf(is, after, path).map(loader => registryRequirement(requireName(path), loader.spec)).filter((r): r is Requirement => !!r && r.name === name),
       ...overrides.filter(r => r.name === name),
@@ -423,9 +425,10 @@ export function notOldest(table: Pick<ResolutionTable, "answers" | "v">, beforeL
 }
 
 /**
- * The PR job's own reading (the decision, section 5): nothing in the artifact counts. From the lockfiles Ludion checked,
- * the registry's metadata and OSV alone, the table is worked out again and every new version held against it. The fix's
- * advisories are OSV's: those on the version moved from that do not name the version moved to, as the judge reads them.
+ * The PR job's own reading (the decision, section 5). From the plan and lockfiles Ludion checked, the registry's metadata
+ * and OSV, the table is worked out again and every new version held against it. The plan's V is the artifact's: it starts
+ * the walk and sets T, and nothing here holds that it is the smallest fixed version. The receipt's `resolution` is not
+ * read. The fix's advisories are OSV's: those on the version moved from that do not name the version moved to, as the judge reads them.
  * Only names and versions, and back to OSV the IDs it returned, are sent, and no package's code is run. Returns why the
  * fix is refused, or null. A read that fails throws. A fix that brings in nothing new reads nothing.
  */

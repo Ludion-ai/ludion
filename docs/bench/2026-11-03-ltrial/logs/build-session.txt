@@ -1,0 +1,12 @@
+2026-11-03T09:46:50Z available=14935 limit=3072m need=3840
+HEAD 3d143fe2a17bf06d9c03292b3bfe57e1b3178617
+node v24.22.2 npm 11.19.1
+npm-ci exit 0
+build exit 0
+action build exit 0
+30467ee73a7f189897783938213bebaf139a21012c5ed5a3f30e6ffb420c63f5  packages/cli/dist/cli.js
+c87b047a3f95ffd10f0c5dc1d57b8e4d997ee0222179a5c8cf3ddd47c7e0f699  action/dist/record.js
+720261 packages/cli/dist/cli.js
+121157 action/dist/record.js
+841418 total
+memory.peak 1134891008

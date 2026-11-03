@@ -1,0 +1,73 @@
+2026-11-03T09:53:32Z available=14892 limit=256m need=320
+{
+  "line1": {
+    "new_prs": [
+      8
+    ],
+    "1_exactly_one": true,
+    "2_base_main": true,
+    "2_head_branch": "ludion/npm-ltrial/npm/lodash-4.18.1-8451466ef948",
+    "2_head_starts": true,
+    "2_author": "github-actions[bot]",
+    "3_one_parent_run1_head": true,
+    "3_only_under_folder": true,
+    "3_files": [
+      "npm-ltrial/package-lock.json",
+      "npm-ltrial/package.json"
+    ],
+    "4_applied_fixes": 1,
+    "4_is_pr_package": true,
+    "5_pull_request_job": "success"
+  },
+  "line2": {
+    "has_resolution": true,
+    "t": "2026-04-01T21:01:20.458Z",
+    "t_is_string": true,
+    "requirements": 1,
+    "requirements_ge_1": true,
+    "stopped_no_allowed": false,
+    "no_answer_absent": true,
+    "fix_answer": 1,
+    "assert_problems": [],
+    "roles": [
+      "v"
+    ]
+  },
+  "pr_body": {
+    "bytes": 3583,
+    "resolution": false,
+    "oldest": false,
+    "japanese": false,
+    "requirement": false,
+    "receipt_id_named": true
+  },
+  "line3": {
+    "1_same_numbers": true,
+    "numbers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "2_one_pr_on_branch": 1,
+    "2_head_unchanged": true,
+    "head_sha": "d94f806d7c3b9f1644695c5f1fc42cdc692fe8ed",
+    "state": "open",
+    "3_same_ludion_branches": true,
+    "ludion_branches": [
+      "ludion/npm-ltrial/npm/lodash-4.18.1-8451466ef948",
+      "ludion/npm/npm/lodash-4.18.1",
+      "ludion/php-a/php/8.4.27",
+      "ludion/php-b/php/8.4.27",
+      "ludion/php-c/php/8.4.27",
+      "ludion/php-d/php/8.4.27",
+      "ludion/php/php/8.4.27"
+    ],
+    "4_run2_conclusion": "success",
+    "run2_same_head_as_run1": true
+  }
+}

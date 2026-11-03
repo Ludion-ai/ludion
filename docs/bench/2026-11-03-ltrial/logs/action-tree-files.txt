@@ -1,0 +1,15 @@
+./BUILD.md
+./LICENSE
+./action.yml
+./action/body.jq
+./action/check.sh
+./action/comment.sh
+./action/dist/record.js
+./action/patch-workflow.yml
+./action/patch.sh
+./action/pick.jq
+./action/read.sh
+./action/refuse.jq
+./action/start.sh
+./action/valid.jq
+./packages/cli/dist/cli.js

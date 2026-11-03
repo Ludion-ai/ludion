@@ -1,0 +1,4 @@
+./ludion.security.json
+./package-lock.json
+./package.json
+./tests/smoke.test.cjs

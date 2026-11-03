@@ -16,7 +16,7 @@ import { snapshot } from "../src/security/project.ts";
 const passed = { status: "passed" as StepStatus, seconds: 1 };
 const absent = { status: "absent" as StepStatus, seconds: 0 };
 const page = (path: string, over: Partial<Gate3Page> = {}): Gate3Page => ({ path, status: 200, exceptions: [], console: [], dom: ["aaaaaaaa", "bbbbbbbb"], screenshot: "0".repeat(32), ...over });
-const run = (pages: Gate3Page[], over: Partial<Gate3Run> = {}): Gate3Run => ({ build: passed, types: passed, start: passed, crawl: passed, tests: passed, too_many_pages: false, pages, seconds: 2, memory_peak_bytes: 1, memory_swap_peak_bytes: 0, memory_oom_kills: 0, tmp_min_free_bytes: 40 * 1_048_576, heap_out_lines: 0, enospc_lines: 0, host_cpus: 16, ...over });
+const run = (pages: Gate3Page[], over: Partial<Gate3Run> = {}): Gate3Run => ({ build: passed, types: passed, start: passed, crawl: passed, tests: passed, too_many_pages: false, pages, seconds: 2, memory_peak_bytes: 1, memory_swap_peak_bytes: 0, memory_swap_max: "0", memory_oom_kills: 0, tmp_min_free_bytes: 40 * 1_048_576, heap_out_lines: 0, enospc_lines: 0, host_cpus: 16, ...over });
 const failed = { status: "failed" as StepStatus, seconds: 1 }, timedOut = { status: "timed_out" as StepStatus, seconds: 1 };
 const old = () => run([page("/"), page("/about")]);
 
@@ -318,6 +318,10 @@ describe("parseRun: what the box prints is data the candidate could have written
     ["a screenshot that is not a hash", print({ ...good, pages: [page("/", { screenshot: "x" })] })],
     ["too many pages", print({ ...good, pages: Array.from({ length: MAX_PAGES + 1 }, (_, i) => page(`/${i}`)) })],
     ["memory that is not a number", print({ ...good, memory_oom_kills: "0" })],
+    ["no memory.swap.max at all", print({ ...good, memory_swap_max: undefined })],
+    ["a memory.swap.max that is a number, not its text", print({ ...good, memory_swap_max: 0 })],
+    ["text where memory.swap.max belongs", print({ ...good, memory_swap_max: "Text with spaces, from the box." })],
+    ["a null memory.swap.max", print({ ...good, memory_swap_max: null })],
     ["a CPU count that is not a number", print({ ...good, host_cpus: "16" })],
     ["a /tmp figure that is not a number", print({ ...good, tmp_min_free_bytes: "0" })],
     ["no /tmp figure at all", print({ ...good, tmp_min_free_bytes: undefined })],
@@ -422,12 +426,12 @@ describe("what goes into the box", () => {
   });
 
   /** The driver itself, up to a build that fails, with Node.js's modules stood in for. It shows nothing about real builds: those are in the progress record. */
-  const driverUpToBuild = async (over: { env?: Record<string, string>; hostEnv?: Record<string, string>; cpus?: number; statfs?: (state: { inBuild: boolean; ended: boolean }) => { bavail: number; bsize: number }; buildMs?: number; buildExit?: number; stderr?: Record<string, string[]>; noStderrEnd?: boolean; noClose?: boolean } = {}) => {
+  const driverUpToBuild = async (over: { cgroup?: Record<string, string>; env?: Record<string, string>; hostEnv?: Record<string, string>; cpus?: number; statfs?: (state: { inBuild: boolean; ended: boolean }) => { bavail: number; bsize: number }; buildMs?: number; buildExit?: number; stderr?: Record<string, string[]>; noStderrEnd?: boolean; noClose?: boolean } = {}) => {
     const events: string[] = [], envs: Record<string, Record<string, string>> = {}, state = { inBuild: false, ended: false };
     let printed = "", forwarded = "";
     const missing = () => { throw new Error("not in this stand-in"); };
     const fs = {
-      readFileSync: (path: string) => path === "/ludion/config.json" ? JSON.stringify({ env: over.env ?? {}, freeze: "" }) : path === "/app/package.json" ? "{}" : missing(),
+      readFileSync: (path: string) => path === "/ludion/config.json" ? JSON.stringify({ env: over.env ?? {}, freeze: "" }) : path === "/app/package.json" ? "{}" : over.cgroup?.[path] ?? missing(),
       readdirSync: () => [], copyFileSync: () => {}, symlinkSync: () => {}, existsSync: () => false,
       mkdirSync: (path: string) => { events.push(`mkdir ${path}`); },
       chmodSync: (path: string, mode: number) => { events.push(`chmod ${mode.toString(8)} ${path}`); },
@@ -521,6 +525,22 @@ describe("what goes into the box", () => {
     const result = parseRun(printed);
     expect(result?.build.status).toBe("failed");
     expect(result?.tmp_min_free_bytes).toBeNull();
+  });
+
+  describe("gate3-result-records-swap-max", () => {
+    const SWAP_MAX = "/sys/fs/cgroup/memory.swap.max";
+    it.each([["0\n", "0"], ["max\n", "max"], ["536870912\n", "536870912"]])("the driver prints what the box's file says: %j", async (file, value) => {
+      const { printed } = await driverUpToBuild({ cgroup: { [SWAP_MAX]: file } });
+      expect(parseRun(printed)?.memory_swap_max).toBe(value);
+    });
+    it("a file it cannot read is unknown, not a number", async () => {
+      const { printed } = await driverUpToBuild();
+      expect(parseRun(printed)?.memory_swap_max).toBe("unknown");
+    });
+    it.each(["", "not a figure\n", "-1\n", "0 0\n"])("a file that holds no figure is unknown, not a number: %j", async file => {
+      const { printed } = await driverUpToBuild({ cgroup: { [SWAP_MAX]: file } });
+      expect(parseRun(printed)?.memory_swap_max).toBe("unknown");
+    });
   });
 
   it("gate3-webpack-cache-read-only-before-build: that folder, and nothing else, is read-only before the build starts", async () => {
@@ -694,6 +714,30 @@ describe("one judgement, with Docker stood in for", () => {
       expect(JSON.parse(c.config!).env).toEqual({ API_URL: "http://127.0.0.1:9/", SECRET: "ludion-dummy" });
       expect(c.config).not.toContain("real.example");
     }
+  });
+
+  it("gate3-result-records-swap-max: each run in the result has the box's memory.swap.max", async () => {
+    const d = docker(), b = boxes(exited(printed(old())), exited(printed(run(old().pages, { memory_swap_max: "unknown" }))), exited(printed(run(old().pages, { memory_swap_max: "max" }))));
+    const result = await judgeGate3({ dir, old: sides, new: sides }, deps(d, b));
+    expect(result.runs.map(r => r.run?.memory_swap_max)).toEqual(["0", "unknown", "max"]);
+    // Recorded only: no verdict reads it.
+    expect(result.verdict).toBe("not_broken");
+  });
+
+  it("gate3-boxes-one-at-a-time: a box starts only when the one before it has ended", async () => {
+    const noBuild = run([], { build: failed, types: absent, start: absent, crawl: absent, tests: absent });
+    const answers = [old(), old(), noBuild, noBuild];
+    let running = 0, most = 0, started = 0;
+    const box = async () => {
+      most = Math.max(most, ++running);
+      started++;
+      await new Promise(done => setTimeout(done, 5));
+      running--;
+      return exited(printed(answers.shift()!));
+    };
+    await judgeGate3({ dir, old: sides, new: sides }, { policy: () => {}, snapshot, command: docker().command, box });
+    expect(started).toBe(4);
+    expect(most).toBe(1);
   });
 
   it("stops before Docker on a project that is not Next.js, or a package.json it cannot read", async () => {

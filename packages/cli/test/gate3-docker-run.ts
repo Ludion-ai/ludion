@@ -5,11 +5,11 @@
 import { spawnSync } from "node:child_process";
 import { cpSync } from "node:fs";
 import { setTimeout as delay } from "node:timers/promises";
-import { runContainer, runDockerImageCommand } from "../../sandbox/src/docker.ts";
+import { NPM_BOX_MEMORY, runContainer, runDockerImageCommand } from "../../sandbox/src/docker.ts";
 import { caseProblems, runCase, type CaseName } from "./gate3-cases.ts";
 
 const ALPINE = "alpine@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a";
-const BOX_MEMORY_MB = 512;
+const BOX_MEMORY_MB = Number.parseInt(NPM_BOX_MEMORY, 10) * 1024;
 const available = () => Number(/^Mem:(?:\s+\d+){5}\s+(\d+)/m.exec(spawnSync("docker", ["run", "--rm", ALPINE, "free", "-m"], { encoding: "utf8" }).stdout ?? "")?.[1]);
 
 const [examples, ...names] = process.argv.slice(2);

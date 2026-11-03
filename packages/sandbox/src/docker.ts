@@ -17,6 +17,16 @@ export type Tool = "npm" | "composer" | "maven";
 const CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/;
 const OUTPUT_CAP = 1_000_000;
 const GRACE_MS = 10_000;
+const SWAP_READ_MS = 30_000;
+
+/**
+ * The memory of the box npm projects' code runs in, validation's and gate 3's alike, in one place, with one CPU and no
+ * swap: `--memory-swap` equal to `--memory` turns swap off (docs/decisions/2026-11-03-box-one-cpu-4g-no-swap.md).
+ */
+export const NPM_BOX_MEMORY = "4g";
+
+/** What a box's memory.swap.max can hold. Anything else is reported as "unknown", never as a number. */
+export const SWAP_MAX_TEXT = /^(?:\d{1,20}|max)$/;
 
 let neutral: string | undefined;
 /**
@@ -112,7 +122,8 @@ export function runArgs(name: string, image: string, command: readonly string[],
   if (typeof image !== "string" || !/^sha256:[a-f0-9]{64}$/.test(image)) throw new Error("Security tests require an immutable local image ID.");
   if (!Array.isArray(command) || !command.length || !command.every(a => typeof a === "string" && a.length > 0 && a.length <= 2000 && !a.includes("\0")) || command[0]!.startsWith("-")) throw new Error("Expected a nonempty application test argv.");
   if (tool !== undefined && tool !== "npm" && tool !== "composer" && tool !== "maven") throw new Error("Unsupported security test tool.");
-  const args = ["run", "--rm", "--name", name, "--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "65534:65534", "--cpus", "1", "--memory", "512m", "--pids-limit", "256", "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m"];
+  const memory = tool === "npm" ? ["--memory", NPM_BOX_MEMORY, "--memory-swap", NPM_BOX_MEMORY] : ["--memory", "512m"];
+  const args = ["run", "--rm", "--name", name, "--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "65534:65534", "--cpus", "1", ...memory, "--pids-limit", "256", "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m"];
   // Fixed scratch directories the package manager's test tools write to, inside the container only. No host mounts.
   if (tool === "npm") args.push("--tmpfs", "/app/node_modules/.vite:rw,noexec,nosuid,nodev,size=32m,mode=1777", "--tmpfs", "/app/node_modules/.vite-temp:rw,noexec,nosuid,nodev,size=32m,mode=1777");
   if (tool === "composer") args.push("--tmpfs", "/app/.phpunit.cache:rw,noexec,nosuid,nodev,size=32m,mode=1777");
@@ -160,4 +171,16 @@ export function runContainer(name: string, image: string, command: readonly stri
     child.on("error", err => finish({ kind: "spawn_error", message: err.message }));
     child.on("close", exitCode => finish({ kind: "exited", exitCode, stdout, stderr, timedOut }));
   });
+}
+
+/**
+ * The value of memory.swap.max in a box with these flags, from this image: one `cat` in a box of its own, so that the
+ * project's test runs exactly as it is configured. "unknown" when it cannot be read, and no failure here stops anything.
+ */
+export async function readSwapMax(name: string, image: string, tool: Tool): Promise<string> {
+  try {
+    const result = await runContainer(name, image, ["cat", "/sys/fs/cgroup/memory.swap.max"], SWAP_READ_MS, tool);
+    const text = result.kind === "exited" && !result.timedOut && result.exitCode === 0 ? result.stdout.trim() : "";
+    return SWAP_MAX_TEXT.test(text) ? text : "unknown";
+  } catch { return "unknown"; }
 }

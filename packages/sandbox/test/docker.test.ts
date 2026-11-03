@@ -4,17 +4,19 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSyn
 import { tmpdir } from "node:os";
 import { isAbsolute, join, relative } from "node:path";
 import { afterAll, beforeAll } from "vitest";
-import { dockerCwd, findDocker, findProgram, runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
+import { dockerCwd, findDocker, findProgram, NPM_BOX_MEMORY, readSwapMax, runArgs, runContainer, runDockerImageCommand } from "../src/docker.ts";
 
 // The module takes no spawn parameter (a caller could otherwise rewrite the argv), so tests replace node's spawn.
 const current = vi.hoisted(() => ({ spawn: undefined as unknown as (cmd: string, args: readonly string[], options: unknown) => unknown }));
 vi.mock("node:child_process", () => ({ spawn: (cmd: string, args: readonly string[], options: unknown) => current.spawn(cmd, args, options) }));
 
 const IMAGE = `sha256:${"a".repeat(64)}`;
-const HARDENED = [
-  "--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "65534:65534",
-  "--cpus", "1", "--memory", "512m", "--pids-limit", "256", "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m",
-];
+const ISOLATION = ["--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "65534:65534"];
+const LIMITS_AFTER_MEMORY = ["--pids-limit", "256", "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=64m"];
+const HARDENED = [...ISOLATION, "--cpus", "1", "--memory", "512m", ...LIMITS_AFTER_MEMORY];
+// Written out, not read from NPM_BOX_MEMORY: this list is what the box must be.
+const NPM_HARDENED = [...ISOLATION, "--cpus", "1", "--memory", "4g", "--memory-swap", "4g", ...LIMITS_AFTER_MEMORY];
+const flag = (args: readonly string[], name: string) => args.filter((_, i) => args[i - 1] === name);
 
 type FakeChild = EventEmitter & { stdout: EventEmitter; stderr: EventEmitter; kill: () => boolean };
 function fakeChild(): FakeChild {
@@ -51,7 +53,7 @@ describe("security test container arguments", () => {
   it("add only fixed container scratch directories and HOME=/tmp for a package manager", () => {
     const scratch = "rw,noexec,nosuid,nodev,size=32m,mode=1777";
     expect(runArgs("n", IMAGE, ["npm", "test"], "npm")).toEqual([
-      "run", "--rm", "--name", "n", ...HARDENED, "--tmpfs", `/app/node_modules/.vite:${scratch}`, "--tmpfs", `/app/node_modules/.vite-temp:${scratch}`,
+      "run", "--rm", "--name", "n", ...NPM_HARDENED, "--tmpfs", `/app/node_modules/.vite:${scratch}`, "--tmpfs", `/app/node_modules/.vite-temp:${scratch}`,
       "--env", "HOME=/tmp", "--entrypoint", "npm", IMAGE, "test",
     ]);
     expect(runArgs("n", IMAGE, ["php", "t.php"], "composer")).toEqual([
@@ -62,6 +64,32 @@ describe("security test container arguments", () => {
     ]);
     expect(() => runArgs("n", IMAGE, ["sh"], "pip" as "npm")).toThrow("Unsupported security test tool");
     expect(() => runArgs("n", IMAGE, ["sh"], "--privileged" as "npm")).toThrow("Unsupported security test tool");
+  });
+  it("gate3-box-has-no-swap: npm's box, validation's and gate 3's, has one CPU and --memory-swap equal to --memory", () => {
+    const args = runArgs("n", IMAGE, ["node", "/ludion/driver.cjs"], "npm");
+    expect(flag(args, "--cpus")).toEqual(["1"]);
+    expect(flag(args, "--memory")).toEqual(["4g"]);
+    expect(flag(args, "--memory-swap")).toEqual(flag(args, "--memory"));
+    // Every other flag of the isolation is still there.
+    expect(args.join(" ")).toContain(ISOLATION.join(" "));
+    expect(args.join(" ")).toContain(LIMITS_AFTER_MEMORY.join(" "));
+    expect(flag(args, "--mount").concat(flag(args, "--volume"), flag(args, "-v"))).toEqual([]);
+  });
+  it("leave Composer's, Maven's and the official images' boxes as they were", () => {
+    for (const tool of ["composer", "maven", undefined] as const) {
+      const args = runArgs("n", IMAGE, ["sh"], tool);
+      expect(flag(args, "--cpus")).toEqual(["1"]);
+      expect(flag(args, "--memory")).toEqual(["512m"]);
+      expect(args).not.toContain("--memory-swap");
+    }
+  });
+  it("box-size-is-one-number: the decision, gate 3's definition, the constant and the arguments say the same", () => {
+    const args = runArgs("n", IMAGE, ["sh"], "npm");
+    const flags = args.slice(args.indexOf("--cpus"), args.indexOf("--pids-limit")).join(" ");
+    expect(flags).toBe(`--cpus 1 --memory ${NPM_BOX_MEMORY} --memory-swap ${NPM_BOX_MEMORY}`);
+    for (const path of ["2026-11-03-box-one-cpu-4g-no-swap.md", "2026-11-02-gate-3-type-definition.md"]) {
+      expect(readFileSync(new URL(`../../../docs/decisions/${path}`, import.meta.url), "utf8")).toContain(`\`${flags}\``);
+    }
   });
   it("refuse unsafe names, tags instead of image IDs and flag-like or empty test argv", () => {
     expect(() => runArgs("two words", IMAGE, ["php"])).toThrow("single safe token");
@@ -170,8 +198,38 @@ describe("security test container runner", () => {
   });
 });
 
+describe("reading memory.swap.max", () => {
+  it("reads it in a box with the tool's own flags", async () => {
+    const { calls } = fakeSpawn((_args, child) => queueMicrotask(() => { child.stdout.emit("data", "0\n"); child.emit("close", 0); }));
+    await expect(readSwapMax("x", IMAGE, "npm")).resolves.toBe("0");
+    expect(calls.map(c => c.args)).toEqual([runArgs("x", IMAGE, ["cat", "/sys/fs/cgroup/memory.swap.max"], "npm")]);
+  });
+  it("keeps a number or max as it is", async () => {
+    fakeSpawn((_args, child) => queueMicrotask(() => { child.stdout.emit("data", "max\n"); child.emit("close", 0); }));
+    await expect(readSwapMax("x", IMAGE, "npm")).resolves.toBe("max");
+  });
+  it.each<[string, string, number]>([
+    ["no such file", "", 1],
+    ["empty", "", 0],
+    ["text where a number belongs", "Text from the box\n", 0],
+    ["a negative number", "-1\n", 0],
+    ["a number with text after it", "0 and more\n", 0],
+    ["a value with an exit that is not 0", "0\n", 1],
+  ])("is unknown, with no number made up: %s", async (_name, stdout, exit) => {
+    fakeSpawn((_args, child) => queueMicrotask(() => { child.stdout.emit("data", stdout); child.emit("close", exit); }));
+    await expect(readSwapMax("x", IMAGE, "npm")).resolves.toBe("unknown");
+  });
+  it("is unknown when Docker cannot start or the arguments are refused, and does not throw", async () => {
+    current.spawn = () => { throw new Error("EACCES"); };
+    await expect(readSwapMax("x", IMAGE, "npm")).resolves.toBe("unknown");
+    const { calls } = fakeSpawn();
+    await expect(readSwapMax("x", "php:latest", "npm")).resolves.toBe("unknown");
+    expect(calls).toEqual([]);
+  });
+});
+
 describe("findDocker", () => {
-  const root = mkdtempSync(join(tmpdir(), "ludion-find-"));
+  const root =mkdtempSync(join(tmpdir(), "ludion-find-"));
   const folder = (name: string) => { const dir = join(root, name); mkdirSync(dir, { recursive: true }); return dir; };
   const docker = (dir: string, mode = 0o755) => { const file = join(dir, "docker"); writeFileSync(file, ""); chmodSync(file, mode); return file; };
   afterAll(() => rmSync(root, { recursive: true, force: true }));

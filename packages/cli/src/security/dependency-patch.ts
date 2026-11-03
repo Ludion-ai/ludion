@@ -3,7 +3,7 @@ import { closeSync, cpSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSy
 import { tmpdir } from "node:os";
 import { join, resolve, sep } from "node:path";
 import semver from "semver";
-import { runContainer, runDockerImageCommand, type Tool } from "../../../sandbox/src/docker.ts";
+import { readSwapMax, runContainer, runDockerImageCommand, type Tool } from "../../../sandbox/src/docker.ts";
 import { changedManifest, DEFAULT_IMAGES, inventory, jsonFile, MANIFESTS, mavenGraph, packageEntry, parsePom, textFile, type Change, type Ecosystem, type Inventory } from "./inventory.ts";
 import { comparableVersion, OsvClient, type DependencyScan, type Finding } from "./osv.ts";
 import { hash } from "./php.ts";
@@ -28,6 +28,8 @@ export type DependencyReceipt = {
   started_at: string; finished_at: string; outcome: "failed" | "validated" | "applied" | "partial" | "skipped";
   tree_hash: string; config_hash: string; before: DependencyScan;
   tool_image: string; baseline_image: string | null; baseline_passed: boolean; test: string[];
+  /** npm: memory.swap.max in a box with the baseline's flags and image, "0" with swap off, or "unknown". Recorded; nothing reads it. */
+  baseline_memory_swap_max?: string;
   /** With --apply: the commit every fix branch starts from, checked to hold the validated files. */
   base_commit: string | null;
   /** The baseline's Composer archives. */
@@ -44,6 +46,8 @@ export type FixReceipt = {
   fix_published_at: string | null; fix_published_note: string; found_at: string; applied_at: string | null;
   branch: string | null; commit: string | null;
   candidate_image: string | null; candidate_passed: boolean; after: DependencyScan | null;
+  /** npm: as baseline_memory_swap_max, with this candidate's image. */
+  candidate_memory_swap_max?: string;
   files: { path: string; before_hash: string; after_hash: string }[];
   archives?: ArchiveEvidence[];
   /** Every package whose installed versions differ between baseline and candidate, planned or not. */
@@ -66,7 +70,7 @@ export type FixReceipt = {
 export type PackageChange = { name: string; from: string[]; to: string[] };
 /** The final manifest beside the pinned one in the npm candidate context (see resolverDockerfile). */
 export const NPM_FINAL_MANIFEST = "ludion-final-package.json";
-type Dependencies = { client?: OsvClient; fetchFn?: typeof fetch; signal?: AbortSignal; command?: typeof runDockerImageCommand; testRun?: (name: string, image: string, command: readonly string[], timeoutMs: number, tool: Tool) => Promise<void> };
+type Dependencies = { client?: OsvClient; fetchFn?: typeof fetch; signal?: AbortSignal; command?: typeof runDockerImageCommand; testRun?: (name: string, image: string, command: readonly string[], timeoutMs: number, tool: Tool) => Promise<void>; swapRead?: (name: string, image: string, tool: Tool) => Promise<string> };
 
 /** Packages whose set of installed versions differs between two inventories, sorted by name. */
 export function changedPackages(before: Inventory, after: Inventory): PackageChange[] {
@@ -331,6 +335,8 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     if (result.kind === "spawn_error") throw new Error(`Docker unavailable: ${result.message}`);
     if (result.timedOut || result.exitCode !== 0) throw new Error(result.timedOut ? "Application validation timed out." : `Application validation failed (${result.exitCode}): ${result.stderr.slice(-1000)}`);
   });
+  // A stand-in for the test has no box to read from.
+  const swapRead = deps.swapRead ?? (deps.testRun ? async () => "unknown" : readSwapMax);
   try {
     writeFileSync(fd, JSON.stringify({ id, pid: process.pid, started_at: receipt.started_at }));
     temp = mkdtempSync(join(tmpdir(), "ludion-dependencies-"));
@@ -437,7 +443,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
       return { exported, installedCache, archives, inventory: resolvedInventory };
     };
     /** Build the application on one side's dependencies and run the project's test in the sandbox. Returns the image id. */
-    const test = async (label: string, exported: string, installedCache: string) => {
+    const test = async (label: string, exported: string, installedCache: string, recordSwapMax: (value: string) => void) => {
       const app = join(temp, `${label}-app`); mkdirSync(app);
       cpSync(source, app, { recursive: true });
       // Installed dependency caches stay in the prepared image, not in the source COPY layer.
@@ -447,6 +453,8 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
       const image = `ludion-application-${id}-${label}`; images.push(image);
       await command(["build", "--network=none", "--pull=false", "--file", join(app, "Dockerfile.ludion"), "--tag", image, app], 300_000); active();
       const imageId = await command(["image", "inspect", image, "--format", "{{.Id}}"], 15_000); active();
+      // Before the test, so that a test that fails has it too.
+      if (ecosystem === "npm") { recordSwapMax(await swapRead(`ludion-check-${id}-${label}-swap`, imageId, ecosystem)); active(); }
       await run(`ludion-check-${id}-${label}`, imageId, config.test, config.timeout_seconds * 1000, ecosystem); active();
       return imageId;
     };
@@ -454,7 +462,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
     if (baseline) {
       for (const file of MANIFESTS[ecosystem]) if (textFile(baseline.exported, file) !== textFile(source, file)) throw new Error("Baseline acquisition changed a dependency file.");
       if (baseline.archives.length) receipt.archives = baseline.archives;
-      receipt.baseline_image = await test("baseline", baseline.exported, baseline.installedCache);
+      receipt.baseline_image = await test("baseline", baseline.exported, baseline.installedCache, value => { receipt.baseline_memory_swap_max = value; });
       receipt.baseline_passed = true;
     }
     const versioned = new Set(scan.findings.map(f => findingId(f)));
@@ -519,7 +527,7 @@ export async function patchDependencies(dir: string, apply: boolean, deps: Depen
         if (landing.length) throw new Error(`The asserts on the oldest versions stop this fix: ${landing.slice(0, 5).join(" ")}`);
         const files = MANIFESTS[ecosystem].map(path => ({ path, before: textFile(source, path), after: textFile(candidate.exported, path) })).filter(f => f.before !== f.after);
         if (!files.length) throw new Error("No dependency file changed.");
-        fix.candidate_image = await test(label, candidate.exported, candidate.installedCache);
+        fix.candidate_image = await test(label, candidate.exported, candidate.installedCache, value => { fix.candidate_memory_swap_max = value; });
         fix.candidate_passed = true;
         if (snapshot(root) !== receipt.tree_hash) throw new Error("Project changed during validation; no dependency file was updated.");
         fix.files = files.map(f => ({ path: f.path, before_hash: hash(f.before), after_hash: hash(f.after) }));

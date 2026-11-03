@@ -1,0 +1,169 @@
+{
+  "id": "R10",
+  "package": "psitransfer 2.3.0 -> 2.3.1",
+  "lold_outcome": "stopped_no_allowed",
+  "t": "2025-12-30T19:25:04.000Z",
+  "table_seconds": 30.084,
+  "table_requirements": 172,
+  "table_without_answer": [
+    {
+      "requirement": "uuid@^9.0.1",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "axios@^1.13.2",
+      "reason": "nothing is left in range: 18 in range, 6 published after T, 1 withdrawn, 0 deprecated, 11 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 11
+      }
+    },
+    {
+      "requirement": "morgan@^1.10.0",
+      "reason": "nothing is left in range: 5 in range, 1 published after T, 0 withdrawn, 0 deprecated, 4 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 4
+      }
+    },
+    {
+      "requirement": "crypto-js@^4.2.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "fs-promise@^2.0.3",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "compression@^1.7.4",
+      "reason": "nothing is left in range: 5 in range, 1 published after T, 0 withdrawn, 0 deprecated, 4 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 4
+      }
+    },
+    {
+      "requirement": "qs@6.13.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "proxy-addr@~2.0.7",
+      "reason": "nothing is left in range: 2 in range, 1 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "body-parser@1.20.3",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "path-to-regexp@0.1.12",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "minimatch@^5.1.0",
+      "reason": "nothing is left in range: 10 in range, 0 published after T, 0 withdrawn, 0 deprecated, 10 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 10,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 10
+      }
+    },
+    {
+      "requirement": "glob@^7.1.4",
+      "reason": "nothing is left in range: 7 in range, 0 published after T, 0 withdrawn, 7 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 7,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "glob@^7.2.3",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    }
+  ],
+  "outcome": "stopped_no_allowed",
+  "no_answer": "axios@^1.13.2",
+  "reason": "No allowed version for axios@^1.13.2: nothing is left in range: 18 in range, 6 published after T, 1 withdrawn, 0 deprecated, 11 named by OSV, 0 with no publish time. This fix stops: no newer or excluded version is taken."
+}

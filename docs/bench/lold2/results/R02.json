@@ -1,0 +1,61 @@
+{
+  "id": "R02",
+  "package": "@react-native-community/cli-server-api 19.1.1 -> 19.1.2",
+  "lold_outcome": "stopped_no_allowed",
+  "t": "2025-11-05T21:56:39.769Z",
+  "table_seconds": 10.14,
+  "table_requirements": 117,
+  "table_without_answer": [
+    {
+      "requirement": "ws@^6.2.3",
+      "reason": "nothing is left in range: 4 in range, 3 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "body-parser@^1.20.3",
+      "reason": "nothing is left in range: 6 in range, 1 published after T, 0 withdrawn, 0 deprecated, 5 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 5
+      }
+    },
+    {
+      "requirement": "compression@^1.7.1",
+      "reason": "nothing is left in range: 8 in range, 1 published after T, 0 withdrawn, 0 deprecated, 7 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 7
+      }
+    },
+    {
+      "requirement": "launch-editor@^2.9.1",
+      "reason": "nothing is left in range: 11 in range, 1 published after T, 0 withdrawn, 0 deprecated, 10 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 10
+      }
+    }
+  ],
+  "outcome": "stopped_no_allowed",
+  "no_answer": "launch-editor@^2.9.1",
+  "reason": "No allowed version for launch-editor@^2.9.1: nothing is left in range: 11 in range, 1 published after T, 0 withdrawn, 0 deprecated, 10 named by OSV, 0 with no publish time. This fix stops: no newer or excluded version is taken."
+}

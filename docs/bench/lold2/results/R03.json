@@ -1,0 +1,311 @@
+{
+  "id": "R03",
+  "package": "next 15.5.6 -> 15.5.7",
+  "lold_outcome": "built",
+  "t": "2025-12-03T19:07:11.000Z",
+  "table_seconds": 4.503,
+  "table_requirements": 22,
+  "table_without_answer": [
+    {
+      "requirement": "postcss@8.4.31",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "sharp@^0.34.3",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 0 deprecated, 3 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    }
+  ],
+  "moved_non_v": 9,
+  "path_moved": 9,
+  "path_added": 0,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "stop",
+  "refusal": "The judge stops the candidate: gate 2: next@15.5.7 is deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.",
+  "assert": {
+    "t": "2025-12-03T19:07:11.000Z",
+    "resolved_at": "2025-12-03T19:07:11.000Z",
+    "wait_hours": 24,
+    "youngest": "@next/env@15.5.7",
+    "wait_until": "2025-12-04T15:26:12.822Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/@next/env",
+        "name": "@next/env",
+        "version": "15.5.7",
+        "role": "oldest",
+        "published_at": "2025-12-03T15:26:12.822Z",
+        "age_hours": 8026.3
+      },
+      {
+        "path": "node_modules/@next/swc-darwin-arm64",
+        "name": "@next/swc-darwin-arm64",
+        "version": "15.5.7",
+        "role": "oldest",
+        "published_at": "2025-12-03T15:24:28.388Z",
+        "age_hours": 8026.4
+      },
+      {
+        "path": "node_modules/@next/swc-darwin-x64",
+        "name": "@next/swc-darwin-x64",
+        "version": "15.5.7",
+        "role": "oldest",
+        "published_at": "2025-12-03T15:24:28.836Z",
+        "age_hours": 8026.4
+      },
+      {
+        "path": "node_modules/@next/swc-linux-arm64-gnu",
+        "name": "@next/swc-linux-arm64-gnu",
+        "version": "15.5.7",
+        "role": "oldest",
+        "published_at": "2025-12-03T15:24:41.883Z",
+        "age_hours": 8026.4
+      },
+      {
+        "path": "node_modules/@next/swc-linux-arm64-musl",
+        "name": "@next/swc-linux-arm64-musl",
+        "version": "15.5.7",
+        "role": "oldest",
+        "published_at": "2025-12-03T15:24:42.572Z",
+        "age_hours": 8026.4
+      },
+      {
+        "path": "node_modules/@next/swc-linux-x64-gnu",
+        "name": "@next/swc-linux-x64-gnu",
+        "version": "15.5.7",
+        "role": "oldest",
+        "published_at": "2025-12-03T15:24:58.096Z",
+        "age_hours": 8026.4
+      },
+      {
+        "path": "node_modules/@next/swc-linux-x64-musl",
+        "name": "@next/swc-linux-x64-musl",
+        "version": "15.5.7",
+        "role": "oldest",
+        "published_at": "2025-12-03T15:24:58.926Z",
+        "age_hours": 8026.4
+      },
+      {
+        "path": "node_modules/@next/swc-win32-arm64-msvc",
+        "name": "@next/swc-win32-arm64-msvc",
+        "version": "15.5.7",
+        "role": "oldest",
+        "published_at": "2025-12-03T15:25:09.744Z",
+        "age_hours": 8026.4
+      },
+      {
+        "path": "node_modules/@next/swc-win32-x64-msvc",
+        "name": "@next/swc-win32-x64-msvc",
+        "version": "15.5.7",
+        "role": "oldest",
+        "published_at": "2025-12-03T15:25:13.908Z",
+        "age_hours": 8026.4
+      },
+      {
+        "path": "node_modules/next",
+        "name": "next",
+        "version": "15.5.7",
+        "role": "v",
+        "published_at": "2025-12-03T15:26:07.201Z",
+        "age_hours": 8026.3
+      }
+    ]
+  },
+  "not_oldest": [],
+  "pr_job_recheck": null,
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "next@15.5.7",
+      "version": "15.5.7",
+      "role": "v",
+      "published_at": "2025-12-03T15:26:07.201Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@next/env@15.5.7",
+      "version": "15.5.7",
+      "role": "oldest",
+      "published_at": "2025-12-03T15:26:12.822Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@next/swc-darwin-x64@15.5.7",
+      "version": "15.5.7",
+      "role": "oldest",
+      "published_at": "2025-12-03T15:24:28.836Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@next/swc-darwin-arm64@15.5.7",
+      "version": "15.5.7",
+      "role": "oldest",
+      "published_at": "2025-12-03T15:24:28.388Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@next/swc-linux-x64-gnu@15.5.7",
+      "version": "15.5.7",
+      "role": "oldest",
+      "published_at": "2025-12-03T15:24:58.096Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@next/swc-linux-x64-musl@15.5.7",
+      "version": "15.5.7",
+      "role": "oldest",
+      "published_at": "2025-12-03T15:24:58.926Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@next/swc-win32-x64-msvc@15.5.7",
+      "version": "15.5.7",
+      "role": "oldest",
+      "published_at": "2025-12-03T15:25:13.908Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@next/swc-linux-arm64-gnu@15.5.7",
+      "version": "15.5.7",
+      "role": "oldest",
+      "published_at": "2025-12-03T15:24:41.883Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@next/swc-linux-arm64-musl@15.5.7",
+      "version": "15.5.7",
+      "role": "oldest",
+      "published_at": "2025-12-03T15:24:42.572Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@next/swc-win32-arm64-msvc@15.5.7",
+      "version": "15.5.7",
+      "role": "oldest",
+      "published_at": "2025-12-03T15:25:09.744Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "postcss@8.4.31",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "sharp@^0.34.3",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    }
+  ]
+}

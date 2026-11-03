@@ -1,0 +1,82 @@
+{
+  "id": "T1",
+  "package": "braces 3.0.2 -> 3.0.3",
+  "lold_outcome": "built",
+  "t": "2024-05-21T09:59:11.390Z",
+  "table_seconds": 1.071,
+  "table_requirements": 4,
+  "table_without_answer": [],
+  "moved_non_v": 1,
+  "path_moved": 1,
+  "path_added": 0,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "ready_except_build",
+  "refusal": null,
+  "assert": {
+    "t": "2024-05-21T09:59:11.390Z",
+    "resolved_at": "2024-05-21T09:59:11.390Z",
+    "wait_hours": 144,
+    "youngest": "braces@3.0.3",
+    "wait_until": "2024-05-27T08:59:11.390Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/braces",
+        "name": "braces",
+        "version": "3.0.3",
+        "role": "v",
+        "published_at": "2024-05-21T08:59:11.390Z",
+        "age_hours": 21497
+      },
+      {
+        "path": "node_modules/fill-range",
+        "name": "fill-range",
+        "version": "7.1.1",
+        "role": "oldest",
+        "published_at": "2024-05-21T08:45:51.224Z",
+        "age_hours": 21497.2
+      }
+    ]
+  },
+  "not_oldest": [],
+  "pr_job_recheck": null,
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "braces@3.0.3",
+      "version": "3.0.3",
+      "role": "v",
+      "published_at": "2024-05-21T08:59:11.390Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "fill-range@^7.1.1",
+      "version": "7.1.1",
+      "role": "oldest",
+      "published_at": "2024-05-21T08:45:51.224Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    }
+  ]
+}

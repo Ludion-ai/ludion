@@ -1,0 +1,109 @@
+{
+  "id": "R13",
+  "package": "@vitejs/plugin-rsc 0.5.6 -> 0.5.7",
+  "lold_outcome": "built",
+  "t": "2025-12-12T16:41:08.000Z",
+  "table_seconds": 20.341,
+  "table_requirements": 21,
+  "table_without_answer": [
+    {
+      "requirement": "vite@*",
+      "reason": "nothing is left in range: 440 in range, 35 published after T, 0 withdrawn, 0 deprecated, 405 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 440,
+        "no_time": 0,
+        "after_t": 35,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 405
+      }
+    }
+  ],
+  "moved_non_v": 1,
+  "path_moved": 1,
+  "path_added": 0,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "ready_except_build",
+  "refusal": null,
+  "assert": {
+    "t": "2025-12-12T16:41:08.000Z",
+    "resolved_at": "2025-12-12T16:41:08.000Z",
+    "wait_hours": 72,
+    "youngest": "@vitejs/plugin-rsc@0.5.7",
+    "wait_until": "2025-12-15T00:25:14.587Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/@vitejs/plugin-rsc",
+        "name": "@vitejs/plugin-rsc",
+        "version": "0.5.7",
+        "role": "v",
+        "published_at": "2025-12-12T00:25:14.587Z",
+        "age_hours": 7825.4
+      },
+      {
+        "path": "node_modules/es-module-lexer",
+        "name": "es-module-lexer",
+        "version": "2.0.0",
+        "role": "oldest",
+        "published_at": "2025-12-07T08:37:02.250Z",
+        "age_hours": 7937.2
+      }
+    ]
+  },
+  "not_oldest": [],
+  "pr_job_recheck": null,
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "@vitejs/plugin-rsc@0.5.7",
+      "version": "0.5.7",
+      "role": "v",
+      "published_at": "2025-12-12T00:25:14.587Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "es-module-lexer@^2.0.0",
+      "version": "2.0.0",
+      "role": "oldest",
+      "published_at": "2025-12-07T08:37:02.250Z",
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "vite@*",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 440,
+        "no_time": 0,
+        "after_t": 35,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 405
+      }
+    }
+  ]
+}

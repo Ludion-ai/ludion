@@ -8,6 +8,7 @@ import { publicArchiveUrl } from "./acquisition.ts";
 import { fixBranchName, git, gitProgram, GIT_SETTINGS } from "./branch.ts";
 import { candidateRefusal, judgeNpmCandidate } from "./candidate-judge.ts";
 import { registryManifest } from "./npm-facts.ts";
+import { recheckOldest, unneededMoves } from "./oldest.ts";
 import { changedManifest, MANIFESTS, type Change } from "./inventory.ts";
 import { DECLARED, lockEntries, lockKey, newUnmetRequirements, readLock, requiredNames, requireName, resolveFrom, type Judgement, type LockEntry } from "./judge.ts";
 import semver from "semver";
@@ -281,8 +282,11 @@ const ROOT_GROUPS = ["dependencies", "devDependencies", "optionalDependencies", 
  *   is named for it or is an npm alias of it under another name (its entry's `name`; an alias of another package at
  *   the package's own path is not it) (review 6529858505, B2). Each change has one, and in the fix each is at the same
  *   path at that change's `to`, as the same package; no install path has the package at a `from` any more;
- * - every added path is installed, and is what a planned path or another added path resolves for one of its own
- *   requirements (requiredNames, by Node's lookup: an optional peer is not one), so none comes from nowhere;
+ * - every added path is installed, and every other path that moves is what a planned, added or moved path resolves for
+ *   one of its own requirements (requiredNames, by Node's lookup: an optional peer is not one), so none comes from nowhere;
+ * - a path other than the planned ones moves only when its old version fails a requirement of a package that loads it
+ *   in the fix, and goes away only when no package that stays as it was loaded it (oldest.ts, unneededMoves;
+ *   docs/decisions/2026-11-03-oldest-resolution-in-product.md, section 2);
  * - every other key is as at the base apart from its flags (sameButFlags); the root's only change is the fix's
  *   package's requirement;
  * - the fix leaves no requirement unmet that the base meets (newUnmetRequirements, with each side's package.json
@@ -339,20 +343,29 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix,
   // Each requirement group of the root with the fix's package's range blanked: nothing else of the root may change.
   const root = (item: Record<string, unknown> | null) => item && Object.fromEntries(Object.entries(item).map(([key, value]) => [key,
     ROOT_GROUPS.includes(key) && isObject(value) ? Object.fromEntries(Object.entries(value).map(([name, range]) => [name, name === fix.package ? "" : range])) : value]));
-  const added: string[] = [];
+  // A path other than the planned ones moves or goes away only when the fix needs it to.
+  const unneeded = unneededMoves(old, now, fix.changes);
+  if (unneeded.length) return `package-lock.json ${unneeded.slice(0, 3).map(m => m.to === null ? `removes ${show(m.path)} (${plain(m.from).slice(0, 60)})` : `changes ${show(m.path)} (${plain(m.from).slice(0, 60)} -> ${plain(m.to).slice(0, 60)})`).join(", ")}, which this fix does not plan and no requirement makes it move.`;
+  const added: string[] = [], moved: string[] = [];
   for (const path of kinds.keys()) {
     if (planned.includes(path)) continue;
     const before = entry(was, path), after = entry(is, path), version = (item: Record<string, unknown> | null) => plain(String(item?.version)).slice(0, 60);
     if (path === "") { if (!isDeepStrictEqual(root(before), root(after))) return "package-lock.json changes the project's own entry beyond the fix's requirement."; continue; }
-    if (!after) return `package-lock.json removes ${show(path)} (${version(before)}), which this fix does not plan.`;
+    if (!after) {
+      if (kinds.get(path) !== "install" || before!.link) return `package-lock.json removes ${show(path)} (${version(before)}), which this fix does not plan.`;
+      continue;
+    }
     if (!before) {
       if (kinds.get(path) !== "install" || after.link) return `package-lock.json adds ${show(path)}, which is not an installed package.`;
       added.push(path);
       continue;
     }
-    if (!sameButFlags(before, after)) return `package-lock.json changes ${show(path)} (${version(before)} -> ${version(after)}), which this fix does not plan.`;
+    if (sameButFlags(before, after)) continue;
+    // The same version with something else changed, or a link or folder, is no move: nothing in the fix explains it.
+    if (kinds.get(path) !== "install" || before.link || after.link || before.version === after.version) return `package-lock.json changes ${show(path)} (${version(before)} -> ${version(after)}), which this fix does not plan.`;
+    moved.push(path);
   }
-  // From the planned paths, every added path some reached path resolves for one of its own requirements.
+  // From the planned paths, every added or moved path some reached path resolves for one of its own requirements.
   const installed = new Map([...kinds].filter(([, kind]) => kind === "install").filter(([path]) => Object.hasOwn(is, path)).map(([path]) => [path, { path } as LockEntry]));
   const reached = new Set<string>(), queue = [...planned];
   while (queue.length) {
@@ -361,16 +374,18 @@ function npmLockProblem(old: string | null, now: string | null, fix: CheckedFix,
     // Only what npm installs for it: an optional peer adds nothing (audit 6541743253, item 1).
     for (const name of requiredNames(item)) {
       const target = resolveFrom(installed, `${path}/`, name)?.path;
-      if (target && added.includes(target) && !reached.has(target)) { reached.add(target); queue.push(target); }
+      if (target && (added.includes(target) || moved.includes(target)) && !reached.has(target)) { reached.add(target); queue.push(target); }
     }
   }
   const stray = added.filter(path => !reached.has(path));
   if (stray.length) return `package-lock.json adds ${stray.slice(0, 3).map(show).join(", ")}, which no package the fix moves or adds requires.`;
+  const strayMoves = moved.filter(path => !reached.has(path));
+  if (strayMoves.length) return `package-lock.json moves ${strayMoves.slice(0, 3).map(show).join(", ")}, which no package the fix moves or adds requires.`;
   // What the root and every entry the fix does not move load stays the same path: an added copy that shadows another
   // package's dependency would change what that package loads (review of 7d25696, B1 (B)).
   const wasAt = new Map([...kinds].filter(([path, kind]) => kind === "install" && Object.hasOwn(was, path)).map(([path]) => [path, { path } as LockEntry]));
   for (const path of Object.keys(is)) {
-    if (planned.includes(path) || added.includes(path) || (path && (kinds.get(path) !== "install" || entry(is, path)!.link))) continue;
+    if (planned.includes(path) || added.includes(path) || moved.includes(path) || (path && (kinds.get(path) !== "install" || entry(is, path)!.link))) continue;
     const item = entry(is, path)!, dir = path ? `${path}/` : "";
     for (const group of path ? DECLARED : ROOT_GROUPS) for (const name of isObject(item[group]) ? Object.keys(item[group]) : []) {
       const then = resolveFrom(wasAt, dir, name)?.path, now = resolveFrom(installed, dir, name)?.path;
@@ -432,6 +447,21 @@ async function npmAgain(top: string, prefix: string, base: string, fix: CheckedF
     return null;
   } catch (error) {
     return `the registry could not be read: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;
+  }
+}
+
+/**
+ * npm: every version the fix brings in, other than its own, is the oldest in range now, worked out here from the registry's
+ * metadata and OSV (oldest.ts, recheckOldest), from the fix's V as the receipt names it. npmLockProblem lets a path move
+ * when a requirement needs it; this is what holds the version it moves to, so under a given V a forged artifact cannot pick
+ * a later one in range. It does not hold that V is the smallest fixed version. A read that fails refuses the fix. No package's code runs (docs/decisions/2026-11-03-oldest-resolution-in-product.md, section 5).
+ */
+async function oldestAgain(top: string, prefix: string, base: string, fix: CheckedFix, check: typeof recheckOldest): Promise<string | null> {
+  try {
+    const read = (rev: string, name: string) => git(top, ["cat-file", "blob", `${rev}:${prefix}${name}`]).stdout;
+    return await check({ plan: fix.changes, beforeLock: read(base, "package-lock.json"), afterLock: read(fix.commit, "package-lock.json"), finalManifest: read(fix.commit, "package.json") });
+  } catch (error) {
+    return `the oldest versions could not be worked out: ${plain(error instanceof Error ? error.message : String(error)).slice(0, 300)}`;
   }
 }
 
@@ -855,7 +885,7 @@ async function imageAgain(top: string, prefix: string, fix: CheckedFix, reposito
  * The PR job: checks the artifact, then for each fix, unless a PR from its branch exists, pushes the branch (never moving
  * one that exists at another commit) and opens one PR into the default branch. A fix that fails stops no other.
  */
-export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; npmManifest?: (name: string, version: string) => Promise<Record<string, unknown> | null>; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; nodeDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
+export async function openFixes(options: { dir: string; artifact: string; base: string; repo: string; ref: string; api: string; remote: string; token: string; fetchFn?: typeof fetch; push?: typeof pushBranch; judgeNpm?: (before: string, after: string) => Promise<Judgement>; npmManifest?: (name: string, version: string) => Promise<Record<string, unknown> | null>; oldest?: typeof recheckOldest; packagist?: (name: string, version: string) => Promise<PackagistRelease | null>; phpDigest?: (tag: string) => Promise<string>; nodeDigest?: (tag: string) => Promise<string>; osv?: (ecosystem: "Packagist" | "Maven", name: string, version: string) => Promise<string[]> }): Promise<{ checked: CheckedArtifact; deliveries: Delivery[] }> {
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(options.repo)) throw new Error("--repo must be owner/name.");
   if (!/^https:\/\/[A-Za-z0-9.-]+(?::\d+)?(\/[A-Za-z0-9._/-]*)?$/.test(options.api) && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(options.api)) throw new Error("--api must be an https URL.");
   const api: Api = { url: options.api.replace(/\/$/, ""), token: options.token, fetchFn: options.fetchFn ?? fetch };
@@ -896,10 +926,12 @@ export async function openFixes(options: { dir: string; artifact: string; base: 
         }
       }
       // The lockfile's content, which only the registry can confirm: each moved or added entry's requirements as the
-      // registry lists them, then the judge again, here, on the base and this commit.
+      // registry lists them, each new version the oldest in range, then the judge again, here, on the base and this commit.
       if (checked.ecosystem === "npm") {
         const problem = await npmAgain(top, prefix, checked.base, fix, options.npmManifest ?? ((name, version) => registryManifest(name, version)));
         if (problem) throw new Error(`Not pushed: ${problem}`);
+        const notOldest = await oldestAgain(top, prefix, checked.base, fix, options.oldest ?? recheckOldest);
+        if (notOldest) throw new Error(`Not pushed: ${notOldest}`);
         const refusal = await judgeAgain(top, prefix, checked.base, fix, options.judgeNpm ?? ((before, after) => judgeNpmCandidate(before, after)));
         if (refusal) throw new Error(`Not pushed: the judge was run again on this commit's lockfile. ${refusal}`);
       }

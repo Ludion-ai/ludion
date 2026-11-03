@@ -135,6 +135,13 @@ export async function registryFacts(name: string, versions: string[], fetchFn: F
   return facts;
 }
 
+/** A package's whole registry document (only its name is sent): `time` and `versions`. A 404 throws with its `status`. */
+export async function registryDocument(name: string, fetchFn: Fetch = fetch): Promise<{ time: Record<string, unknown>; versions: Record<string, any> }> {
+  const doc = await boundedJson(fetchFn, `https://registry.npmjs.org/${registryPath(name)}`);
+  if (!doc || typeof doc !== "object" || !doc.versions || typeof doc.versions !== "object" || Array.isArray(doc.versions) || !doc.time || typeof doc.time !== "object" || Array.isArray(doc.time)) throw new Error(`Invalid registry document for ${name}.`);
+  return { time: doc.time, versions: doc.versions };
+}
+
 /** One version's manifest as the registry lists it (only the package's name is sent), or null when it lists none. */
 export async function registryManifest(name: string, version: string, fetchFn: Fetch = fetch): Promise<Record<string, unknown> | null> {
   const doc = await boundedJson(fetchFn, `https://registry.npmjs.org/${registryPath(name)}`);

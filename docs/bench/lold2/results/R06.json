@@ -1,0 +1,769 @@
+{
+  "id": "R06",
+  "package": "@sentry/nextjs 8.48.0 -> 8.49.0",
+  "lold_outcome": "stopped_no_allowed",
+  "t": "2025-01-28T20:37:26.000Z",
+  "table_seconds": 79.29,
+  "table_requirements": 589,
+  "table_without_answer": [
+    {
+      "requirement": "rollup@3.29.5",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "next@^13.2.0 || ^14.0 || ^15.0.0-rc.0",
+      "reason": "nothing is left in range: 171 in range, 21 published after T, 0 withdrawn, 133 deprecated, 17 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 171,
+        "no_time": 0,
+        "after_t": 21,
+        "withdrawn": 0,
+        "deprecated": 133,
+        "advisory": 17
+      }
+    },
+    {
+      "requirement": "@opentelemetry/core@^1.29.0",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 0 deprecated, 3 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    },
+    {
+      "requirement": "@opentelemetry/sdk-trace-base@^1.29.0",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 3 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 3,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-pg@0.49.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-knex@0.43.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-mysql@0.44.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-mysql2@0.44.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-tedious@0.17.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/instrumentation-mongoose@0.45.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "uuid@^9.0.0",
+      "reason": "nothing is left in range: 2 in range, 0 published after T, 0 withdrawn, 2 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 2,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "picomatch@^4.0.2",
+      "reason": "nothing is left in range: 6 in range, 4 published after T, 0 withdrawn, 0 deprecated, 2 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 2
+      }
+    },
+    {
+      "requirement": "@opentelemetry/sdk-trace-base@^1.22",
+      "reason": "nothing is left in range: 12 in range, 0 published after T, 0 withdrawn, 12 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 12,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 12,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@opentelemetry/core@1.30.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@opentelemetry/core@^1.8.0",
+      "reason": "nothing is left in range: 32 in range, 0 published after T, 0 withdrawn, 0 deprecated, 32 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 32,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 32
+      }
+    },
+    {
+      "requirement": "@opentelemetry/core@1.29.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "glob@^9.3.2",
+      "reason": "nothing is left in range: 4 in range, 0 published after T, 0 withdrawn, 4 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 4,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@babel/core@^7.18.5",
+      "reason": "nothing is left in range: 69 in range, 5 published after T, 0 withdrawn, 0 deprecated, 64 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 69,
+        "no_time": 0,
+        "after_t": 5,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 64
+      }
+    },
+    {
+      "requirement": "ajv@^6.10.2",
+      "reason": "nothing is left in range: 11 in range, 2 published after T, 0 withdrawn, 0 deprecated, 9 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 9
+      }
+    },
+    {
+      "requirement": "micromatch@^3.1.10",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "ajv@^6.9.1",
+      "reason": "nothing is left in range: 15 in range, 2 published after T, 0 withdrawn, 0 deprecated, 13 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 15,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 13
+      }
+    },
+    {
+      "requirement": "ajv@^6.1.0",
+      "reason": "nothing is left in range: 34 in range, 2 published after T, 0 withdrawn, 0 deprecated, 32 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 34,
+        "no_time": 0,
+        "after_t": 2,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 32
+      }
+    },
+    {
+      "requirement": "serialize-javascript@^1.7.0",
+      "reason": "nothing is left in range: 4 in range, 0 published after T, 0 withdrawn, 0 deprecated, 4 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 4
+      }
+    },
+    {
+      "requirement": "picomatch@^2.0.4",
+      "reason": "nothing is left in range: 13 in range, 1 published after T, 0 withdrawn, 0 deprecated, 12 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 13,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 12
+      }
+    },
+    {
+      "requirement": "picomatch@^2.2.1",
+      "reason": "nothing is left in range: 6 in range, 1 published after T, 0 withdrawn, 0 deprecated, 5 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 5
+      }
+    },
+    {
+      "requirement": "braces@^2.3.0",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 0 deprecated, 3 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    },
+    {
+      "requirement": "fsevents@^1.0.0",
+      "reason": "nothing is left in range: 35 in range, 0 published after T, 3 withdrawn, 32 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 35,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 3,
+        "deprecated": 32,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "ajv@>=5.0.0",
+      "reason": "nothing is left in range: 101 in range, 4 published after T, 0 withdrawn, 0 deprecated, 97 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 101,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 97
+      }
+    },
+    {
+      "requirement": "querystring@0.2.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "pbkdf2@^3.0.3",
+      "reason": "nothing is left in range: 22 in range, 1 published after T, 0 withdrawn, 0 deprecated, 21 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 22,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 21
+      }
+    },
+    {
+      "requirement": "glob@^7.1.4",
+      "reason": "nothing is left in range: 7 in range, 0 published after T, 0 withdrawn, 7 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 7,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "rimraf@^2.6.3",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 3 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 3,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "figgy-pudding@^3.5.1",
+      "reason": "nothing is left in range: 2 in range, 0 published after T, 0 withdrawn, 2 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 2,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "move-concurrently@^1.0.1",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "micromatch@^3.1.8",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 0 deprecated, 3 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    },
+    {
+      "requirement": "acorn-dynamic-import@^3.0.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "lodash@3.x",
+      "reason": "nothing is left in range: 17 in range, 0 published after T, 0 withdrawn, 0 deprecated, 17 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 17,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 17
+      }
+    },
+    {
+      "requirement": "underscore.string@2.3.x",
+      "reason": "nothing is left in range: 4 in range, 0 published after T, 0 withdrawn, 0 deprecated, 4 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 4
+      }
+    },
+    {
+      "requirement": "micromatch@^3.1.4",
+      "reason": "nothing is left in range: 7 in range, 0 published after T, 0 withdrawn, 0 deprecated, 7 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 7
+      }
+    },
+    {
+      "requirement": "minimatch@^2.0.10",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "path-dirname@^1.0.0",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 2 withdrawn, 1 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 2,
+        "deprecated": 1,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "bn.js@^4.1.0",
+      "reason": "nothing is left in range: 41 in range, 3 published after T, 0 withdrawn, 0 deprecated, 38 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 41,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 38
+      }
+    },
+    {
+      "requirement": "elliptic@^6.0.0",
+      "reason": "nothing is left in range: 29 in range, 0 published after T, 0 withdrawn, 0 deprecated, 29 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 29,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 29
+      }
+    },
+    {
+      "requirement": "sha.js@^2.3.6",
+      "reason": "nothing is left in range: 14 in range, 1 published after T, 1 withdrawn, 0 deprecated, 12 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 14,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 12
+      }
+    },
+    {
+      "requirement": "bn.js@^5.2.1",
+      "reason": "nothing is left in range: 5 in range, 3 published after T, 0 withdrawn, 0 deprecated, 2 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 2
+      }
+    },
+    {
+      "requirement": "elliptic@^6.5.4",
+      "reason": "nothing is left in range: 6 in range, 0 published after T, 0 withdrawn, 0 deprecated, 6 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 6
+      }
+    },
+    {
+      "requirement": "ajv@^5.0.0",
+      "reason": "nothing is left in range: 20 in range, 0 published after T, 0 withdrawn, 0 deprecated, 20 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 20,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 20
+      }
+    },
+    {
+      "requirement": "uglify-es@^3.1.3",
+      "reason": "nothing is left in range: 22 in range, 0 published after T, 0 withdrawn, 22 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 22,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 22,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "bn.js@^4.0.0",
+      "reason": "nothing is left in range: 42 in range, 3 published after T, 0 withdrawn, 0 deprecated, 39 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 42,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 39
+      }
+    },
+    {
+      "requirement": "sha.js@^2.4.0",
+      "reason": "nothing is left in range: 13 in range, 1 published after T, 1 withdrawn, 0 deprecated, 11 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 13,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 11
+      }
+    },
+    {
+      "requirement": "sha.js@^2.4.8",
+      "reason": "nothing is left in range: 5 in range, 1 published after T, 0 withdrawn, 0 deprecated, 4 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 4
+      }
+    },
+    {
+      "requirement": "bn.js@^5.0.0",
+      "reason": "nothing is left in range: 11 in range, 3 published after T, 0 withdrawn, 0 deprecated, 8 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 3,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 8
+      }
+    },
+    {
+      "requirement": "lodash@^4.17.14",
+      "reason": "nothing is left in range: 11 in range, 1 published after T, 0 withdrawn, 1 deprecated, 9 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 1,
+        "advisory": 9
+      }
+    },
+    {
+      "requirement": "ajv@^4.7.0",
+      "reason": "nothing is left in range: 29 in range, 0 published after T, 0 withdrawn, 0 deprecated, 29 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 29,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 29
+      }
+    },
+    {
+      "requirement": "loader-utils@^0.2.16",
+      "reason": "nothing is left in range: 2 in range, 0 published after T, 0 withdrawn, 0 deprecated, 2 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 2
+      }
+    },
+    {
+      "requirement": "acorn-dynamic-import@^2.0.0",
+      "reason": "nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 3 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 3,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "glob@^7.1.2",
+      "reason": "nothing is left in range: 9 in range, 0 published after T, 0 withdrawn, 9 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 9,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 9,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "ssri@^5.0.0",
+      "reason": "nothing is left in range: 7 in range, 0 published after T, 0 withdrawn, 0 deprecated, 7 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 7
+      }
+    },
+    {
+      "requirement": "rimraf@^2.6.1",
+      "reason": "nothing is left in range: 5 in range, 0 published after T, 0 withdrawn, 5 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 5,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 5,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "micromatch@^2.1.5",
+      "reason": "nothing is left in range: 15 in range, 0 published after T, 0 withdrawn, 0 deprecated, 15 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 15,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 15
+      }
+    },
+    {
+      "requirement": "yargs-parser@^4.0.2",
+      "reason": "nothing is left in range: 4 in range, 0 published after T, 0 withdrawn, 0 deprecated, 4 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 4
+      }
+    },
+    {
+      "requirement": "ajv@>=4.2.0",
+      "reason": "nothing is left in range: 138 in range, 4 published after T, 0 withdrawn, 0 deprecated, 134 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 138,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 134
+      }
+    },
+    {
+      "requirement": "spdx@^0.4.0",
+      "reason": "nothing is left in range: 4 in range, 0 published after T, 0 withdrawn, 4 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 4,
+        "advisory": 0
+      }
+    }
+  ],
+  "outcome": "stopped_no_allowed",
+  "no_answer": "@opentelemetry/core@^1.29.0",
+  "reason": "No allowed version for @opentelemetry/core@^1.29.0: nothing is left in range: 3 in range, 0 published after T, 0 withdrawn, 0 deprecated, 3 named by OSV, 0 with no publish time. This fix stops: no newer or excluded version is taken."
+}

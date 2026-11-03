@@ -1,0 +1,511 @@
+{
+  "id": "R07",
+  "package": "@portkey-ai/gateway 1.13.0 -> 1.14.0",
+  "lold_outcome": "built",
+  "t": "2025-12-02T01:08:37.000Z",
+  "table_seconds": 25.358,
+  "table_requirements": 103,
+  "table_without_answer": [
+    {
+      "requirement": "ws@^8.18.0",
+      "reason": "nothing is left in range: 13 in range, 6 published after T, 0 withdrawn, 0 deprecated, 7 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 13,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 7
+      }
+    },
+    {
+      "requirement": "zod@^3.22.4",
+      "reason": "nothing is left in range: 91 in range, 0 published after T, 0 withdrawn, 0 deprecated, 91 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 91,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 91
+      }
+    },
+    {
+      "requirement": "hono@^4.9.7",
+      "reason": "nothing is left in range: 78 in range, 54 published after T, 0 withdrawn, 0 deprecated, 24 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 78,
+        "no_time": 0,
+        "after_t": 54,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 24
+      }
+    },
+    {
+      "requirement": "@hono/node-ws@^1.2.0",
+      "reason": "nothing is left in range: 3 in range, 1 published after T, 0 withdrawn, 2 deprecated, 0 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 2,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@hono/node-server@^1.3.3",
+      "reason": "nothing is left in range: 63 in range, 1 published after T, 0 withdrawn, 0 deprecated, 62 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 63,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 62
+      }
+    },
+    {
+      "requirement": "tmp@^0.2.4",
+      "reason": "nothing is left in range: 4 in range, 1 published after T, 0 withdrawn, 0 deprecated, 3 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    },
+    {
+      "requirement": "yaml@^2.2.2",
+      "reason": "nothing is left in range: 25 in range, 4 published after T, 0 withdrawn, 0 deprecated, 21 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 25,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 21
+      }
+    },
+    {
+      "requirement": "picomatch@^2.3.1",
+      "reason": "nothing is left in range: 2 in range, 1 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    }
+  ],
+  "moved_non_v": 11,
+  "path_moved": 0,
+  "path_added": 11,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "ready_except_build",
+  "refusal": null,
+  "assert": {
+    "t": "2025-12-02T01:08:37.000Z",
+    "resolved_at": "2025-12-02T01:08:37.000Z",
+    "wait_hours": 144,
+    "youngest": "@portkey-ai/gateway@1.14.0",
+    "wait_until": "2025-11-13T14:00:18.262Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/@ioredis/commands",
+        "name": "@ioredis/commands",
+        "version": "1.4.0",
+        "role": "oldest",
+        "published_at": "2025-09-15T06:46:34.408Z",
+        "age_hours": 9931
+      },
+      {
+        "path": "node_modules/@portkey-ai/gateway",
+        "name": "@portkey-ai/gateway",
+        "version": "1.14.0",
+        "role": "v",
+        "published_at": "2025-11-07T14:00:18.262Z",
+        "age_hours": 8651.8
+      },
+      {
+        "path": "node_modules/cluster-key-slot",
+        "name": "cluster-key-slot",
+        "version": "1.1.0",
+        "role": "oldest",
+        "published_at": "2019-07-18T09:32:37.646Z",
+        "age_hours": 63952.3
+      },
+      {
+        "path": "node_modules/debug",
+        "name": "debug",
+        "version": "4.3.4",
+        "role": "oldest",
+        "published_at": "2022-03-17T13:38:47.641Z",
+        "age_hours": 40596.2
+      },
+      {
+        "path": "node_modules/denque",
+        "name": "denque",
+        "version": "2.1.0",
+        "role": "oldest",
+        "published_at": "2022-07-18T10:14:29.117Z",
+        "age_hours": 37647.6
+      },
+      {
+        "path": "node_modules/ioredis",
+        "name": "ioredis",
+        "version": "5.8.0",
+        "role": "oldest",
+        "published_at": "2025-09-23T08:25:09.724Z",
+        "age_hours": 9737.4
+      },
+      {
+        "path": "node_modules/lodash.defaults",
+        "name": "lodash.defaults",
+        "version": "4.2.0",
+        "role": "oldest",
+        "published_at": "2016-08-13T17:37:52.434Z",
+        "age_hours": 89600.2
+      },
+      {
+        "path": "node_modules/lodash.isarguments",
+        "name": "lodash.isarguments",
+        "version": "3.1.0",
+        "role": "oldest",
+        "published_at": "2016-08-13T17:40:07.017Z",
+        "age_hours": 89600.1
+      },
+      {
+        "path": "node_modules/ms",
+        "name": "ms",
+        "version": "2.1.2",
+        "role": "oldest",
+        "published_at": "2019-06-06T17:31:55.859Z",
+        "age_hours": 64952.3
+      },
+      {
+        "path": "node_modules/redis-errors",
+        "name": "redis-errors",
+        "version": "1.2.0",
+        "role": "oldest",
+        "published_at": "2017-06-01T00:22:49.218Z",
+        "age_hours": 82609.4
+      },
+      {
+        "path": "node_modules/redis-parser",
+        "name": "redis-parser",
+        "version": "3.0.0",
+        "role": "oldest",
+        "published_at": "2017-05-25T18:52:28.462Z",
+        "age_hours": 82758.9
+      },
+      {
+        "path": "node_modules/standard-as-callback",
+        "name": "standard-as-callback",
+        "version": "2.1.0",
+        "role": "oldest",
+        "published_at": "2021-03-14T07:17:44.418Z",
+        "age_hours": 49434.5
+      }
+    ]
+  },
+  "not_oldest": [],
+  "pr_job_recheck": null,
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "@portkey-ai/gateway@1.14.0",
+      "version": "1.14.0",
+      "role": "v",
+      "published_at": "2025-11-07T14:00:18.262Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "ioredis@^5.8.0",
+      "version": "5.8.0",
+      "role": "oldest",
+      "published_at": "2025-09-23T08:25:09.724Z",
+      "excluded": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "debug@^4.3.4",
+      "version": "4.3.4",
+      "role": "oldest",
+      "published_at": "2022-03-17T13:38:47.641Z",
+      "excluded": {
+        "in_range": 8,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 1,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "denque@^2.1.0",
+      "version": "2.1.0",
+      "role": "oldest",
+      "published_at": "2022-07-18T10:14:29.117Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "redis-errors@^1.2.0",
+      "version": "1.2.0",
+      "role": "oldest",
+      "published_at": "2017-06-01T00:22:49.218Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "redis-parser@^3.0.0",
+      "version": "3.0.0",
+      "role": "oldest",
+      "published_at": "2017-05-25T18:52:28.462Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "lodash.defaults@^4.2.0",
+      "version": "4.2.0",
+      "role": "oldest",
+      "published_at": "2016-08-13T17:37:52.434Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "cluster-key-slot@^1.1.0",
+      "version": "1.1.0",
+      "role": "oldest",
+      "published_at": "2019-07-18T09:32:37.646Z",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@ioredis/commands@1.4.0",
+      "version": "1.4.0",
+      "role": "oldest",
+      "published_at": "2025-09-15T06:46:34.408Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "lodash.isarguments@^3.1.0",
+      "version": "3.1.0",
+      "role": "oldest",
+      "published_at": "2016-08-13T17:40:07.017Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "standard-as-callback@^2.1.0",
+      "version": "2.1.0",
+      "role": "oldest",
+      "published_at": "2021-03-14T07:17:44.418Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "ms@2.1.2",
+      "version": "2.1.2",
+      "role": "oldest",
+      "published_at": "2019-06-06T17:31:55.859Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "ws@^8.18.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 13,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 7
+      }
+    },
+    {
+      "requirement": "zod@^3.22.4",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 91,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 91
+      }
+    },
+    {
+      "requirement": "hono@^4.9.7",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 78,
+        "no_time": 0,
+        "after_t": 54,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 24
+      }
+    },
+    {
+      "requirement": "@hono/node-ws@^1.2.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 2,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "@hono/node-server@^1.3.3",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 63,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 62
+      }
+    },
+    {
+      "requirement": "tmp@^0.2.4",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 4,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 3
+      }
+    },
+    {
+      "requirement": "yaml@^2.2.2",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 25,
+        "no_time": 0,
+        "after_t": 4,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 21
+      }
+    },
+    {
+      "requirement": "picomatch@^2.3.1",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    }
+  ]
+}

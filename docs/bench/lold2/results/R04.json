@@ -1,0 +1,167 @@
+{
+  "id": "R04",
+  "package": "react-server-dom-webpack 19.1.1 -> 19.1.2",
+  "lold_outcome": "built",
+  "t": "2025-12-03T19:07:39.000Z",
+  "table_seconds": 6.166,
+  "table_requirements": 10,
+  "table_without_answer": [
+    {
+      "requirement": "webpack@^5.59.0",
+      "reason": "nothing is left in range: 114 in range, 29 published after T, 0 withdrawn, 0 deprecated, 85 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 114,
+        "no_time": 0,
+        "after_t": 29,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 85
+      }
+    }
+  ],
+  "moved_non_v": 3,
+  "path_moved": 3,
+  "path_added": 0,
+  "path_removed": 0,
+  "unneeded_moves": [],
+  "new_unmet": [],
+  "npm_ci_dry_run": 0,
+  "npm_ls_problems": 0,
+  "npm_install_again": 0,
+  "lock_unchanged": true,
+  "judge": "stop",
+  "refusal": "The judge stops the candidate: gate 2: react-server-dom-webpack@19.1.2 is deprecated: High Security Vulnerability in React Server Components",
+  "assert": {
+    "t": "2025-12-03T19:07:39.000Z",
+    "resolved_at": "2025-12-03T19:07:39.000Z",
+    "wait_hours": 24,
+    "youngest": "react-server-dom-webpack@19.1.2",
+    "wait_until": "2025-12-04T15:32:24.004Z",
+    "t_before_push_less_wait": true,
+    "waits": [],
+    "problems": [],
+    "versions": [
+      {
+        "path": "node_modules/react",
+        "name": "react",
+        "version": "19.2.0",
+        "role": "oldest",
+        "published_at": "2025-10-01T21:38:32.757Z",
+        "age_hours": 9532.1
+      },
+      {
+        "path": "node_modules/react-dom",
+        "name": "react-dom",
+        "version": "19.2.0",
+        "role": "oldest",
+        "published_at": "2025-10-01T21:38:42.388Z",
+        "age_hours": 9532.1
+      },
+      {
+        "path": "node_modules/react-server-dom-webpack",
+        "name": "react-server-dom-webpack",
+        "version": "19.1.2",
+        "role": "v",
+        "published_at": "2025-12-03T15:32:24.004Z",
+        "age_hours": 8026.2
+      },
+      {
+        "path": "node_modules/scheduler",
+        "name": "scheduler",
+        "version": "0.27.0",
+        "role": "oldest",
+        "published_at": "2025-10-01T21:39:15.208Z",
+        "age_hours": 9532.1
+      }
+    ]
+  },
+  "not_oldest": [],
+  "pr_job_recheck": null,
+  "outcome": "built",
+  "resolution_answers": [
+    {
+      "requirement": "react-server-dom-webpack@19.1.2",
+      "version": "19.1.2",
+      "role": "v",
+      "published_at": "2025-12-03T15:32:24.004Z",
+      "excluded": {
+        "in_range": 0,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "react@^19.1.2",
+      "version": "19.2.0",
+      "role": "oldest",
+      "published_at": "2025-10-01T21:38:32.757Z",
+      "excluded": {
+        "in_range": 21,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "react-dom@^19.1.2",
+      "version": "19.2.0",
+      "role": "oldest",
+      "published_at": "2025-10-01T21:38:42.388Z",
+      "excluded": {
+        "in_range": 21,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "scheduler@^0.27.0",
+      "version": "0.27.0",
+      "role": "oldest",
+      "published_at": "2025-10-01T21:39:15.208Z",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "react@^19.2.0",
+      "version": "19.2.0",
+      "role": "oldest",
+      "published_at": "2025-10-01T21:38:32.757Z",
+      "excluded": {
+        "in_range": 12,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 0
+      }
+    },
+    {
+      "requirement": "webpack@^5.59.0",
+      "version": null,
+      "role": null,
+      "published_at": null,
+      "excluded": {
+        "in_range": 114,
+        "no_time": 0,
+        "after_t": 29,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 85
+      }
+    }
+  ]
+}

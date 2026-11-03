@@ -1,0 +1,349 @@
+{
+  "total": 49,
+  "caught": 49,
+  "results": [
+    {
+      "what": "newest first instead of oldest",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-by-publish-time: the earliest published in range, not the lowest version number (recorded semver)",
+      "head": "e2ec262"
+    },
+    {
+      "what": "lowest version instead of earliest published",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-by-publish-time: the earliest published in range, not the lowest version number (recorded semver)",
+      "head": "e2ec262"
+    },
+    {
+      "what": "versions after T are taken",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-t-cuts: a version published after T is not taken; only V's same release is, and the time cap's rul",
+      "head": "e2ec262"
+    },
+    {
+      "what": "deprecated versions are taken",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-skips-deprecated-withdrawn: a deprecated version and one the registry no longer lists are passed o",
+      "head": "e2ec262"
+    },
+    {
+      "what": "withdrawn versions are not told apart",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-skips-deprecated-withdrawn: a deprecated version and one the registry no longer lists are passed o",
+      "head": "e2ec262"
+    },
+    {
+      "what": "OSV's records are ignored",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-vulnerable-next: an oldest version OSV names gives way to the next oldest",
+      "head": "e2ec262"
+    },
+    {
+      "what": "a withdrawn OSV record counts",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-withdrawn-record: a record OSV marks withdrawn does not count, and a MAL- record does",
+      "head": "e2ec262"
+    },
+    {
+      "what": "nothing left: the newest in range is taken",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-nothing-left: every version in range excluded gives no answer, and no newer or excluded version (r",
+      "head": "e2ec262"
+    },
+    {
+      "what": "locked versions do not come first",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-recorded-transitive: LOLD's braces fix, on the recorded packuments: fill-range moves to 7.1.1, the",
+      "head": "e2ec262"
+    },
+    {
+      "what": "V does not answer its own range",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-recorded-transitive: LOLD's braces fix, on the recorded packuments: fill-range moves to 7.1.1, the",
+      "head": "e2ec262"
+    },
+    {
+      "what": "anything after T counts as the same release",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-t-cuts: a version published after T is not taken; only V's same release is, and the time cap's rul",
+      "head": "e2ec262"
+    },
+    {
+      "what": "optional peers are required",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-walks: answers' own requirements, non-optional peers and aliases; not optional peers, Git or URL s",
+      "head": "e2ec262"
+    },
+    {
+      "what": "answers' own requirements are not walked",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-by-publish-time: the earliest published in range, not the lowest version number (recorded semver)",
+      "head": "e2ec262"
+    },
+    {
+      "what": "T ignores the advisory",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-recorded-transitive: LOLD's braces fix, on the recorded packuments: fill-range moves to 7.1.1, the",
+      "head": "e2ec262"
+    },
+    {
+      "what": "T takes the latest advisory",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "which version a requirement gets > oldest-t: T is the later of V's publish time and the earliest advisory of the fix; other advisories do no",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the age of a version is not checked",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the asserts on the diff as npm wrote it > assert-youngest-sets-the-line: each version's age is read, and the youngest decides when the fix m",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the oldest version sets the line",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the asserts on the diff as npm wrote it > assert-youngest-sets-the-line: each version's age is read, and the youngest decides when the fix m",
+      "head": "e2ec262"
+    },
+    {
+      "what": "a version the table did not give passes",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the asserts on the diff as npm wrote it > assert-landing-stops: a version the table did not give, one published after T, or one with no publ",
+      "head": "e2ec262"
+    },
+    {
+      "what": "a version after T passes the assert",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the asserts on the diff as npm wrote it > assert-landing-stops: a version the table did not give, one published after T, or one with no publ",
+      "head": "e2ec262"
+    },
+    {
+      "what": "no publish time passes the assert",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the asserts on the diff as npm wrote it > assert-landing-stops: a version the table did not give, one published after T, or one with no publ",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the resolution time is T alone",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the asserts on the diff as npm wrote it > assert-resolution-time: the resolution time is at most push − wait, and the literal comparison of ",
+      "head": "e2ec262"
+    },
+    {
+      "what": "a move needs no reason",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "a version already locked does not move while it satisfies the range > moves-unneeded: moving is refused when every package that loads the pa",
+      "head": "e2ec262"
+    },
+    {
+      "what": "a loader that cannot be read counts as a reason",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "a version already locked does not move while it satisfies the range > moves-unneeded: nothing at all loading it, a spec that is not a range,",
+      "head": "e2ec262"
+    },
+    {
+      "what": "a removal needs no reason",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "a version already locked does not move while it satisfies the range > moves-removed: a removal is allowed when all that loaded the path has ",
+      "head": "e2ec262"
+    },
+    {
+      "what": "another package at the path is a move",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "a version already locked does not move while it satisfies the range > moves-another-package: another package at the path is refused, whateve",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the script gives a question with no answer to npm",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the script in the resolver's container > script-no-answer: nothing allowed and a question the table does not hold fail that question, and ne",
+      "head": "e2ec262"
+    },
+    {
+      "what": "a stop is not counted",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the script in the resolver's container > script-table: the file holds versions and nulls only; the error text names the requirement, and the",
+      "head": "e2ec262"
+    },
+    {
+      "what": "patch does not stop on the landing assert",
+      "file": "dependency-patch.ts",
+      "caught": true,
+      "by": "npm fixes take the oldest version in range > patch-landing: a version npm wrote that the table did not give stops the fix before any test of",
+      "head": "e2ec262"
+    },
+    {
+      "what": "patch does not stop on the age assert",
+      "file": "dependency-patch.ts",
+      "caught": true,
+      "by": "npm fixes take the oldest version in range > patch-age-assert: the assert stops a fix on its own when the judge's later read says the wait i",
+      "head": "e2ec262"
+    },
+    {
+      "what": "patch does not check moves",
+      "file": "dependency-patch.ts",
+      "caught": true,
+      "by": "the smallest fix (docs/design.md) > stops when the candidate moves a package version that no planned fix replaces",
+      "head": "e2ec262"
+    },
+    {
+      "what": "patch gives npm no table",
+      "file": "dependency-patch.ts",
+      "caught": true,
+      "by": "npm fixes take the oldest version in range > patch-takes-oldest: the table goes to npm's container, helper moves to the oldest in range, and",
+      "head": "e2ec262"
+    },
+    {
+      "what": "npm's own install runs in place of the table's",
+      "file": "dependency-patch.ts",
+      "caught": true,
+      "by": "the smallest fix (docs/design.md) > resolves npm and Composer candidates for the planned packages only, never a blanket update",
+      "head": "e2ec262"
+    },
+    {
+      "what": "a failure's reason is not read from npm's error",
+      "file": "dependency-patch.ts",
+      "caught": true,
+      "by": "npm fixes take the oldest version in range > patch-nothing-left: npm's run fails on a requirement with nothing allowed, and the fix stops wi",
+      "head": "e2ec262"
+    },
+    {
+      "what": "patch does not hold versions to what loads them",
+      "file": "dependency-patch.ts",
+      "caught": true,
+      "by": "npm fixes take the oldest version in range > patch-answer-per-requirement: a version the table gives for another range of the name is no ans",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the PR job does not work the oldest out again",
+      "file": "deliver.ts",
+      "caught": true,
+      "by": "the PR job refuses an artifact the validation job would not write > pr-job-rechecks-moved-version-is-oldest: a forged artifact that moves a ",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the PR job takes a failed read as no problem",
+      "file": "deliver.ts",
+      "caught": true,
+      "by": "the PR job refuses an artifact the validation job would not write > pr-job-rechecks-moved-version-is-oldest: a forged artifact that moves a ",
+      "head": "e2ec262"
+    },
+    {
+      "what": "a version need only be some answer of its name",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "every new version is the answer for what loads it > not-oldest-reads-the-loader's-range: the answer for the range that loads it passes; a la",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the recheck stops at the first read of nothing new",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the PR job refuses an artifact the validation job would not write > pr-job-rechecks-moved-version-is-oldest: a forged artifact that moves a ",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the recheck finds nothing wrong",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the PR job refuses an artifact the validation job would not write > pr-job-rechecks-moved-version-is-oldest: a forged artifact that moves a ",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the recheck's advisories include what still names V",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "every new version is the answer for what loads it > not-oldest-t-from-osv: the PR job takes the fix's advisories from OSV, not from anything",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the PR job does not check moves",
+      "file": "deliver.ts",
+      "caught": true,
+      "by": "the policy at the base decides what a fix may change, and what it may say > Composer and Maven: the update goes up, and Composer's from is w",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the PR job takes moves nothing reaches",
+      "file": "deliver.ts",
+      "caught": true,
+      "by": "the policy at the base decides what a fix may change, and what it may say > Composer and Maven: the update goes up, and Composer's from is w",
+      "head": "e2ec262"
+    },
+    {
+      "what": "the PR job takes any other change as a move",
+      "file": "deliver.ts",
+      "caught": true,
+      "by": "the policy at the base decides what a fix may change, and what it may say > Composer and Maven: the update goes up, and Composer's from is w",
+      "head": "e2ec262"
+    },
+    {
+      "what": "a version locked elsewhere is not let through",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "every new version is the answer for what loads it > not-oldest-allows: V, a version the base locks, a path that did not change, an alias's t",
+      "head": "later than e2ec262"
+    },
+    {
+      "what": "V is not let through",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "the PR job refuses an artifact the validation job would not write > pr-job-rechecks-moved-version-is-oldest: a forged artifact that moves a ",
+      "head": "later than e2ec262"
+    },
+    {
+      "what": "a withdrawn advisory moves T in the recheck",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "two small cases of the PR job's check > not-oldest-withdrawn-record: an advisory OSV marks withdrawn does not move T",
+      "head": "later than e2ec262"
+    },
+    {
+      "what": "V is read by a plain lookup",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "two small cases of the PR job's check > not-oldest-package-named-constructor: a package named as an object's own property gets a reason, not",
+      "head": "later than e2ec262"
+    },
+    {
+      "what": "an added path is not held to it",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "every new version is the answer for what loads it > not-oldest-added: an added copy is held to it too, and one nothing loads is refused",
+      "head": "later than f7a22a9"
+    },
+    {
+      "what": "any version of the fix's package passes as V",
+      "file": "oldest.ts",
+      "caught": true,
+      "by": "two small cases of the PR job's check > not-oldest-v-version: only V's exact version passes as V; another version of the fix's package is he",
+      "head": "later than f7a22a9"
+    }
+  ]
+}

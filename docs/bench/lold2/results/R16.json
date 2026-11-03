@@ -1,0 +1,181 @@
+{
+  "id": "R16",
+  "package": "mcp-server-kubernetes 2.9.7 -> 2.9.8",
+  "lold_outcome": "stopped_no_allowed",
+  "t": "2025-12-03T20:44:45.000Z",
+  "table_seconds": 22.546,
+  "table_requirements": 107,
+  "table_without_answer": [
+    {
+      "requirement": "zod@3.23.8",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "yaml@2.7.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "js-yaml@4.1.1",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "@modelcontextprotocol/sdk@1.17.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "qs@6.13.0",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "proxy-addr@~2.0.7",
+      "reason": "nothing is left in range: 2 in range, 1 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 2,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "body-parser@1.20.3",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "path-to-regexp@0.1.12",
+      "reason": "nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 1,
+        "no_time": 0,
+        "after_t": 0,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 1
+      }
+    },
+    {
+      "requirement": "ws@^8.18.2",
+      "reason": "nothing is left in range: 11 in range, 6 published after T, 0 withdrawn, 0 deprecated, 5 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 11,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 5
+      }
+    },
+    {
+      "requirement": "js-yaml@^4.1.0",
+      "reason": "nothing is left in range: 6 in range, 1 published after T, 0 withdrawn, 0 deprecated, 5 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 6,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 5
+      }
+    },
+    {
+      "requirement": "form-data@^4.0.0",
+      "reason": "nothing is left in range: 7 in range, 1 published after T, 0 withdrawn, 0 deprecated, 6 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 7,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 6
+      }
+    },
+    {
+      "requirement": "ws@*",
+      "reason": "nothing is left in range: 185 in range, 15 published after T, 2 withdrawn, 0 deprecated, 168 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 185,
+        "no_time": 0,
+        "after_t": 15,
+        "withdrawn": 2,
+        "deprecated": 0,
+        "advisory": 168
+      }
+    },
+    {
+      "requirement": "form-data@^4.0.4",
+      "reason": "nothing is left in range: 3 in range, 1 published after T, 0 withdrawn, 0 deprecated, 2 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 3,
+        "no_time": 0,
+        "after_t": 1,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 2
+      }
+    },
+    {
+      "requirement": "ip-address@^10.0.1",
+      "reason": "nothing is left in range: 18 in range, 6 published after T, 0 withdrawn, 0 deprecated, 12 named by OSV, 0 with no publish time",
+      "excluded": {
+        "in_range": 18,
+        "no_time": 0,
+        "after_t": 6,
+        "withdrawn": 0,
+        "deprecated": 0,
+        "advisory": 12
+      }
+    }
+  ],
+  "outcome": "stopped_no_allowed",
+  "no_answer": "js-yaml@4.1.1",
+  "reason": "No allowed version for js-yaml@4.1.1: nothing is left in range: 1 in range, 0 published after T, 0 withdrawn, 0 deprecated, 1 named by OSV, 0 with no publish time. This fix stops: no newer or excluded version is taken."
+}

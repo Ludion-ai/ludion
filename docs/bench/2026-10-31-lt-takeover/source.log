@@ -1,0 +1,44 @@
+2026-10-30T16:40:43.163Z source 1/44 @ui-ux-gang/devextreme-rpk 24.1.6 -> 24.1.7 DevExpress/DevExtreme: not comparable (previous commit: package directory not found)
+2026-10-30T16:40:48.957Z source 2/44 devextreme-rpk 21.2.7 -> 21.2.8 DevExpress/DevExtreme: not comparable (previous commit: package directory not found)
+2026-10-30T16:40:49.791Z source 3/44 @asyncapi/avro-schema-parser 3.0.24 -> 3.0.25 asyncapi/avro-schema-parser: none
+2026-10-30T16:40:50.736Z source 4/44 @asyncapi/openapi-schema-parser 3.0.24 -> 3.0.25 asyncapi/openapi-schema-parser: none
+2026-10-30T16:40:51.649Z source 5/44 @asyncapi/bundler 0.6.4 -> 0.6.5 asyncapi/bundler: none
+2026-10-30T16:40:51.942Z source 6/44 @asyncapi/generator-components 0.3.1 -> 0.3.2 asyncapi/generator: not comparable (previous commit: directory not in source)
+2026-10-30T16:40:52.335Z source 7/44 create-glee-app 0.2.1 -> 0.2.2 asyncapi-archived-repos/glee: not comparable (previous commit: package directory not found)
+2026-10-30T16:40:52.965Z source 8/44 @asyncapi/protobuf-schema-parser 3.6.0 -> 3.6.1 asyncapi/protobuf-schema-parser: none
+2026-10-30T16:40:54.360Z source 9/44 go-template 0.1.7 -> 0.1.8 asyncapi-archived-repos/go-watermill-template: not comparable (version commit: package directory not found)
+2026-10-30T16:40:55.604Z source 10/44 @asyncapi/optimizer 1.0.4 -> 1.0.5 asyncapi/optimizer: none
+2026-10-30T16:40:57.280Z source 11/44 @asyncapi/markdown-template 1.6.7 -> 1.6.8 asyncapi/markdown-template: none
+2026-10-30T16:40:57.841Z source 12/44 @asyncapi/generator-react-sdk 1.1.3 -> 1.1.4 asyncapi/generator: not comparable (previous commit: package directory not found)
+2026-10-30T16:40:59.692Z source 13/44 asyncapi-preview 1.0.0 -> 1.0.1 asyncapi/vs-asyncapi-preview: none
+2026-10-30T16:41:00.991Z source 14/44 @asyncapi/html-template 3.3.1 -> 3.3.2 asyncapi/html-template: none
+2026-10-30T16:41:01.847Z source 15/44 @asyncapi/avro-schema-parser 3.0.24 -> 3.0.26 asyncapi/avro-schema-parser: new capability in the source [api:fetch]
+2026-10-30T16:41:02.115Z source 16/44 @asyncapi/generator-components 0.3.1 -> 0.3.3 asyncapi/generator: not comparable (previous commit: directory not in source)
+2026-10-30T16:41:02.717Z source 17/44 go-template 0.1.7 -> 0.1.9 asyncapi-archived-repos/go-watermill-template: not comparable (version commit: package directory not found)
+2026-10-30T16:41:03.004Z source 18/44 @asyncapi/generator-react-sdk 1.1.3 -> 1.1.5 asyncapi/generator: not comparable (previous commit: package directory not found)
+2026-10-30T16:41:03.006Z source 19/44 @posthog/siphash 1.1.1 -> 1.1.2 PostHog/siphash-js: not comparable (no release for the previous version)
+2026-10-30T16:41:03.291Z source 20/44 @posthog/nextjs-config 1.4.0 -> 1.5.1 PostHog/posthog-js: not comparable (previous commit: directory not in source)
+2026-10-30T16:41:03.609Z source 21/44 @actbase/css-to-react-native-transform 1.0.2 -> 1.0.3 actbase/css-to-react-native-transform: not comparable (previous commit: package directory not found)
+2026-10-30T16:41:04.308Z source 22/44 @postman/tunnel-agent 0.6.4 -> 0.6.5 postmanlabs/tunnel-agent: none
+2026-10-30T16:41:04.888Z source 23/44 @postman/tunnel-agent 0.6.4 -> 0.6.6 postmanlabs/tunnel-agent: none
+2026-10-30T16:41:05.404Z source 24/44 @postman/tunnel-agent 0.6.4 -> 0.6.7 postmanlabs/tunnel-agent: none
+2026-10-30T16:41:07.081Z source 25/44 zapier-platform-legacy-scripting-runner 4.0.1 -> 4.0.2 zapier/zapier-platform: none
+2026-10-30T16:41:08.499Z source 26/44 zapier-platform-schema 18.0.1 -> 18.0.2 zapier/zapier-platform: none
+2026-10-30T16:41:10.012Z source 27/44 zapier-platform-core 18.0.1 -> 18.0.2 zapier/zapier-platform: none
+2026-10-30T16:41:11.113Z source 28/44 zapier-platform-cli 18.0.1 -> 18.0.2 zapier/zapier-platform: new capability in the source [new-dependency]
+2026-10-30T16:41:12.202Z source 29/44 zapier-platform-core 18.0.1 -> 18.0.3 zapier/zapier-platform: none
+2026-10-30T16:41:14.365Z source 30/44 zapier-platform-schema 18.0.1 -> 18.0.3 zapier/zapier-platform: none
+2026-10-30T16:41:15.701Z source 31/44 zapier-platform-cli 18.0.1 -> 18.0.3 zapier/zapier-platform: new capability in the source [new-dependency]
+2026-10-30T16:41:17.141Z source 32/44 zapier-platform-core 18.0.1 -> 18.0.4 zapier/zapier-platform: none
+2026-10-30T16:41:18.454Z source 33/44 zapier-platform-schema 18.0.1 -> 18.0.4 zapier/zapier-platform: none
+2026-10-30T16:41:19.630Z source 34/44 zapier-platform-cli 18.0.1 -> 18.0.4 zapier/zapier-platform: new capability in the source [new-dependency]
+2026-10-30T16:41:20.136Z source 35/44 typeorm-orbit 0.2.26 -> 0.2.27 typeorm/typeorm: not comparable (previous commit: package directory not found)
+2026-10-30T16:41:20.138Z source 36/44 wellness-expert-ng-gallery 5.1.0 -> 5.1.1 MurhafSousli/ngx-gallery: not comparable (no release for the previous version)
+2026-10-30T16:41:20.139Z source 37/44 @accordproject/markdown-it-cicero 0.16.20-20241108141903 -> 0.16.26 accordproject/markdown-transform: not comparable (no release for the previous version)
+2026-10-30T16:41:21.084Z source 38/44 @accordproject/template-engine 2.7.1 -> 2.7.2 accordproject/template-engine: none
+2026-10-30T16:41:21.408Z source 39/44 @voiceflow/anthropic 0.4.3 -> 0.4.4 anthropics/anthropic-sdk-typescript: not comparable (previous commit: package directory not found)
+2026-10-30T16:41:21.697Z source 40/44 @jayeshsadhwani/telemetry-sdk 1.0.13 -> 1.0.14 DrDroidLab/telemetry-sdk: not comparable (previous commit: package directory not found)
+2026-10-30T16:41:22.264Z source 41/44 @hyperlook/telemetry-sdk 1.0.18 -> 1.0.19 DrDroidLab/telemetry-sdk: none
+2026-10-30T16:41:22.628Z source 42/44 uniswap-test-sdk-core 4.0.7 -> 4.0.8 Uniswap/sdk-core: not comparable (previous commit: package directory not found)
+2026-10-30T16:41:22.949Z source 43/44 buffered-interpolation-babylon6 0.2.7 -> 0.2.8 frame-xr/buffered-interpolation: not comparable (previous commit: package directory not found)
+2026-10-30T16:41:23.257Z source 44/44 @asyncapi/generator-helpers 1.1.0 -> 1.1.1 asyncapi/generator: not comparable (previous commit: directory not in source)

@@ -24,7 +24,7 @@
     "@types/pngjs": "^6.0.5",
     "pngjs": "^7.0.0",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.12",
+    "vitest": "^5.0.5",
     "wrangler": "^4.148.0"
   },
   "overrides": {

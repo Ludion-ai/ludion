@@ -1,0 +1,174 @@
+
+Running 57 tests using 2 workers
+
+  ✓   2 [chromium] › e2e/a11y.spec.ts:15:5 › dark theme › axe finds no violations on any page (4.7s)
+  ✓   1 [chromium] › e2e/a11y.spec.ts:15:5 › light theme › axe finds no violations on any page (4.8s)
+  ✓   4 [chromium] › e2e/a11y.spec.ts:46:1 › every page names its public URL as canonical (2.4s)
+  ✓   5 [chromium] › e2e/home-mobile.spec.ts:40:1 › a phone does not scroll sideways and keeps reachable controls (1.6s)
+  ✓   6 [chromium] › e2e/home-mobile.spec.ts:59:1 › 200 percent text keeps the design on the phone (1.2s)
+  ✓   3 [chromium] › e2e/a11y.spec.ts:31:1 › no page scrolls sideways, from 320 px up (WCAG 1.4.10, reflow) (6.3s)
+  ✓   8 [chromium] › e2e/home.spec.ts:25:1 › the security workflow stays in the page without JavaScript (709ms)
+  ✓   7 [chromium] › e2e/home.spec.ts:6:1 › the home page describes security updates and clearly limits production claims (2.7s)
+  ✓   9 [chromium] › e2e/home.spec.ts:39:1 › changing reduced motion stops and resumes the wave without reloading (12.3s)
+  ✓  10 [chromium] › e2e/home.spec.ts:60:1 › home opens on the visual scene and scrolls to the guard (11.8s)
+  ✓  12 [chromium] › e2e/ja.spec.ts:71:3 › / is not redirected by the browser's language (15ms)
+  ✓  13 [chromium] › e2e/ja.spec.ts:77:3 › /ja/ is not redirected by the browser's language (11ms)
+  ✓  11 [chromium] › e2e/ja.spec.ts:44:3 › / and /ja/ name each other, and each links to the other (6.9s)
+  ✓  15 [chromium] › e2e/ja.spec.ts:71:3 › /start/ is not redirected by the browser's language (86ms)
+  ✓  16 [chromium] › e2e/ja.spec.ts:77:3 › /ja/start/ is not redirected by the browser's language (9ms)
+  ✓  17 [chromium] › e2e/ja.spec.ts:84:1 › the 404 page has no language link or hreflang (309ms)
+  ✓  14 [chromium] › e2e/ja.spec.ts:44:3 › /start/ and /ja/start/ name each other, and each links to the other (7.3s)
+  ✓  19 [chromium] › e2e/ja.spec.ts:112:1 › the Japanese home page keeps its content without JavaScript (214ms)
+  ✓  20 [chromium] › e2e/ja.spec.ts:125:1 › the Japanese home page works by keyboard (1.9s)
+  ✓  18 [chromium] › e2e/ja.spec.ts:90:1 › the Japanese home page carries the same workflow and limits, with its links kept in Japanese (3.4s)
+  ✓  21 [chromium] › e2e/ja.spec.ts:147:1 › the Japanese home page's motion follows reduced motion (1.3s)
+  ✓  23 [chromium] › e2e/ja.spec.ts:189:1 › Japanese text breaks by phrase and by the strict rules, in the device's font (2.9s)
+  ✓  22 [chromium] › e2e/ja.spec.ts:156:1 › the Japanese setup page keeps the commands, copies them, and opens each step by keyboard (4.6s)
+  ✓  25 [chromium] › e2e/redirects.spec.ts:9:3 › /lessons/ redirects to /start/ (11ms)
+  ✓  26 [chromium] › e2e/redirects.spec.ts:9:3 › /lessons/01M4N4KZ0QT41TY27SW0E683RX redirects to /start/ (6ms)
+  ✓  27 [chromium] › e2e/redirects.spec.ts:9:3 › /teachers/ludion-ai/ redirects to /start/ (5ms)
+  ✓  28 [chromium] › e2e/redirects.spec.ts:9:3 › /bench/ redirects to / (57ms)
+  ✓  29 [chromium] › e2e/redirects.spec.ts:9:3 › /bench/method/ redirects to / (6ms)
+  ✓  30 [chromium] › e2e/redirects.spec.ts:9:3 › /bench.json redirects to / (5ms)
+  ✓  31 [chromium] › e2e/redirects.spec.ts:9:3 › /models redirects to / (5ms)
+  ✓  32 [chromium] › e2e/redirects.spec.ts:9:3 › /vitest/ redirects to /start/ (4ms)
+  ✓  33 [chromium] › e2e/redirects.spec.ts:9:3 › /vitest redirects to /start/ (11ms)
+  ✓  34 [chromium] › e2e/redirects.spec.ts:9:3 › /agents/ redirects to /start/ (4ms)
+  ✓  35 [chromium] › e2e/redirects.spec.ts:9:3 › /wrangler redirects to /start/ (4ms)
+  ✓  36 [chromium] › e2e/redirects.spec.ts:9:3 › /python/ redirects to /start/ (4ms)
+  ✓  37 [chromium] › e2e/redirects.spec.ts:18:1 › the ended 0.1.x lesson and MCP endpoints answer 410 with the reason (26ms)
+  ✓  38 [chromium] › e2e/redirects.spec.ts:27:1 › /@ludion-ai redirects to setup (15ms)
+  -  39 [chromium] › e2e/screenshots.spec.ts:20:1 › capture actual pages at mobile and desktop widths in both themes
+  ✓  24 [chromium] › e2e/ja.spec.ts:211:3 › on a phone › the Japanese pages keep reachable controls at 320 px, also at 200 percent text (2.7s)
+  -  41 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/, light)
+  -  42 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/, dark)
+  -  43 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/start/, light)
+  -  44 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/start/, dark)
+  -  45 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/ja/, light)
+  -  46 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/ja/, dark)
+  -  47 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/ja/start/, light)
+  -  48 [chromium] › e2e/water-full.spec.ts:42:5 › every moment of the water (/ja/start/, dark)
+  ✓  40 [chromium] › e2e/start.spec.ts:3:1 › security setup explains preview scope, copies the scan command, and makes apply opt-in (5.8s)
+Worst contrast over the water (/, light), lowest first:
+  span.focus-bracket 2: 5.51 (needs 4.5)
+  p: 6.19 (needs 4.5)
+  span.file: 6.41 (needs 4.5)
+  span.flow-arrow: 6.52 (needs 4.5)
+  span.focus-bracket: 6.69 (needs 4.5)
+  p.scene-caption: 6.69 (needs 4.5)
+  a.scroll-cue: 6.69 (needs 4.5)
+  span 4: 6.69 (needs 4.5)
+  ✓  49 [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/, light) (13.7s)
+Worst contrast over the water (/, dark), lowest first:
+  span.focus-bracket 2: 5.09 (needs 4.5)
+  span.file: 7.65 (needs 4.5)
+  p: 7.70 (needs 4.5)
+  span.flow-arrow: 7.70 (needs 4.5)
+  span.focus-bracket: 7.79 (needs 4.5)
+  p.scene-caption: 7.84 (needs 4.5)
+  a.scroll-cue: 7.84 (needs 4.5)
+  span 4: 7.84 (needs 4.5)
+  ✓  50 [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/, dark) (12.3s)
+  ✘  51 [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/start/, light) (6.3s)
+Worst contrast over the water (/start/, dark), lowest first:
+  p.where: 7.48 (needs 4.5)
+  span.step-detail: 7.48 (needs 4.5)
+  p.intro: 7.52 (needs 4.5)
+  span.step-detail 2: 7.56 (needs 4.5)
+  span.step-detail 3: 7.65 (needs 4.5)
+  p.wiring: 7.70 (needs 4.5)
+  p.coverage: 7.74 (needs 4.5)
+  h2 2: 7.84 (needs 4.5)
+  ✓  52 [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/start/, dark) (6.4s)
+  ✘  53 [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/ja/, light) (11.4s)
+Worst contrast over the water (/ja/, dark), lowest first:
+  span.focus-bracket 2: 5.09 (needs 4.5)
+  p: 7.70 (needs 4.5)
+  span.flow-arrow: 7.70 (needs 4.5)
+  span.file: 7.70 (needs 4.5)
+  span.focus-bracket: 7.84 (needs 4.5)
+  p.scene-caption: 7.84 (needs 4.5)
+  a.scroll-cue: 7.84 (needs 4.5)
+  span 4: 7.84 (needs 4.5)
+  ✓  54 [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/ja/, dark) (11.6s)
+  ✘  55 [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/ja/start/, light) (6.4s)
+Home JavaScript: 6 file(s), 32.1 KB gzipped
+  ✓  57 [chromium] › e2e/water.spec.ts:75:1 › the home page's JavaScript stays within 60 KB gzipped (902ms)
+Worst contrast over the water (/ja/start/, dark), lowest first:
+  p.where: 7.48 (needs 4.5)
+  span.step-detail: 7.48 (needs 4.5)
+  p.intro: 7.52 (needs 4.5)
+  span.step-detail 2: 7.56 (needs 4.5)
+  p.wiring: 7.70 (needs 4.5)
+  span.step-detail 3: 7.70 (needs 4.5)
+  p.coverage: 7.74 (needs 4.5)
+  h2 2: 7.84 (needs 4.5)
+  ✓  56 [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/ja/start/, dark) (6.0s)
+
+
+  1) [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/start/, light) ─
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      61 |       }
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass.
+    > 63 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      64 |
+      65 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      66 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:63:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-start-light--chromium/error-context.md
+
+  2) [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/ja/, light) ────
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      61 |       }
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass.
+    > 63 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      64 |
+      65 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      66 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:63:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-ja-light--chromium/error-context.md
+
+  3) [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/ja/start/, light) 
+
+    Error: the water moved between moments
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1
+    Received:   1
+
+      61 |       }
+      62 |       // A paused clock that stopped reaching the water would show one frame again and again, and still pass.
+    > 63 |       expect(frames.size, "the water moved between moments").toBeGreaterThan(1);
+         |                                                              ^
+      64 |
+      65 |       const report = boxes.map((b) => `${b.name}: ${worst.get(b.name)!.toFixed(2)} (needs ${thresholdOf(b)})`);
+      66 |       const lowest = [...report].sort((x, y) => parseFloat(x.split(": ")[1]!) - parseFloat(y.split(": ")[1]!)).slice(0, 8);
+        at /w/e2e/water.spec.ts:63:62
+
+    Error Context: test-results/water-text-over-the-water-keeps-its-contrast-ja-start-light--chromium/error-context.md
+
+  3 failed
+    [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/start/, light) ──
+    [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/ja/, light) ─────
+    [chromium] › e2e/water.spec.ts:11:5 › text over the water keeps its contrast (/ja/start/, light) 
+  9 skipped
+  45 passed (1.4m)
